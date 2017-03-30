@@ -1,0 +1,39 @@
+Description: 		
+(DELETE THIS LINE)	What the changes represent and why they were done.
+(DELETE THIS LINE)	(Remember CVS already logs your login, the date, 
+(DELETE THIS LINE)	the exact differences, and the files changed)
+
+Update (merging):
+
+(DELETE THIS LINE) VITAL -- read the following and the web-page!!!
+(DELETE THIS LINE)
+(DELETE THIS LINE) The developer needs to be careful when codes
+(DELETE THIS LINE) are updated.  Sometimes, bugs can creep back
+(DELETE THIS LINE) in unless the merging is carefully watched.
+(DELETE THIS LINE) This is true irregardless of the merging
+(DELETE THIS LINE) alogrithm -- even by hand.  Using CVS update as a 
+(DELETE THIS LINE) tool helps make the merge less painful and 
+(DELETE THIS LINE) time-consuming, but the developer still needs
+(DELETE THIS LINE) to exersize caution.  This is especially true when
+(DELETE THIS LINE) CVS points out a conflict.
+
+
+(DELETE THIS LINE) The recommended procedure before doing a update.
+(DELETE THIS LINE) is on the web page at
+(DELETE THIS LINE) http://www.cgd.ucar.edu/~ccm/cvs/update.shtml
+
+Did you follow the recommended procedure?
+Or address the issue's in your own way?
+
+Testing done?  	
+(DELETE THIS LINE)	We assume this version will at least compile 
+(DELETE THIS LINE)	link and run on at least one machine
+(DELETE THIS LINE)	(typically a IBM such as babyblue if at NCAR).  
+(DELETE THIS LINE)   You should also design your testing to address the types
+(DELETE THIS LINE)	of problems that might incur due to the
+(DELETE THIS LINE)	particular code changes you implemented.
+(DELETE THIS LINE)	Describe your tests and list the machine
+(DELETE THIS LINE)	or even compiler and OS's you tested on if
+(DELETE THIS LINE)	you want to be the most complete. In general you 
+(DELETE THIS LINE)   should be using "test-model.pl" for some of your testing.
+Machine(s) tested:

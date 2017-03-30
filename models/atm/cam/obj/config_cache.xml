@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+
+<config_bld>
+
+<comment>
+This is a configuration file for building CAM.  It is the file format
+produced by the configure script to store a build configuration.  It
+may also be read by the configure script (via setting the -defaults
+option) to provide a default build configuration.
+
+This file may be edited by hand to quickly customize a configuration.  If
+hand editing is done it should be recognized that XML parser used to read
+this file is not able to check the file for valid syntax.  Also, the
+current parser places some restrictions on the normally valid XML syntax:
+1. Attribute values must be enclosed in DOUBLE QUOTED STRINGS!!!
+</comment>
+
+<comment>
+cam_bld    CAM build directory, contains .o and .mod files
+cam_exedir Directory where CAM executable will be created
+cam_root   Root directory of CAM distribution
+esmf_bld   Build directory for ESMF, only needed if ESMF lib will be built
+esmf_root  Root directory of ESMF distribution, only needed if ESMF lib will be built
+usr_src    User source directories to prepend to the filepath.  Multiple directories
+           are specified as a comma separated list with no embedded white space.
+</comment>
+
+<directories
+cam_bld="/Users/mark/mmf/cam3_sp/models/atm/cam/obj"
+cam_exedir="/Users/mark/mmf/cam3_sp/models/atm/cam/run"
+cam_root="/Users/mark/mmf/cam3_sp"
+esmf_bld="/Users/mark/mmf/cam3_sp/models/atm/cam/obj/esmf"
+esmf_root="/Users/mark/mmf/cam3_sp/models/utils/esmf"
+usr_src=""
+/>
+
+<comment>
+dyn    Dynamics package: eul, sld, or fv
+phys   Physics package: cam1 or ccm366
+lnd    Land model: clm2 or lsm.  Currently this value depends on the
+       phys value as follows:  cam1 => clm2, ccm366 => lsm.
+ocn    Use SST data or slab ocean model: dom or som
+sice   Sea ice package: csim4 or ccmice
+pergro Use modifications that allow perturbation growth testing
+           0 => no, 1 => yes
+</comment>
+
+<packages
+dyn="sld"
+phys="cam1"
+lnd="clm2"
+ocn="dom"
+sice="csim4"
+pergro="0"
+/>
+
+<comment>
+res     Horizontal grid resolution.  Spectral dycores use Gaussian grids are specified
+        by nlat x nlon.  The finite volume dycore uses an equally spaced grid that includes
+        pole points and is specified as lat_cell_size x lon_cell_size in degrees.
+nlon    Number of longitude grid points
+nlat    Number of latitude grid points
+nlev    Number of vertical levels
+nadv    Number of advected constituents
+nnadv   Number of non-advected constituents
+trm     Maximum Fourier wavenumber
+trn     Highest degree of the Legendre polynomials for m=0
+trk     Highest degree of the associated Legendre polynomials
+pcols   Maximum number of columns in a chunk
+twod_yz Switch to enable or disable use of 2D Y-Z parallel decomposition 
+        (only used for FV dynamics)
+</comment>
+
+<resolution
+res="64x128"
+nlon="128"
+nlat="64"
+nlev="30"
+nadv="3"
+nnadv="0"
+trm="63"
+trn="63"
+trk="63"
+pcols="8"
+twod_yz="0"
+/>
+
+<comment>
+cam_exe    Name of CAM executable
+cc         User specified C compiler overrides Makefile default.
+cflags     User specified C compiler options to append to Makefile defaults.
+fc         User specified Fortran compiler overrides Makefile default.
+debug      Switch to enable debugging options for Fortran compiler.
+fflags     User specified Fortran compiler options to append to Makefile defaults.
+ldflags    User specified ld options to append to Makefile defaults.
+spmd       Switch to enable or disable building SPMD version of CAM.
+smp        Switch to enable or disable building SMP version of CAM.
+nc_inc     Directory containing NetCDF include files.
+nc_lib     Directory containing NetCDF library.
+nc_mod     Directory containing NetCDF module files.
+mpi_inc    Directory containing MPI include files.
+mpi_lib    Directory containing MPI library.
+</comment>
+
+<makefile
+cam_exe="cam"
+cc=""
+cflags=""
+fc=""
+debug="0"
+fflags=""
+ldflags=""
+spmd="0"
+smp="0"
+nc_inc="/usr/local/absoft/include"
+nc_lib="/usr/local/absoft/lib"
+nc_mod=""
+mpi_inc=""
+mpi_lib=""
+/>
+
+</config_bld>

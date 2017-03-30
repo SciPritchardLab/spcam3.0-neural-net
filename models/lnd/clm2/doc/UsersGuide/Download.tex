@@ -1,0 +1,118 @@
+\section{Obtaining the Source Code and Datasets}
+
+The source code and datasets required to run the Community Land Model
+version 2.1 (CLM2.1) in offline mode (uncoupled from other components
+of the Community Climate System Model version 2 (CCSM2.0.1)) can be
+obtained via the web from:
+
+\bigskip
+{\bf http://www.cgd.ucar.edu/tss/clm}.
+\bigskip
+
+The user should refer to the CAM2.0 User's Guide or the CCSM2.0.1 General
+Documentation for instructions on obtaining code and datasets to run CLM2.1
+coupled to other CCSM2.0.1 components.
+
+It is assumed that the user has access to the utilities {\bf tar},
+Free Software Foundation {\bf gunzip} and {\bf gmake (GNU gmake)}.
+
+The CLM2.1 distribution consists of two tar files:
+
+\bigskip
+{\bf CLM2.1\_code.tar.gz}
+\bigskip
+
+and
+
+\bigskip
+{\bf CLM2.1\_inputdata.tar.gz}.
+\bigskip
+
+The file CLM2.1\_code.tar.gz contains code, documentation, and
+scripts. This file must first be uncompressed with the {\bf gunzip}
+utility and then "untarred" as follows:
+
+\bigskip
+gunzip -c CLM2.1\_code.tar.gz | tar xvf -
+\bigskip
+
+The above command both uncompresses and "untars" the code into a {\bf clm2/}
+subdirectory. The directory hierarchy for "{\bf clm2/}" is as follows:
+
+\bigskip
+
+\begin{longtable}{|p{1.5in}|p{4.5in}|}
+\caption{\label{source_directory} Source Code Directory Structure} \\
+\hline
+\endhead
+\hline
+\multicolumn{1}{|c|}{\bf Directory Name} & 
+\multicolumn{1}{|c|}{\bf Description}  \\ \hline 
+{\bf src/}           &   Directory of FORTRAN and "C" source code \\ \hline
+src/biogeophys/      &   Biogeophysics routines (e.g., surface fluxes) \\ \hline
+src/camclm\_share/   &   Code shared between the CLM2 and CAM (e.g., calendar information) \\ \hline
+src/csm\_share/      &   Code shared by all the geophysical model components of the Community \\
+                     &   Climate System Model (CCSM). Currently contains code for CCSM \\
+                     &   message passing orbital calculations, and system utilities. \\ \hline
+src/ecosysdyn/       &   Ecosystem dynamics routines (e.g., leaf and stem area index) \\ \hline
+src/main/            &   Control (driver) routines \\ \hline
+src/mksrfdata/       &   Routines for generating surface datasets \\ \hline
+src/riverroute/      &   River routing (RTM) routines \\ \hline
+src/utils/           &   Independent utility routines \\ \hline
+src/utils/esmf/      &   Earth System Modeling Framework utilities \\ \hline
+src/utils/timing/    &   General purpose timing library \\ \hline
+{\bf bld/}           &   Directory of build, test and run scripts \\ \hline        
+bld/offline/         &   Script to build and execute the model on various platforms\\ \hline
+bld/offline/tests    &   Perl scripts for model development testing   \\ \hline
+{\bf doc/}           &   model documentation \\ \hline
+{\bf tools/}         &   Directory of tools for input dataset manipulation \\ \hline
+tools/convert\_ascii/ &   Routines for converting user-generated ascii surface dataset files to netCDF format suitable for use by the model (this tool is used independent of running the model) \\ \hline
+tools/cprlndnc/      &   Produces executable that compares model netCDF history files (this tool is used independent of running the model) \\ \hline
+tools/convert\_init   &   Tool for converting CLM2.0 initial datasets to CLM2.1 form. \\ \hline
+\end{longtable}
+
+\bigskip
+The file CLM2.1\_inputdata.tar.gz contains surface and offline
+atmospheric forcing datasets. This file must first be uncompressed
+with the {\bf gunzip} utility and then "untarred" as follows:
+\bigskip
+
+	gunzip -c CLM2.1\_inputdata.tar.gz | tar xvf -
+
+\bigskip
+The above command results in a directory hierarchy containing {\bf
+inputdata/lnd/clm2/} as the root.  This directory hierarchy is
+outlined below.
+\bigskip
+
+\begin{longtable}{|p{1.5in}|p{4.5in}|}
+\caption{\label{inputdata_directory} Input Data Directory Structure} \\
+\hline
+\endhead
+\hline
+\multicolumn{1}{|c|}{\bf Directory Name} & 
+\multicolumn{1}{|c|}{\bf Synopsis}  \\ \hline 
+{\bf NCEPDATA/}        & One year's worth of atmospheric forcing variables
+                         in monthly netCDF format suitable for running the model
+                         in offline mode (uncoupled from the atmospheric model)  \\ \hline
+{\bf inidata\_2.1/}    & Directory hierarchy containing netCDF CLM2.1 initial datasets \\ \hline
+{\bf inidata\_2.1/cam} & Initial datasets for initializing CLM2.1 from a spun-up state when
+                         running in cam mode (can also be used when running in offline mode) \\ \hline
+{\bf inidata\_2.1/ccsm}& Initial datasets for initializing CLM2.1 from a spun-up state when
+                         running in ccsm mode (can also be used when running in offline mode) \\ \hline
+{\bf inidata\_2.1/offline} & initial datasets for initializing CLM2.1 from a spun-up state when
+                             running in offline mode \\ \hline
+{\bf pftdata/}         & Plant functional type (PFT) physiological constants
+                         dataset (ascii format) \\ \hline
+{\bf rawdata/}         & "Raw" (highest provided resolution) datasets (netCDF format) \\ 
+                       & (used by CLM2.1 to generate surface datasets at model resolution) \\ \hline 
+{\bf rtmdata/}         & River direction map for RTM in ascii format \\ \hline
+{\bf srfdata/}         & Directory hierarchy containing netCDF CLM2.1 surface datasets \\ \hline
+{\bf srfdata/cam}      & Surface datasets for running CLM2.1 in cam mode \\ 
+                       & (can also be used when running in offline mode) \\ \hline
+{\bf srfdata/csm}      & Surface datasets for running CLM2.1 in ccsm mode \\ 
+                       & (can also be used when running in offline mode) \\ \hline
+{\bf srfdata/offline}  & Surface datasets for running CLM2.1 in offline mode \\ \hline
+\end{longtable}
+
+\bigskip

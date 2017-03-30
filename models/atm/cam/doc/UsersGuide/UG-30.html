@@ -1,0 +1,199 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-30.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-30.html,v 1.59.2.13 2003/06/13 15:44:15 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.4.7 Example 7 -- Multi-year SST Dataset Run</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-32.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-29.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-21.html>2.4 Example Namelists</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<H3><A NAME="HEAD_7"></A>2.4.7 Example 7 -- Multi-year SST Dataset Run</H3>
+
+This namelist generates a 2-year run using a multi-year SST
+dataset.&nbsp; The starting date and time (<TT>START_YMD</TT> and
+<TT>START_TOD</TT>) for the model run must fall within the time frame
+spanned by the SST dataset.&nbsp;&nbsp; In this case, the namelist
+variable&nbsp; <TT>SSTCYC </TT>must be set to <TT>false</TT> in order
+to retrieve and time interpolate SST data for the proper year and
+month of the model run.&nbsp; When <TT>SSTCYC </TT>is set to
+<TT>true</TT> the model ignores year information and only cycles over
+the first twelve months of data.&nbsp;
+
+<p>
+To obtain this namelist, the user may invoke <b>build-namelist</b> with
+command line arguments. However, since the number of command line arguments
+for this case are numerous, an easier solution is for the user to first create a 
+namelist file, <b>namelist_input</b>, with the following contents:
+
+<p><B><TT>&nbsp;&amp;camexp</TT></B>
+<BR><B><TT>&nbsp;caseid = 'run07'</TT></B>
+<BR><B><TT>&nbsp;ctitle = 'multi-year SST (AMIP)dataset'</TT></B>
+<BR><B><TT>&nbsp;bndtvs = '/data/atm/cam2/sst/pcmdi_sst_ccm_bcT42_1977_1998.012000.nc'</TT></B>
+<BR><B><TT>&nbsp;start_ymd = 19790901</TT></B>
+<BR><B><TT>&nbsp;start_tod = 0</TT></B>
+<BR><B><TT>&nbsp;nelapse = -245</TT></B>
+<BR><B><TT>&nbsp;sstcyc = .false.</TT></B>
+<BR><B><TT>&nbsp;/</TT></B>
+
+<p>
+The user may then invoke <tt><b>build-namelist</b></tt> as follows:
+
+<pre><b>
+ % setenv CSMDATA /data
+ % build-namelist -runtype branch -infile namelist_input
+</b></pre>
+
+<p>
+The user should invoke this command from the same directory from which
+<tt><b>configure</b></tt> was invoked.
+
+<p>
+<hr>
+<p>
+
+<P><B><TT>&nbsp;&amp;camexp</TT></B>
+<BR><B><TT>&nbsp;caseid = 'run07'</TT></B>
+<BR><B><TT>&nbsp;ctitle = 'multi-year SST (AMIP)dataset'</TT></B>
+<br><b><tt>&nbsp;absems_data = '/data/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc'</tt></b>
+<br><b><tt>&nbsp;ncdata = '/data/atm/cam2/inic/gaus/cami_0000-09-01_64x128_T42_L26_c020430.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvs = '/data/atm/cam2/sst/sst_HadOIBl_bc_64x128_1949_2001_c020411.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvo = '/data/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc'</tt></b>
+<BR><B><TT>&nbsp;nsrest = 0</TT></B>
+<BR><B><TT>&nbsp;start_ymd = 19790901</TT></B>
+<BR><B><TT>&nbsp;start_tod = 0</TT></B>
+<BR><B><TT>&nbsp;nelapse = -245</TT></B>
+<BR><B><TT>&nbsp;sstcyc = .false.</TT></B>
+<BR><B><TT>&nbsp;iyear_ad = 1950</TT></B>
+<BR><B><TT>&nbsp;/</TT></B>
+
+<p><b><tt>&nbsp;&amp;clmexp</tt></b>
+<br><b><tt>&nbsp;fpftcon = '/data/lnd/clm2/pftdata/pft-physiology'</tt></b>
+<br><b><tt>&nbsp;fsurdat = '/data/lnd/clm2/srfdata/cam/clms_64x128_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;finidat = '/data/lnd/clm2/inidata_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc'</tt></b>
+<BR><B><TT>&nbsp;/</TT></B>
+
+<P>
+<HR>
+<DL>
+<DT>
+<B><TT>BNDTVS</TT></B></DT>
+<p>
+<DD>
+This dataset must contain multi-year SST data for the time period over
+which the model will be integrated. In this example, the base date of
+the run is determined by <TT>START_YMD</TT> and <tt>START_TOD</tt>. If
+an end-of-file is read on the SST dataset, the code will abort rather
+than rewinding to recycle the data as in a single-year dataset.</DD>
+
+<p>
+<DT>
+<B><TT>START_YMD, START_TOD</TT></B></DT>
+<p>
+<DD>
+These variables set the starting date and seconds of the model run
+to<TT> SEP 1, 1979 </TT>to be commensurate with dates on the SST
+dataset. If these namelist variables were not specified, the base date
+from the initial dataset would be used as the simulation starting
+date.</DD>
+
+<p>
+<DT>
+<B><TT>SSTCYC</TT></B></DT>
+<p>
+<DD>
+Setting <TT>SSTCYC</TT> to .<TT>false</TT>. indicates that a multi-year
+SST time interpolation should be used to determine model SST data.</DD>
+
+</DL>
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-32.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-29.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.59.2.13 $ $Date: 2003/06/13 15:44:15 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

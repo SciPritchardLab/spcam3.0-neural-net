@@ -1,0 +1,7 @@
+#! /bin/csh -f
+
+foreach f (*.f90)
+  set g = `echo $f | sed s/".f90"/".F90"/ `
+  mv $f $g
+end
+

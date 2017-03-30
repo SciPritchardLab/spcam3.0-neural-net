@@ -1,0 +1,55 @@
+#!/bin/csh -f
+
+# directory
+set dir = "/home/cam/public_html/camUsersGuide"
+
+# CRONFILE FOR ARCHIVE IN DIRECTORY $dir
+
+set quiet = ""
+set log = $dir/.wglog_file
+if ( "$1" == "-q" ) then
+  set quiet = "-q"
+endif
+touch $log
+
+## Set the "cat" operator to use
+#catr="/net/fileserver/fs/tools/sparc.sunos-5.5.1/textutils-1.22/bin/cat"
+set catr = "/bin/cat"
+
+
+# create a file to insure that no one searches during an index
+touch $dir/indexing-in-progress
+
+# delete the search boxes in all current files (filelist may change)
+/web/webglimpse/addsearch $dir -r $quiet >>& $log
+
+# Do the retrieving
+/web/webglimpse/makenh $dir $quiet >>& $log
+
+# put the search box in the html files -- will check config file
+#  and will not do anything if not wanted
+/web/webglimpse/addsearch $dir >>& $log
+
+# Do the indexing
+if ( "$quiet" == "-q" ) then
+  $catr  $dir/.wg_toindex | /opt/local/bin/glimpseindex -H $dir -o -t -h -X -U -f -C -F >>& /dev/null
+
+else
+  $catr $dir/.wg_toindex | /opt/local/bin/glimpseindex -H $dir -o -t -h -X -U -f -C -F
+
+endif
+
+# Compress neighborhood files
+#if [ "$quiet" = "-q" ] ; then
+#  $catr $dir/.wg_madenh | /opt/local/bin/glimpseindex -H $dir -U -P .nh. -F -ni | grep -v "^hash_misses=0"
+#else
+#  $catr $dir/.wg_madenh | /opt/local/bin/glimpseindex -H $dir -U -P .nh. -F -ni
+#fi
+
+# now change the directory and set the permissions
+cd $dir
+chmod a+r .glimpse_*
+
+# remove the locking file
+/bin/rm -f $dir/indexing-in-progress
+

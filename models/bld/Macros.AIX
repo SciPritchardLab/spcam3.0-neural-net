@@ -1,0 +1,117 @@
+#===============================================================================
+# CVS $Id: Macros.AIX,v 1.17.2.9 2003/06/13 16:08:26 hender Exp $
+# CVS $Source: /fs/cgd/csm/models/CVS.REPOS/shared/bld/Macros.AIX,v $
+# CVS $Name:  $
+#===============================================================================
+# Makefile macros for "blackforest," an IBM SP Pwr3 system at NCAR
+#
+# Notes:  (see xlf user's guide for the details)
+#  -lmass          => IBM-tuned intrinsic lib
+#  -qsmp=noauto    => enable SMP directives, but don't add any
+#  -qsmp=omp       => enable SMP directives, strict omp
+#  -qstrict        => don't turn divides into multiplies, etc
+#  -qhot           => higher-order-transformations (eg. loop padding)
+#  -qalias=noaryoverlp => assume no array overlap wrt equivalance, etc
+#  -qmaxmem=-1     => memory available to compiler during optimization
+#  -qipa=level=2   => InterProcedure Analysis (eg. inlining) => slow compiles
+#  -p -pg          => enable profiling (use in both FFLAGS and LDFLAGS)
+#  -qreport        => for smp/omp only
+#  -bmaxdata:0x80000000 => use maximum allowed data segment size
+#  -g              => always leave it on because overhead is minimal (?)
+#  -qflttrap=...   => enable default sigtrap (core dump)
+#  -C              => runtime array bounds checking (runs slow)
+#  -qinitauto=...  => initializes automatic variables
+#===============================================================================
+
+INCLDIR    := -I. -I/usr/local/include -I/usr/include -I/usr/lpp/ppe.poe/include/thread -I${INCROOT}
+SLIBS      := -L /usr/local/lib32/r4i4 -l netcdf -llapack -lblas
+ULIBS      :=  -L$(LIBROOT) -lesmf -lmct -lmpeu -lmph
+CC         := cc_r
+CPP        := /lib/cpp
+CPPFLAGS   := -P
+CPPDEFS    := -DAIX -DMSS -DTHREADED_PTHREADS
+#CFLAGS     := -c -O2 -DDISABLE_TIMERS
+CFLAGS     := -c -O2 -qsmp=omp
+FIXEDFLAGS := -qsuffix=f=f   -qfixed=132
+FREEFLAGS  := -qsuffix=f=f90 -qfree=f90
+FC         := mpxlf90_r
+FFLAGS     := -c -qsmp=omp -qrealsize=8 -qdpc=e -g -qfullpath      \
+              -O2 -qstrict -qmaxmem=-1 -qarch=auto -Q -qsigtrap=xl__trcedump 
+#              -O2 -qstrict -Q -qmaxmem=-1 -qspillsize=2500             \
+#              -qarch=auto -qtune=auto -qcache=auto \
+#              -qsigtrap=xl__trcedump 
+MOD_SUFFIX := mod
+LD         := $(FC)
+LDFLAGS    := -bmaxdata:0x80000000 -bmaxstack:0x10000000 -qsmp=omp
+
+ifeq ($(OBJECT_MODE),64)
+  INCLDIR    := -I. -I/usr/local/include -I/usr/include -I/usr/lpp/ppe.poe/include/thread64 -I${INCROOT}
+  SLIBS      := -L /usr/local/lib64/r4i4 -l netcdf -llapack -lblas
+  LDFLAGS    := -qsmp=omp
+endif
+
+ifeq ($(MACH),seaborg)
+   INCLDIR    := -I. -I/usr/include -I/usr/lpp/ppe.poe/include/thread -I${INCROOT} -I$(NETCDF_DIR)/include
+   SLIBS      := -L $(NETCDF_DIR)/lib -l netcdf
+endif
+
+ifeq ($(MODEL),pop)
+   CPPDEFS :=  $(CPPDEFS) -DPOSIX -Dimpvmix -Dcoupled \
+               -DNPROC_X=$(NX) -DNPROC_Y=$(NY)
+#   CFLAGS  := -c -O2
+   FFLAGS  := -c -qsmp=omp -O2 -qstrict -Q -qalias=noaryovrlp -qmaxmem=-1    \
+              -qarch -qtune -qcache  -qsave -qdpc=e -I${INCROOT}
+#   LDFLAGS := 
+   ifneq ($(DEBUG),TRUE)
+      FFLAGS  := -qhot $(FFLAGS)
+   endif
+endif
+
+ifeq ($(MODEL),csim)
+   CPPDEFS :=  $(CPPDEFS) -Dcoupled -DNPROC_X=$(NX) -DNPROC_Y=$(NY) -D_MPI
+   CFLAGS  := -c -O2
+   FFLAGS  := -c -O2 -qstrict -Q -qmaxmem=-1 -qrealsize=8  \
+              -qarch=auto -qtune=auto -I${INCROOT}
+   LDFLAGS := 
+endif
+
+#ifeq ($(THREAD),TRUE)
+#   CFLAGS   := $(CFLAGS) -qsmp=omp
+##  CPPDEFS  := $(CPPDEFS) -D_OPENMP -DTHREADED_PTHREADS
+#   CPPDEFS  := $(CPPDEFS) -D_OPENMP -DTHREADED_OMP
+#   FFLAGS   := $(FFLAGS)   -qsmp=omp  # default is -qnosmp
+#   LDFLAGS  := $(LDFLAGS)  -qsmp=omp
+#endif
+
+ifeq ($(DEBUG),TRUE)
+   FFLAGS   := $(FFLAGS) -C -qinitauto=7FF7FFFF \
+               -qflttrap=ov:zero:inv:en
+   CPPDEFS := $(CPPDEFS) -DNO_SHR_VMATH
+else
+# -qflttrap doesn't run with lmass turned on.
+#   FFLAGS   := $(FFLAGS)  -qflttrap=ov:zero:inv:en:imp
+ifeq ($(MACH),babyblue)
+   SLIBS      := $(SLIBS) -l mass -l massv
+endif
+ifeq ($(MACH),blackforest)
+   SLIBS      := $(SLIBS) -l mass -l massv
+endif
+ifeq ($(MACH),bluesky)
+   SLIBS      := $(SLIBS) -l mass -l massv
+endif
+ifeq ($(MACH),seaborg)
+   SLIBS      := $(SLIBS) -L/usr/common/usg/MASS/3.0/lib -lmass -L/usr/common/usg/MASS/3.0/lib -lmassv
+endif
+ifeq ($(MACH),eagle)
+   SLIBS      := $(SLIBS) -L /usr/local/lib -l mass -l massv
+endif
+ifeq ($(MACH),cheetah)
+   SLIBS      := $(SLIBS) -L /usr/local/lib -l mass -l massv
+endif
+endif
+
+
+
+
+
+

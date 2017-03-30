@@ -1,0 +1,62 @@
+#===============================================================================
+# CVS $Id: Macros.IRIX64,v 1.9.4.8 2003/06/13 16:08:26 hender Exp $
+# CVS $Source: /fs/cgd/csm/models/CVS.REPOS/shared/bld/Attic/Macros.IRIX64,v $
+# CVS $Name:  $
+#===============================================================================
+# Makefile macros for "chinook," an SGI O2000 system at NCAR
+#
+# Notes:   (for details, see man pages for f90, ld, & debug_group)
+#  -64            => 64 bit object code (memory addressing)
+#  -show          => prints name of linker being used
+#  -v             => prints name of linker, libs linked in, ...
+#  -extend_source => 132 char line length for fixed format lines
+#  -mp            => recognize multiprocessing directives
+#  -r8 -i4        => default is 8-bit reals, 4-bit integers
+#  -C             => array bounds checking (same as -DEBUG:subscript_check)
+#  -DEBUG:...     => activates various options, see man debug_group
+#===============================================================================
+
+INCLDIR    := -I ${MPT_SGI}/usr/include -I /usr/include -I /usr/local/include -I${INCROOT}
+SLIBS      := -lfpe -lnetcdf -llapack -lblas
+ULIBS      := -L${LIBROOT}  -lesmf -lmct -lmpeu -lmph -lmpi 
+CPP        := /lib/cpp
+CPPFLAGS   := 
+CPPDEFS    := -DIRIX64 -DSGI
+ifeq ($(MACH),chinook)
+  SLIBS    := -lfpe -lmpi \
+              -L/usr/local/lib64/r8i4 -lmss   \
+              -L/usr/local/lib64/r4i4 -lnetcdf 
+  CPPDEFS  := $(CPPDEFS) -DMSS
+endif
+ifeq ($(MACH),guyot)
+  INCLDIR  := -I $(NETCDF_INC) $(INCLDIR)
+endif
+CC         := cc
+CFLAGS     := -c -64
+FIXEDFLAGS := 
+FREEFLAGS  := 
+FC         := f90
+FFLAGS     := -c -64 -mips4 -O2 -r8 -i4 -show -extend_source
+MOD_SUFFIX := mod
+LD         := $(FC)
+LDFLAGS    :=    -64 -mips4 -O2 -r8 -i4 -show -mp
+
+
+ifeq ($(MODEL),pop)
+   CPPDEFS :=  $(CPPDEFS) -DPOSIX -Dimpvmix -Dcoupled -DNPROC_X=$(NX) -DNPROC_Y=$(NY)
+endif
+
+ifeq ($(MODEL),csim)
+   CPPDEFS :=  $(CPPDEFS) -Dcoupled  -DNPROC_X=$(NX) -DNPROC_Y=$(NY) -D_MPI
+endif
+
+ifeq ($(THREAD),TRUE)
+#  CPPFLAGS := $(CPPFLAGS) -D_OPENMP
+   CPPDEFS  := $(CPPDEFS) -D_OPENMP -DTHREADED_OMP
+   FFLAGS   := $(FFLAGS)  -mp
+endif
+
+ifeq ($(DEBUG),TRUE)
+   FFLAGS   := $(FFLAGS) -C -DEBUG:trap_uninitialized:verbose_runtime
+endif
+

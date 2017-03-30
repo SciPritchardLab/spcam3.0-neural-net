@@ -1,0 +1,164 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-11.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-11.html,v 1.65.2.11 2003/01/03 22:34:38 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>1.2 Quick Start</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-13.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-9.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-8.html>1. Introduction</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<H2>1.2 Quick Start</H2>
+The following list of steps allows a user to quickly make a test run
+of CAM2.0.2 for machines at NCAR. For machines not at NCAR you can
+can still follow the following outline, but you will have to edit
+the run script for your particular situation and platform.
+<OL>
+<LI>
+Download CAM source code and datasets from.
+<p>
+<a href="http://www.ccsm.ucar.edu/models/atm-cam/">http://www.ccsm.ucar.edu/models/atm-cam/</a>
+<p>
+The download of the source code is called "cam2.0.2_source.tar.gz" and the 
+download of the datasets is called "cam2.0.2_standard_datasets.tar.gz".
+
+<li>
+Untar the standard datasets (to run at other resolutions or with other
+dynamics you will need to also untar the "non-standard" dataset.
+<p>
+<b>
+<tt>
+gunzip -c  cam2.0.2.standard_datasets.tar.gz | tar xvf -</LI>
+</tt>
+</b>
+
+<LI>
+Set the environment variable "CSMDATA" to the location of the input datasets.
+<p>
+<b>
+<tt>
+setenv CSMDATA `pwd`/inputdata
+</tt>
+</b>
+<li>
+Go to the location you want to store the source code and untar the source-code.
+<p>
+<b>
+<tt>
+gunzip -c  cam2.0.2.source.tar.gz | tar xvf -</LI>
+</tt>
+</b>
+
+<LI>
+Do a simple run on the NCAR IBM with the "run-ibm.pl" script (if
+not running on the NCAR IBM you will need to edit this script). If
+you want to run on a different machine there are scripts for the IBM,
+SGI or Linux-PC platforms that can be modified for your specific
+machine in question. The run-ibm.csh and run-sgi.csh scripts both
+have batch information in them that allow them to be run either interactively
+or in the NCAR batch-queue.
+<p>
+<b>
+<tt>
+cd cam2/models/atm/cam/bld<br>
+run-ibm.csh<br>
+</tt>
+</b>
+
+</LI>
+</OL>
+At this point the model should begin compiling and executing.&nbsp; Appropriate
+log files will be generated in the <b><TT>/ptmp/$LOGNAME/$CASE</TT></b>
+directory.&nbsp; After a successful run
+of the model, the user may edit the namelist variables in run-ibm.csh
+to better suit their particular needs.
+After successfully compiling the model, subsequent invocations of the run 
+script will only recompile when the user makes changes to model code. The model should begin
+execution very quickly after gmake verifies than no code has been changed.&nbsp;
+For more detailed help see section <A HREF="UG-14.html">2.1 How
+To Build and Run CAM2.0.2</A>.
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-13.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-9.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.65.2.11 $ $Date: 2003/01/03 22:34:38 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

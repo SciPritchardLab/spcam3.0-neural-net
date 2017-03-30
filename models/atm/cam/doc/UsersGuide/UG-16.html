@@ -1,0 +1,1153 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-16.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-16.html,v 1.71.2.20 2003/06/13 15:42:52 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.1.2 Using the Build/Run Scripts in the "bld" Directory</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-19.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-14.html>2.1 How to Configure, Build and Run CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<h3><a NAME="HEAD_2"></a>2.1.2 Using the Build/Run Scripts in the "bld" Directory</h3>
+
+<p>This section describes how to use the utilities available in the
+"models/atm/cam/bld" directory to build and run the model.  The
+<b>configure</b> utility provides a flexible way to specify a particular
+configuration of CAM.  By default it will produce the configuration files
+required to build the standard production version of CAM (currently
+Eulerian dynamics at T42 spectral resolution with 26 levels).  Invoking the
+<b>gmake</b> command then builds a CAM executable.  The
+<b>build-namelist</b> utility builds a namelist which specifies the
+run-time details.  It looks at the configuration cache file produced by
+<b>configure</b> to determine the features of the CAM executable, such as
+the dynamical core and horizontal resolution, that affect the default
+specifications for namelist variables.  Sample run scripts are provided
+that illustrate how to use <b>configure</b> and <b>build-namelist</b> to
+set up a production run on an IBM-SP, an SGI Origin, or a PC-Linux
+platform.  The basic execution procedure is:
+<ol>
+<li>configure
+<li>gmake
+<li>build-namelist
+<li>Invoke the executable
+</ol>
+
+<p>CAM2.0.2 may be built to run in one of two modes. It can run as a
+stand-alone executable where the land model and the ocean component are
+contained as part of the executable.  This will be referred to as
+stand-alone mode. In this mode, the model's ocean component uses
+climatological sea surface temperatures instead of interacting with an
+external ocean model.  Alternatively, CAM2.0.2 can be run as a component in a
+system of geophysical models (CCSM) in which two-way interaction is enabled
+through the use of a flux coupler (Bryan <i>et al.</i>, 1996). In this
+mode, the land, ocean, and sea-ice models are run as separate executables
+that communicate with CAM via the flux coupler. This will be referred to as
+flux-coupled mode. Separate build and run
+procedures are required for running in flux-coupled mode see section 
+<a href=UG-19.html>2.1.4</a>.
+.  This section will cover running in stand-alone mode
+only.
+</p>
+
+<H4><A NAME="configure"></A>2.1.2.1 The configure utility</H4>
+
+<P><STRONG>configure</STRONG> produces the configuration build files
+<EM>Filepath</EM>, <EM>misc.h</EM>, <EM>params.h</EM>, <EM>preproc.h</EM>,
+and <EM>Makefile</EM>.  Each of these files specify the compile-time parameters
+and settings needed to build the model. In addition, a configuration cache file
+(<EM>config_cache.xml</EM> by default) is written which may be used in a
+subsequent invocation of <STRONG>configure</STRONG> to exactly reproduce
+the configuration files.  The files produced by running
+<STRONG>configure</STRONG> are written to the directory where CAM will be
+built, which by default is the directory from which
+<STRONG>configure</STRONG> is executed, but can be specified to be
+elsewhere (see the <strong>-cam_bld</strong> opttion).</P>
+
+<P><STRONG>configure</STRONG> will optionally perform tests to validate that the Fortran
+compiler is operational and Fortran 90 compliant, and that the linker can
+resolve references to required external libraries (NetCDF and possibly
+MPI).  These tests will point out problems with the user environment in a
+way that is much easier to understand than looking at the output from a
+failed build of CAM.  We strongly recommend that the first time CAM is
+built on any new machine, <STRONG>configure</STRONG> should be invoked to execute these
+tests (see the <STRONG>-test</STRONG> option).
+
+<P>
+<H5><A NAME="options"></a>2.1.2.1.1 Options to configure</H5>
+<P>All configuration options can be specified in the following ways, listed
+in order of decreasing precedence:</P>
+<UL>
+<LI>
+by invoking <STRONG>configure</STRONG> in interactive prompting mode (enabled with the
+<STRONG>-i</STRONG> option),
+<P></P>
+<LI>
+by setting specific options on the command-line,
+<P></P>
+<LI>
+by a default configuration cache file (specified using the <STRONG>-defaults</STRONG>
+option).
+<P></P></UL>
+
+<P>At the next level of precedence a few options can be specified by setting
+environment variables.  And finally, at the lowest precedence, many options
+have hard-coded defaults.  Most of these are located in the file
+<EM>config_cache_defaults.xml</EM> in the configuration script directory.  A few
+that depend on previous settings are hard-coded in
+<STRONG>configure</STRONG> (a perl script).
+The hard-coded defaults will produce the standard production configuration
+of CAM.</P>
+
+<P>The interactive prompting mode has two levels: basic and expert.  The basic
+mode, which is enabled by the <STRONG>-i</STRONG> option, asks the user all questions
+required to configure CAM, assuming that the model is built entirely from
+code that is contained in the distribution.  The expert mode, which is
+enabled by setting the <STRONG>-x</STRONG> option in addition to <STRONG>-i</STRONG>, allows the user
+to specify that various pieces of code required to build CAM may come from
+directories outside the distribution.  All the flexibility available in the
+expert interactive mode is also available from the specific options set on
+the command-line or from a user specified cache file.</P>
+<p>The configure script allows the user to specity compile time options such as 
+model resolution, dynamical core type, additional compiler flags, and many other 
+aspects. The user caan type <tt><b>configure --help</b></tt> for a complete
+list of available options.
+<P>The following options may all be specified with either one or two leading
+dashes, e.g., <STRONG>-help</STRONG> or <STRONG>--help</STRONG>.  Options that can be expressed as
+single letter switches may not be clumped, e.g., <STRONG>-i -x</STRONG> may NOT be
+expressed as <STRONG>-ix</STRONG>.  When multiple options are listed separated by a
+vertical bar (<STRONG>|</STRONG>), either version may be used.</P>
+<p>
+<a name="TABLE2_2"></a>
+<b>Table 2.2:&nbsp; Command line arguments to configure</b>
+<DL>
+<DT><STRONG><A NAME="item_%2Dcache_file">-cache <EM>file</EM></A></STRONG><BR>
+<DD>
+<EM>file</EM> specifies the pathname of the output configuration cache file.
+This file is not used in the build process (i.e., the Makefile does not
+depend on it), but is used instead to archive a complete description of the
+configuration of a CAM executable.  This file is used by the
+<STRONG>build-namelist</STRONG> utility for setting default namelist values that depend on the
+configuration of the CAM executable (e.g., which dynamics package and what
+resolution are used).
+<P>Default: config_cache.xml</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcam_bld_dir">-cam_bld <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory where CAM will be built.  It will contain all the
+.o and .mod files produced by the build.  The configuration build files
+produced by invoking <STRONG>configure</STRONG> are written to this directory.
+<P>Default:  <EM>./</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcam_cfg_dir">-cam_cfg <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the CAM configuration scripts, which
+includes perl modules as well as various defaults files that are required
+by <STRONG>configure</STRONG>.  It is possible (but not recommended) to move <STRONG>configure</STRONG>
+to another directory, but then the configuration script directory must be
+explicitly specified so that <STRONG>configure</STRONG> can find its support files.
+Normally this directory will be determined by looking at the pathname that
+is used to invoke <STRONG>configure</STRONG> (assuming that <STRONG>configure</STRONG> has not been
+moved from the configuration script directory).  If <STRONG>configure</STRONG> is not in
+the configuration script directory, then that directory can be specified
+either by this option, by setting the environment variable <STRONG>CAM_CFGDIR</STRONG> to
+the configuration script directory, or by setting the environment variable
+<STRONG>CAM_ROOT</STRONG> to the root directory of the CAM distribution assuming that the
+configuration directory is <STRONG>$CAM_ROOT/models/atm/cam/bld</STRONG>.
+<P>Default:  directory part of the absolute pathname used to invoke <STRONG>configure</STRONG></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcam_exe_name">-cam_exe <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> is the name of the CAM executable file.
+<P>Default: <EM>cam</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcam_exedir_dir">-cam_exedir <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory where the CAM executable will be created.
+<P>Default: the CAM build directory</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcam_root_dir">-cam_root <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> specifies the top level directory of a CAM distribution.  This
+directory must contain the subdirectory <EM>models</EM> which must contain the
+subdirectories <EM>atm</EM>, <EM>atmlnd_share</EM>, <EM>csm_share</EM>, <EM>ice</EM>, and <EM>lnd</EM>.
+The CAM root directory can also be specified by setting the environment
+variable <STRONG>CAM_ROOT</STRONG>.
+<P>Default: <EM>config_dir/../../../..</EM> where <EM>config_dir</EM> is the
+configuration script directory.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcc_name">-cc <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> specifies the C compiler.  This allows the user to override the
+default setting in the <EM>Makefile</EM> (Linux only).  The C compiler can also
+be specified by setting the environment variable <STRONG>USER_CC</STRONG>.
+<P>Default: pgcc if using pgf90, otherwise use cc</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ddebug">-debug</A></STRONG><BR>
+<DD>
+Enable the compiler debugging options that are specified in the <EM>Makefile</EM>.
+<P>Default: no debugging</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ddefaults_file">-defaults <EM>file</EM></A></STRONG><BR>
+<DD>
+<EM>file</EM> specifies the pathname of a configuration cache file, e.g.,
+<EM>config_cache.xml</EM> from a previous invocation of <STRONG>configure</STRONG>, that is to
+be used to provide default values.  Note that the current configuration
+will be written to a file named <EM>config_cache.xml</EM>, so the default file
+should be renamed, or be in another directory, to prevent it from being
+overwritten. Alternatively the output cache file can be renamed by using
+the <STRONG>-cache</STRONG> option.
+<P>Default: none</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ddyn_name">-dyn <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> specifies the dynamics package to be used when running CAM.  The
+valid options are <STRONG>eul</STRONG> (Eulerian spectral dynamics), <STRONG>sld</STRONG>
+(semi-Lagrangian spectral dynamics), and <STRONG>fv</STRONG> (finite-volume dynamics).
+<P>Default: <EM>eul</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Desmf_bld_dir">-esmf_bld <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the top level directory where the ESMF library will be built.  It
+will contain the directories <EM>mod</EM>, <EM>lib/libg</EM> and/or <EM>lib/libO</EM> which
+each contain subdirectories that contain machine architecture specific
+files.
+<P>Default: <EM>cam_bld/esmf</EM> where <EM>cam_bld</EM> is the build directory for CAM.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Desmf_root_dir">-esmf_root <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the top level directory for the ESMF distribution.  This
+directory contains the main makefile for the ESMF library.  The ESMF root
+directory can also be specified by setting the environment variable
+<STRONG>ESMF_ROOT</STRONG>.  Note that the ESMF library is supplied as part of the CAM
+distribution, and by default the supplied library is built and used by CAM.
+This option allows for a custom build of CAM that builds an ESMF library
+using source code from outside the CAM distribution.
+<P>Default: <EM>cam_root/models/utils/esmf</EM> where <EM>cam_root</EM> is the
+root directory of the CAM distribution.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dfc_name">-fc <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> specifies the Fortran compiler.  This allows the user to override
+the default setting in the <EM>Makefile</EM>.  The Fortran compiler can also be
+specified by setting the environment variable <STRONG>USER_FC</STRONG>.
+<P>Default: OS dependent</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dfflags_string">-fflags <EM>string</EM></A></STRONG><BR>
+<DD>
+The Fortran compiler options specified by <EM>string</EM> will be appended to the
+default setting of <CODE>FFLAGS</CODE> in the <EM>Makefile</EM>.  If <EM>string</EM> contains any
+whitespace it must be quoted.
+<P>Default: ''</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dgmake_name">-gmake <EM>name</EM></A></STRONG><BR>
+<DD>
+Name of the GNU make program on your system.  Supply the absolute pathname
+if the program is not in your path (or fix your path).  This is only needed
+if testing will be done (see <STRONG>-test</STRONG>).
+<P>Default: The names 'gmake', 'gnumake', and 'make' are checked in order.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dh_%7C_%2Dhelp">-h | -help</A></STRONG><BR>
+<DD>
+Print usage to STDOUT.
+<P></P>
+<DT><STRONG><A NAME="item_%2Di_%7C_%2Dinteractive">-i | -interactive</A></STRONG><BR>
+<DD>
+Turns on the basic interactive prompting mode.  In the basic prompt mode
+only questions required to obtain a standard configuration of CAM will be
+asked.  To allow configurations which require code from outside the CAM
+distribution, an expert prompt mode can be enabled by additionally
+specifying the <STRONG>-x</STRONG> option.
+<P>In either mode a default value for each setting will be determined based
+on, in order of decreasing precedence, the specific command-line option for
+that setting, a user specified default configuration cache file, an
+environment variable, or a hard-coded default.  This default value may then
+be accepted by entering ``return'', or overridden by the user.  Values are
+checked when possible for legality and consistency.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dmpi_inc_dir">-mpi_inc <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the MPI library include files.
+Only SPMD versions of CAM require MPI.  The MPI include directory can
+also be specified by setting the environment variable <STRONG>INC_MPI</STRONG>.
+<P>Default: <EM>/usr/local/include</EM> except on IBM systems.  The IBM Fortran
+compilers <STRONG>mpxlf90</STRONG> and <STRONG>mpxlf90_r</STRONG> have the MPI include file location
+built in.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dmpi_lib_dir">-mpi_lib <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the MPI library.  Only SPMD versions
+of CAM require MPI.  The MPI library directory can also be specified by
+setting the environment variable <STRONG>LIB_MPI</STRONG>.
+<P>Default: <EM>/usr/local/lib</EM> except on IBM systems.  The IBM Fortran
+compilers <STRONG>mpxlf90</STRONG> and <STRONG>mpxlf90_r</STRONG> have the MPI library location built
+in.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnadv_num">-nadv <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the number of advected constituents.  This value must be at least 1
+because water vapor is always an advected constituent.
+<P>Default: 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnc_inc_dir">-nc_inc <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the NetCDF library include files.
+All configurations of CAM require NetCDF.  The NetCDF include directory can
+also be specified by setting the environment variable <STRONG>INC_NETCDF</STRONG>.
+<P>Default: <EM>/usr/local/include</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnc_lib_dir">-nc_lib <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the NetCDF library.  All
+configurations of CAM require NetCDF.  The NetCDF library directory can
+also be specified by setting the environment variable <STRONG>LIB_NETCDF</STRONG>.
+<P>Default: <EM>/usr/local/lib</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnlat_num">-nlat <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the number of model grid latitudes.  This option is only
+recognized when the <STRONG>-res</STRONG> option is set to <STRONG>custom</STRONG>.
+<P>Default: 64</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnlev_num">-nlev <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the number of model vertical layers.
+<P>Default: 26</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnlon_num">-nlon <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the number of distinct model grid longitudes.  This option is
+only recognized when the <STRONG>-res</STRONG> option is set to <STRONG>custom</STRONG>.
+<P>Default: 128</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnnadv_num">-nnadv <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the number of non-advected constituents.  The default value is 1
+because the prognostic cloud water is treated as a non-advected constituent.
+<P>Default: 1</P>
+<P></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dpergro">-pergro</A></STRONG><BR>
+<DD>
+Configure CAM to enable perturbation growth experiments.  Note that this
+option disables parts of the CAM code that have been found to produce rapid
+growth of roundoff size perturbations.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dres_name">-res <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> specifies the horizontal resolution.  For spectral dynamics the
+horizonal grid is Gaussian and is specified by as <CODE>nlat x nlon</CODE> where nlat
+is the number of Gaussian latitudes and nlon is the number of distinct
+longitudes.  The valid values for spectral dynamics are <STRONG>64x128</STRONG>,
+<STRONG>32x64</STRONG>, or <STRONG>8x16</STRONG>.  For finite-volume dynamics the 
+meridional grid is equally spaced and includes the pole points.  It is specified as 
+<CODE>dlatxdlon</CODE> where dlat is the latitude cell size and dlon is the longitude 
+cell size, both in
+degrees.  The valid values for finite-volume dynamics are <STRONG>2x2.5</STRONG>, <STRONG>4x5</STRONG>,
+or <STRONG>10x15</STRONG>.  The valid resolutions are listed in the
+<EM>resolution_parameters.xml</EM> file in the configuration script directory.
+To configure CAM for a resolution that is not in the
+<EM>resolution_parameters.xml</EM> file the value of <STRONG>-res</STRONG> must be set to
+<STRONG>custom</STRONG>.
+<P><EM>NOTE: some of resolutions recognized by this option are for development
+purposes only.  The recognition of a resolution by this option does NOT
+imply the existence of a validated control run.</EM></P>
+<P>Default: 64x128</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ds_%7C_%2Dsilent">-s | -silent</A></STRONG><BR>
+<DD>
+Turns off all output to STDOUT.  Fatal error messages will still be issued
+to STDERR.
+<P></P>
+
+<DT><STRONG><A NAME="item_%2D%5Bno%5Dspmd">-[no]smp</A></STRONG><BR>
+<DD>
+<STRONG>-smp</STRONG> enables an SMP configuration of CAM (via openMP).
+<STRONG>-nosmp</STRONG> disables an SMP configuration of CAM.
+<P>Default: SMP is enabled by default only on IBM and SGI systems.</P> <P></P>
+
+<DT><STRONG><A NAME="item_%2D%5Bno%5Dspmd">-[no]spmd</A></STRONG><BR>
+<DD>
+<STRONG>-spmd</STRONG> enables an SPMD configuration of CAM (via MPI).
+<STRONG>-nospmd</STRONG> disables an SPMD configuration of CAM.
+<P>Default: SPMD is enabled by default only on IBM systems.</P> <P></P>
+
+<DT><STRONG><A NAME="item_%2D%5Bno%5Dtest">-[no]test</A></STRONG><BR>
+<DD>
+<STRONG>-test</STRONG> enables testing the Fortran compiler and external libraries and
+<STRONG>-notest</STRONG> disables testing.  The tests are:
+<OL>
+<LI>
+Check that the Fortran compiler will successfully build a ``hello world''
+program that uses Fortran 90 module syntax.
+<P></P>
+<LI>
+Check that the Fortran compiler will successfully build a test program that
+contains an external reference to a NetCDF library function.
+<P></P>
+<LI>
+Check that the Fortran compiler will successfully build a test program that
+contains an external reference to an MPI library function, if SPMD is
+enabled.
+<P></P></OL>
+<P>Default: testing off except in interactive prompting mode</P>
+<DT><STRONG><A NAME="item_%2Dtrk_num">-trk <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the spectral resolution parameter that specifies the highest
+degree of the associated Legendre polynomials.  This option is only
+recognized when the <STRONG>-res</STRONG> option is set to <STRONG>custom</STRONG>.
+<P>Default: 42</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dtrm_num">-trm <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the spectral resolution parameter that specifies the maximum
+Fourier wavenumber.  This option is only recognized when the <STRONG>-res</STRONG> option
+is set to <STRONG>custom</STRONG>.
+<P>Default: 42</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dtrn_num">-trn <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> is the spectral resolution parameter that specifies the highest
+degree of the Legendre polynomials for m=0.  This option is only recognized
+when the <STRONG>-res</STRONG> option is set to <STRONG>custom</STRONG>.
+<P>Default: 42</P>
+<a name="usr_src"></a>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dusr_src_dir1%5B%2Cdir2%5B%2Cdir3%5B%2E%2E%2E%5D">-usr_src <EM>dir1[,dir2[,dir3[...]]]</EM></A></STRONG><BR>
+<DD>
+<EM>dir1[,dir2[,dir3[...]]]</EM> specifies the directories containing user source
+code.  These directories will be placed, in the order in which they are
+specified, at the beginning of the <EM>Filepath</EM> file.
+<P>The <EM>Filepath</EM> file is used by the CAM <EM>Makefile</EM> to determine which
+source files will be compiled.  The list of source files is comprised of
+all files with <EM>.F90</EM>, <EM>.F</EM>, or <EM>.c</EM> extensions in each directory listed
+in <EM>Filepath</EM> plus the current directory.</P>
+<P>The <EM>Filepath</EM> file is also used by the CAM <EM>Makefile</EM> to determine which
+directories will be searched when looking for a source file that can be
+used to build an object file.  The search begins in the current directory,
+and then proceeds to the directories in the <EM>Filepath</EM> file, in the order
+in which they are specified.  The first file found will be the one used by
+<STRONG>make</STRONG> to create the object file.</P>
+<P>Default: none</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dv_num">-v <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> specifies the verbosity level of the output to STDOUT.  Level 1
+echos only the names of the files produced by <STRONG>configure</STRONG>.  Level 2 adds
+echoing of the configuration specifications associated with a standard
+build of CAM.  Level 3 adds echoing of the specifications associated with
+an ``expert'' build of CAM.
+<P>Default: 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dversion">-version</A></STRONG><BR>
+<DD>
+Echo the CVS tag name that was used to check out the CAM distribution, then
+exit.  If no tag was used for the check-out then the string $Name:  $ will be
+echoed.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dx">-x</A></STRONG><BR>
+<DD>
+Turns on the ``expert'' interactive mode.  See the <STRONG>-i</STRONG> option for more
+details.
+</DD>
+
+</DL>
+
+<H5><A NAME="cfg_env_vars"></A>2.1.2.1.2 Environment variables used by configure</H5>
+
+<P>The environment variables recognized by <STRONG>configure</STRONG> are the following:</P>
+
+<DL>
+
+<DT><STRONG><A NAME="item_CAM_ROOT">CAM_ROOT</A></STRONG><BR>
+<DD>
+The root directory of the CAM distribution.  The directory containing the
+configuration scripts is $CAM_ROOT/models/atm/cam/bld.
+<P></P>
+<DT><STRONG><A NAME="item_CAM_CFGDIR">CAM_CFGDIR</A></STRONG><BR>
+<DD>
+The directory that contains the CAM configuration scripts.  This is
+provided only for the special case that the configuration scripts are taken
+from a directory outside of the CAM distribution.
+<P></P>
+<DT><STRONG><A NAME="item_ESMF_ROOT">ESMF_ROOT</A></STRONG><BR>
+<DD>
+Root directory to the ESMF source code.
+<P></P>
+<DT><STRONG><A NAME="item_INC_NETCDF">INC_NETCDF</A></STRONG><BR>
+<DD>
+Directory containing the NetCDF include files.
+<P></P>
+<DT><STRONG><A NAME="item_LIB_NETCDF">LIB_NETCDF</A></STRONG><BR>
+<DD>
+Directory containing the NetCDF library.
+<P></P>
+<DT><STRONG><A NAME="item_INC_MPI">INC_MPI</A></STRONG><BR>
+<DD>
+Directory containing the MPI include files.  This is only required when CAM
+is built with SPMD enabled.
+<P></P>
+<DT><STRONG><A NAME="item_LIB_MPI">LIB_MPI</A></STRONG><BR>
+<DD>
+Directory containing the MPI library.  This is only required when CAM
+is built with SPMD enabled.
+<P>
+<DT><STRONG><A NAME="item_USER_FC">USER_FC</A></STRONG><BR>
+<DD>
+User specified Fortran compiler.  Overrides Makefile default.
+<P></P>
+<DT><STRONG><A NAME="item_USER_CC">USER_CC</A></STRONG><BR>
+<DD>
+User specified C compiler.  Overrides Makefile default.  Currently only
+recognized on linux systems.
+<P></P>
+
+</DL>
+
+<H5><A NAME="using_configure"></a>2.1.2.1.3 Using configure from the command-line</H5>
+
+<P>This section provides a few simple examples of using <STRONG>configure</STRONG> from the
+command-line and building an executable in interactive prompt mode.  In a
+later section a complete configure, build, and run sequence will be
+presented in the context of a simple C shell script.</P>
+<P>The examples in this section <STRONG>all assume</STRONG> that the CAM configuration script
+directory is located in the standard place within the CAM distribution.  It
+is also assumed that the CAM configuration directory is not in the user's
+<STRONG>PATH</STRONG> environment variable.  For this reason the <STRONG>configure</STRONG> script <STRONG>must
+be invoked</STRONG> using an absolute pathname.  The script attempts to use the
+pathname that it was invoked with to determine the configuration script
+directory.  If this is successful then <STRONG>configure</STRONG> can determine the CAM
+root directory without the user needing to set the CAM_ROOT environment
+variable.</P>
+<P>
+<H5><A NAME="example1"></a>2.1.2.1.4 Example 1: build the default CAM executable</H5>
+<P>The following interactive C shell session builds a default production
+version of CAM.  The shell variable <CODE>tmpdir</CODE> is set to a working directory
+on the user's system, and <CODE>camcfg</CODE> is set to the CAM configuration
+directory (models/atm/cam/bld).  We recommend using the <STRONG>-test</STRONG> 
+option the first time CAM is built on any machine.  This will check that the 
+environment is properly set up so that the Fortran compiler works and can successfully
+link to the NetCDF and MPI (if SPMD enabled) libraries.</P>
+<PRE>
+    % cd $tmpdir
+    % $camcfg/configure -test 
+    configure wrote file: Filepath
+    configure wrote file: params.h
+    configure wrote file: misc.h
+    configure wrote file: preproc.h
+    configure wrote file: Makefile
+    configure wrote file: config_cache.xml
+    Looking for a valid GNU make... using gmake
+    Testing for Fortran 90 compatible compiler... using mpxlf90_r
+    Testing NetCDF library... ok
+    Testing MPI library... ok
+    configure done.
+    % gmake -j4  &gt;! make.out
+</PRE>
+<P>We started by changing into the directory in which the CAM executable will
+be built.  All the files produced by <b>configure</b> except for the cache file
+are required to be in the CAM build directory, so it is generally easiest
+to be in that directory when <b>configure</b> is invoked.  This example was
+carried out on an IBM-SP node.  The testing tells us that <b>gmake</b> is a GNU
+Make on this machine, that the Fortran compiler is <b>mpxlf90_r</b>, and that
+the compiler can successfully reference the NetCDF and MPI libraries.  We
+then issue the <b>gmake</b> command with a <b>-j4</b> option, which tells <b>gmake</b>
+to use 4 processors for the build.
+Output from the make,
+except for the messages issued to STDERR, are redirected to the file
+<CODE>make.out</CODE>.  In the event of an error during the build, the <CODE>make.out</CODE>
+file will contain the command that was issued by <b>gmake</b> that resulted in
+the error.</P>
+<P>
+<H5><A NAME="example2"></a>2.1.2.1.5 Example 2: configure CAM to use finite-volume dynamics</H5>
+<P>Suppose we type the following command-line:</P>
+<PRE>
+    % $camcfg/configure -dyn fv
+    ** stopping: invalid value of res (64x128) specified as a default
+    ** expected one of: 10x15 2x2.5 4x5</PRE>
+<P>The configure script is telling us that the default resolution of <CODE>64x128</CODE> is
+not valid for the finite-volume dynamics.  If we specify a valid resolution
+for fv on the command-line:</P>
+<PRE>
+    % $camcfg/configure -dyn fv -res 2x2.5</PRE>
+<P>then <STRONG>configure</STRONG> will successfully generate the output files.</P>
+<P>
+<H5><A NAME="example3"></a>2.1.2.1.6 Example 3: interactive configuration of CAM for finite-volume dynamics</H5>
+<P>The previous example illustrated that changing a single default value via
+the command-line options may fail due to dependencies between the
+configuration parameters.  One way to avoid this type of configuration
+failure is to use the interactive prompting option.  The following
+illustrates such an interactive session:</P>
+<PRE>
+   % $camcfg/configure -i</PRE>
+<PRE>
+   Entering interactive mode.  To accept the default values given in
+   brackets [] just enter return.</PRE>
+<PRE>
+   Enter directory where CAM will be built [.]: 
+   Setting CAM build directory to /ptmp/eaton/bld-test</PRE>
+<PRE>
+   Enter directory where CAM executable will be created [.]: 
+   The CAM executable will be created in /ptmp/eaton/bld-test</PRE>
+<PRE>
+   Enter dynamics package; eul or sld or fv [eul]: fv
+   Using fv dynamics.</PRE>
+<PRE>
+   Modify CAM for perturbation growth testing? y or n [n]: 
+   NOT configuring CAM for perturbation growth testing.</PRE>
+<PRE>
+   Choose the finite-volume grid resolution.  The valid options are expressed
+   as dlatxdlon where dlat is the latitude cell size and dlon is the longitude
+   cell size, both in degrees.
+    10x15 2x2.5 4x5 [64x128]: 2x2.5
+   Using horizontal resolution: 2x2.5</PRE>
+<PRE>
+   Setting number of longitudes to 144
+   Setting number of latitudes to 91
+
+   Setting maximum number of columns in a chunk to 16
+</PRE>
+<PRE>
+   Enter number of vertical levels [26]: 
+   Setting number of levels to 26</PRE>
+<PRE>
+   Enter number of advected constituents [1]: 
+   Setting number of advected constituents to 1</PRE>
+<PRE>
+   Enter number of non-advected constituents [1]: 
+   Setting number of non-advected constituents to 1</PRE>
+<PRE>
+   Enter name of CAM executable [cam]: 
+   CAM executable will be called cam</PRE>
+<PRE>
+   Enter Fortran compiler ('default' will use Makefile setting) [default]: 
+   Setting Fortran compiler to default</PRE>
+<PRE>
+   Enable compiler debugging options? [n]: 
+   DISabling compiler debugging options.</PRE>
+<PRE>
+   Enter Fortran compiler options to be appended to Makefile defaults: []: 
+   Setting additional Fortran compiler options ''</PRE>
+<PRE>
+   Enable SPMD parallelism? [y]: 
+   Enabling SPMD parallelism.
+
+   Enable SMP parallelism (openMP)? [y]: 
+   Enabling SMP parallelism.
+
+   Enable 2D Y-Z parallelism? [n]: 
+   Enter directory containing NetCDF include files [/usr/local/include]: 
+   Found NetCDF include file in /usr/local/include</PRE>
+<PRE>
+   Enter directory containing NetCDF library [/usr/local/lib32/r4i4]: 
+   Found NetCDF library in /usr/local/lib32/r4i4</PRE>
+<PRE>
+   Enter directory containing MPI include files []: 
+   Enter directory containing MPI library []: 
+   creating /ptmp/eaton/bld-test/Filepath
+   creating /ptmp/eaton/bld-test/params.h
+   creating /ptmp/eaton/bld-test/misc.h
+   creating /ptmp/eaton/bld-test/preproc.h
+   creating /ptmp/eaton/bld-test/Makefile
+   creating /ptmp/eaton/bld-test/config_cache.xml</PRE>
+<PRE>
+   Run tests on the Fortran compiler and external libraries? y or n [y]: 
+   Looking for a valid GNU make... using gmake</PRE>
+<PRE>
+   Testing for Fortran 90 compatible compiler... using mpxlf90_r</PRE>
+<PRE>
+   Testing NetCDF library... ok</PRE>
+<PRE>
+   Testing MPI library... ok</PRE>
+<PRE>
+   configure done.</PRE>
+<P>The only non-default options specified were to use the fv dynamics and to
+set the horizontal resolution to 2x2.5.  In interactive prompt mode
+<STRONG>configure</STRONG> presents valid resolution names to the user and ensures that a
+valid value is entered.  Note that the default value presented for the
+location of the NetCDF library was not the hard-coded default
+(/usr/local/lib).  This value came from the <STRONG>LIB_NETCDF</STRONG> environment
+variable.</P>
+
+
+<H4><A NAME="bld-nl"></a>2.1.2.2 The build-namelist utility</H4>
+<P>After the model has been configured and built, the user must define the run tiume
+parameters for a CAM run.
+<STRONG>build-namelist</STRONG> produces namelists for both CAM and CLM.  These are
+written to a single file (<EM>namelist</EM> by default) in the directory from
+which <STRONG>build-namelist</STRONG> is invoked.  The only required input for
+<STRONG>build-namelist</STRONG> is a configuration cache file produced by a previous
+invocation of <STRONG>configure</STRONG>.  The cache file provides information about the
+configuration of the CAM executable that <STRONG>build-namelist</STRONG> needs to provide
+the correct default values for things like initial and boundary datasets.
+The default values are specified in the files <EM>DefaultCAMEXPNamelist.xml</EM>
+and <EM>DefaultCLMEXPNamelist.xml</EM> in the CAM configuration script directory.</P>
+<P>The user can specify namelist values that are not set by default, or can
+override the values that are set by default, in two ways.  A file that
+contains a namelist may be specified using the <STRONG>-infile</STRONG> option, and
+namelist values may be specified directly on the command-line using the
+<STRONG>-namelist</STRONG> option.  The command-line specification takes precedence over
+values read from a file, and both take precedence over the default values.
+In addition a few namelist variables may be set with specific command-line
+options and these settings take precedence over the values set using
+<STRONG>-namelist</STRONG> or <STRONG>-infile</STRONG>.  There is also an interactive prompting option
+(<STRONG>-i</STRONG>) which allows the user to view the namelist produced by the default
+and command-line settings, and make final changes.</P>
+<P>
+To get a list of all available options to use <tt><b>build-namelist --help</b></tt>.
+<P>
+<H5><A NAME="options"></a>2.1.2.2.1 Options to build-namelist</H5>
+<P>The following options may all be specified with either one or two leading
+dashes, e.g., <STRONG>-help</STRONG> or <STRONG>--help</STRONG>.  When multiple options are listed
+separated by a vertical bar (<STRONG>|</STRONG>), either version may be used.</P>
+<p> 
+<a name="TABLE2_3"></a>
+<b>Table 2.3:&nbsp; Command line arguments to build-namelist</b>
+<DL>
+<DT><STRONG><A NAME="item_%2Dcam_cfg_dir"></a>-cam_cfg <EM>dir</EM></STRONG><BR>
+<DD>
+<EM>dir</EM> is the directory that contains the CAM configuration scripts, which
+includes perl modules as well as various defaults files that are required
+by <STRONG>build-namelist</STRONG>.  It is possible (but not recommended) to move
+<STRONG>build-namelist</STRONG> to another directory, but then the configuration script
+directory must be explicitly specified so that <STRONG>build-namelist</STRONG> can find
+its support files.  Normally this directory will be determined by looking
+at the pathname that is used to invoke <STRONG>build-namelist</STRONG> (assuming that
+<STRONG>build-namelist</STRONG> has not been moved from the configuration script
+directory).  If <STRONG>build-namelist</STRONG> is not in the configuration script
+directory, then that directory can be specified either by this option, by
+setting the environment variable <STRONG>CAM_CFGDIR</STRONG> to the configuration script
+directory, or by setting the environment variable <STRONG>CAM_ROOT</STRONG> to the root
+directory of the CAM distribution assuming that the configuration directory
+is <STRONG>$CAM_ROOT/models/atm/cam/bld</STRONG>.
+<P>Default: directory part of the absolute pathname used to invoke
+<STRONG>build-namelist</STRONG></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcase_name">-case <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> is the case identifier for the CAM run (up to 32 characters).  This
+value is used to set the <EM>caseid</EM> variable in the CAM namelist.
+<P>Default: camrun</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dconfig_file">-config <EM>file</EM></A></STRONG><BR>
+<DD>
+<EM>file</EM> is a configuration cache file produced by the <STRONG>configure</STRONG> script.
+<STRONG>build-namelist</STRONG> obtains the configuration of the CAM executable from this
+file.
+<P>Default: <EM>config_cache.xml</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcsmdata_dir">-csmdata <EM>dir</EM></A></STRONG><BR>
+<DD>
+<EM>dir</EM> is the root directory for the default initial and boundary datasets
+supplied with the CAM distribution.  This directory can also be specified
+by setting the CSMDATA environment variable.  It is assumed that the root
+directory will contain the subdirectories <EM>atm/cam2</EM> for CAM datasets and
+<EM>lnd/clm2</EM> for CLM datasets.
+<P>Default: <EM>/fs/cgd/csm/inputdata</EM>.  This value is set in the files
+<EM>DefaultCAMEXPNamelist.xml</EM> and <EM>DefaultCLMEXPNamelist.xml</EM> in the CAM
+configuration script directory.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dh_%7C_%2Dhelp">-h | -help</A></STRONG><BR>
+<DD>
+Print usage to STDOUT.
+<P></P>
+<DT><STRONG><A NAME="item_%2Di_%7C_%2Dinteractive">-i | -interactive</A></STRONG><BR>
+<DD>
+Turns on interactive prompting to modify a namelist.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dinfile_file">-infile <EM>file</EM></A></STRONG><BR>
+<DD>
+<EM>file</EM> is a namelist file to read values from.  All values read from this
+file will appear in the output namelist unless they are overridden by other
+values having higher precedence.
+<P>Default: none</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dnamelist_namelist">-namelist <EM>namelist</EM></A></STRONG><BR>
+<DD>
+<EM>namelist</EM> is a string that contains namelist settings using valid
+namelist syntax, e.g.,
+<PRE>
+   -namelist &quot;&amp;camexp nelapse=-10, empty_htapes=.true. /&quot;</PRE>
+<P>Namelist values set on the command-line take precedence over values read 
+from a file specified with the <STRONG>-infile</STRONG> option.</P>
+<P>Default: none</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dncdata_vers">-ncdata_vers <EM>ncdata_vers</EM></A></STRONG><BR>
+<DD>
+<EM>ncdata_vers</EM> is the version number of the type of NCDATA Initial condition
+files you'd like to use.
+<P>Default: 1</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Do_file">-o <EM>file</EM></A></STRONG><BR>
+<DD>
+<EM>file</EM> is the filename of the output namelist.
+<P>Default: <EM>namelist</EM></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Druntype_name">-runtype <EM>name</EM></A></STRONG><BR>
+<DD>
+<EM>name</EM> specifies the type of simulation.  Valid values are <STRONG>initial</STRONG>,
+<STRONG>restart</STRONG>, or <STRONG>branch</STRONG>.
+<P>Default: <STRONG>initial</STRONG></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ds_%7C_%2Dsilent">-s | -silent</A></STRONG><BR>
+<DD>
+Turns off all output to STDOUT.  Fatal error messages will still be issued
+to STDERR.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dtest">-test</A></STRONG><BR>
+<DD>
+Enable checking that initial and boundary datasets exist on local filesystem.
+<P>Default: no checking</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dv_num">-v <EM>num</EM></A></STRONG><BR>
+<DD>
+<EM>num</EM> specifies the verbosity level of the output to STDOUT.  The default
+(1) echos only the name of the file produced by <STRONG>build-namelist</STRONG>.  Level 2
+adds echoing of the results from the <STRONG>-test</STRONG> option, and level 3 adds
+echoing of the default values read from the files in the CAM configuration
+script directory.
+<P>Default: 1</P>
+<P></P></DL>
+<P>
+<H5><A NAME="environment variables">2.1.2.2.2 Environment variables used by build-namelist</A></H5>
+<P>The environment variables recognized by <STRONG>build-namelist</STRONG> are the following:</P>
+<DL>
+<DT><STRONG><A NAME="item_CSMDATA">CSMDATA</A></STRONG><BR>
+<DD>
+The root directory for the default initial and boundary datasets supplied
+with the CAM distribution.  It is assumed that the root directory will
+contain the subdirectories <EM>atm/cam2</EM> for CAM datasets and <EM>lnd/clm2</EM> for
+CLM datasets.
+<P></P>
+<DT><STRONG><A NAME="item_CAM_ROOT">CAM_ROOT</A></STRONG><BR>
+<DD>
+The root directory of the CAM distribution.  The directory containing the
+configuration scripts is $CAM_ROOT/models/atm/cam/bld.
+<P></P>
+<DT><STRONG><A NAME="item_CAM_CFGDIR">CAM_CFGDIR</A></STRONG><BR>
+<DD>
+The directory that contains the CAM configuration scripts.  This is
+provided only for the special case that the configuration scripts are taken
+from a directory outside of the CAM distribution.
+<P></P></DL>
+<P>
+<H5><A NAME="using build-namelist from the commandline">2.1.2.2.3 Using build-namelist from the command-line</A></H5>
+
+<P>This section provides a simple example of using <STRONG>build-namelist</STRONG> from
+the command-line.  Several additional examples of building namelists will
+be found in <a href="UG-21.html#HEADII.EXAMPLE">Sec. 2.4 </a>.
+</P>
+
+<P>
+<H5><A NAME="example 1: build a default namelist">2.1.2.2.4 Example 1: build a default namelist</A></H5>
+<P>Assume the shell variable <CODE>camcfg</CODE> is set to the CAM configuration
+directory and that <STRONG>configure</STRONG> has been invoked to build a default CAM
+executable (Eulerian dynamics at T42).  The first time a namelist for a
+particular CAM configuration is produced, we recommend using the <STRONG>-test</STRONG>
+option which checks whether the initial and boundary datasets exist on a
+local filesystem.  If they do not then a warning is issued to inform the
+user which datasets must be copied to the directory from which CAM will be
+run.</P>
+<P>The invocation of <STRONG>build-namelist</STRONG>,</P>
+<PRE>
+  % $camcfg/build-namelist -test
+  Write out namelist to: namelist</PRE>
+<P>produces the following default namelist:</P>
+<PRE>
+  &amp;camexp
+   absems_data = '/fs/cgd/csm/inputdata/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc'
+   bndtvo      = '/fs/cgd/csm/inputdata/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc'
+   bndtvs      = '/fs/cgd/csm/inputdata/atm/cam2/sst/sst_HadOIBl_bc_64x128_clim_c020411.nc'
+   caseid      = 'camrun'
+   iyear_ad    = 1950
+   ncdata      = '/fs/cgd/csm/inputdata/atm/cam2/inic/gaus/cami_0000-09-01_64x128_T42_L26_c020514.nc'
+   nelapse     = -1
+   nsrest      = 0
+  /            
+  &amp;clmexp      
+   finidat     = '/fs/cgd/csm/inputdata/lnd/clm2/inidata_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc'
+   fpftcon     = '/fs/cgd/csm/inputdata/lnd/clm2/pftdata/pft-physiology'
+   fsurdat     = '/fs/cgd/csm/inputdata/lnd/clm2/srfdata/cam/clms_64x128_T42_c020514.nc'
+  /</PRE>
+<P><STRONG>build-namelist</STRONG> used the configuration cache file (<EM>config_cache.xml</EM>)
+that was produced by <STRONG>configure</STRONG> to determine the dynamics package, land
+model, and resolution of the CAM executable.  This information was used to
+choose the default initial and boundary datasets.  The default run type is
+an initial run (<CODE>nsrest=0</CODE>), the run length is 1 day beyond the date of
+the initial conditions (<CODE>nelapse=-1</CODE>), and the valid year for the
+calculated orbital parameters is 1950 (<CODE>iyear_ad=1950</CODE>).</P>
+<P>The absence of warnings from <STRONG>build-namelist</STRONG> indicates that all the initial and 
+boundary datasets were found on the local filesystem.</P>
+
+
+<H4><A NAME="MARKER_9_26"></A>2.1.2.3 Example run scripts </H4>
+
+<p>
+Before we present the example run scripts, we first discuss details of
+the multitasking strategy employed in CAM2.0.2 &nbsp; Both shared-memory
+multitasking (using OpenMP) and distributed memory (using MPI)
+multitasking is allowed. Hybrid-mode enables both shared-memory (for
+CPU's within a node) and distributed-memory (between nodes) multitasking.
+
+<p>
+Shared-memory multitasking requires the run-time specification of the
+number of processors to use (by setting the environment variable
+$OMP_NUM_THREADS).  Distributed memory multitasking involves the use
+of the MPI message-passing programming paradigm.  The message-passing
+code has been validated on IBM SP3, SGI (IRIX), and
+Linux platforms. Different implementations of MPI handle the settings
+of the number of tasks in different ways.
+
+<p>The sample run scripts are contained in the directory <a
+href="#cfg_env_vars">$CAM_ROOT</a>/models/atm/cam/bld/ in the files
+<code>run-ibm.csh</code>, <code>run-sgi.csh</code>, and
+<code>run-pc.csh</code>.  They are set up to build and run the default CAM
+configuration, i.e., Eulerian dynamics at T42 spectral resolution (about 2.8
+degree grid spacing) with 26 vertical levels, CLM2 land model, and CSIM4
+ice model.  The following list describes the features of the scripts, and
+how to customize them.
+</p>
+
+<dl>
+<dt>Root directory of CAM source distribution</dt>
+<dd>The shell variable <code>camroot</code> must be set to the root
+directory of the CAM distribution.  This variable is used to set the
+directory of the configuration utilities which is assumed to be
+<code>$camroot/models/atm/cam/bld</code>.
+</dd>
+<dt>Root directory of CAM dataset distribution</dt>
+<dd>The environment variable <code>CSMDATA</code> must be set to the root
+directory of the CAM dataset distribution.  The value in the run scripts is
+appropriate for runs at NCAR on machines that mount the /fs filesystem.
+<code>CSMDATA</code> is used by the <code>build-namelist</code> utility to
+specify the locations of initial and boundary datasets used by CAM and CLM2.
+</dd>
+<dt>CAM work directory</dt>
+<dd>The work directory is specified by the shell variable
+<code>wrkdir</code>.  The defaults are appropriate for NCAR machines and
+are large capacity temporary filesystems.  The scripts assume that the CAM
+build and run directories will be subdirectories of the work directory.
+</dd>
+<dt>CAM run directory</dt>
+<dd>The run directory is specified by the shell variable
+<code>rundir</code>.  By default this is set to a subdirectory of the work
+directory which has the same name as the run's case name (which is a
+required namelist input).  The script will create this directory if it
+doesn't exist, and will exit if an error is encountered trying to create
+the directory.
+</dd>
+<dt>CAM build directory</dt>
+<dd>The build directory is specified by the shell variable
+<code>blddir</code>.  By default this is set to the <code>bld</code>
+subdirectory of the run directory.  The script will create this directory
+if it doesn't exist, and will exit if an error is encountered trying to
+create the directory.
+</dd>
+<dt>Configuration of CAM</dt>
+<dd>The configuration of CAM is done by calling the 
+<a href="#configure"><code>configure</code></a>
+utility.  The default configuration may be changed by supplying the
+appropriate arguments to <code>configure</code>.
+</dd>
+<dt>Building CAM</dt>
+<dd>The script will check for an executable named <code>cam</code> in the
+build directory.  If no executable exists then the script changes to the
+build directory and issues the <code>configure</code> and
+<code>gmake</code> commands.  If the GNU make command on your system is not
+called "gmake", or if it is not in your PATH, then the <code>gmake</code>
+in the script will need to be changed to the appropriate name.
+<code>gmake</code> is invoked with the <code>-jn</code> option where
+<code>n</code> is the number of simultaneous compilation commands issued.
+This number should not be larger than the number of processors available
+for the build.
+</dd>
+<dd>The output from the build is written to the file <code>MAKE.out</code>
+in the build directory.  If a build fails this is the first place to look
+for information.
+</dd>
+<dt>Rebuilding CAM</dt>
+<dd>The scripts are set up to <em>not</em> rebuild CAM if an executable
+already exists.  To use the script in the situation where a rebuild of only
+the code (and its dependencies) that has been modified is desired, the
+script must be edited by commenting out the conditional statement that
+tests for the existence of a <code>cam</code> executable.  Also, the
+<code>configure</code> command must be commented out since rerunning it
+will update the configuration files (e.g., misc.h) that all the source
+files depend on, and hence will result in a complete rebuild.
+</dd>
+<dt>Creating the namelist</dt>
+<dd>The script will change into the build directory and issue the
+<a href="#bld-nl"><code>build-namelist</code></a> command.  The reason for the change to the
+build directory is that that is the location of the
+<code>config_cache.xml</code> file produced by <code>configure</code> which
+is used by <code>build-namelist</code>.  The namelist is created in a file
+called <code>namelist</code> which is written to the run directory.
+</dd>
+<dd>The case name, run type, and elapsed length of run are set by assigning
+values to the shell variables <code>case</code>, <code>runtype</code>, and
+<code>nelapse</code> respectively.  Other changes to the namelist may be
+made by modifying the <code>-namelist</code> argument of the
+<code>build-namelist</code> command.
+</dd>
+<dt>Running on an IBM</dt>
+<dd>The default parallelization on the IBM is hybrid MPI/OpenMP.  The
+script is set up for NCAR's machine which has 4 processor nodes.  One MPI
+process (task) is assigned to each node and by default the number of
+threads is set to the number of processors on each node.  The number of
+nodes is set by either the <code>#@node</code> loadleveler variable if
+running in batch mode, or by the <code>MP_NODES</code> environment variable
+if running interactively.  For the spectral dynamical cores the number of
+MPI processes is restricted to being a power of 2.
+</dd>
+<dd>Changing the number of MPI processes per node is done by setting either
+the <code>#@tasks_per_node</code> loadleveler variable if running in batch
+mode, or by the <code>MP_TASKS_PER_NODE</code> environment variable if
+running interactively.  If more than 1 MPI process is assigned to a node
+then the number of threads for each task should be reduced so that the
+number of MPI processes times the number of threads per process does not
+exceed the processor count on the node.  The number of threads per process
+can be set by changing the value of the <code>XLSMPOPTS</code> environment
+variable.  For example the number of threads is set to 2 with the string
+<code>"stack=86000000:parthds=2"</code>.
+</dd>
+<dt>Running on an SGI</dt>
+<dd>The default parallelization on the SGI is pure OpenMP.  The script is
+setup to use the default number of threads which is set to the number of
+processors on the machine, or to the number available in the queue if
+running in batch mode.  This number can be reduced by uncommenting the
+setenv command for <code>OMP_NUM_THREADS</code> environment variable and
+setting it to the desired number.  The script also uses some
+<code>module</code> commands which set up the system environment for NCAR
+machines.  These commands may need to be commented out or modified on
+non-NCAR platforms.
+</dd>
+<dt>Running on a PC</dt>
+<dd>The PC run script is set up to illustrate a pure OpenMP run.  Since the
+default shared memory processing for the PC in the <code>configure</code> utility is
+none, the <code>-smp</code> option must be supplied to build CAM for an
+OpenMP run.  The number of processes is set by the shell variable
+<code>nthreads</code>.
+The PC script does not have a batch queue submission capability.
+</dd>
+<dt>Running batch jobs</dt>
+<dd>The IBM and SGI scripts both contain lines that control batch queue
+submission.  On the IBM the loadleveler variable <code>#@class</code> must
+be set to a valid queue name, and the run script submitted using the
+<code>llsubmit</code> command.  On the SGI the <code>-q</code> option to
+the <code>qsub</code> command must be set to a valid queue name, and the
+run script is submitted using the <code>qsub</code> command.
+</dd>
+
+</dl>
+
+
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-16.html#configure>2.1.2.1 The configure utility</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-16.html#bld-nl>2.1.2.2 The build-namelist utility</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-16.html#MARKER_9_26>2.1.2.3 Example run scripts </A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-19.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.71.2.20 $ $Date: 2003/06/13 15:42:52 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

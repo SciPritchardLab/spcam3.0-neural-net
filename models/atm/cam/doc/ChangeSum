@@ -1,0 +1,470 @@
+Originator:	Date:	Tag:	    		Synopsis:
+===============================================================
+rosinski		12/29/03 cam2_0_2_dev56	 	Enable restarting coupled 
+						model from dev51 restart 
+						file.
+jmccaa		12/22/03 cam2_0_2_dev55	 	Tuning mods for finite 
+						volume 2x2.5.
+pworley		12/18/03 cam2_0_2_dev54	 	Improved and SMP-aware 
+						physics load balancing 
+						schemes; spmdinit_dyn 
+						called after runtime_options called
+hender		12/15/03 cam2_0_2_dev53	 	Improve and extend 
+						prototype of new run-time 
+						options module.
+rosinski		12/12/03 cam2_0_2_dev52	 	Improve handling of 
+						surface fractions, 
+						especially in coupled 
+						mode (SOM and CCSM)
+mvr		12/08/03 cam2_0_2_dev51	 	add -Q to Makefile for 
+						IBM, added XLSMPOPTS back 
+						into run-ibm.csh
+jmccaa		12/03/03 cam2_0_2_dev50	 	Small change to prevent 
+						CAM from incorrectly 
+						modifying sea ice 
+						fractions in SOM/CCSM 
+						mode.
+hender		11/18/03 cam2_0_2_dev49	 	New T85 surface data set 
+						with pre-computed fields, 
+						fixed SST data sets at 
+						T85 and T170, T85 
+						tuning.
+rosinski		11/11/03 cam2_0_2_dev48	 	Save memory in aerosol 
+						code by holding in-core 
+						only 2 time levels of 
+						data.
+jet		11/05/03 cam2_0_2_dev47	 	cam usage of  boundary 
+						dataset ice fraction made 
+						consistant with HADISST 
+						data.
+pworley		11/04/03 cam2_0_2_dev46	 	Decreased memory 
+						requirements in 
+						dynamics/eul/inidat and 
+						added new load balancing 
+						scheme to phys_grid (same 
+						as dev39).
+hender		10/31/03 cam2_0_2_dev45	 	Performance optimization 
+						for IBM.
+jmccaa		10/31/03 cam2_0_2_dev44	 	T85 tuning, removal of 
+						many default history file 
+						fields, modification of 
+						dif4 initialization.
+rosinski		10/29/03 cam2_0_2_dev43	 	cos(lat) now applied to 
+						LANDM field offline.  
+						Since all IC files now 
+						require this field 
+						(LANDM_COSLAT), new IC 
+						fields were generated.
+rosinski		10/28/03 cam2_0_2_dev42	 	Eliminate global TS print 
+						from physpkg and other 
+						minor speedups. Add T85 
+						and 2x2.5 aerosol 
+						datasets to xml 
+						file.
+jmccaa		10/23/03 cam2_0_2_dev41	 	Climate tuning mods for 
+						T42 and T85.
+rosinski		10/22/03 cam2_0_2_dev40	 	Move horizontal aerosol 
+						interpolation offline.  
+						Modify print_memusage for 
+						readability and 
+						portability.
+pworley		09/29/03 cam2_0_2_dev39	 	Decreased memory 
+						requirements in 
+						dynamics/eul/inidat and 
+						added new load balancing 
+						scheme to phys_grid.
+hender		09/22/03 cam2_0_2_dev38	 	Bug fix for prognostic 
+						aerosols, SE improvements.
+mirin		09/17/03 cam2_0_2_dev37	 	Transpose and other FV 
+						improvements
+jmccaa		09/12/03 cam2_0_2_dev36	 	Merge of physics tuning 
+						branch onto cam_dev 
+						branch.
+mvertens		09/10/03 cam2_0_2_dev35	 	fix clm bug that caused 
+						problems at very high mpi 
+						task number
+hender		09/02/03 cam2_0_2_dev34	 	AIX 64-bit addressing and 
+						a bunch of other 
+						stuff
+mvertens		08/25/03 cam2_0_2_dev33	 	updated clm code from 
+						clm2_deva_30 to 
+						clm2_deva_36
+pworley		08/19/03 cam2_0_2_dev32	 	Chunking data structures 
+						and optimizing interprocessor communication in ozone routines
+rosinski		08/14/03 cam2_0_2_dev31	 	Bugfix from Natalie M. 
+						for sulfur fields.  
+						Consistent treatment of 
+						r4 vs. r8 in function 
+						calls
+pworley		08/13/03 cam2_0_2_dev30	 	Replaced global spectral 
+						arrays and indices with 
+						local arrays in EUL 
+						dycore, to decrease 
+						memory requirements.
+aconley		08/07/03 cam2_0_2_dev29	 	linearly interp. asym and 
+						ssa parameters, Do not 
+						extrap. optics beyond rh 
+						= 1.0
+rosinski		08/06/03 cam2_0_2_dev28	 	Back out nf90 interface 
+						from sulfur codes.
+hender		07/30/03 cam2_0_2_dev27	 	First cut at getting dust 
+						to work with physics 
+						chunking.
+hender		07/28/03 cam2_0_2_dev26	 	Added Phil Rasch's 
+						prognostic SOx aerosols.
+jmccaa		07/17/03 cam2_0_2_dev25	 	Introduction of 
+						orographic form drag and 
+						modification of gravity 
+						wave drag routines.
+eaton		07/11/03 cam2_0_2_dev24	 	dycore independent energy 
+						fixer, only active for 
+						FV
+hender		06/21/03 cam2_0_2_dev23	 	Fixes for s coupled 
+						runs, removal of CCM366 
+						and LSM, other minor 
+						fixes.
+hender		06/20/03 cam2_0_2_dev22	 	Rolled back dev21 changes 
+						(per CAM CRB).
+eaton		06/18/03 cam2_0_2_dev21	 	dycore independent energy 
+						fixer, only active for 
+						FV
+erik		06/16/03 cam2_0_2_dev20	 	Get rid of ccm366/lsm 
+						test in test-model.pl, 
+						clean more files in 
+						$MODEL_BLDDIR, send 
+						*.cprout files in 
+						test-model to $MODEL_BLDDIR
+hender		06/13/03 cam2_0_2_dev19	 	Merged "science" branch 
+						into "dev" branch.
+rosinski		04/08/03 cam2_0_2_dev18	 	 
+						
+rosinski		04/05/03 cam2_0_2_dev17	 	Added ISCCP cloud 
+						simulator
+tcraig		04/03/03 cam2_0_2_dev16	 	Updates for CCSM coupling 
+						with cpl6, CCSM coupling 
+						with FV, rain/snow in 
+						coupling
+jet		04/02/03 cam2_0_2_dev15	 	Added capability to 
+						output history tape 
+						fields on a column by 
+						column basis
+eaton		03/27/03 cam2_0_2_dev14	 	fix fv restart under 
+						lf95/debug and fix bug in 
+						pseudo-ozone test 
+						tracer
+hender		03/25/03 cam2_0_2_dev13	 	Fixes and upgrades to 
+						test scripts, change for 
+						omega in history 
+						output.
+erik		03/20/03 cam2_0_2_dev12	 	Fix bug in test-model 
+						with -compare and update 
+						XML::Lite from 0.11 to 
+						0.14
+mirin		03/13/03 cam2_0_2_dev11	 	Changes to transposes for 
+						2D FV decomposition.
+hender		03/12/03 cam2_0_2_dev10	 	Added SOM test to 
+						test-model.pl.  Various 
+						bug fixes.  2nd tag 
+						attempt!!
+rosinski		02/26/03 cam2_0_2_dev9	 	Added SOM capability.
+jet		02/19/03 cam2_0_2_dev8	 	fix bug in srface 
+						diagnostic variables - 
+						fsnslnd fsnsocn 
+						etc
+hender		02/10/03 cam2_0_2_dev7	 	Grab bag:  Makefile and 
+						script fixes for SGI, 
+						Linux (PGI and Lahey), 
+						IBM
+pworley		02/05/03 cam2_0_2_dev6	 	New 1D decomposition for 
+						Fourier and Spectral 
+						domains in SLD dycore, 
+						for improved performance
+eaton		01/21/03 cam2_0_2_dev5	 	makefile/configure 
+						changes
+hender		01/17/03 cam2_0_2_dev4	 	ncar_batch.csh:  added 
+						support for test-model.pl 
+						with -compare option
+jet		01/13/03 cam2_0_2_dev3	 	Added diagnostics for 
+						surface budget calculation, moved sst/ocn interpolation to correct minor flux bug
+rosinski		01/09/03 cam2_0_2_dev2	 	Add evap bugfix to 
+						ice_srf.F90 per C. 
+						Bitz
+hender		01/06/03 cam2_0_2_dev1	 	Minor improvements to 
+						batch execution of 
+						test-model and User's 
+						Guide updates
+erik		12/20/02 cam2_0_1_dev17	 	Small script change for 
+						testing, Makefile change 
+						to run on Compaq
+mvertens		12/19/02 cam2_0_1_dev16	 	updated cam documentation 
+						for cam2_0_2 release
+mvertens		12/18/02 cam2_0_1_dev15	 	 
+						
+erik		12/17/02 cam2_0_1_dev14	 	Fix script problems use 
+						new datasets, update to 
+						ccsm2_0_beta61
+mvertens		12/09/02 cam2_0_1_dev13	 	clm code updated to 
+						development tag 
+						clm2_deva_01 (clm2.1 
+						code)
+eaton		11/26/02 cam2_0_1_dev12	 	new physics buffer and 
+						misc makefile changes
+eaton		11/21/02 cam2_0_1_dev11	 	 
+						
+eaton		11/14/02 cam2_0_1_dev10	 	fix some uninitialized 
+						variables so lf95 debug 
+						mode works
+eaton		11/14/02 cam2_0_1_dev9	 	change AIX optimization 
+						from O3 to O2
+forrest		11/13/02 cam2_0_1_dev8	 	Fix for new code 
+						introduced in cam2_0_1_dev7 that caused run-time failures on SGI and Linux
+forrest       11/08/02 cam2_0_1_dev7      introduced clump land
+                                          model decomposition and
+                                          implemented new alltoall
+                                          comm between atm and
+                                          lnd
+pworley       11/06/02 cam2_0_1_dev6      Fixed minor bugs
+                                          introduced in cam2_0_1_dev3 that were found with Lahey a
+nd SGI compilers
+bshen         11/06/02 cam2_0_1_dev5      Changed DAO scripts
+eaton         10/30/02 cam2_0_1_dev4      implement ghg surface
+                                          values module
+pworley       10/27/02 cam2_0_1_dev3      New 1D decomposition for
+                                          Fourier and Spectral
+                                          domains in EUL dycore,
+                                          for improved performance
+pworley       10/27/02 cam2_0_1_dev2      In-lined two temporaries
+                                          in grcalc, so that new
+                                          EUL dom. decomp. will be
+                                          bit_for_bit on the
+                                          IBM
+sawyer        10/20/02 cam2_0_1_dev1      Bug fix for tracer
+                                          advection (from S.-J.
+                                          Lin)
+sawyer		10/18/02 cam2_0_dev26	Bug fix from FVGCM for 
+						multiple advected 
+						constituents (S.-J. 
+						Lin)
+erik		10/02/02 cam2_0_dev25	Fix run-pc.csh script.
+erik		09/24/02 cam2_0_dev24	Fix minor problems 
+						(cam-bugs 64,65,66)
+eaton		09/20/02 cam2_0_dev23	updates to User Guide
+rosinski	09/20/02 cam2_0_dev22	fix potential memory 
+						overwrite bug in 
+						radae.F90
+erik		09/16/02 cam2_0_dev21	 	Add new output fields: 
+						PRECCINT, PRECCFRQ, 
+						PRECLINT, PRECLFRQ, and 
+						Z050
+rosinski		09/16/02 cam2_0_dev20	 	Implement shared 
+						constants in ice code.  
+						NOTE: no control run for 
+						this tag yet exists.
+eaton		09/14/02 cam2_0_dev19	 	implement the Makefile 
+						SMP option for linux-pgf90
+olson		09/06/02 cam2_0_dev18	 	bugfix in sld/scan2.F90
+sawyer		09/05/02 cam2_0_dev17	 	Allowed 3 latitudes per 
+						process; improvements 
+						from fvgcm-1_3_71
+erik		08/28/02 cam2_0_dev16	 	Fix deadlock with 
+						scenario_so4, fix various 
+						bugs, T85, T170 in 
+						scripts, update to 
+						clm2_3_dev32, ccsm2_0_beta53
+sawyer		08/07/02 cam2_0_dev15	 	Completed merge of 
+						fvgcm-1_3_56 te_map, 
+						cleaned up remaining 
+						t3/tvm arrays
+sawyer		08/06/02 cam2_0_dev14	 	Patched FV communicator 
+						bug in coupled mode; T3 
+						reset to phys_state%t in 
+						p_d_coupling; config. 
+						improvments
+jet		08/01/02 cam2_0_dev13	 	Fix  initialization 
+						problem with fractional 
+						land, doesn't affect 
+						climate, only for CAM not 
+						CCSM
+erik		07/31/02 cam2_0_dev12	 	Add 2D-decomp for FV to 
+						bld, Fix Solaris climate, 
+						add production test, add 
+						timing parser, fix 
+						various bugs
+sawyer		07/30/02 cam2_0_dev11	 	te_map.F90 aligned with 
+						latest FVGCM version; 
+						optimizations: overlapping communication/computation
+sawyer		07/15/02 cam2_0_dev10	 	Merged latest work from 
+						DAO FVGCM version 
+						fvgcm-1_3_44 
+sawyer		07/04/02 cam2_0_dev9	 	Bug fixes for 2D domain 
+						decomposition, LF95 
+						strict error checking
+sawyer		06/24/02 cam2_0_dev8	 	FV patches for Lahey 
+						strict error checking
+erik		06/20/02 cam2_0_dev7	 	#include "" to <>, Fix 
+						Solaris make, Fix SLD for 
+						Lahey, change coupled 
+						restarts, fix sort, 
+						update csm_share/bld/scripts, fix clm restart, 
+mvertens		06/20/02 cam2_0_dev6	 	put chunking into coupled 
+						model
+eaton		06/19/02 cam2_0_dev5	 	build procedure mods, 
+						memory allocation 
+						mods
+erik		06/15/02 cam2_0_dev4	 	Remove precision module, 
+						and use csm_share/shr_kind_mod instead with renames to r8,r4,i8
+sawyer		06/13/02 cam2_0_dev3	 	Solved SUN compilation 
+						problem; further merging 
+						of FVGCM into CAM; bug 
+						fix for SMP-only
+sawyer		06/04/02 cam2_0_dev2	 	Merge of FVGCM (DAO) 
+						software engineering 
+						improvements into 
+						CAM2
+erik		06/03/02 cam2_0_dev1	 	Fix test-model.pl 
+						problems, fix problems 
+						running Lahey for Eul 
+						dy-core, add T31 namelist 
+						options
+erik		05/17/02 cam1_8_dev11	 	License update, icefrac 
+						bug-fix, build fixes, 
+						dataset name changes, fix 
+						test-model.pl so that 
+						validation could be 
+						done
+erik		05/13/02 cam1_8_dev10	 	Replace Numerical-Recipe 
+						code, Lahey fixes for 
+						multiple constituents, 
+						Update to ccsm2_0_beta45, 
+						update to clm2_3_dev30, 
+						some Solaris and Compaq 
+						fixes
+eaton		05/13/02 cam1_8_dev9	 	merge newbld branch
+erik		05/08/02 cam1_8_dev8	 	Fix CCSM restart problem
+jet		05/08/02 cam1_8_dev7	 	definesurf to extend ross 
+						ice shelf by default, 
+						clean up csim error 
+						messages
+sawyer		05/08/02 cam1_8_dev6	 	FV patches to help pass 
+						lf95 strict error 
+						checking, Erik's fix of 
+						tphysbc.F90 to pass FV 
+						test 1
+erik		05/07/02 cam1_8_dev5	 	Fix problem with restarts 
+						when running coupled.
+rosinski		05/02/02 cam1_8_dev4	 	xlf90 bugfix for 
+						h_override.  make clean 
+						deletes esmf.  flint 
+						complaints.  modified 
+						timing calls.  Added lf95 
+						to definesurf makefile.
+erik		05/01/02 cam1_8_dev3	 	Output field changes, 
+						cam1 to cam2, FLAND to 
+						LANDFRAC, fix vertinterp, 
+						longname for constituents
+erik		04/27/02 cam1_8_dev2	 	 
+						
+erik		04/22/02 cam1_8_dev1	 	 
+						
+rosinski		03/29/02 cam1_7_dev34	 	Bugfix to tphysbc.F90 to 
+						keep uninitialized data 
+						from being used.
+pworley		03/12/02 cam1_7_dev33	 	load-balanced physics 
+						option; PCOLS cpp token 
+						for setting pcols; SOM 
+						chunking bug fix
+erik		03/07/02 cam1_7_dev32	 	Bug-fix to cam1_7_dev30 
+						snowfall rates, also fix 
+						interpret_filename_spec
+mirin		03/07/02 cam1_7_dev31	 	Completed full history 
+						capability for 2D FV 
+						decomposition
+erik		03/06/02 cam1_7_dev30	 	Fix labels on monthly 
+						files, physics changes 
+						from mzh6, fix CCSM logs, 
+						update to ccsm2_0_beta38
+erik		03/01/02 cam1_7_dev29	 	Fix initial filenames and 
+						increase caseid from 16 
+						to 32 characters
+erik		02/15/02 cam1_7_dev28	 	Add new flexible 
+						filenames with CCSM names 
+						as defaults, update to 
+						CLM2.3.17
+eaton		02/08/02 cam1_7_dev27	 	bugfix for CAM makefile
+eaton		02/06/02 cam1_7_dev26	 	 
+						
+eaton		02/05/02 cam1_7_dev25	 	remove prognostic sulfur 
+						cycle stubs
+olson		01/31/02 cam1_7_dev24	 	modifications and bufixes 
+						to eulerian, sld, and 
+						physics routines
+sawyer		01/16/02 cam1_7_dev23	 	Upgraded fvCAM to newest 
+						mod_comm primitives
+mirin		01/15/02 cam1_7_dev22	 	Support history files for 
+						2D FV decomposition
+sawyer		01/07/02 cam1_7_dev21	 	Merge of current DAO 
+						fvGCM FV dycore into CAM 
+						baseline: ghosting of 
+						variables, mod_comm for 
+						communication
+rosinski		01/02/02 cam1_7_dev20	 	Mods to SOM: MLD renamed 
+						MLDANN on SST dataset., 
+						and contains yearly 
+						values.  SPMD SOM 
+						indexing fix.  No 
+						resetting SICTHK, SNOWH, 
+						TSSUB in SSTINI
+sawyer		12/27/01 cam1_7_dev19	 	FV core upgrade: Q3 
+						indexing changed to 
+						(i,j,k,iq); no changes in 
+						order on history/restart 
+						files
+eaton		12/18/01 cam1_7_dev18	 	changes for share 
+						constants
+sawyer		12/18/01 cam1_7_dev17	 	Bug fix of mod_comm 
+						library for AIX and 
+						Linux
+sawyer		12/17/01 cam1_7_dev16	 	FV dycore improvements: 
+						mod_comm comm. library; 
+						more support for 2D 
+						decomposition
+rosinski		12/06/01 cam1_7_dev15	 	Add per-tape averaging 
+						flag.
+mvertens		12/04/01 cam1_7_dev14	 	put in esmf calendar 
+						manager into clm2
+eaton		12/02/01 cam1_7_dev13	 	make history files 
+						conform to CF metadata 
+						conventions
+eaton		11/29/01 cam1_7_dev12	 	update ESMF lib to 
+						MF_LLU_0_0_11p3
+mirin		11/28/01 cam1_7_dev11	 	Changes for multi-2D 
+						decomposition for FV 
+						dycore
+mvertens		11/26/01 cam1_7_dev10	 	changed mpi distribution 
+						of subgrid patches in 
+						clm2
+erik		11/21/01 cam1_7_dev9	 	Get coupled model to 
+						work, update to 
+						scripts_a011121 and 
+						bld_b011121
+eaton		11/21/01 cam1_7_dev8	 	add perpetual calendar 
+						option to time manager
+eaton		11/16/01 cam1_7_dev7	 	update ESMF library
+erik		11/16/01 cam1_7_dev6	 	 
+						
+eaton		11/13/01 cam1_7_dev5	 	makefile changes for ESMF 
+						library build
+erik		11/09/01 cam1_7_dev4	 	Fix problem with 
+						run-model.pl, add 
+						condense-path utility, 
+						update ESMF to MF_LLU_0_0_10p1
+mvertens		11/07/01 cam1_7_dev3	 	 
+						
+mvertens		11/07/01 cam1_7_dev2	 	put in three clm2 bug 
+						fixes that change 
+						answers
+erik		11/07/01 cam1_7_dev1	 	Move from CCM to CAM, 
+						mask error-growth 
+						problems by not letting 
+						CLM see snowfall
+

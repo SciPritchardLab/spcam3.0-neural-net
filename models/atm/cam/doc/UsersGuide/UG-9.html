@@ -1,0 +1,187 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-9.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-9.html,v 1.72.2.18 2003/01/03 22:34:50 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>1.1 What is new with CAM2.0.2</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-11.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-8.html>1. Introduction</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+-- do not edit anything above!!!> 
+CAM2.0.2 is the latest version of the NCAR Community Climate
+Model.&nbsp;&nbsp; The primary changes since the last public release
+(CAM2.0.1) are incorporations of new land model data structures
+(CLM2.1) and a new land-atmosphere communication scheme that
+significantly improves the model performance.  The primary changes of
+CAM2.0.1 relative to CAM2.0 were support for the Compaq-alpha cluster,
+Solaris, and Linux-PC Lahey F95 compilers.  Note that answers for this
+version of the model as well as for CAM2.0.1 are only slightly different
+than the CAM2.0 release.
+
+The following provides a summary of changes for CAM2.0.1.
+
+<A NAME="HEADING10_0"></A>
+<p>
+<b>Note: This model release is still considered a "pre-release" of the
+code before a finalized version can be prepared. There are several aspects of the
+code that are missing from previous releases that will be provided in a future
+model release. Among these are: support of off-line input dataset interpolation tools, 
+and support for reduced grid operation.</b>
+<UL>
+<LI>
+<B>Model functionality:</B>
+</LI>
+
+<UL>
+<LI>Fix initialization problem with fractional land. Initialization
+uses the value for TS from the land initialization instead of value
+from udpate surface fluxes method.
+
+<LI>Restart pointer files aren't looked for on MSS or local disk, and
+model
+will die if it expects to find them and can't.
+
+<LI>Fix problems associated with using the scenario_so4 namelist
+option.
+
+<LI>Various changes to the FV dynamical core to bring it up to date
+with the work at NASA/DAO.
+</UL>
+<P>
+<LI>
+<B>Computational environment:</B>
+</LI>
+
+<UL>
+<P>
+<LI>
+Added support for Compaq-Alpha cluster, Solaris and Linux PC (with Lahey F95 Compiler).</LI>
+</LI>
+
+<LI>Model works with strict error checking with Lahey F95 compiler.
+
+<LI>
+Support for interpolation tools for initial datasets has been temporarily removed, but datasets at
+several standard resolutions are provided.
+</LI>
+
+<LI>Update ESMF library to ESMF_0_0_2p5, which changes the name of
+"conf.h" to "ESMF_conf.h", so that this file won't be confused with
+system files.
+
+<LI>Use physics chunking (2D decomposition) when running the coupled model.
+</UL>
+
+<P>
+<LI>
+<B>User Interface changes:</B></LI>
+
+<UL>
+
+<LI><B><TT>DIF4</TT></B> is now a namelist parameter that is required to be set when
+running T42 resolution with Eulerian dynamics.
+
+<LI>Restart files changed when running in coupled mode so that
+"b20.007" restart files could be used with the new model.
+
+<LI>Don't limit the length on the CLM restart pointer file, doing so
+caused trouble when restarting cases with long caseid's.
+</UL>
+
+<P>
+<LI>
+<B>Build and run scripts:</B>
+</LI>
+
+<UL>
+<LI>Add options to configure to set PCOLS (the max number of physics
+columns), and to turn Open-MP threading on or off.
+
+</UL>
+</UL>
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-11.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-8.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.72.2.18 $ $Date: 2003/01/03 22:34:50 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

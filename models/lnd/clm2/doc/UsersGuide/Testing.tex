@@ -1,0 +1,101 @@
+\section {Testing Model Changes}
+
+The script test-model.pl in the {\bf bld/offline/tests} directory runs
+a suite of basic tests for the CLM2.1 model running in offline mode on
+a T42 model grid.  In order to use test-model.pl, users need to
+have at least Perl version 5.004 on their system.  This test suite is
+designed for model testing during the modification of model code or
+for simply porting the code to another machine. The test suite
+provides a check that the basic functionality of the model still works
+despite the changes that have been introduced.
+
+In this section, usage of test-model.pl for basic acceptance testing
+is described.  The command-line arguments to ``test-model.pl'' and
+environment variables useful to the script are described. The script
+is designed to be run interactively.  Although this script can be run
+at other labs, testing has only been done on NCAR
+machines. Consequently, the following discussion will be confined to
+NCAR platforms. The user should feel free to try the scripts at other
+labs.
+
+Before running test-model.pl, the user needs to set the environment
+variable, {\bf CSMDATA}, to the full disk pathname containing the
+untarred data subdirectories.  At NCAR, CCSM input datasets are stored
+on a NFS mounted directory,
+``/fs/cgd/csm/inputdata/lnd/clm2''. Consequently, this is the default
+value for \$CSMDATA in the testing scripts.  If the user has untarred
+the source code such that the test-model.pl script is in the directory
+``/home/user/clm2/bld/offline/tests'', then the user may invoke the
+script as follows:\newline
+
+\begin{verbatim}
+     cd /home/user/clm2/bld/offline/tests 
+     test-model.pl 
+\end{verbatim}
+
+The script, test-model.pl, is designed such that the common settings
+the user might want to control are easily set by command line
+arguments. The ``-h'' option to test-model.pl lists all of the
+possible command-line options. 
+
+\begin{verbatim}
+    -h       = Help (this message) 
+    -t       = List the tests that are performed  
+    -clean   = Clean the old directories out   
+    -nofail  = Continue even if errors are found   
+    -res     = Resolution (T42)
+    -s n     = Skip to given test n (or range of numbers)   
+             = (example -s 4 start with test no. 4)   
+             = (or      -s 2-4 do tests 2 through 4)   
+    -c dir   = Compare to another version of the CLM2 model in this directory   
+             = (example -c /home/user/clm2/src)  
+    -l lab   = Set the lab you are running at    
+\end{verbatim}
+
+The ``-t'' option to ``test-model.pl'' lists all of the possible
+tests.  Below is a brief summary of each test. \newline
+
+\medskip
+\begin{itemize}
+\item 
+Tests 1 and 2. Run three time-steps with DEBUG compiler flags on, with
+SPMD on and off, and then ensure that answers are identical.
+\item 
+Tests 3,4 and 5. Perform an initial run followed by a restart using
+fewer SPMD tasks (if SPMD enabled), and fewer threads. Then do an
+initial run the same number of timesteps as the restart, and compare
+answers ensuring they are identical.
+
+\item 
+Test 6. If a comparison to a previous code library is requested (via
+the ``-c'' option), repeat the last initial run with the previous code
+library and check if answers are identical.
+\end{itemize}
+\medskip
+
+An important feature of test-model.pl is the ability to compare
+user modified model code to a previous program library. This is useful in
+order to ensure that the implemented modifications do not change
+answers if that is what is expected.  Using the command line option
+``-c dir'' the user can compare to a previous program library by giving
+the full path to the root of the library to compare to. For example,
+if a test library can be found in ``/home/user/clm2mod/src'' and the
+unmodified library is located in ``/home/user/clm2/src'' then ``-c''
+can be used as follows: \newline
+
+\begin{verbatim}
+     cd /home/user/testmod/bld/offline/tests 
+     test-model.pl -c /home/user/clm2/src 
+\end{verbatim}
+
+Many times differences with respect to a control library are intended
+to be bit-for-bit.  When the ``-c'' option is used, only test 6 is
+compared to test 5 (see the list of tests above).  If this comparison
+is identical, the modified model is identified as being bit-for-bit
+with the control library. Whereas test-model.pl can easily identify if
+two model libraries give identical answers, it is more difficult to
+verify if changes are within machine roundoff. Currently, if non
+bit-for-bit differences occur, differences between the history files
+produced by both the control as well as modified libraries must be
+examined to determine if these differences indicate only roundoff
+level changes.

@@ -1,0 +1,154 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-19.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-19.html,v 1.28.2.15 2003/01/03 22:34:41 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.1.3 Running CAM as part of the CCSM coupled model system</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-20.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-16.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-14.html>2.1 How to Configure, Build and Run CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<H3><A NAME="SECTION2_1_4"></A>2.1.3 Running CAM as part of the CCSM coupled model system</H3>
+<P>
+The previous sections dealt with compiling and running CAM as a single stand-alone executable.
+CAM can also be run as part of the CCSM coupled model system. In this case the you need other
+CCSM components and scripts in addition to the CAM source code. To get the CCSM download
+go to the web-page:
+<p>
+<a href="http://www.ccsm.ucar.edu/models/ccsm2.0/">http://www.ccsm.ucar.edu/models/ccsm2.0/</a>
+<p>
+The CCSM download includes the flux coupler, active ocean and sea-ice models as well as
+data ocean and sea-ice models. and it includes the CAM2 and CLM2 source code provided with
+the CAM distribution.  The CCSM2.0 download page also gives full documentation on running 
+the coupled system and using the scripts and Makefile. Here we give a short description 
+on how to use the scripts.
+<p>
+The first thing to do is to uncompress and untar the source code and needed datasets.
+<br>
+<tt><b>unzip <br>
+untar xvf <br>
+unzip <br>
+untar xvf <br>
+</b></tt>
+<p>
+The main CCSM script is in "ccsm2/scripts/test.a1" and is called "test.a1.run". The suggestion
+is that if you run several cases you create directories parallel to "test.a1" with the case-name,
+and main scripts with the case name ending in ".run". In this case the standard test script
+case-name is "test.a1". "test.a1.run" invokes the "*.setup.csh" scripts that create the model
+executables and setup input files and namelists for each model component. The setup scripts
+are as follows:
+<ul>
+<li>atm.setup.csh -- CAM model setup.
+<li>cpl.setup.csh -- CCSM Coupler setup.
+<li>ice.setup.csh -- CSIM sea-ice model setup.
+<li>lnd.setup.csh -- CLM land model setup.
+<li>ocn.setup.csh -- CCSM POP ocean model setup.
+<li>datm.setup.csh - Data atmospheric model setup.
+<li>dice.setup.csh - Data sea-ice model setup.
+<li>dlnd.setup.csh - Data land model setup.
+<li>docn.setup.csh - Data ocean model setup.
+</ul>
+<p>
+The "b" section of the "test.a1.run" script is where the user can set various important model
+configuration settings (resolution, run-type, case-name etcetera). Be sure to change 
+"CSMDATA" to the location of where you untarred the input datasets. The "c" section then allows you
+to set the model components that will be used (data or active models) and to choose the number of
+threads and MPI tasks given to each component. After this the setup scripts are invoked in
+turn for the configuration of data or active model choosen in the main run script.
+<p>
+The "atm.setup.csh" script creates the CAM model namelist, including preparing input 
+datasets, creating the Filepath and misc.h, params.h CPP definition files, and building the 
+model executable. This script is configured to support a small number of model configurations
+(T31 and T42 resolution using Eulerian dynamics). The user may be able to use other
+resolutions by changing each of the setup.csh scripts. The user should also become familiar
+with the namelist options and Filepath, params.h and misc.h configuration files described later in
+this document.
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-20.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-16.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-14.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.28.2.15 $ $Date: 2003/01/03 22:34:41 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

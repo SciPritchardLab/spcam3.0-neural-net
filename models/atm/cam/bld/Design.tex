@@ -1,0 +1,862 @@
+\documentclass[]{article}
+\usepackage{html}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+\bodytext{BGCOLOR=white LINK=#083194 VLINK=#21004A}
+
+\begin{titlepage}
+
+\begin{latexonly}
+\noindent {\bf Community Climate System Model} \\
+\noindent National Center for Atmospheric Research, Boulder, CO \\
+\vspace{2in}
+\end{latexonly}
+
+\begin{center}
+{\Large\bf CAM Build Script Architecture Design} \\
+\medskip
+{\it Author Erik Kluzek}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section{Synopsis}
+
+This is an overview of the CAM model build-run-test-script design. The basic design includes
+three elements:\\
+
+\begin{tabular}{r p{3.7in}}
+	& Use of Environment variables to control behavior. \\
+	& Separation of configure, build, and run steps. \\
+	& Use of modular perl-scripts, object-oriented perl-objects, and c-shell scripts to control 
+	the process and allow for flexibility, modifications, customization and extensions. \\
+\end{tabular}
+		
+\section{Description}
+
+This document is a basic design over-view of the files in the
+``cam/bld'' directory used to configure, build, and run the CAM model. As well
+as the perl objects and scripts  in the "cam/test/system" and "cam/test/unit" 
+directories that are used for model testing. The main supported scripts are:
+
+\begin{tabular}{r p{3.7in}}
+	& run-model.pl -- Build and run a given model configuration. \\
+	& test-model.pl -- Test the model under several configurations and all dynamical cores. \\
+	& configure.pl -- Script to configure the model. \\
+	& build\_namelist.pl -- Simple script to create a model namelist. \\
+\end{tabular}
+
+\section{Architecture}
+
+The Build Objects divide the process of running the model into the
+following steps:\\
+\begin{tabular}{r p{3.7in}}
+         	&  Initialization (directory creation, build-tool creation etcetera) \\
+                &  Configuration\\
+                &  Build executable\\
+                &  Generate namelist\\
+                &  Running the model
+\end{tabular}
+
+The configuration step is done using a set of Object-oriented Perl scripts, and the 
+Build-step is done using a GNU-Make Makefile that is created from the configuration
+step. The other steps are done 
+using a set of Object Oriented Perl objects that allow processes to be 
+modular, flexible and easily extended by the user. The Perl-objects
+also provide methods to access the the configuration step and build
+steps.
+
+An initial design goal was to separate the configuration step so
+that in the future a configuration tool such as GNU-autoconf could do
+a whole-sale replacement of the current configuration process. Later
+it was realized that well-designed Perl configuration scripts could
+provide the same functional goals as autoconf, with less needless complexity
+and be easier to manage. However, the configuration process remains
+single part of the process which does allow the ability to do a whole-sale
+replacement of the step with a different process.
+
+\subsection{Environment variables}
+The main scripts allow settings by either using Environment variables
+or by using command-line options (or both). For some environment variables
+the scripts use defaults if the user doesn't select values by either
+method. For other variables scripts will terminate with an error if the user did not
+select anything. There is a limited set of variables that can be set with environment
+variables. The precedence is such that command-line options override 
+any settings that environment variables have. So if the user selects
+both a command-line option and sets the environment variable that controls
+the same behavior -- the command-line option will be used rather than
+the environment variable. The scripts use Environment variables in a read-only fashion.
+Default values for environment variables for different labs and platforms are
+provided in the CAM\_lab.pm perl object.
+
+\subsection{Default settings}
+Default settings are all provided in a XML file (CAM\_Defaults.xml) that is read to provide
+settings that the user does not provide. The user can also create their own customized
+defaults file that is read first for customized defaults the user likes to use.
+
+\subsection{Configuration cache file}
+The configuration process creates a XML file (config\_cache\_\$ARCH.xml) that is used
+to archive the configuration settings. The user can create this file themself, or let
+the configuration process create one for them. Once created this file is used to
+communicate the configuration settings to each part of the configure, build, and run
+process.
+
+\subsection{Configure step}
+The configure step is accomplished with a set of ``C-shell'' and perl scripts
+that help the user to prepare the files needed to build the
+model. Each file that is built has a separate script that
+is used to build that file. Scripts that create configuration files are
+named by the configuration file they create followed by ".in", followed by
+either ".csh" or ".pl" to designate c-shell or perl scripts respectively. 
+There are several files needed before the model can be built:
+Filepath, misc.h, params.h, preproc.h, and Rootdir. The Filepath lists 
+the directories that will be used to build the model (in some cases the
+order is important). misc.h, params.h, preproc.h are files used by CPP to 
+define various parameter settings in the model. "misc.h" is shared between
+the land and atmosphere model, params.h is used for the atmosphere only
+and preproc.h is used by the land-model only. Rootdir, gives the root path to the CAM
+directory, and is used by the Makefile to figure out the path to the ESMF
+library and any other configuration scripts needed.
+
+The configure scripts are designed such that they use Environment
+variables to communicate between scripts, but each script could be
+called on it's own if the appropriate environment variables are set.
+To make the user-interface simpler, command-line options are not used 
+in the scripts called from "configure.csh". The exception to this
+rule is "config\_machine\_specs.pl", which uses a single command-line option
+to specify if it is setting defaults needed for configure or build.
+Since, the order that the scripts are run is important the main
+``configure.csh'', calls the scripts in the order that makes the most
+sense, and also prepares a "config\_cache\_\$ARCH.xml" that records the
+settings that were chosen (as an XML file). "\$ARCH" above refers to the platform type that is returned
+using the UNIX command "uname -s". Any default settings or prompting from the
+user will be done from the main "configure.csh" script, the other scripts
+will terminate if a needed environment variable is not set. The "*.in" scripts
+are not guaranteed to run stand-alone -- although in principle they should
+be able to run by themselves.
+
+\subsubsection{configure.csh script}
+The main configure.csh script calls the other configuration scripts in 
+sequence and then creates the ``config\_cache\_\$ARCH.xml'' script that
+stores the configuration settings. "configure.csh" uses environment
+variables if they are set, but also allows for command-line options to 
+set specific settings. Command-line options over-ride any environment
+settings previously set. By default "configure.csh" is in "interactive-mode"
+and required settings will be prompted for from the user. Although this is somewhat
+against the "autoconf" design goal it is the simplest and easiest user-interface
+for users. If the "disable-interactive" command-line option  is set, any missing environment 
+variables settings required that
+are not set (by command-line options or by explicit setting of the required variable)
+will cause the script to terminate.  After running each configuration file script 
+(Filepath,in.csh, misc.h.in.csh etcetera) ``configure.csh'' checks the error status and 
+terminates if there was a problem running the particular script. Since, the script
+runs on environment variables, if you run the script twice the previous settings
+will be used, unless explicitly changed after running the script for the first time.
+When running in interactive-mode important configuration settings will be prompted
+for again even though they are set (with the defaults being the previous setting).
+
+Command line options to the "configure.csh" script are patterned after
+the command line options available for Autoconf "configure" scripts. Examples,
+include "--enable-FEATURE" and --disable--FEATURE", and "--prefix".
+
+The minimum set of environment variables that must be set are:
+CASE, RESOLUTION, PLEV, and DYNAMICS.
+Other variables will be set to appropriate defaults. The one exception
+is when "RESOLUTION=custom" is selected when PLAT, PLON, PTRM, PTRK, and
+PTRN are also required.
+
+The list of scripts called from "configure.csh" and the order they
+are called in (as well as any command-line options used) is listed below:\\
+
+\begin{tabular}{r p{3.7in}}
+  & config\_machine\_specs.pl configure \\
+  & misc.h.in.csh \\
+  & params.h.in.csh \\
+  & preproc.h.in.csh \\
+  & Filepath.in.csh \\
+  & Rootdir.in.csh \\
+  & config\_machine\_specs.pl build
+\end{tabular}
+
+After running "configure.csh" the environment settings needed for
+building the model executable are stored in the "config\_cache\_\$ARCH.xml"
+file created. After running "configure.csh" the user has the option
+of "souring" this file so that the makefile can be run by hand. In
+other words the following steps are a valid way of interacting with
+the scripts:\\
+
+{\ttfamily
+configure.csh\\
+source config\_cache\_AIX.xml\\
+cd \$MODEL\_BLDDIR\\
+\$GNUMAKE\\
+}
+
+Each separate ".in" script that builds a configuration file is designed in
+order that it should be able to be run by itself, with all communication happening 
+using environment variables. A "*.in" script will simply terminate if a needed
+environment variable is not set. Thus, separate scripts will not prompt for
+input nor set default values. All prompting for values will be done from the
+configure.csh script. And settings of defaults will be handled by either configure.csh
+directly or by the config\_machine\_specs.pl script.
+
+\subsubsection{config\_machine\_specs.pl}
+
+This script is used for setting the default environment variables needed to build for the
+different machines at various labs. Primarily this sets defaults for the
+following env variables depending on platform and the setting of the LAB environment 
+variable: LIB\_NETCDF, INC\_NETCDF, LIB\_MPI, INC\_MPI, SHELL\_MSS and SPMD. 
+This script uses the CAM\_lab.pm
+perl object described later. This script is actually called twice. The
+first time it is called to set defaults for configuration, and the next
+time it is used to append settings needed for building the model executable.
+This script allows for a single command-line argument to it, that determines
+whether it's operation is to setup for "configuration", "build" or "run".
+"configuration" creates the "config\_cache\_\$ARCH.xml" script with the needed
+variables to run the other configuration scripts, "build" appends the environment variables 
+needed to run the Makefile to build the model executable into the "config\_cache\_\$ARCH.xml" 
+script. "run" appends the environment variables needed to run the model into the 
+"config\_env\_\$ARCH.csh" script.
+
+\subsubsection{misc.h.in.csh, params.h.in.csh, preproc.h.in.csh}
+These scripts create the preprocessor files used to set 
+CPP tokens for the model. The scripts each create files based on the
+input env variables. If the script was run previously, the new file is 
+compared to the old, and the old only updated if it's different than
+the old file. This allows the configuration step to be run over again
+without requiring make to recompile all the source code because one of 
+the *.h files was updated (if in fact it's the same as it was previously).
+
+\subsubsection{Filepath.in.csh, Rootdir.in.csh}
+These scripts create the Filepath which lists the directories that
+will be used in compilation, and the order of precedence, and Rootdir, 
+the absolute directory name to the top of the CAM directory.
+\subsubsection{config\_env\_\$ARCH.csh}
+The "config\_env\_\$ARCH.csh" file is a c-shell script created in the
+configuration process, by the "config\_machine\_specs.pl" script. It provides a way 
+to store the environment variable settings used in the configuration step. 
+This way other parts of the process can read the file and know what the previous
+configuration settings were. The user could also ``source'' this file 
+in order to inherit the configuration settings in their environment.
+\subsection{Makefile}
+In order to compile and link the model after the configuration files
+are created a GNU-Makefile is used. The Makefile expects that certain environment
+variables will be set to provide critical bits of information for the build
+process. Examples of environment variables expected by the Makefile include location 
+of NetCDF library and include files, MPI library and include files. The Makefile also
+queries using "uname -s" to decide what Operating system or machine is being used and 
+invoke the appropriate compiler options. The list of files to compile, and the dependencies
+between source files is generated automatically using a FORTRAN-90 dependency generator "makdep"
+that is provided with the distribution. The dependency generator is designed to mimic the
+behavior of "cpp -M", but it recognizes FORTRAN-90 "use" statements.
+\subsection{CAM Perl objects for configure/build/run}
+
+To build a modular flexible build/configure/run system, perl objects are
+used to manage the separate steps. Objects allow general code to be written
+but extended or customized later.
+
+\subsubsection{Inheritance hierarchy}
+
+Many of the Perl objects take a base class, and extend it with new object
+data and new methods, modify existing methods, or completely over-ride old
+methods. Since, objects that extend a base class, include the methods from
+the base class as well as it's own methods, it's important to understand
+the inheritance hierarchy of what objects extend which base classes.\\
+\begin{tabular}{r p{3.7in}}
+& {\bf CAM.pm} -- Base CAM object, containing hidden and
+utility methods \\
+& {\bf CAM\_run.pm} --- Extends the CAM.pm object with methods
+for building and running \\
+& {\bf CAM\_test.pm} --- Extends the CAM\_run.pm object with methods
+for building and running system tests for CAM.\\
+& {\bf CAM\_unit\_test.pm} --- Extends the CAM\_run.pm object with methods
+for building and running unit-tests.\\
+& {\bf lab\_default.pm} --- Base object creating a syntax to
+succinctly provide defaults settings for different labs
+and platforms. \\
+& {\bf CAM\_lab.pm} --- Object to deal with setting the default environment 
+                  variables needed for configuration, build and run steps. 
+                  Contains specific lab\_default objects that provide the
+                  specific default settings needed for the different supported
+                  labs and platforms.
+\end{tabular}
+
+\subsubsection{Environment variables}
+
+Environment variables handled by the CAM objects are imported directly as object data.
+Once imported into an object the object data is accessed rather than the environment
+variables directly. If a specific environment variable is not set, the CAM objects will
+often provide a suitable default value. These default values are provided within the object
+data and do not effect the outside environment variables. Thus environment variables are
+handled in a read-only fashion. As such if the environment variables are changed themselves
+the environment needs to be re-imported for the new variables to go into effect. The list
+of environment variables that a CAM object understands is listed in the object data "env\_list".
+Any object that extends the CAM.pm object that needs to access more environment variables 
+needs to add the additional env variables to "env\_list". The CAM.pm
+object has several basic methods for dealing with environment variables as follows.\\
+\begin{tabular}{r p{3.7in}}
+& {\bf import\_env} - Import environment variables into the object. \\
+& {\bf setenv} ------ Set the given environment variable into the object data. Only works
+                on environment variables that are used in by the object. \\
+& {\bf env} --------- Returns the value of the environment variable in the object. Only works
+                on environment variables used by the object. \\
+& {\bf exists} ------ Returns true if the given environment variable is used by this object. \\
+& {\bf write\_config\_env} - Writes env variable settings to the config\_env\_\$ARCH.csh file.\\
+& {\bf config\_env} -- Imports the contents of the config\_env\_\$ARCH.csh script created by the
+		configure.csh step.\\
+& {\bf config\_env\_file} - Get's or sets the name of the config\_env\_\$ARCH.csh script. \\
+& {\bf append\_config\_env} - Appends additional environment variable settings onto the end of
+              the config\_env\_\$ARCH.csh file.
+\end{tabular}
+\subsubsection{import\_env method}
+The import\_env method imports the environment variables from the environment into the Perl 
+object. The Perl object maintains a list of the environment variables it understands and it
+goes through the list to see if any of these env variables have been set or changed from the
+current object data value. Import\_env is only called from the CAM object
+constructor.
+\subsubsection{setenv method}
+The setenv method simply sets the value of the object data for a particular env variable. If
+the variable selected is not in the list of env variables for this object, an error code is
+returned. The setenv method only sets the object data it does not effect the environment.
+\subsubsection{exists method}
+The exists method checks to see if the given env variable exists for this object. This simply
+checks to see if the input variable is in the list of env variables this object deals with. If
+the variable is in the list, return true otherwise return false.
+\subsubsection{env method}
+The env method returns the value of the given env variable. If the input variable given is not
+used in this object the value "NOT-USED-HERE" is returned.
+\subsubsection{config\_env method}
+The config\_env method imports the env variable settings in the config\_env\_\$ARCH.csh 
+script. Any variables set in the config\_env\_\$ARCH.csh script that aren't listed in
+the object will set the given variable in the environment.
+\subsubsection{append\_config\_env method}
+The append\_config\_env method adds the build-time, or run-time settings on to the end 
+of the config\_env\_\$ARCH.csh script.
+\subsubsection{write\_config\_env method}
+Creates or adds env variables to the config\_env\_\$ARCH.csh script.
+
+\subsubsection{Error handling}
+
+To ensure defaults or settings are correct, the "machine\_specs" method queries the
+most important env variable settings to ensure they will work. So the "check\_gmake"
+method checks the value of "\$GNUMAKE" to ensure that the value is set and a working
+version of GNU Make. The "check\_files\_in\_dirs" method is used to ensure the appropriate
+libraries or include files are in the following directory's: (LIB\_NETCDF, INC\_NETCDF, 
+LIB\_MPI, INC\_MPI (if SPMD is TRUE). Also CASE\_DIR, BUILD\_DIR, and LOG\_DIR are queried
+to ensure they are existing writable directories. SPMD\_RUNCMND is also queried to ensure
+it is a valid executable. Because, command options vary for MPI submission there is no
+checking to ensure it is a valid MPI submission command, the user is required to ensure
+the command is correct on a non-supported platform.
+
+Error checking on namelists, consist of ensuring standard options are used correctly
+with other options, ensuring only one setting of a option is provided in the namelist,
+providing defaults for required settings, scanning the namelist for valid F90 syntax,
+and checking if input files are set and exist on disk for important input datasets.
+If RUNTYPE="branch", the namelist ensures that "nrevsn" is set in both atmosphere and land
+namelists.
+\subsubsection{CAM.pm object}
+Base CAM object, includes basic and utility methods needed for any objects derived from
+this base class. Important methods beyond the methods dealing with env variables already
+described previously for the CAM.pm object are:\\
+\begin{tabular}{r p{3.7in}}
+	& {\bf chdir} ------------- Change to given directory. \\
+	& {\bf checkdir} ---------- Check that path to given directory is what's expected. Used
+			by CAM\_run.pm to ensure when running the model you are in \$MODEL\_EXEDIR.\\
+       & {\bf check\_gmake} ------- Check that \$GNUMAKE is set to a valid path for GNU Make.
+			If not set correctly abort with an error.\\
+       & {\bf check\_files\_in\_dir} - Check that given files are in the given directory. This
+                     is primarily used to ensure that INC\_NETCDF, LIB\_NETCDF, INC\_MPI, 
+			and LIB\_MPI point to the proper directories. \\
+	& {\bf build\_support} ----- Build a support program (makdep, cprnc). \\
+	& {\bf build\_namelist} ---- Build the model namelist.\\
+	& {\bf parse\_namelist} ---- Parse a previous model namelist.\\
+	& {\bf interactive\_build} - Run with interactive prompts for env variables needed.\\
+	& {\bf clean} ------------- Clean the old directories out. \\
+	& {\bf OS} ---------------- Return the operating system on.\\
+	& {\bf arch} -------------- Return "uname -s" the short architecture name.\\
+	& {\bf Platform} ---------- Return a short 3-letter description of this architecture.\\
+	& {\bf exec} -------------- Execute the given command.\\
+	& {\bf do} ---------------- Check if a given option is set and return true if it is. This
+				method is used by several other methods that query specific options
+				(do\_clean, do\_build\_namelist, do\_resubmit, do\_pergro, 
+                            do\_interactive, and do\_batch).\\
+	& {\bf die} --------------- Terminate if there is a problem.
+\end{tabular}
+\subsubsection{CAM\_run.pm object}
+Extends the CAM.pm base class with methods for building and running the model. The
+list of public methods follows.\\
+\begin{tabular}{r p{3.7in}}
+& {\bf machine\_specs} - Set the environment variables needed for machine using.\\
+& {\bf configure}------ Run the configure step.\\
+& {\bf make} ---------- Build the model executable.\\
+& {\bf run} ----------- Run the model.\\
+& {\bf rest\_pfile} ---- Access the restart pointer file.\\
+& {\bf resubmit} ------ Resubmit the model to the batch que.\\
+\end{tabular}
+\subsubsection{CAM\_run\_unit\_test.pm object}
+Extends the CAM\_run.pm base class with methods for building unit-tests. Uses the "NEWBUILD"
+method in the Makefile in order to create a limited list of source files to compile rather
+than requiring to compile all files.\\
+\begin{tabular}{r p{3.7in}}
+	& {\bf Srcfiles} -------- Create list of source files need to compile.\\
+	& {\bf Filepath\_append} - Append the unit-test driver directory name onto Filepath.\\
+	& {\bf build\_namelist} -- Create a simple input namelist.\\
+	& {\bf configure} ------- Extend the CAM\_run.pm configure method for the unit-test.\\
+	& {\bf run} ------------- Run the unit-test.\\
+	& {\bf exec} ------------ Extend the CAM\_run "exec" method so that FAIL-tests won't
+			abort unless the unit-test fails to abort.\\
+	& {\bf list\_fail\_tests} - Read in a log-file and get a list of failure-tests that
+			this unit-test can do. Assumes the unit-test has a "list" option for
+			listing tests that can be run and a "general" option for generalized tests.
+\end{tabular}
+\subsubsection{lab\_default.pm}
+Generic object for dealing with a way to cleanly designate default settings of environment
+variables for different labs. The main public method for lab\_default.pm is "value" which
+figures out the default value, based on the platform running on and the LAB setting. This
+method also expands any environment variables that are in the value according to
+the C-shell definition of variable names.
+\subsubsection{CAM\_lab.pm object}
+Uses the lab\_default.pm object to define important default settings for use with running
+the model. CAM\_lab.pm sets defaults for the following list of variables:\\
+\begin{tabular}{r p{3.7in}}
+	& {\bf CASE\_DIR} ----- Directory where cases will be run. \\
+	& {\bf BUILD\_DIR} ---- Directory where model is built. \\
+	& {\bf LOG\_DIR} ------ Directory where log-files go. \\
+	& {\bf MODEL\_BLDDIR} - Directory where this specific case will be built. \\
+	& {\bf SPMD} --------- If SPMD (distributed memory) version of model is created. \\
+	& {\bf GNUMAKE} ------ Path to GNU Make to use. \\
+	& {\bf SHMEM\_CPUS} --- Number of shared memory CPU's to use. \\
+	& {\bf SPMD\_NODES} --- Number of SPMD nodes to use. \\
+	& {\bf SPMD\_RUNCMND} - Path to the SPMD run command (ie. mpirun). \\
+	& {\bf INC\_NETCDF} --- Directory for NetCDF include files. \\
+	& {\bf LIB\_NETCDF} --- Directory for NetCDF library files. \\
+	& {\bf INC\_MPI} ------ Directory for MPI include files. \\
+	& {\bf LIB\_MPI} ------ Directory for MPI library files. \\
+	& {\bf ARCHIVE} ------ Path to command to archive files. \\
+	& {\bf batch} -------- Path to batch submission command.
+\end{tabular} \\
+
+The methods in CAM\_lab.pm are as follows:\\
+
+\begin{tabular}{r p{3.7in}}
+	& {\bf env\_list} --- List the environment variables that CAM\_lab has defaults for. \\
+	& {\bf default} ---- Get the default value for the given variable for this platform
+                            and LAB setting.\\
+	& {\bf LAB\_list} --- List of LAB's that default settings are provide for.\\
+	& {\bf initialize} - Actually set the defaults for the list of environment
+	variables operating on.
+\end{tabular}
+\subsubsection{CAM\_test.pm object}
+Extends the CAM\_run.pm object to add methods dealing with system testing.
+\subsubsection{CAM\_unit\_test.pm object}
+Extends the CAM\_run.pm object to add methods dealing with unit testing.
+\subsection{CAM objects dealing with namelists}
+Several perl objects deal with model namelists. These objects are used by the CAM\_run.pm and
+CAM.pm objects, but are separate object classes.
+\subsubsection{Inheritance hierarchy}
+The namelist objects extend or modify the base object classes. Since, the extended
+objects inherit the methods from the base class, it's important to understand the
+hierarchy of what object extends what class.\\
+\begin{tabular}{r p{3.7in}}
+             & {\bf namelist.pm} ---- Base object for dealing with generic FORTRAN namelists \\
+             & {\bf atmlndnl.pm} ---- Extends namelist.pm, Adds methods for dealing with
+                                atmosphere or land namelists. Adds
+                                ability to read XML files with default
+                                values, and checks if nrevsn is set if 
+                                branch.\\
+             & {\bf camexp.pm} ------ Extends atmlndnl.pm, for CAM namelist \\
+             & {\bf clm2exp.pm} ----- Extends atmlndnl.pm, for CLM2 namelist
+\\
+             & {\bf lsmexp.pm} ------ Extends atmlndnl.pm, for LSM namelist
+\\
+             & {\bf CAM\_namelist.pm} -- Base object that uses, camexp.pm, clm2exp.pm, and
+                                  lsmexp.pm objects to create the full 
+                                  namelist including both the
+                                  atmosphere and specific land-model being used. Also
+				      uses the CAM\_run.pm object to deal with env variable
+			             settings.
+\end{tabular}
+\subsubsection{Handling of environment variables in the namelist objects}
+
+Because, the environment variables are handled in a read-only fashion in the CAM
+objects, the namelist objects must use the same values from the CAM objects. Hence, when
+the namelist objects need environment variables they must both query the appropriate
+CAM object and environment variables. Because, in many cases defaults will be set in
+the CAM\_run object rather than by setting the environment variables. Hence, if a
+CAM\_run object is being used that contains a CAM\_namelist object, the CAM\_namelist 
+object will need to query the CAM\_run object to ensure it's using the same env variables
+settings as the CAM\_run object. If a CAM\_namelist object is being used without a
+CAM\_namelist object then it can directly query the env variables.
+\subsubsection{namelist.pm object}
+namelist.pm is a perl object for parsing and writing generic FORTRAN namelists. namelist.pm
+converts a ASCII namelist into a perl associate array and vice versa.
+Here's the list of methods in the atmlndnl.pm object and their functionality.\\
+\begin{tabular}{r p{3.7in}}
+	& {\bf change} ---------- Interactively prompt for changes to a namelist.\\
+	& {\bf checkstring} ----- Check that a string namelist item is handled correctly.\\
+	& {\bf print} ----------- Print the namelist out.\\
+	& {\bf Write} ----------- Write the namelist out to a file.\\
+	& {\bf convert\_case} ---- Convert the case of the keys in a namelist to lowercase.\\
+	& {\bf parse} ----------- Parse a namelist from a file.\\
+\end{tabular}
+\subsubsection{atmlndnl.pm object}
+atmlndnl.pm extends the namelist.pm object for issues used by the land and atmosphere namelists.
+One extension is to adding the capability to set namelist defaults by parsing a XML file that
+saves default settings. The other common aspect is to add a method to ensure that the nrevsn
+namelist item is set if RUNTYPE="branch". atmlndnl.pm also adds methods for dealing with
+environment variables by accessing CAM\_run objects or searching for env variables directly.
+Thus all the methods for dealing with environment variables remain in the CAM.pm object.
+Since, CAM.pm object queries the environment for settings, but also provides it's own defaults,
+it's critical to query the CAM.pm object directly to ensure the settings are the same.
+
+Here's the list of methods in the atmlndnl.pm object and their functionality.\\
+\begin{tabular}{r p{3.7in}}
+	& {\bf import\_env} --------- Import environment variables from environment or from CAM\_run object. \\
+	& {\bf exists} ------------- Check if the given env variable is used in this namelist object.\\
+	& {\bf setenv} ------------- Set the given env variable in this namelist object.\\
+	& {\bf env} ---------------- Return the value of a given env variable.\\
+	& {\bf get\_default\_values} - Get the default values from the XML file for this namelist object.\\
+	& {\bf do\_interactive} ----- Return true if the interactive option is set.\\
+	& {\bf checkinputfile} ----- Check that given input file exists.\\
+	& {\bf check} -------------- Do a general check of the namelist for problems.
+\end{tabular}
+\subsubsection{camexp.pm object}
+The camexp.pm object extends the atmlndnl.pm object for specifically dealing with the CAM
+model namelists. The camexp.pm object contains the "set\_default\_values" method, and inherits
+all the methods from the "atmlndnl.pm" and "namelist.pm" object. The "set\_default\_values"
+method runs the "import\_env", "get\_default\_values", and "check" methods inherited from
+the "atmlndnl.pm" object, and also may apply the "checkinputfile" method for specific
+filenames that need to be set in the namelist.
+\subsubsection{clm2exp.pm object}
+The clm2exp.pm object extends the atmlndnl.pm object for specifically dealing with the CLM
+model namelists. The clm2exp.pm object contains the "set\_default\_values" method, and inherits
+all the methods from the "atmlndnl.pm" and "namelist.pm" object. The "set\_default\_values"
+method runs the "import\_env", "get\_default\_values", and "check" methods inherited from
+the "atmlndnl.pm" object, and also may apply the "checkinputfile" method for specific
+filenames that need to be set in the namelist.
+\subsubsection{lsmexp.pm object}
+The lsmexp.pm object extends the atmlndnl.pm object for specifically dealing with the LSM
+model namelists. The lsmexp.pm object contains the "set\_default\_values" method, and inherits
+all the methods from the "atmlndnl.pm" and "namelist.pm" object. The "set\_default\_values"
+method runs the "import\_env", "get\_default\_values", and "check" methods inherited from
+the "atmlndnl.pm" object, and also may apply the "checkinputfile" method for specific
+filenames that need to be set in the namelist.
+\subsubsection{CAM\_namelist.pm object}
+The CAM\_namelist.pm object uses the camexp.pm object and the appropriate land-model namelist object
+(clm2exp.pm or lsmexp.pm) to setup the complete model namelist including the atmosphere namelist
+and land-model namelist.
+\subsection{Main scripts using Perl objects}
+The modular object oriented nature of the perl objects makes it easy to create short scripts
+with the needed functionality for specific purposes. Since the scripts are short and depend on
+the underlying perl objects they are easy to maintain. Here are some of the scripts maintained
+in the bld directory:\\
+
+\begin{tabular}{r p{3.7in}}
+      & run-model.pl\\
+      & condense-path.pl \\
+      & build-namelist.pl \\
+      & test-model.pl
+\end{tabular}
+
+\subsubsection{run-model.pl}
+run-model.pl is a simple script that takes care of doing a model simulation. It is configured by
+default to run a T42L26 case with Eulerian dynamics, but can also be easily changed for other
+resolutions and dynamics. The script will do a one day initial simulation followed by a longer
+restart simulation. It can also be configured to resubmit itself to the batch queuing system.
+\subsubsection{condense-path.pl}
+condense-path.pl is a simple script to take a directory or Filepath that has "parent directory"
+commands ".." and condense it into a shorter pathname.
+\subsubsection{build-namelist.pl}
+build-namelist.pl is a simple script to create a namelist for a model simulation. It allows you
+to interactively add namelist settings, use default settings, or parse a old namelist.
+\subsubsection{test-model.pl}
+test-model.pl is a script for doing system testing on the model. It runs the model in many different
+configurations and with several different options to ensure the most important model functionality
+is still working. It also tests the model under different parallel decompositions and ensures
+answers are identical under these different configurations and that model restarts give identical
+answers to a continuous simulation.
+
+\subsection{How to add another platform}
+
+The CAM.pm object determines the platform type by the perl "\$\^O" special variable. The
+value of this variable is set in the CAM.pm object as the object data referred to as "OS".
+Methods that are dependent on the Operating system platform them query this piece of data
+to determine what they should do. The "Platform" and "OS\_list" CAM.pm objects would need to
+be extended for the "\$\^O" value used by the new platform. Defaults for env variables
+would need to be added to CAM\_lab.pm. The "run\_time\_env" method in CAM\_run.pm would need
+to be extended for the new platform with any env variable settings that are required for the
+particular platform (for example variables needed to configure SPMD or threading). This same
+method needs to map the SPMD\_NODES, SHMEM\_CPUS, SPMD\_CPUS\_ON\_NODE variables to the actual
+variables used on the platform. 
+
+In many cases the code needs to be changed to add a CPP token to deal with the new platform.
+The "cfort.h" file in "cam1/models/atmlnd\_share" needs to be updated so that "C" code can
+be called from FORTRAN. Other parts of the code may need to be updated or changed to work
+on the new platform. The handling of floating point exceptions may require code changes.
+
+The other change necessary is to update the Makefile, adding a new "if block" dealing with
+the new platform. In most cases a query on "UNAMES" which is the result of "uname -s" is
+done to establish the platform. Compiler and link options for both F90, FORTRAN and "C"
+codes are in this block. Dealing with linking in NETCDF and when SPMD is enabled the MPI 
+library, and threading are two main concerns. "cpp" needs to be turned on in the compile step, 
+ESMF utilities need to be linked in, floats need to be advanced to 64-bit by the compiler 
+(although most of the code does this through use of F90-precision, a few legacy codes do not).
+Also much of the code goes beyond 72 characters and some compilers require special options to
+take care of this. The new platform will need to define the relevant "cpp" token used in
+this case, and currently the "HIDE\_SHR\_MSG", and "NO\_SHR\_VMATH" cpp tokens must be defined
+in the Makefile as well. Also "HIDE\_MPI" needs to be turned on when SPMD is enabled. These
+tokens govern behavior when dealing with the "cam1/models/csm\_share" codes which are shared
+between CCSM component models. When running in stand-alone mode currently these tokens need
+to be enabled.
+
+By using Perl methods most system dependencies are built into
+the Perl binary, so they will work on UNIX based machines without trouble. The *.csh configure
+scripts are of course dependent on the availability of UNIX c-shell on the new platform. The UNIX
+commands that are assumed in the Perl scripts are "/bin/rm" and "time". Also the perl method 
+"symlink" is used which is only supported on UNIX platforms. By using a GNU Makefile, vendor
+make dependencies are avoided as well. The new platform does need to have a sufficiently recent
+version of Perl and GNU Make in order to work.
+
+\subsection{Some basic help with Perl}
+
+Perl is a widely used scripting language that has many powerful data-structures and methods.
+Perl is used extensively for many of the build/run scripts. Here, we will give a short introduction
+to some of the basic syntax of Perl. It is recommended that a developer unfamiliar with perl
+use one of the many on-line resources or books available on Perl to become more familiar
+with it. Here we will introduce a few of the most important concepts. Much of Perl is similar
+to "C" in that braces are used to mark off blocks of code and semicolons are used to mark
+the end of a statement. Comments are any part of a line after the pound sign ("\#"). Control
+structures include: for, foreach, while, if, if-else, and if-elsif. To read from a file you
+use "open" to open the given file on a filehandle and then read the file with "<>" around
+the filehandle. "<>" by itself refers to standard-input. To search variables for patterns 
+you use regular expressions inside "//". "my" is used in front of a variable to make it 
+local to the given code-block. Perl also uses special global variables. For example, "\$\_"
+is commonly used as a variable and in many cases is the default variable used for string
+comparison with the "//" for example. "\$?" refers to the status of the last command.
+\subsubsection{Basic data types}
+       {\em Scalar data}: \texttt{\$variable = "value";} \\
+       {\em Array data}:
+\begin{ttfamily}
+\begin{verbatim}
+  @array = ("value1", "value2");   # Create an array of two elements
+  $value = $array[0];              # Access the first element.
+  $narray = $#array;               # This is the number of elements minus one.
+
+\end{verbatim}
+\end{ttfamily}
+       {\em Associative arrays}:  
+\begin{ttfamily}
+\begin{verbatim}
+  %hash = {element1=>"value1", element2=>"value2"}; # Create a hash
+  $elm = $hash{element1};    # Access one of the elements with the hash key
+  @keys = keys(%hash);       # This is the list of hash keys (element1,element2)
+
+\end{verbatim}
+\end{ttfamily}
+       {\em References}:
+\begin{ttfamily}
+\begin{verbatim}
+  $ref = \$variable; # $ref now points to the address of $variable
+
+\end{verbatim}
+\end{ttfamily}
+
+An example of using the "\$\_" global variables follows.
+
+\begin{ttfamily}
+\begin{verbatim}
+$_ = "value";
+if ( $_ =~ /val../ ) { print "Variable matches the regular expression val..\n"; }
+\end{verbatim}
+\end{ttfamily}
+Since, the "\$\_" variable is the default variable used for the "//" pattern operator
+the following shortcut is equivalent to the above.
+\begin{ttfamily}
+\begin{verbatim}
+$_ = "value";
+if ( /val../ ) { print "Variable matches the regular expression val..\n"; }
+\end{verbatim}
+\end{ttfamily}
+  
+\subsubsection{Object Oriented Perl}
+To provide flexibility and modularity Perl objects are used for many of the scripts.
+Object oriented perl works by using the "package" declaration to contain all the data
+and methods into one object, then a constructor method creates the data. Typically, objects
+are stored in a single filename called "objectname.pm". Here's a simple example of an
+object and a constructor for that object.
+
+\begin{ttfamily}
+\begin{verbatim}
+
+package PObject;              # Object classname will be "PObject"
+
+sub new {
+#
+# Constructor for the PObject object
+#
+   my $class = shift;       # Classname of object
+   my $self = {};           # This is the reference to the associative array 
+                            # that will be used to become the Pobject object.
+   $self{DATA} = 1;         # Add some object data
+   $self{DATA2} = 1;        # Add some more object data
+   bless( $self, $class );  # Ok, now make it an object
+   return( $self );         # Return the newly created object
+}
+
+\end{verbatim}
+\end{ttfamily}
+Thus, the above "PObject" class is named "PObject", and has a "new" method to use as a constructor,
+and the object has two data elements DATA, and DATA2. Any method in the class can then access or
+change the object data. 
+To create a PObject object then, you invoke the "new" method by giving the class-name followed
+by "->" followed by "new" (the name of the method you are using). So to create a new PObject object
+you have...
+\begin{ttfamily}
+\begin{verbatim}
+
+use PObject;
+my $obj = PObject->new;  # Create a PObject
+
+\end{verbatim}
+\end{ttfamily}
+The "use PObject" line will load the perl object in the file "PObject.pm". \$obj is now an
+instance of the PObject class. To create a method that operates on object data you do something
+as follows:
+\begin{ttfamily}
+\begin{verbatim}
+
+sub print_sum {
+#
+# Print the sum of the object data
+#
+   my $self = shift;        # Object operating on
+   print $self{DATA} + $self{DATA2};
+}
+
+\end{verbatim}
+\end{ttfamily}
+
+So to invoke the above method on the \$obj instance that we created above you:
+\begin{ttfamily}
+\begin{verbatim}
+   
+  $obj->print_sum; # Invoke the print_sum method of the PObject class
+
+\end{verbatim}
+\end{ttfamily}
+To extend or modify an existing object class, you can declare that an object is an existing
+class, this allows you to add additional data or methods to the object, or modify existing
+methods. To create an extension of the a base class, do the following:
+\begin{ttfamily}
+\begin{verbatim}
+
+package Box_PObject;
+@Box_PObject::ISA = "PObject";    # The Box_Object is now an extension 
+                                  # of the PObject base class
+use PObject;
+
+\end{verbatim}
+\end{ttfamily}
+At this point, the Box\_PObject, is now an extension of the PObject base class. To add additional
+data to the object I extend, the constructor, by referring to the base-class constructor, and
+adding additional data.
+\begin{ttfamily}
+\begin{verbatim}
+
+sub new {
+#
+# Constructor for the Box_PObject object
+#
+   my $class = shift;             # Classname of object
+   my $self = $class->SUPER::new  # Use the base object constructor
+   $self{DATA3} = 1;              # Add some additional object data
+   bless( $self, $class );        # Ok, now make it an object
+   return( $self );               # Return the newly created object
+}
+
+\end{verbatim}
+\end{ttfamily}
+Thus to completely change the behavior of a base-class, method, I simply create a method
+with the same name in the new class. To modify the existing behavior you can call the old
+method using the "SUPER::" syntax to refer to the base-class method. You can then add additional
+calculations before or after the call to the base-class method. To create new methods for
+the class, you simply add them to the newly created class.
+
+\section{Glossary}
+
+\begin{tabular}{r p{1.3in} p{2in}}
+
+{\bf autoconf:} & A GNU utility program that helps to maintain source code build configurations
+for different platforms. \\ \\
+
+{\bf configure:} & Create the files needed in order to build the model executable. This
+includes determining which code needs to be compiled and resolution. It ussually involves
+creating the CPP files and Makefile. \\ \\
+
+{\bf CPAN:} & Comprehensive Perl Archive Network. A web-accessible site that contains
+a host of code written in Perl by others to do various things. Since, people around the
+world use and contribute to software here, it tends to be well-tested and of high-quality.
+If you can find something to use from here it's likely that you can save time from having
+to write the code yourself. \\ \\
+
+{\bf CPP:} & "C" Pre-processor. A standard syntax for "editing" source code
+by replacing special "CPP" syntax with code that can be compiled.  \\ \\
+
+{\bf C-shell:} & A particular UNIX shell that is often used for creating utility scripts. \\ \\
+
+{\bf distributed-memory:} & Parallel processing on machines where the memory is not
+shared between processors. This is done by passing data between the different CPU's. \\ \\
+
+{\bf Environment variables:} & Variables that are set in the UNIX shell that retain
+their value in sub-processes. \\ \\
+
+{\bf ESMF:} & Earth System Modeling Framework. A set of utilities and high-level
+framework to create Geophysical models around. One current feature of this library
+is the calender manager utility. \\ \\
+
+{\bf GNU:} & A set of UNIX shell programs and utilities created using a Open-source
+code paradigm by the Free Software Foundation. (The acyonym stands for GNU's NOT UNIX). \\ \\
+
+{\bf Makefile:} & A utility to maintain a consistent build mechanism for program
+source codes. \\ \\
+
+{\bf MPI:} & Message Passing Interface. An industry standard library for writing
+distributed memory programs. \\ \\
+
+{\bf NetCDF:} & Network Common Data Format. A standard self-describing data format
+created by UNIDATA. \\ \\
+
+{\bf Object Oriented and Objects:} & A programming methodology, where data and methods
+are tied together. An object creates a set of data that it will use object methods to
+operate on. The data in the object is private to the object. \\ \\
+
+{\bf Perl:} & A scripting language (Practical Extraction and Report Language). \\ \\
+
+{\bf soft-link:} & A UNIX command that provides a "hook" to a file in another location.
+It creates a new name that allows you to access a file in another location. \\ \\
+
+{\bf SPMD:} & Single Program Multiple Data. A method of distributed memory programming
+where a single program is used, but different machine CPU's operate on different parts
+of the data. \\ \\
+
+{\bf XML:} & eXtensible Markup Language. A industry standard language that allows the
+creation of simple text databases. \\ \\
+
+\end{tabular}
+
+\section{Review Status}
+
+\noindent {\bf Architecture Review} \\
+
+\begin{tabular}{r p{1.3in} p{2in}}
+{\bf Review Date:} & Feb/22/2002 \\ \\
+{\bf Reviewers:}   & Brian Eaton         & NCAR \\
+                   & Mariana Vertenstein & NCAR
+\end{tabular}
+
+\end{document}

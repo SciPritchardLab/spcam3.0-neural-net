@@ -1,0 +1,359 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/appendixb.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: appendixb.html,v 1.1.2.6 2003/01/03 22:34:51 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>Appendix B: Details of configuration files</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-121.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<hr noshade size=3>
+<h1><a NAME="HEAD_b"></a>Appendix B: Details of the configuration files</h1>
+<hr noshade>`
+
+<p>
+The <b>configure</b> utility creates the header files <b>misc.h</b>,
+<b>params.h</b>, and <b>preproc.h</b> and the directory search path file
+<b>Filepath</b>.  These files are written to the directory given by the
+<tt>-cam_bld</tt> argument of <b>configure</b> (the default is the
+directory from which <b>configure</b> is executed).  It is not necessary to
+edit these files to produce supported CAM configurations as that can be
+easily accomplished by the <b>configure</b> utility.  However, a user
+experimenting with non-standard configurations may need to edit these files
+directly.  Thus, the file contents are summarized below.  The use of these
+files by <b>gmake</b> is also discussed below in the section <a
+href="#HEAD_c">"Details of gmake procedure"</a>.
+
+<ul>
+<li>
+<b>Filepath</b></li>
+
+<dir>Contains a list of directories used by <b>gmake</b> to determine the
+list of source files to build.  All source files listed by the filename
+expansion expressions <tt>*.F90</tt>, <tt>*.F</tt>, and <tt>*.c</tt> in
+each of the directories are included in the build.  It a given filename
+occurs in more than one of the directories, it is the version in the first
+directory of the list that will be built.  The list of directories in
+<b>Filepath</b> will vary with target architecture and depend on the
+specified dynamics and physics packages.</dir>
+
+<li>
+<b>misc.h</b></li>
+
+<dir>Contains a list of resolution-independent <tt>cpp</tt> directives.
+The following <tt>cpp</tt> tokens must either be defined or undefined (i.e.
+preceded by <tt>#define</tt> or <tt>#undef</tt>).
+<p><a NAME="TABLEC_1"></a><b>Table C.1: misc.h pre-processor tokens</b>
+<table BORDER CELLSPACING=2 CELLPADDING=4 WIDTH="85%" >
+<tr>
+<td VALIGN=CENTER WIDTH="20%">
+<center><b>misc.h cpp tokens</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="80%">
+<center><b>Synopsis</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><tt>COUP_CSM</tt></td>
+
+<td VALIGN=CENTER WIDTH="80%">Define if the flux-coupled ocean configuration
+will be used.&nbsp;
+<br><tt>COUP_CSM</tt> <b>is always undefined for stand-alone mode</b>.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><tt>PERGRO</tt></td>
+
+<td VALIGN=CENTER WIDTH="80%">Define if you want to make error growth tests
+with your model simulation. This token turns off parts of the prognostic
+cloud water parameterization so that the error growth happens at a reasonable
+rate.
+<br>Default setting is with <tt>PERGRO</tt> undefined.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><tt>USEFFTLIB</tt></td>
+
+<td VALIGN=CENTER WIDTH="80%">Define if you want to use a intrinsic FFT
+package rather than the ECMWF FFT package provided with the code in the
+"models/atm/cam/src/utils" directory.
+<br>Default setting is <tt>USEFFTLIB</tt> undefined.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><tt>SPMD</tt></td>
+
+<td VALIGN=CENTER WIDTH="80%">Enables the distributed memory (SPMD) implementation.</td>
+</tr>
+
+<tr>
+<td><tt>STAGGERED</tt></td>
+
+<td>Enables staggered grid processing.&nbsp; Required for use with the
+Lin-Rood dynamical core, otherwise undefined.</td>
+</tr>
+</table>
+</dir>
+</ul>
+
+<ul>
+<li>
+<b>params.h</b></li>
+
+<dir>Contains a list of resolution-dependent <tt>cpp</tt> directives for
+the atmosphere model.
+<p><a NAME="TABLEC_2"></a><b>Table C.2: params.h pre-processor tokens</b>
+<table BORDER CELLSPACING=2 CELLPADDING=4 WIDTH="85%" >
+<tr>
+<td VALIGN=CENTER WIDTH="15%">
+<center><b>params.h cpp tokens</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="85%">
+<center><b>Synopsis</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PCNST&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of advected constituents including
+water vapor and cloud-water.&nbsp;
+<br>Default setting is <tt>1</tt> (for water vapor).</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PNATS&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of non-advected constituents.&nbsp;
+<br>Default setting is <tt>1</tt> (for cloud water).&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PLEV&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of vertical levels.&nbsp;
+<br>Default setting is 26.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PLEVR&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of vertical levels over which radiation
+calculations are performed. Use of separate vertical coordinate for the
+radiation calculation has not been tested. Therefore this directive must
+currently be set to the same value as <tt>PLEV</tt>.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PLON&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of longitudes on the transform grid.&nbsp;
+<br>Default setting is 128.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PLAT&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Number of Gaussian latitudes on the CAM2.0
+transform grid.&nbsp;
+<br>Default setting is 64.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PCOLS</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Maximum number of columns to use for the
+physics. This value can be tuned for different computer architectures
+in order to increase performance.
+<br>Default setting is 16.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PTRM&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Spectral truncation of the zonal wavenumber
+<tt>m</tt>.&nbsp;
+<br>Default setting is 42.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PTRN&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Spectral truncation of the total wavenumber
+<tt>n</tt>
+for zonal wavenumber 0.&nbsp;
+<br>Default setting is 42.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="15%"><tt>PTRK&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="85%">Maximum total wavenumber <tt>k</tt>, for
+any zonal wavenumber <tt>m</tt>.&nbsp;
+<br>Default setting is 42.</td>
+</tr>
+</table>
+</dir>
+</ul>
+
+<ul>
+<li>
+<b>preproc.h</b></li>
+
+<dir>Contains a list of resolution-dependent <b>cpp</b> tokens for the
+land-model code. Currently the resolution of the land-model <b>must </b>be the same as
+that of the atmospheric component.</dir>
+<a NAME="TABLEC_3"></a><b>Table C.3: preproc.h pre-processor tokens</b>
+<table BORDER CELLSPACING=2 CELLPADDING=4 WIDTH="85%" >
+<tr>
+<td VALIGN=CENTER WIDTH="16%">
+<center><b>preproc.h cpp tokens</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="84%">
+<center><b>Synopsis</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="16%"><tt>COUP_CAM</tt></td>
+<td VALIGN=CENTER WIDTH="84%">Tell the CLM that it is being run as a subroutine
+beneath the atmospheric model.
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="16%"><tt>LSMLON&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="84%">Number of longitudes for the landmodel grid. Currently
+this directive must have the same value as <tt>PLON </tt>in <b>params.h</b>.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="16%"><tt>LSMLAT&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="84%">Number of latitudes for the land-model grid. Currently
+this directive must have the same value as <tt>PLAT</tt> in <b>params.h</b>.</td>
+</tr>
+
+</tr>
+</table>
+</ul>
+
+<b><a NAME="HEAD_c"></a>Details of gmake procedure</b>
+<p>
+<tt>cpp</tt> directives of the form <tt>#include</tt>, <tt>#if defined</tt>,
+etc., are used to enhance portability, and allow for the implementation
+of distinct blocks of platform-specific code within a single file. Header
+files, such as <b>misc.h</b>, are included with <tt>#include</tt> statements
+within the source code. When <b>gmake</b> is invoked, the C preprocessor
+includes or excludes blocks of code depending on which <tt>cpp</tt> tokens
+have been defined. <tt>cpp</tt> directives are also used to perform textual
+substitution for resolution-specific parameters in the code. The format
+of these <tt>cpp</tt> tokens follows standard <tt>cpp</tt> protocol in
+that they are all uppercase versions of the Fortran variables, which they
+define. Thus, a code statement like
+<p>&nbsp;&nbsp;&nbsp; <b><tt>parameter(plat = PLAT)</tt></b>
+<p>will result in the following processed line (for standard T42 resolution).
+<p>&nbsp;&nbsp;&nbsp;&nbsp; <b><tt>parameter(plat = 64)</tt></b>
+
+<p><b>gmake</b> invokes the utility <b>mkSrcfiles</b> to generate a list of
+source files (written to the file <b>Srcfiles</b>) using each directory
+listed in <b>Filepath</b>.  <b>gmake</b> then invokes the utility
+<b>mkDepends</b> to create a dependency file (written to the file
+<b>Depends</b>) in the CAM build directory.  If a file listed as a
+dependency does not exist in the CAM build directory, <b>gmake</b> searches
+the directories contained in <b>Filepath</b>, in the order given, for a
+file with that name. The first file found satisfies the dependency.  If
+user-modified code is to be introduced, <b>Filepath</b> should contain, as
+the first entry (or entries), the directory containing the user code.  User
+code directories are specified with the <tt>-usr_src</tt> option to
+<b>configure</b>.
+
+<p>A parallel <b>gmake</b> is achieved in the build scripts by using
+<b>gmake</b>
+with the <b>-j</b> option, which specifies the number of jobs (commands)
+to run simultaneously.
+<p>
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=appendixb.html#HEAD_b>Appendix B: Details of the configuration files</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-121.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.1.2.6 $ $Date: 2003/01/03 22:34:51 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

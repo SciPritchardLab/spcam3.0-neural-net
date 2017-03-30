@@ -1,0 +1,274 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-25.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-25.html,v 1.60.2.20 2003/06/13 15:43:53 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.4.2 Example 2 -- Initial Run, T21</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-26.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-23.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-21.html>2.4 Example Namelists</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<h3><a NAME="HEAD_2"></a>2.4.2 Example 2 -- T21 One Day Initial Run</h3> 
+
+The following namelist produces a one day T21 initial run using
+Eulerian dynamics.  To obtain the namelist,
+<tt><b>build-namelist</b></tt> may be invoked with the following
+arguments in the same directory from which <tt><b>"configure -res 32x64"</b></tt>
+was invoked.
+
+<pre><b>
+ % setenv CSMDATA /data
+ % build-namelist -case run02 -namelist "&camexp start_ymd=010901 \
+    start_tod=0 stop_ymd=010902 stop_tod=0 mss_irt=0 /"
+</b></pre>
+
+Note, that a space must be present between the last '0' above and the
+'/'.
+
+<p>
+To utilize this namelist, the model must be configured to run at T21
+resolution. This namelist does not provides a CLM2.1 initial dataset
+at T21. When an initial dataset is not specified, CLM2.1 will generate
+'reasonable values' for certain model variables as part of its
+initialization. When running without specifying an CLM2.1 initial 
+dataset, the model should be run for several years in order
+for the land-component to "spin-up".  During a model run, CLM2.1 will
+generate initial datasets either 6-hourly, daily, monthly or yearly depending on the
+setting of the <tt>clmexp</tt> variable, <tt>HIST_CRTINIC</tt>.  These
+initial datasets can then be used to obtain "spun-up" initial states
+for future T21 runs.
+
+<p>
+<hr>
+<p>
+
+<p><b><tt>&nbsp;&amp;camexp</tt></b>
+<br><b><tt>&nbsp;caseid = 'run02'</tt></b>
+<br><b><tt>&nbsp;absems_data = '/data/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc'</tt></b>
+<br><b><tt>&nbsp;ncdata = '/data/atm/cam2/inic/gaus/cami_0000-09-01_32x64_L26_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvs = '/data/atm/cam2/sst/sst_HadOIBl_bc_32x64_clim.c020426.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvo = '/data/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc'</tt></b>
+<br><b><tt>&nbsp;dtime = 1800</tt></b>
+<br><b><tt>&nbsp;dif2 = 2.5E5.</tt></b>
+<br><b><tt>&nbsp;dif4 = 2.0E16.</tt></b>
+<br><b><tt>&nbsp;nsrest = 0</tt></b>
+<br><b><tt>&nbsp;start_ymd =  010901</tt></b>
+<br><b><tt>&nbsp;start_tod =  0</tt></b>
+<br><b><tt>&nbsp;stop_ymd = 010902</tt></b>
+<br><b><tt>&nbsp;stop_tod = 0</tt></b>
+<br><b><tt>&nbsp;iyear_ad = 1950</tt></b>
+<br><b><tt>&nbsp;mss_irt = 0</tt></b>
+<br><b><tt>&nbsp;reset_csim_iceprops = .true.</tt></b>
+<br><b><tt>&nbsp;/</tt></b>
+
+<p><b><tt>&nbsp;&amp;clmexp</tt></b>
+<br><b><tt>&nbsp;fpftcon = '/data/lnd/clm2/pftdata/pft-physiology'</tt></b>
+<br><b><tt>&nbsp;fsurdat = '/data/lnd/clm2/srfdata/cam/clms_32x64_c020515.nc</tt></b>
+<br><b><tt>&nbsp;/</tt></b></b>
+
+<p>
+<hr>
+<p>
+
+<dl>
+
+<p>
+<dt>
+<b><tt>NCDATA</tt></b></dt>
+<p>
+<dd>
+Specifies the T21 initial conditions dataset.
+
+<p>
+<dt>
+<b><tt>BNDTVO</tt></b></dt>
+<p>
+<dd>
+The default ozone dataset can be used with any spatial resolution.
+The model will interpolate the dataset to the correct resolution.</dd>
+
+<p>
+<dt>
+<b><tt>BNDTVS</tt></b></dt>
+<p>
+<dd>
+Specifies the T21 SST dataset.</dd>
+
+<p>
+<dt>
+<b><tt>DTIME</tt></b></dt>
+<p>
+<dd>
+Specifies the appropriate timestep (1800 seconds) to use at T21.</dd>
+
+<p>
+<dt>
+<b><tt>DIF2</tt></b></dt>
+<p>
+<dd>
+Specifies the appropriate value of the del2 horizontal diffusion
+coefficient to use at T21.
+</dd>
+
+<p>
+<dt>
+<b><tt>DIF2</tt></b></dt>
+<p>
+<dd>
+Specifies the appropriate value of the del4 horizontal diffusion
+coefficient to use at T21.
+</dd>
+
+<p>
+<dt>
+<b><tt>START_YMD</tt></b></dt>
+<p>
+<dd>
+Specifies the starting year, month and day of the model run.  &nbsp;
+
+<p>
+<dt>
+<b><tt>START_TOD</tt></b></dt>
+<p>
+<dd>
+Specifies the starting time of day of the model run.  &nbsp;
+
+<p>
+<dt>
+<b><tt>STOP_YMD</tt></b></dt>
+<p>
+<dd>
+Specifies the ending year, month and day for the model run.  &nbsp;
+The above namelist results in a run which will end after one
+day.&nbsp;
+
+<p>
+<dt>
+<b><tt>STOP_TOD</tt></b></dt>
+<p>
+<dd>
+Specifies the stopping time of day for the model run.  &nbsp; These
+namelist settings results in a run which will end after one day.&nbsp;
+<br><b>Hint: </b>When starting a long run, it is a good idea to make a
+1-day initial run, then restart the case for the remainder of the
+experiment.&nbsp; If the system crashes and the job is rerun,&nbsp;
+the model will restart from the last restart files.&nbsp; If on the
+other hand, you specified your model run as one long, initial
+run,&nbsp; the job would reload the initial namelist and start again
+from the beginning, duplicating all model results from the aborted
+job. </dd>
+
+<p>
+<dt>
+<b><tt>MSS_IRT</tt></b></dt>
+<p>
+<dd>
+No history files or restart files will be archived. If there is no
+connection to an archival device, <tt>MSS_IRT</tt> should be set to
+zero and output datasets will be written to disk.&nbsp; If this
+variable is non-zero, the model will build an archival command that it
+will execute as a shell command.</dd>
+<p>
+<dt>
+<b><tt>RESET_CSIM_ICEPROPS</tt></b></dt>
+<p>
+<dd>
+Reset the state variables of the CSIM sea-ice model. Sometimes this
+is needed to get the sea-ice model to start-up when the initial conditions
+dataset is not in equilibrium. Typically, this is needed when the initial
+conditions dataset used for the simulation was not a spun-up state output
+from the model, but either interpolated from another dataset or from an
+outside source such as empirical data.
+</dd>
+
+</dl>
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-26.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-23.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.60.2.20 $ $Date: 2003/06/13 15:43:53 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

@@ -1,0 +1,578 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/test-model.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: test-model.html,v 1.1.2.6 2003/03/12 20:37:11 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>4. Testing Model Changes</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-120.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-102.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="test-model.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<P>
+<HR NOSHADE SIZE=3><A NAME="HEADING4_0"></A>
+<H1><A NAME="SECTION4"></A>4. Testing Model Changes</H1>
+
+<HR NOSHADE>
+
+<P>
+After making changes to the model it's critical to test that the model still works
+as it did without the changes. We've provided a mechanism for doing basic system
+testing on model changes using the same infrastructure as given in Chapter 2.
+<H2>4.1 Using the Model Test Scripts (test-model.pl)</H2>
+<p>
+The script "test-model.pl" in the "cam1/models/atm/cam/test/system" directory runs a suite of
+basic testing for the model. This is designed for when you are changing the model
+code, or porting to another machine. It provides a good check that the basic functionality
+of the model still works despite the changes the user has introduced. Although, the
+user could run these tests on their own, the script provides a nice easy to use,
+interface to basic testing. It also has the advantage that it was designed for testing
+so it does look for likely "gotcha's" that could occur with code changes. In this section
+we will go over how to use "test-model.pl" for basic acceptance testing. First, we
+go over the command-line arguments that can be given to "test-model.pl", next we discuss
+some of the environment variables that are useful to use with "test-model.pl", and last
+we discuss how to "test-model.pl" in machine batch ques. The discussion of command-line
+arguments includes how to change resolutions and how to run at different labs. The
+discussion on environment variables includes how to over-ride the default behavior with
+environment variables so that you can control such things as number of CPU's and nodes
+for the parallel decomposition.
+<p>
+"test-model.pl" is built around the build/run scripts in the "cam1/models/atm/cam/bld" directory. All
+of the configuration, build, and run steps are taken from the scripts in "cam1/models/atm/cam/bld". As
+such many of the details on the usage of "test-model.pl" are covered in the section
+on "Using the Build/Run Scripts in the "bld" Directory" 
+<a href="UG-16.html#HEAD_2">2.1.2</a>.
+
+<H3><A NAME="test-model.pl.quick"></A>4.1.1 Quick-start guide to using "test-model.pl"</H3>
+<p>
+In this section we go over the simplest most straight forward usage of "test-model.pl".
+This includes interactive use at NCAR, interactive use at other cooperating LABS, and
+batch submission.
+<p>
+<b>Interactive usage at NCAR:</b><br>
+The basic operation of "test-model.pl" for interactive submission is straight-forward.
+On a NCAR machine the user need only log onto the machine they wish to test on and type:
+<b>
+<pre>
+cd cam1/models/atm/cam/test/system/
+test-model.pl
+</pre>
+</b>
+<b>Interactive use at other cooperating LABS:</b><br>
+Running interactively at a cooperating LAB (dao, ornl, llnl, or nersc) requires only
+slightly more effort. The requirements here, are only to designate which LAB you are
+running at, and the directory location of the model datasets. For example, on the
+NERSC machine "gseaborg" I might do the following (using csh).
+<b>
+<pre>
+setenv LAB "nersc"
+setenv CSMDATA  /u4/erik/data
+cd cam1/models/atm/cam/test/system/
+test-model.pl
+</pre>
+</b>
+<p>
+By putting the above environment variables in my ".cshrc" the settings will be established
+every time I login to the given machine. Then I can run "test-model.pl" as above without
+having to remember special options or having to remember to set these variables each time.
+For information on how to obtain the model datasets see <a href=UG-14.html#HEADI_OBTAIN>
+Section 2.1.1</a>.
+<p>
+<b>Batch usage:</b><br>
+Batch scripts that execute "test-model.pl" have been setup for each lab. These are typically
+named: $LAB_batch.csh. So for example, there are batch scripts named: llnl_compass.csh, 
+nersc_batch.csh, llnl_blue.csh, ncar_batch.csh, and ornl_batch.csh. The batch scripts
+are setup with specific batch commands, and possibly some environment variable settings,
+then the script merely runs test-model.pl with the "-nofail" option.
+"-nofail" will run the entire script even if it fails. Then look at the "test.$arch.log"
+file to see if the script successfully completed all of the tests. To submit the script
+to batch, follow the directions given at the top of the specific batch script. For example,
+the "ornl_batch.csh" is submitted with:
+<b>
+<pre>
+env SCRIPT_DIR=`pwd` llsubmit ornl_batch.csh
+</pre>
+</b>
+<H3><A NAME="test-model.pl.cmdargs"></A>4.1.2 Command-line arguments to test-model.pl</H3>
+<p>
+"test-model.pl" is designed such that the common settings the user might want to control
+can be set either by command line arguments or by environment variables that are set
+before the user runs the script. In some cases, the user can control the script by
+either a command-line argument -- or a environment variable as up to the user. In this
+section we go over the possible command line arguments to the script. We include discussion
+on how to change the resolution for the tests, how to run at different labs, how to
+do a port-validation against a trusted machine, how to have test-model.pl compare to
+a control code library, and how to control the selection of the tests that are performed.
+<p>
+The "-help" option to "test-model.pl" lists all of the possible command-line options.
+<b>
+<pre>
+Import: SCRIPT_DIR as: /fs/cgd/data0/erik/new_cam1/models/atm/cam/test/system
+process_args:: Process the input arguments
+Usage: perl test-model.pl [options]
+
+Options are:
+
+	-lab     = Set the lab you are running at 
+                 (of ncar ornl dao nersc llnl default) [ncar]
+                 (Also set by setting the env variable LAB)
+	-help    = Help (this message, also lists tests performed)
+	-noclean = Don't clean the old directories out.
+	-nofail  = Continue even if errors are found
+	-resume  = Continue a previous run of the script at the point it left off at
+	-errgro mach(plat:lab) = List the remote machine and platform to use as the 
+                 baseline for error-growth tests (ie. -e "babyblue.ucar.edu(aix:ncar)" )
+                 (list of valid platforms are: dec_osf linux solaris irix aix)
+                 (tests must be in the default location on the remote machine)
+                 (list of valid labs are: ncar ornl dao nersc llnl default [leave off :lab to use ncar])
+	-fv2d    = Turn on the 2D parallel decomposition for FV dynamics.
+	-skip dy:#:res = Skip to given dynamics and test # (or range of numbers)
+                 (example -skip sld:9 start with sld dynamics test no. 9)
+                 (or      -skip fv:2-4 start with fv dynamics test no. 2 and do up to test 4)
+                 (or      -skip all:2 start at tests 2 for all dynamics)
+                 (or      -skip eul:2-4:64x128L26 do tests 2 through 4 for eul at 64x128 (T42) with 26 levs)
+	-compare cam-root-dir = Compare to given version of the model in this directory
+                 This is the root directory of the cam1 directory tree 
+                        (Example -compare /home/erik/cam1)
+                        (Also set by setting the env variable CONT_ROOTDIR)
+
+Batch operation: To submit to batch you need to create and/or edit the
+      submission information at the top of a script. This directory contains
+      simple batch submission scripts for each lab that can be used for this
+      purpose. Most likely the que name and possibly the number of nodes might 
+      need to be changed. You need to edit either the PBS, NQS, or Loadleveler 
+      sections, depending on which queing system your machine supports.
+
+      To specify non-standard options for batch operation edit the execution
+      statement in the batch script for test-model.pl.
+
+      submit to batch as either
+
+      env SCRIPT_DIR=`pwd` qsub     ncar_batch.csh
+      env SCRIPT_DIR=`pwd` llsubmit ncar_batch.csh
+
+  List of tests that are performed:
+
+  for each dynamics at these resolutions:
+
+eul: 	Horizontal Resolution: 32x64 # of vertical levels: 26
+fv: 	Horizontal Resolution: 4x5 # of vertical levels: 26
+sld: 	Horizontal Resolution: 32x64 # of vertical levels: 26
+01_initial_debug_run_SPMD
+02_initial_debug_run_SPMDnoSMD
+03_initial_debug_run_nonSPMD
+04_initial
+05_restart
+06_initial_compare_to_restart
+07_SOM
+08_control_nonpert
+09_control_SOM
+10_error_growth_adiabatic
+11_error_growth_adiabatic_pert
+12_error_growth_full_physics
+13_error_growth_full_physics_pert
+14_control_adiabatic
+15_control_adiabatic_pert
+16_control_full_physics
+17_control_full_physics_pert
+18_366phys_and_lsm only eul dynamics
+19_dataicemodel only eul dynamics
+
+Terminating at CAM_test.pm line 577.
+</pre>
+</b>
+<p><a NAME="TABLE2_2"></a><b>Table 2.2:&nbsp; Commandline arguments to test-model.pl</b>
+<TABLE BORDER=1 CELLSPACING=2 CELLPADDING=4 WIDTH="85%">
+<TABLE>
+<tr>
+<th>Option</th><th>Description</th>
+</tr>
+<td>-lab LAB</td><td>Sets the lab you are running at (ncar,dao,ornl,llnl,or nersc).</td>
+<tr>
+</tr>
+<td>-help</td><td>The help message that lists the usage, as well as information about
+the test that will be performed.</td>
+<tr>
+</tr>
+<td>-noclean</td><td>Don't clean out the directories before building. By default
+directories will be cleaned and complete build of the whole system will be done.</td>
+<tr>
+</tr>
+<td>-nofail</td><td>Don't stop if an error is encountered, try to
+run the other tests as well.</td>
+<tr>
+</tr>
+<tr>
+<td>-fv2d</td><td>Run FV tests using the 2D parallel decomposition.</td>
+</tr>
+<td>-resume</td><td>Restart the script at the point where it was before
+it failed.</td>
+<tr>
+</tr>
+<td>-errgro "machine-domain-name(platform)"</td><td>Calculate the 
+error-growth relative to the given trusted machine. Optionally, the platform
+can include ":lab-name" if the machine is for a different lab.
+<tr>
+</tr>
+<td>-skip dyn:tests:resolution</td><td>Skip some tests, only running the
+tests that are specified. Also, used to set the resolution that tests will be performed
+at.
+<tr>
+</tr>
+<td>-compare control-source-directory</td><td>Compare this code to the given
+control source code.</td>
+<tr>
+</tr>
+</table>
+section we go over the possible command line arguments to the script. We include discussion
+on how to change the resolution for the tests, how to run at different labs, how to
+do a port-validation against a trusted machine, how to have test-model.pl compare to
+a control code library, and how to control the selection of the tests that are performed.
+<h4>4.1.2.1 How to run at different labs</h4>
+<p>
+test-model.pl is setup to run with usable defaults at the 
+following labs: ncar, nersc, dao, llnl, and ornl. The defaults settings used are those given in the
+"CAM_lab.pm" perl object. When running at a different lab you will have to either use the "-lab"
+command line option or set the environment variable "LAB" to use the defaults for that lab. Platform
+specific settings are set by the machine you are running test-model.pl on. 
+<p>
+Besides LAB the other required environment variable setting is CSMDATA the location of the input 
+datasets. At NCAR CCSM input datasets are stored on a NFS mounted disk on all machines
+at "/fs/cgd/csm/inputdata". CAM developers who just need the datasets to run CAM stand-alone
+can get a copy from the "CAM Developers page" at:
+<p>
+<a href="http://www.cgd.ucar.edu/~cam/cam_data.shtml">http://www.cgd.ucar.edu/~cam/cam_data.shtml</a>
+<p>
+The file is a GNU zipped tar file. To unpack it:
+<pre>
+gunzip cam2.0.2.scidac-atm.datasets.tar.gz
+tar xvf cam2.0.2.scidac-atm.datasets
+</pre>
+The directory created is called "inputdata" and the directory structure is as follows:
+<pre>
+inputdata
+inputdata/atm ------------------- CCSM Atmosphere component datasets
+inputdata/atm/cam1 -------------- CAM component datasets
+inputdata/atm/cam1/inic --------- Initial condition datasets
+inputdata/atm/cam1/inic/gaus ---- Gaussian initial condition datasets
+inputdata/atm/cam1/inic/fv ------ Finite-volume dy-core initial condition datasets
+inputdata/atm/cam1/inic/sld ----- Semi-Lagrange dy-core initial condition datasets
+inputdata/atm/cam1/ggas --------- Greenhouse gas datasets
+inputdata/atm/cam1/sst ---------- Sea-Surface temperature datasets.
+inputdata/atm/cam1/ozone -------- Ozone datasets.
+inputdata/atm/cam1/hrtopo ------- High resolution topography (used when interpolating datasets)
+inputdata/atm/cam1/rad ---------- Radiation datasets
+inputdata/lnd ------------------- CCSM Land component datasets
+inputdata/lnd/clm2 -------------- CLM2 component datasets
+inputdata/lnd/clm2/inidat ------- CLM2 initial condition datasets
+inputdata/lnd/clm2/inidat/cam --- CLM2 initial condition datasets for use with CAM
+inputdata/lnd/clm2/srfdat ------- CLM2 time invariant surface description datasets
+inputdata/lnd/clm2/srfdat/cam --- CLM2 surface description datasets for use with CAM
+</pre>
+<b>
+Note: The clm2 datasets do not include the "mksrfdat" and "rawdata" directories and 
+datasets required to create new surface datasets at different resolutions. If you need
+to create new surface datasets at resolutions not provided in the "inidat" and "srfdat"
+directories you will need to obtain the datasets at NCAR in the 
+"/fs/cgd/csm/inputdata/lnd/clm2/mksrfdat" directory.
+</b>
+<h4>4.1.2.2 How to compare to a control library</h4>
+<p>
+An important feature of test-model.pl is the ability to compare to a previous program
+library. This is useful in order to ensure that the changes you are making do not change
+answers compared to the previous version. The default way of running "test-model.pl" without
+command line options does not do a comparison to another version (although if comparisons
+have been done and files still exist it will run comparisons -- this will be discussed later).
+Using the command line option "-compare"you can compare to a previous program library by 
+giving the full path to the root of the library to compare to. For example, if my test
+library is checked out under "/fs/cgd/data0/erik/test_cam1" and I am in the test directory
+"/fs/cgd/data0/erik_test_cam1/models/atm/cam1/test/system" and I want to compare the "test_cam1"
+directory with the base model I've checked out under "/fs/cgd/data0/erik/base_cam1" then
+I use "-compare" as follows:
+<pre>
+cd /fs/cgd/data0/erik/test_cam1/models/atm/cam1/test/system
+test-model.pl -compare /fs/cgd/data0/erik/base_cam1
+</pre>
+When the "-compare" option is used, tests 8, 9, 14, 15, 16, and 17 are done (see the list of tests in section 
+4.1.2 above). If "-compare" is not used these tests are not done. Test 8 is compared to test 6, 
+test 9 with test 7, and test 14 is compared to test 10, and test 16 is compared to test 12. 
+If all four of these 
+comparisons are identical -- at the end of the model run the model is identified as being 
+bit-for-bit with the control library. This is reported at the end of test-model.pl (and in the log file) as follows:
+<pre>
+Code is bit-for-bit with control library
+</pre>
+If the comparison shows that one of the above comparisons is not identical the difference is 
+reported as not identically zero with the following at the end of test-model.pl:
+<pre>
+
+WARNING!!!:: Code is NOT bit-for-bit with control library
+             Verify that this is ok or validate that at least within roundoff.
+
+
+</pre>
+<h5>4.1.2.2.1 Verifying that differences are within roundoff</h5>
+<p>
+Many times differences to a control library are intended to be bit-for-bit. As explained above
+simply by using the "-compare" option test-model.pl can easily identify if two model libraries
+give identical answers. However, it is more difficult to verify if changes are within machine 
+roundoff. Using the "-compare" option and plotting both the comparison and the error-growth tests
+the user can verify if the changes are within roundoff. Typically this is done by plotting
+the root-mean-square (RMS) differences of temperature for the control-comparison and the error 
+growth. The results of the "*.cprout" files already have the RMS differences reported for each
+field. A simple way to extract the RMS differences of temperature is using the UNIX command "grep"
+as follows:
+<pre>
+grep " RMS T " *.cprout
+</pre>
+A program to plot up the cprout files is included in the "cam1/models/atm/cam/bld" directory,
+called "graphgrowth.csh". This c-shell script uses "xgraph" to plot up any of the "*.cprout" files
+created from running test-model.pl. The script has a simple prompt interface asking the user the
+following questions.
+<pre>
+</pre>
+The figures below show plots for differences that are within roundoff and differences that are
+not within roundoff and hence answer changing. When the line for the comparison is below or very
+near the relevant error-growth curve (relevant adiabatic or full-physics), the differences are
+within roundoff. If the comparison curve is higher than the error-growth the differences are
+greater than roundoff.
+<h4>4.1.2.3 How to control the tests that are performed</h4>
+<p>
+A summary of the tests performed is shown above under section 4.1.2, under the output given
+when the user uses the "-help" option. To do a subset of the tests that are done by default
+use the "-skip" option. "-skip" allows you to pick the dynamics and either a range of tests to
+perform or a specific test to start at and continue from.
+<h4>4.1.2.4 How to change resolution</h4>
+<p>
+To change resolution use the "-skip" option to specify the dynamics to use, tests to run, and 
+the horizonal and vertical resolution to run the selected tests at. For example, to run tests
+1 through 14 or test-model.pl with Eulerian dynamics at T42 (64x128) resolution with 26 levels you
+would do the following.
+<pre>
+test-model.pl -skip eul:1-14:64x128L26
+</pre>
+<h4>4.1.2.5 How to do a port-validation against a trusted machine</h4>
+<p>
+Part of the default tests that "test-model.pl" runs are error-growth tests on the machine
+the user is running. Error growth tests run a simulation, and then compare this simulation
+with a different simulation where the initial conditions are randomly perturbed by an amount 
+equal to machine roundoff. The nature of the model's equation is such that these two simulations 
+will continue to diverge until the model states are completely different. Since, the process
+of this divergence ("error growth") takes simulation time to achieve we can use this as a benchmark
+to find problems in the model. We can also use this "error-growth" process to validate that 
+simulations performed on one machine will give climate simular to another. To do this we compare
+the non-perturbed simulations on the two machines to the error-growth of the trusted machine.
+<p>
+To do this with test-model.pl we use the "-errgro" option. The "-errgro" option expects a
+machine domain name followed by the platform type in parenthesis. So for example to compare error
+growth on the machine I am running on to the NCAR machine "blackforest.ucar.edu" which is
+a AIX IBM machine (so type "aix"). I would need to do the following:
+<p>
+<b>On Blackforest</b>
+<pre>
+test-model.pl
+</pre>
+<p>
+<b>On the machine to test</b>
+<pre>
+test-model.pl -errgro "blackforest.ucar.edu(aix)"
+</pre>
+<p>
+Before running with the "errgro" option you need to run the error-growth tests on the trusted
+machine (instead of running the whole suite, you use the "-skip" option to just run the error-growth
+tests). The files from that machine will then be copied from the remote machine using "scp". You
+will need to either have scp setup so that passwords are not required between the two machines
+in question, or will need to enter a password interactively. Hence, you may not be able to use
+this option in batch mode.
+<p><a NAME="TABLE2_3"></a><b>Table 2.3:&nbsp; List of platform names to use</b>
+<TABLE BORDER=1 CELLSPACING=2 CELLPADDING=4 WIDTH="85%">
+<table>
+<tr><th>Platform</th><th>Name to use</th></tr>
+<tr><td>IBM</td><td>aix</td></tr>
+<tr><td>Sun-OS</td><td>sunos</td></tr>
+<tr><td>SGI</td><td>sgi</td></tr>
+<tr><td>Compaq-alpha</td><td>dec_osf</td></tr>
+<tr><td>Linux</td><td>linux</td></tr>
+</table>
+<H3><A NAME="test-model.pl.envars"></A>4.1.3 Useful environment variables to use with test-model.pl</H3>
+<p>
+List of variables that can be set before running "test-model.pl".
+
+<ul>
+<li><b>INC_NETCDF</b> NetCDF include files.
+<li><b>LIB_NETCDF</b> NetCDF library.
+<li><b>INC_MPI</b> MPI include files.
+<li><b>LIB_MPI</b> MPI library.
+<li><b>PHYSICS</b> Physics directory to use (cam1, or ccm366 -- cam1 default).
+<li><b>SPMD</b> Run most of the tests in the SPMD distributed memory parallel paradigm 
+(TRUE or FALSE) [whether this is set or not at least one test will run with SPMD TRUE
+and one with SPMD FALSE].
+<li><b>SMP</b> Run most of the tests with shared memory processing (i.e. OpenMP)
+(TRUE or FALSE) [whether this is set or not at least one test will run with SMP TRUE
+and one with SMP FALSE].
+<li><b>LANDMODEL</b> Surface Land Model to use (CLM2 or LSM1).
+<li><b>OCEANMODEL</b> Ocean Model to use (dom or som).
+<li><b>CSMDATA</b> Location of input datasets.
+<li><b>CASE_DIR</b> Location where cases are ran.
+<li><b>BUILD_DIR</b> Location where cases are built.
+<li><b>LOG_DIR</b> Location where the log-files go.
+<li><b>SHMEM_CPUS</b> Number of shared-memory CPU's to use.
+<li><b>SPMD_NODES</b> Number of distributed-memory nodes to use.
+<li><b>SPMD_CPUS_ON_NODE</b> Number of CPU's on each SPMD-node to use.
+<li><b>SPMD_RUN_CMND</b> The command needed to run a SPMD (MPI) program on this
+machine.
+<li><b>LAB</b> The name of the lab running at.
+<li><b>GNUMAKE</b> The name of the GNU-Make command to use.
+</ul>
+<H3><A NAME="test-model.pl.batch"></A>4.1.4 Using test-model.pl in machine batch-ques</H3>
+<p>
+In the "cam1/models/atm/cam/test/system" directory there are several sample batch scripts
+for use at various specific labs or machines.
+<ul>
+<li>ncar_batch.csh -- Batch script for NCAR batch ques (blackforest, babyblue, utefe).
+<li>ornl_batch.csh -- Batch script for ORNL batch ques (eagle).
+<li>llnl_blue.csh -- Batch script for LLNL IBM SP "Blue" batch que.
+<li>llnl_frost.csh -- Batch script for LLNL IBM SP "Frost" batch que.
+<li>nersc_batch.csh -- Batch script for NERSC IBM SP "seaborg" batch que.
+<li>llnl_compass.csh -- Batch script for LLNL Compaq "compass" batch que.
+</ul>
+The above scripts can be used at the given site on the specific machines listed. Since,
+batch queing information is specific to the site and platform, the user would need to
+create their own batch script at other sites. The scripts above simply set a few environment
+variables and then run  test-model.pl with the "-nofail" option, so that it will complete the 
+complete suite of tests even if one fails. The batch scripts require the presence of the 
+environment variable "SCRIPT_DIR" before they will work. So for example to submit the
+"ncar_batch.csh" script on NCAR's blackforest:
+<tt>
+<b>
+<pre>
+         env SCRIPT_DIR=`pwd` llsubmit ncar_batch.csh
+</pre>
+</b>
+</tt>
+<H3><A NAME="test-model.pl.tests"></A>4.1.5 Tests performed by test-model.pl</H3>
+<p>
+The "-help" option lists the specific tests that are performed. See 
+<a href=#test-model.pl.cmdargs>Section 4.1.2</a> for the output of the "-help" option. Here
+is a list of what the bottom-line of these tests are:
+<ol>
+<li>Run three time-steps with DEBUG compiler flags on, with SPMD on and off, and then ensure
+that answers are identical.
+<li>Also do a three time-step run with DEBUG compiler flags on SPMD on and Open-MP off.
+<li>Do an initial run followed by a restart using fewer SPMD tasks (if SPMD enabled),
+and fewer threads. Then do an initial run the same number of time-steps as the restart, and
+compare answers ensuring they are identical.
+<li>Do a 30 time-step run with SOM.
+<li>If you are comparing to a previous code library, repeat the initial run done just
+before the SOM run with the previous code library and check if answers are identical.
+<li>If you are comparing to a previous code library, repeat the SOM run with
+the previous code library and check if answers are identical.
+<li>Run a error-growth test in adiabatic mode with a perturbation of zero and roundoff level.
+<li>If the resulting error-growth seems to be high report this at the end of the script.
+<li>If you are comparing to a previous code library, repeat 
+with the previous code library and check if answers are identical for the zero perturbation
+case.
+<li>Run a error-growth test with full-physics mode with a perturbation of zero and roundoff
+level.
+<li>If the resulting error-growth seems to be high report this at the end of the script.
+<li>If you are comparing to a previous code library, repeat the runs
+with the previous code library and check if answers are identical for the zero perturbation
+case.
+<li>Make sure a three time-step test with DEBUG compiler flags on will work with CCM3.6.6
+physics and LSM1.
+<li>Make sure a three time-step test with DEBUG compiler flags on will work with the
+CCM3.6.6 data ice-model.
+<li>If the three comparison tests are identical, report that answers are bit-for-bit
+with the previous code library. If they are different report this as a warning.
+<li>If any of the error-growth tests show large error-growth report this as a warning.
+</ol>
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=test-model.html#SECTION4>4.1 Using the Model Test Scripts (test-model.pl)</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-120.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-102.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="test-model.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.1.2.6 $ $Date: 2003/03/12 20:37:11 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

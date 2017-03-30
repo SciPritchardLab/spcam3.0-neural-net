@@ -1,0 +1,37 @@
+&camexp
+ absems_data	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/abs_ems_factors_fastvx.c030508.nc'
+ aeroptics	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/AerosolOptics_c030529.nc'
+ bndtvaer	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/AerosolMass_V_64x128_clim_c031022.nc'
+ bndtvo		= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/pcmdio3.r8.64x1_L60_clim_c970515.nc'
+ bndtvs		= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/sst_HadOIBl_bc_64x128_1949_2001_c020411.nc'
+ caseid		= 'spcam'
+ co_emis	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/carbon_penner_cooke_doubled_64x128_c021120.nc'
+ dms_emis	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/DMS_emissions_64x128_c030722.nc'
+ iyear_ad	= 1950
+ ncdata		= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/cami_0000-09-01_64x128_L30_c031210.nc'
+ nelapse	= -5
+ nsrest		= 0
+ mss_irt        = 0
+ dtime          = 900
+ oxid		= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/oxid_3d_64x128_L26_c030722.nc'
+ soil_erod	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/dust_64x128_c021028.nc'
+ sox_emis	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/SOx_emissions_64x128_L2_c030722.nc'
+ doisccp        = .true.
+ isccpdata      = '/gpfs/bransonm/mmf_cam3.0/cam3rundata/isccp.tautab_invtau.nc'
+ sstcyc         = .false.
+ start_ymd      = 19850901
+ nhtfrq = 0,-24,-3,-1
+ MFILT  = 1, 30, 80
+ FINCL1 = 'Z0M:A','TAUX_CRM:A','TAUY_CRM:A','TAUX:A','TAUY:A'
+ FINCL2 = 'SHFLX:A','LHFLX:A','TAUX:A','TAUY:A','PS:A','CLDTOTR:A','CLDTOT:A','CLDLOW:A','CLDMED:A','CLDHGH:A','U:A','V:A','T:A','Q:A','OMEGA:A','CLOUD:A','CLOUDR:A','CLOUDTOP:A','SPQC:A','SPQI:A','SPDT:A','SPDQ:A','SPDQC:A','QRS:A','QRL:A','FSNS:A','FLNS:A','FLWDS:A','FSDS:A','FSNT:A','FLNT:A','FLUT:A','FSNTOA:A','FSUTOA:A','PRECC:A','PRECL:A','PRECT:A','QFLX:A','TMQ:A','U850:A','U200:A','V850:A','V200:A','OMEGA500:A','OMEGA850:A'
+ FINCL3 = 'T:A','Q:A','CLOUD:A','PS:A'
+ FINCL4 = 'SHFLX:A','LHFLX:A','PRECT:A','TS:A','FSNS:A','FLNS:A','PS:A','OMEGA500:A','OMEGA850:A','FLUT:A','FLNT:A','FSNTOA:A','FSUTOA:A'
+/
+&clmexp
+ finidat	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/clmi_0000-09-01_64x128_T42_USGS_c030609.nc'
+ fpftcon	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/pft-physiology'
+ fsurdat	= '/gpfs/bransonm/mmf_cam3.0/cam3rundata/clms_64x128_USGS_c030605.nc'
+ HIST_NHTFRQ = 0,-24
+ HIST_MFILT  = 1, 30
+ HIST_FINCL2    = 'BTRAN:A','ELAI:A','ESAI:A','FCEV:A','FCTR:A','FGEV:A','FGR:A','FIRA:A','FIRE:A','FLDS:A','FPSN:A','FSA:A','FSDS:A','FSH:A','FSNO:A','FSR:A','H2OCAN:A','H2OSNO:A','H2OSOI:A','NDVI:A','Q2M:A','QBOT:A','QDRAI:A','QDRIP:A','QINFL:A','QINTR:A','QMELT:A','QOVER:A','QRGWL:A','QSOIL:A','QVEGE:A','QVEGT:A','RAIN:A','SNOW:A','SOILICE:A','SOILLIQ:A','TBOT:A','TG:A','TSA:A'
+/

@@ -1,0 +1,23 @@
+Running gnumake in this directory will create an executable named "mkrgrid"
+in $(HOME)/bin.  Its function is to take an input CAM history tape (netcdf
+format) and interpolate it either from a full grid to a reduced grid (the
+default), or from a reduced grid to a full grid ("-r" option).  When going
+full->reduced, a namelist defining the reduced grid must be specified to be
+read from stdin.  An example namelist for a 1-digit grid (nl.r1up) is
+contained in this directory.  When coverting reduced->full, no namelist is
+needed as this information is contained in the netcdf history file.
+
+Default interpolation is linear (-l).  Other options available are Fourier
+(-f), cubic (-c), and monotonic cubic (-m field_name).  Fourier and cubic
+options apply to the entire file, while monotonic cubic must be specified on
+a field by field basis.
+
+An example usage might be:
+
+mkrgrid h0001.nc h0001.reduced.nc < nl.r1up
+
+then to reverse the operation:
+
+mkrgrid -r h0001.reduced.nc h0001.nc
+
+

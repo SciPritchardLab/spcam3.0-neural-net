@@ -1,0 +1,296 @@
+Originator:		Date:	Tag:	    		Synopsis:
+===============================================================
+mvertens		08/22/03 clm2_deva_36	 	updated to dust model 
+						changes made in 
+						cam2_0_2_dev27
+mvertens		08/19/03 clm2_deva_35	 	fixed local noon history 
+						output problem in compete 
+						mode
+mvertens		08/15/03 clm2_deva_34	 	 
+						
+mvertens		07/17/03 clm2_deva_33	 	fixed a bug in dgvm 
+						history output in compete 
+						mode
+mvertens		06/10/03 clm2_deva_31	 	moved l%lps soil 
+						properties to c%cps
+mvertens		05/23/03 clm2_deva_30	 	made pft decomposition 
+						always the default
+mvertens		05/16/03 clm2_deva_29	 	changed calculation of 
+						surface temperature sent 
+						back to atm in cam and 
+						ccsm mode
+mvertens		04/29/03 clm2_deva_28	 	put in fix for DGVM to 
+						restart bfb in arbitrary 
+						initialization mode
+mvertens		04/25/03 clm2_deva_27	 	made compete the default 
+						mode
+mvertens		04/14/03 clm2_deva_26	 	put in fix for negative 
+						roundoff level h2osoi_ice
+mvertens		04/10/03 clm2_deva_25	 	fixed problem in 
+						generation of new surface 
+						datasets
+mvertens		04/04/03 clm2_deva_24	 	added t_rad_pft to 
+						initial file 
+mvertens		04/03/03 clm2_deva_23	 	put in mods to lake 
+						levels and fractional 
+						snow cover over 
+						ground
+mvertens		04/03/03 clm2_deva_22	 	enabled DGVM code to work 
+						in compete mode
+mvertens		04/01/03 clm2_deva_21	 	created histFldsMod.F90 - 
+						all history file 
+						initialization now done 
+						here.
+mvertens		03/31/03 clm2_deva_20	 	completely rewrote 
+						accumulator module
+mvertens		03/20/03 clm2_deva_19	 	introduced TREFMNAV and 
+						TREFMXAV on history 
+						file
+mvertens		03/17/03 clm2_deva_18	 	improved initialization 
+						of history file 
+						variables
+mvertens		03/13/03 clm2_deva_17	 	put in cpl6 mods and 
+						introduced DriverInitMod 
+						in biogeophys
+mvertens		03/07/03 clm2_deva_16	 	implemented new csoilc 
+						and fix for bulk density 
+						of snow
+mvertens		03/06/03 clm2_deva_15	 	improved initialization 
+						of clmtype, improved 
+						surface dataset 
+						generation
+mvertens		03/03/03 clm2_deva_14	 	added stability 
+						correction for 2m air 
+						temperature, added new 
+						history fields
+mvertens		02/14/03 clm2_deva_13	 	improved initialization 
+						of pointers in clmpoint.F90
+mvertens		01/30/03 clm2_deva_12	 	put rain-snow branch mods 
+						onto development 
+						branch
+mvertens		01/27/03 clm2_deva_11	 	put in memory reducing 
+						modifications and fixed 
+						offline error growth
+mvertens		01/16/03 clm2_deva_10	 	RTM computation now done 
+						on all mpi tasks in 
+						preparation for 
+						cpl6
+mvertens		01/10/03 clm2_deva_09	 	fixed non-spmd RTM bug
+mvertens		12/17/02 clm2_deva_08	 	fixed ibm compiler bug 
+						(clm_mapping.F90) and 
+						auxiliary history file 
+						restart bug
+mvertens		12/05/02 clm2_deva_07	 	fixed minor bugs
+mvertens		11/25/02 clm2_deva_06	 	updated clm2.1 cam-clm 
+						interface to use 
+						all-to-all communication
+mvertens		11/13/02 clm2_deva_05	 	inserted protex into all 
+						routines
+mvertens		11/04/02 clm2_deva_04	 	wrote clm2.0 to clm2.1 
+						conversion tool and 
+						updated inicFileMod
+mvertens		10/24/02 clm2_deva_03	 	incorporated slevis dust 
+						and VOC changes
+mvertens		10/22/02 clm2_deva_02	 	updated coupled model 
+						interface to work with 
+						clm2.1 data structures
+mvertens		10/10/02 clm2_deva_01	 	brought clm2_1 code onto 
+						main development 
+						branch
+mvertens		10/01/02 clm2_3_dev33	 	fixed bug in clm_map and 
+						updated to ESMF_0_0_2p5
+mvertens		08/19/02 clm2_3_dev32	 	modified history module 
+						so that memory scales 
+						with processor number in 
+						SPMD mode
+mvertens		06/22/02 clm2_3_dev31	 	updated clm2_dev code to 
+						cam2_0_dev7
+mvertens		04/29/02 clm2_3_dev30	 	made all arguments to 
+						generic min,max 
+						consistent
+mvertens		04/26/02 clm2_3_dev29	 	updated to ESMF_0_0_2p4
+mvertens		04/23/02 clm2_3_dev28	 	removed unnecessary files 
+						from atmlnd_share 
+						directory 
+mvertens		04/23/02 clm2_3_dev27	 	added FPSN to default 
+						histor output, updated 
+						cam interface to 
+						cam1_8_dev1
+mvertens		04/22/02 clm2_3_dev26	 	SPMD mod: made gather or 
+						scatter buffer different 
+						between root and non-root 
+						processes
+mvertens		04/15/02 clm2_3_dev25	 	got esmf changes to work 
+						with lahey compiler on 
+						apache
+mvertens		04/10/02 clm2_3_dev24	 	updated to ESMF_0_0_2p1
+mvertens		04/10/02 clm2_3_dev23	 	fixed comments for CLm2.0 
+						release
+mvertens		04/05/02 clm2_3_dev22	 	brought code up to date 
+						with ESMF_0_0_2
+mvertens		04/02/02 clm2_3_dev21	 	put in changes to 
+						decrease memory by 25%- 
+						30% 
+mvertens		04/01/02 clm2_3_dev20	 	brought code up to date 
+						with cam1_7_dev28
+mvertens		03/01/02 clm2_3_dev19	 	put in fixed for VOC and 
+						BGC mode
+mvertens		02/19/02 clm2_3_dev18	 	added missing_value 
+						attribute for history 
+						file attributes
+mvertens		02/14/02 clm2_3_dev17	 	introduced CPP variable 
+						ACCUM to fix CAM memory 
+						problem on IBM
+mvertens		02/11/02 clm2_3_dev16	 	fixed private statement 
+						in driver.F90
+mvertens		02/07/02 clm2_3_dev15	 	put in changes to that 
+						DGVM read in initial 
+						dataset successfully
+mvertens		02/05/02 clm2_3_dev14	 	fixed minor compilation 
+						bugs on sgi
+mvertens		02/04/02 clm2_3_dev13	 	introduced DGVM history 
+						file and added DGVM 
+						fields to initial 
+						dataset
+mvertens		01/25/02 clm2_3_dev12	 	implemented ccsm2.0 
+						output filename 
+						requirements
+mvertens		01/11/02 clm2_3_dev11	 	changed SHR_CONST_TKREF 
+						to SHR_CONST_TKFRZ
+mvertens		12/10/01 clm2_3_dev10	 	added use statements for 
+						needed share constants 
+						for cam and csm 
+						modes
+slevis		12/07/01 clm2_3_dev9	 	 
+						
+slevis		12/07/01 clm2_3_dev8	 	put in new share 
+						constants, dgvm bug fix, 
+						and dgvm diagnostic
+mvertens		12/06/01 clm2_3_dev7	 	fixed problems relating 
+						to incorporating esmf 
+						calendar manager in csm 
+						mode
+mvertens		12/03/01 clm2_3_dev6	 	fixed problems for code 
+						to work in COUP_CCM 
+						mode
+mvertens		11/27/01 clm2_3_dev5	 	put in esmf time manager
+mvertens		11/16/01 clm2_3_dev4	 	made clm work in csm and 
+						cam mode with spmd 
+						on
+mvertens		11/09/01 clm2_3_dev3	 	put in automated testing 
+						tools and CF1.0 
+						conventions in history 
+						files
+mvertens		11/08/01 clm2_3_dev2	 	fixed bug to make results 
+						bfb with clm2_2_14 (DGVM 
+						and BGC on)
+erik		11/06/01 clm2_3_dev1	 	test
+mvertens		11/06/01 clm2_2_14	 	Fixed two "problems" 
+						noticed in the b202.20.0 
+						simulations
+mvertens		10/25/01 clm2_2_13	 	make roughness lenth and 
+						displacement height 
+						function of canopy top 
+						height
+erik		10/23/01 clm2_2_12	 	Update to clm2 changes in 
+						CCM3.12.62
+erik			10/16/01 clm2_2_11	 	 Changes for SunOS/PC/Compaq, 
+							Don't use accumulMod if not DGVM,
+  							New BGC token, Nix stop for "call endrun",
+							check if masterproc on prints
+mvertens		10/10/01 clm2_2_10	 	put  in DGVM changes (not 
+						turned on by default)
+erik			10/09/01 clm2_2_9	 	Changes needed to work on SunOS
+mvertens		10/08/01 clm2_2_8	 	cleaned up river routing code
+mvertens		09/28/01 clm2_2_7	 	set irrigation term to zero
+mvertens		09/28/01 clm2_2_6	 	multiply total runoff by 
+						landfrac before doing 
+						RTM
+mvertens		09/25/01 clm2_2_5	 	fixed RTM spmd bug
+mvertens		09/20/01 clm2_2_4	 	put in albedo shift in 
+						driver.F90
+mvertens		09/14/01 clm2_2_3	 	put in changes relating 
+						to history file updates 
+						that significantly sped 
+						up model
+mvertens		09/11/01 clm2_2_2	 	changed surface dataset 
+						generation routines to 
+						use significantly less 
+						memory
+mvertens		09/07/01 clm2_2_1	 	put in changes to fix 
+						flint complaints
+mvertens		08/24/01 clm2_2_0	 	restructured code to 
+						permit new coupler 
+						communication
+mvertens		08/09/01 clm2_1_28	 	put in ability to read 
+						gaussian grid in offline 
+						mode
+mvertens		08/01/01 clm2_1_27	 	made irt in ccm mode 
+						dependent on ccm 
+						value
+mvertens		07/30/01 clm2_1_26	 	put in snow capping 
+						modifications
+mvertens		07/27/01 clm2_1_25	 	fixed history file 
+						problem in v2xy 
+						routine
+erik		07/26/01 clm2_1_24	 	Changes to compile on 
+						Compaq and Lahey and 
+						check if masterproc for 
+						some prints
+mvertens		07/24/01 clm2_1_23	 	added sending fsa to flux 
+						coupler
+mvertens		06/21/01 clm2_1_22	 	added ability to start 
+						from history file
+mvertens		06/19/01 clm2_1_21	 	fixed spmd bug for 
+						auxillary files
+mvertens		06/06/01 clm2_1_20	 	fixed bug where fwet was 
+						not determined on 
+						initializaton
+erik		06/05/01 clm2_1_19	 	One-line bug-fix to allow 
+						code to run on Solaris 
+						(give kind to float 
+						conversion)
+mvertens		05/31/01 clm2_1_18	 	fixed two minor bugs - 
+						clm_tvi and ioFileMod
+erik		05/25/01 clm2_1_17	 	Add use statement for 
+						shr_sys_mod routine 
+						used.
+mvertens		05/24/01 clm2_1_16	 	fixed two minor spmd bugs
+mvertens		05/15/01 clm2_1_15	 	fixed problems with 
+						deleting auxillary files 
+						too early
+mvertens		05/14/01 clm2_1_14	 	fixed SPMD bugs
+mvertens		05/09/01 clm2_1_13	 	added option to only call 
+						RTM on rtm_nsteps 
+						intervals
+mvertens		05/04/01 clm2_1_12	 	removed history fields 
+						DTV and DTG
+mvertens		05/04/01 clm2_1_11	 	retagged clm2_11 to 
+						clm2_1_11
+mvertens		05/03/01 clm2_11	 	fixed bug in mask_r sent 
+						to flux coupler
+oleson		05/02/01 clm2_1_10	 	Changed jan3x3.csh to 
+						point to new pft 
+						physiology file
+mvertens		04/19/01 clm2_1_9	put in slevis photosynthesis  	 
+					        changes						
+mvertens		04/19/01 clm2_1_8	put in new runoff interface to flux 
+						coupler
+mvertens		04/05/01 clm2_1_7	changed ccm interface 
+						module name to be 
+						consistent with lsm1 and 
+						lsm2
+oleson 			04/05/01 clm2_1_6 	incorporated effective 
+						root fraction
+mvertens		03/13/01 clm2_1_5 	fixed error growth and 
+						bug in clm_qsadv
+mvertens		02/27/01 clm2_1_4 	fixed canopy energy 
+						balance and removed 
+						implicit soil evap 
+						term
+mvertens		02/12/01 clm2_1_3 	removed soil color type 9 
+						(used to brighten N. 
+						Africa)
+oleson			02/05/01 clm2_1_2	fix clm_balchk bug
+mvertens		02/02/01 clm2_1_1 	added clm soil and snow 
+						albedo as default

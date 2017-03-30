@@ -1,0 +1,14 @@
+/CREATE_DIMS_GAU.ncl/1.1.2.1/Wed Oct 22 22:53:10 2003//Tcam_dev
+/CREATE_DIMS_REG.ncl/1.1.2.1/Wed Oct 22 22:53:10 2003//Tcam_dev
+/Makefile/1.1.2.1/Wed Oct 22 22:53:10 2003//Tcam_dev
+/README/1.1.2.1/Wed Oct 22 22:53:10 2003//Tcam_dev
+/REGRID.pl/1.1.2.1/Wed Oct 22 22:53:10 2003//Tcam_dev
+/addglobal.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/bilin.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/driver.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/fmain.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/globals.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/prec.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/preserve_mean.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+/wrap_nf.f90/1.1.2.1/Wed Oct 22 22:53:11 2003//Tcam_dev
+D

@@ -1,0 +1,92 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/index.shtml					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: index.shtml,v 1.21.2.7 2003/01/03 22:34:51 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>User's Guide to NCAR CAM2.0</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="acknowledge.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<HR NOSHADE SIZE=3>
+<H1>User's Guide to NCAR CAM2.0</H1>
+
+<HR NOSHADE>
+
+<P><B>Erik B. Kluzek</B>
+<BR><B>Mariana Vertenstein</B>
+<BR><B>Brian E. Eaton</B>
+
+<P><IMG SRC="images/cover.jpg">
+<DIV ALIGN=right></DIV>
+
+<DIV ALIGN=right><B>Climate and Global Dynamics Division</B>&nbsp;
+<HR NOSHADE SIZE=3></DIV>
+
+<DIV ALIGN=right></DIV>
+
+<DIV ALIGN=right><B>National Center for Atmospheric Research</B></DIV>
+
+<DIV ALIGN=right><B>Boulder, Colorado</B></DIV>
+
+<P>The National Center for Atmospheric Research is operated by the University
+Corporation for Atmospheric Research and is sponsored by the National Science
+Foundation. Any opinions, findings, conclusions, or recommendations expressed
+in this publication are those of the author(s) and do not necessarily reflect
+the views of the National Science Foundation.
+
+<P><A NAME="HEADING4_0"></A>
+
+<P>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="acknowledge.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.21.2.7 $ $Date: 2003/01/03 22:34:51 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

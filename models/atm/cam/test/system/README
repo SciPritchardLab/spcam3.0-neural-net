@@ -1,0 +1,156 @@
+
+	test/system/README			Erik Kluzek
+
+	Directory with test scripts for the stand-alone atmospheric
+	model. These are designed as tests that are expected to
+	be run before a model commit is made.
+
+     I. How to use:
+	1.) Useful Environment variables to set.
+    II. Testing strategy:
+	All.) Test with trace-gas.
+	0.) Test with bounds-checking on (DEBUG option set to TRUE).
+           (Do this both with SPMD on and off and verify that answers same)
+	1.) Restarts are bit-for-bit (and change decomposition).
+	2.) Compare restart comparison to previous version.
+	3.) Error growth test.
+	4.) Compare to previous version. (with error growth on)
+	5.) Adiabatic mode on and off.
+   III. Script strategy:
+
+     I. How to use:
+
+	On the platform you want to test run the script "test-model.pl".
+
+	perl test-model.pl -l lab -c old-cam-src-dir
+
+	Note, "old-cam-src-dir" is a optional command-line argument.
+	Specifying it gives the path to the directory for the old source 
+	code to compare this source to.
+
+	"-l lab" is also an optional command line argument that gives the
+	lab you are running at. This is useful in setting up the default
+	values to run with. The default lab is "NCAR". Default values for
+	other labs are also setup.
+
+	Use the "-r" option to restart where the script left off last. Use
+	"-s" to only do a subset of the tests. Use "-dirty" so that it
+	won't clean directories before and after compiling and running.
+	This is useful when you want testing to go faster and you've already
+	run through several passes.
+
+	The script produces error growth comparison files that can be
+	plotted with "cam1/modelss/atm/cam/bld/graphgrowth.csh". This can be used to assess
+	changes that change answers on the order of machine accuracy.
+	It can also be used to verify a port to a different machine.
+
+	Preferably, run the above script on several different platforms.
+	Notably, SGI-2000, IBM-SP, and Compaq. Sun and Linux may be
+	tested as well.
+
+	1.) Useful Environment variables to set.
+
+	LAB = The lab you are running at (ncar,nersc,dao,ornl)
+	CSMDATA = Location of the datafiles 
+			(with atm/cam1, lnd/lsm1 and lnd/clm2 subdirectories)
+	SPMD = If you want to run in SPMD mode (TRUE or FALSE).
+	SHMEM_CPUS = Number of Open-MP shared memory CPU's you'd like to use.
+	SPMD_NODES = Number of MPI distributed nodes you'd like to use.
+       PHYSICS = The physics directory to use physics or phys366, default physics)
+       LANDMODEL = The Land model to use CLM2 or LSM1, default LSM1.
+
+    II. Testing strategy:
+
+	The test-script runs the following tests for each dynamics 
+	(Eulerian, Semi-Lagrangian, and Lin-Rood). Eulerian and SLD
+	are run at a fairly low resolution of T21 with 18 levels. Lin-Rood
+	is run at a 4x5 degree resolution with 18 levels. In both cases
+	the resolution is deemed high enough to do a reasonable test, but
+	low enough to give a faster turnaround.
+
+	All.) Test with trace-gas.
+
+	All tests are run with "trace_gas" set to true so that
+	code handling multiple constituents will be checked.
+
+	0.) First run a few time-steps with the DEBUG flag set to true.
+	This runs with the debug option on and turns bounds checking on
+	and other features needed for debugging. Some compilers are flaky
+       when using bounds checking (notably the IBM and SGI), so other compilers
+       will have to be used for bounds checking.
+
+	This test is also run in two-parts. It's run with and without SPMD-mode
+       turned on, and the answers are compared to ensure that SPMD and non-SPMD
+       both give identical answers.
+
+	1.) Restarts are bit-for-bit (and change decomposition).
+
+	Both of these tests are run at the same time. If the test fails
+	it could be due to a problem in either the change in PE's or
+	with restarts.
+
+	a.) Test restarts
+
+ 	Restarts are done at an odd time so that both history and abs/ems 
+	restart datasets will be produced. The restart test is also ran
+	with a different number of nodes than the initial run to ensure
+	that restarts don't depend on the parallel domain decomposition.
+
+	b.) Changing the domain decomposition.
+
+	This is done by subtracting one from the previous number of shared 
+	memory CPU's used, and dividing the number of SPMD nodes by two.
+
+	Testing mode for 1 and 2.
+	
+	The above is done with full-physics and error growth turned off so 
+	the production mode of the model is extensively checked.
+
+	2.) Compare restart comparison to previous version.
+
+	Now if the "-c" option is used the control library is run with the
+	same configuration as the last restart test in the list of tests
+	above. The answers are compared to the above test and stored in the
+	"conf*.cprout" file. At the end of the test all of the control
+	tests will be examined to see if the results are bit-for-bit with
+	the previous library. If so the script will mention this fact, if not
+	a WARNING message is printed as well. If answers are different the user
+	will have to assess if this is acceptable and may examine the *.cprout
+	to decide if the changes are within roundoff of the previous library.
+	
+	3.) Error growth test.
+
+	Next the error growth test is done, running with a perturbation
+	of zero and roundoff level (1.e-14). This ensures that the perturbation
+	test can at least run. This test is done with DEBUG set to FALSE so
+	that the test will run as fast as possible and to ensure that both
+	DEBUG on and off works. 
+
+	The results of this test need to be plotted after the test is done
+	by using the "cam1/models/atm/cam/bld/graphgrowth.csh" utility. To compare to a 
+	previous model version you will have to run the test-suite for
+	the previous model version as well and use "cprnc" to compare the
+	two.
+
+	4.) Compare to previous version.
+
+	Finally, if the "-c" command-line argument is given the results for 
+	the error growth test with a perturbation of zero is compared to the
+	results for a perturbation of zero with the previous source code (given
+	after the "-c" option). Results can be compared to the error growth
+	profile produced to determine if they are roundoff.
+
+	If "-c" is NOT given, but it was previously and the files are still
+	available -- it still does the comparison.
+
+	5.) Adiabatic mode on and off.
+
+	The last two tests (3 and 3) are run both with adiabatic mode ON
+	and OFF. This ensures that the model works in both modes.
+
+   III. Script strategy:
+
+	The script "test-model.pl" takes advantage of scripts and Perl
+	modules setup in the "cam/models/atm/cam/bld" directory to configure, build
+	and run the model. As such the script is relatively short.
+

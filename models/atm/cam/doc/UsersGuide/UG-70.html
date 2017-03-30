@@ -1,0 +1,123 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-70.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-70.html,v 1.52.2.11 2003/01/03 22:34:49 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.6 Model Vertical Coordinate</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-72.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-45.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-69.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<H2><A NAME="SEC2_6"></A>2.6 Model Vertical Coordinate</H2>
+The vertical coordinate is a hybrid sigma-pressure system. In this system,
+the upper regions of the atmosphere are discretized by pressure only. Lower
+vertical levels use the sigma (i.e. <B>p/p<SUB>s</SUB></B>)&nbsp;<A NAME="MARKER_2_45"></A>vertical
+coordinate smoothly merged in, with the lowest levels being pure sigma.
+A schematic representation of the hybrid vertical coordinate and vertical
+indexing is presented below.<A NAME="HEADING71_0"></A> Both input and output
+datafiles follow this format as well as internal model datastructures.
+
+<P><A NAME="FIG2_1"></A><B>Figure 2.1 Hybrid Vertical Coordinate.</B>
+<BR>&nbsp;<IMG SRC="images/FigIII.1_hyb_coord.gif" >
+<BR>Pressure is defined as:
+
+<P><B>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; p<SUB>(i,j,k) </SUB>= A<SUB>k</SUB>P<SUB>0</SUB>
++ B<SUB>k</SUB>P<SUB>s</SUB>(i,j)</B>
+
+<P>where <B>p </B>is the pressure at a given level and latitude, longitude
+grid point.&nbsp; The coefficients <B>A</B>, <B>B</B> and <B>P<SUB>0</SUB>
+</B>are constants.&nbsp; <B>P<SUB>s</SUB></B> is the model's current surface
+pressure.&nbsp; <B>P<SUB>0</SUB></B> is set in the model code.&nbsp; The
+input model initial conditions dataset sets <B>A</B> and <B>B</B> through
+the variables <B>hyam,</B> <B>hyai,</B> <B>hybm</B>, and <B>hybi.</B>&nbsp;
+The subscript "i" refers to interface levels, and "m" refers to the mid-point
+levels.&nbsp; "<B>hyam</B>" then refers to Hybrid level "A" coefficient
+on the interfaces.
+
+<P>More details on the theoretical nature of the vertical coordinate system
+can be found in Hack <I>et al.</I> (1993).
+<BR>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-72.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-45.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-69.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.52.2.11 $ $Date: 2003/01/03 22:34:49 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

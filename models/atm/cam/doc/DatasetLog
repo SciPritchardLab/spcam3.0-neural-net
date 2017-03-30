@@ -1,0 +1,1137 @@
+This file documents initial and boundary datasets used by CCM, LSM, and CLM2 which
+are stored within the /fs/cgd/csm/inputdata hierarchy. They are also backed up
+monthly to Mass Store at /CCSM/inputdata.  The backup occurs on dataproc
+by user "erik".
+
+===============================================================================
+File:                   abs_ems_factors_fastvx.052001.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3_12
+File type:              NetCDF
+Resolution:             horiz and vert. not applicable 
+                        ( p = 10 ; tp = 10 ; te = 21 ; rh = 7 ; u = 25 ;)
+What is it:             Transmission coefficients for water vapor absorptivity and
+                        emissitivity. Binned by various physical quantities.
+===============================================================================
+File:                   abs_ems_factors.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3_10_60
+File type:              NetCDF
+Obsolete with:          ccm3_12
+Resolution:             horiz and vert. not applicable 
+                        (p = 10 ; tp = 10 ; te = 11 ; u = 25 ; band = 3)
+What is it:             Transmission coefficients for water vapor absorptivity and
+                        emissitivity. Binned by various physical quantities.
+===============================================================================
+File:                   ERIK_csm_sldnewicefrac01Br_lnd_init_clm2_0010-09-01-00000.c020417.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/inidata/cam
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             T42 with SLD (63 waves)
+What is it:             IC file for CLM2 for T42L26 with SLD dynamics (63 waves).
+                        This is from Sep/1 year 10 of /ERIK/csm/sldnewicefrac01Br which was
+                        a branch simulation from /JET/csm/sldnewicefrac01.
+===============================================================================
+File:                   surface-data.sld.T42.fgrd.fland.c020418.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/srfdata/cam
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             T42 with SLD (63 waves)
+What is it:             Surface dataset for CLM using SLD dynamics at T42 with 63 waves.
+===============================================================================
+File:                   EATON_csm_fv2x-fland05_lnd_init_clm2_0005-09-01-00000.c020329.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/inidata/cam
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             2x2.5 with fv dynamics
+What is it:             IC file for CLM2 for 2x2.5L26 with fv dynamics.
+                        This is from Sep/1 year 5 of /EATON/csm/fv2x-fland05.
+===============================================================================
+File:                   surface-data.fv.2x2.5.fland.c020214.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/srfdata/cam
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             2x2.5
+What is it:             Surface dataset for CLM using fv dynamics at 2x2.5
+===============================================================================
+File:                   fv.SEP1.2x2.5L26.c020329.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/inic/fv
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             2x2.5 26 levels with fv dynamics.
+What is it:             Initial condition dataset for 2x2.5 L26 case with fv dynamics.
+                        from Sep/1 year 5 of /EATON/csm/fv2x-fland05.
+===============================================================================
+File:                   fv.SEP1.2x2.5L26.c020329.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/inic/fv
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             2x2.5 26 levels with fv dynamics.
+What is it:             Initial condition dataset for 2x2.5 L26 case with fv dynamics.
+                        from Sep/1 year 5 of /EATON/csm/fv2x-fland05.
+===============================================================================
+File:                   SEP1.T42L26.fland.c020402.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/inic/gaus
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             T42 26 levels
+What is it:             Initial condition dataset for T42 L26 case with Eulerian dynamics.
+                        from Sep/1 year 35 of /ERIK/csm/newsstclim03Br a branch
+                        simulation of /ROSINSKI/csm/newsstclim03.
+===============================================================================
+File:                   sst_HadOIBl_bcT42_clim.c020411.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/sst
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             T42
+What is it:             Climatology of Hadley center Optimal Interpolation SST data /
+                        Reynolds data melded by J. Hurrell, Climate Analysis Section, NCAR.
+                        Data "adjusted" to make a boundary condition dataset such
+                        that the linear interpolation in time between mid-month
+                        points reproduces the observed monthly average.
+===============================================================================
+File:                   sst_HadOIBl_bcT42_1949_2001.c020411.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/sst
+Originator:             Erik Kluzek
+Model requirements:     CAM1_8_dev1
+File type:              NetCDF
+Resolution:             T42
+What is it:             Hadley center Optimal Interpolation SST data /Reynolds data melded 
+                        by J. Hurrell, Climate Analysis Section, NCAR.
+                        Data "adjusted" to make a boundary condition dataset such
+                        that the linear interpolation in time between mid-month
+                        points reproduces the observed monthly average.
+===============================================================================
+File:                   ERIK_csm_eul31215_clm2raB_clm2_hist_lsmi_00100901_00000_c010829.r1up.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/inidata/ccm
+Originator:             Erik Kluzek
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T42 26 levels, "r1up" reduced grid
+What is it:             IC file for CLM2 for T42L26 reduced grid, simulations.  Came from 
+                        lsmi_00100901_00000.nc which was an initial dataset from a 
+                        climatological SST simuluation /ERIK/csm/eul31215_clm2raB. This 
+                        simulation used CCM3.12.15 with Eulerian dynamics, and the CLM2 
+                        land model.
+===============================================================================
+File:                   JAN1.T85L26.eul.ccsm.c011015.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/cam1/inic/gaus
+Originator:             Tony Craig
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T85 26 levels
+What is it:             IC file for T85L26 simulations. Interpolated from 
+                        JAN1.T42L26.eul.ccsm.052001.nc.
+===============================================================================
+File:                   JAN1.T42L26.eul.ccsm.052001.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T42 26 levels
+What is it:             IC file for T42L26 simulations when running coupled with Eulerian
+                        dynamics from case: /CCSM/csm/Ba.beta08b, Jan/1 year 6, year renamed
+                        to zero. Case was fully active "T42L26eul/gx3 test cpl roff=0".
+===============================================================================
+File:                   SEP1.T42L26.c010829.r1up.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T42 26 levels, "r1up" reduced grid
+What is it:             IC file for T42L26 reduced grid simulations.  
+			   Came from ccmi_00100901_00000.nc which was an initial dataset from a 
+                        climatological SST simuluation /ERIK/csm/eul31215_clm2raB. This 
+                        simulation used CCM3.12.15 with Eulerian dynamics, and the CLM2 land 
+                        model.
+===============================================================================
+File:                   ERIK_csm_eul31215_clm2aBr_clm2_hist_lsmi_00100901_00000_c010825.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/clm2/inidata/ccm
+Originator:             Erik Kluzek
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T42 26 levels
+What is it:             IC file for CLM2 for T42L26 simulations.  Came from lsmi_00100901_00000.nc
+                        which was an initial dataset from a climatological SST simuluation
+			   /ERIK/csm/eul31215_clm2aBr. This simulation used CCM3.12.15 with
+                        Eulerian dynamics, and the CLM2 land model.
+===============================================================================
+File:                   SEP1.T42L26.c010825.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.12.15
+File type:              NetCDF
+Resolution:             T42 26 levels
+What is it:             IC file for T42L26 simulations.  Came from ccmi_00100901_00000.nc
+                        which was an initial dataset from a climatological SST simuluation
+			   /ERIK/csm/eul31215_clm2aBr. This simulation used CCM3.12.15 with
+                        Eulerian dynamics, and the CLM2 land model.
+===============================================================================
+File:                   SEP1.2x2.5L26.122000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             2x2.5
+What is it:             IC file for 2x2.5 LR run.  Came from ccmi_19870901_00000.nc
+                        which was an initial dataset from an AMIP run done by Sharon 
+                        Nebuda at NASA.  I ran interpic to convert it from 30 to 26 
+                        levels.  Erik Kluzek provided the hybrid coefficients.  We had
+                        to paste in the gw values provided by Dave Williamson.
+===============================================================================
+File:                   fv.3x3.6.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             IC file for timing analysis from SJ Lin
+===============================================================================
+File:                   fv.2x2.5.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             IC file for timing analysis from SJ Lin
+===============================================================================
+File:                   lr.SST3x3.6.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             Climatolotical SST file for timing analysis from SJ Lin
+===============================================================================
+File:                   lsmi_19870901_00000.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/lsm1
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             LSM IC file for AMIP run from Sharon Nebuda (NASA)
+===============================================================================
+File:                   ccmi_19870901_00000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             IC file for AMIP run from Sharon Nebuda (NASA)
+===============================================================================
+File:                   sstsice_144x91.amip.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     netcdf-capable
+File type:              NetCDF
+Resolution:             T42
+What is it:             AMIP SST file from Sharon Nebuda (NASA)
+===============================================================================
+File:                   pcmdi_sst_ccm_bcT42_1977_1998.012000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.5 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             Pseudo-monthly SST file from PCMDI. December/1978-1996
+                        of this file are from pcmdi_sst_ccm_bcT42_1978_1996.nc.
+Jan/1978-Nov/1978 are from a "ramp-up" dataset that PCMDI created to smoothly
+go from climatological SST's to Dec/1978.  Nov and Dec 1977 are just the November
+and December climatological values from the pcmdi_sst_ccm_bcT42_clim.nc
+dataset. April 1996 through Aug 1998 are from new data sent from PCMDI.
+
+===============================================================================
+File:                   pcmdi_sst_ccm_bcT42_1977_1996.0699.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.5 and beyond
+File type:              NetCDF
+Obsolete:		   use pcmdi_sst_ccm_bcT42_1977_1998.012000.nc
+Resolution:             T42
+===============================================================================
+File:                   pcmdi_sst_ccm_bcT42_1978_1996.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.5 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             Pseudo-monthly SST file from PCMDI.  This is
+			   a input file for the CCM that was modified from the file
+we got from PCMDI (see pcmdi_sst_ccm_bcT42_clim.nc for a description of the changes).
+
+Pseudo-monthly means that when the CCM is used to interpolate to daily values the
+monthly mean of the daily values will be the same as the observed monthly values.
+===============================================================================
+File:                   pcmdi_sst_ccm_bcT42_clim.032000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.5 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             Same as "pcmdi_sst_ccm_bcT42_clim.nc", but also has 
+			   "ice-cov" sea-ice coverage, SST unmodified for ice-temperature
+"SST_cpl", and "land_mask" for the land-ocean mask.
+===============================================================================
+File:                   pcmdi_sst_ccm_bcT42_clim.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.5 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             Pseudo-climatological SST file from PCMDI.  This is
+			   a input file for the CCM that was modified from the file
+we got from PCMDI.  Mostly the modifications were just to change variable names
+so that it could be read by the CCM. Other changes were to interpolate SST over
+land, and to ensure the sea-ice was flag by verifying it with the sea-ice concentration
+dataset. If conc > 50% and SST > tfrz set SST = tfrz. If conc < 50% and SST <= tfrz
+set SST = tfrz + epsilon. The "amip2" version of the script "pcmdisst2ccm.ncl"
+was used to do the conversion.
+
+Pseudo-climatological means that when the CCM is used to interpolate to daily values the
+monthly mean of the daily values will be the same as the observed monthly climatology.
+===============================================================================
+File:                   DEC1.T42.AMIP2.0199.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.31 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             December 1st initial conditions file for the AMIP2 simulation.
+			This is from year 6 of the /ERIK/csm/pcmdit4 climatological
+SST simulation (which used ccm3_6_16_brnchT_amip2_7).  This simulation used the following 
+datasets...
+ NCDATA = 'ccmi_00050901_00000.nc'
+ BNDTVS = 'pcmdi_sst_ccm_bcT42_clim.nc'
+ BNDTVO = 'pcmdio3.r8.nc'
+And the following non-standard namelist settings...
+ AMIP2 solar forcing: OBLIQ = 23.441, ECCEN = 0.016715, MVELP = 102.7, SCON = 1.365e6
+ AMIP2 volume mixing ratios: CO2VMR = 3.48e-4, CH4VMR = 1.650e-6, N2OVMR = 3.06e-7
+      F11VMR = 4.2521e-10, F12VMR = 3.8290e-10
+The initial conditions dataset was from year 5 of the simulation: /ERIK/csm/pcmdit2.
+The pcmdit2 case used the same namelist settings as above the same ozone dataset, but
+it used a modified SST dataset, and the SEP1.T42.0198.nc IC file.
+
+===============================================================================
+File:                   CCM3.6LSMICDEC1.AMIP2.0199.nc
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Erik Kluzek
+Model requirements:     ccm3.5.10 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             December 1st spin-up for LSM for the AMIP2 simulation.
+			This is from year 6 of the /ERIK/csm/pcmdit4 climatological
+SST simulation (which used ccm3_6_16_brnchT_amip2_7).  This simulation is 
+described by DEC1.T42.AMIP2.0199.nc.
+===============================================================================
+File:                   CCM3.5LSMICJAN1.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Mariana Vertenstein
+Model requirements:     ccm3.5.10 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             CCM3.5LSMICJAN1.0198 converted to netCDF
+			(see description of CCM3.5LSMICJAN1.0198 below)
+===============================================================================
+File:                   CCM3.5LSMICDEC1.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Mariana Vertenstein
+Model requirements:     ccm3.5.10 and beyond
+File type:              NetCDF
+Resolution:             T42
+What is it:             CCM3.5LSMICDEC1.0198 converted to netCDF
+			(see description of CCM3.5LSMICDEC1.0198 below)
+===============================================================================
+File:                   CCM3.5LSMICSEP1.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Mariana Vertenstein
+Model requirements:     ccm3.5.10 and beyond
+Becomes obsolete with:  (CCM3.7 use CCM3.7LSMICSEP1.081999.nc)
+File type:              NetCDF
+Resolution:             T42
+What is it:             CCM3.5LSMICSEP1.0198 converted to netCDF
+			(see description of CCM3.5LSMICSEP1.0198 below)
+===============================================================================
+File:                   sst_jan1978-sep1993.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             John Truesdale                                     
+Model requirements:     CCM3.3.5
+File type:              netcdf                                           
+Becomes obsolete with:  pcmdi_sst_ccm_bcT42_1978_1996.nc
+Resolution:             monthly T42 (lon=128, lev=1, lat=64, time=189)
+What is it:             Same as file sst_jan78-sep93.nc but with 4 digit
+                        years instead of 2 digit years in date field.
+                        I replaced the file sst_jan78-sep93.nc with this 
+                        new one since users should be using 4 digit years.
+                        This new dataset will give roundoff differences 
+                        compared to runs done with previous sst (2 digit 
+                        year). This is due to the fact that the sst routines
+                        interpolate the ssts using real days calculated
+                        from year*365.
+===============================================================================
+File:                   noaao3.120yr.030498.nc                            
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski                                     
+Model requirements:     Ability to read in 3-d netcdf ozone data
+Becomes obsolete with:  
+File type:              netcdf                                           
+Resolution:             lon=36, lev=30, lat=36, time=1452                
+What is it:             Latest 3-d NOAA Ozone dataset converted to netcdf.
+			120 years of monthly data.  Got from Tim Schneider
+===============================================================================
+File:                   SEP1.T42L30.072000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:  
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             30 level, initial conditions file for full-grid simulations.
+			This was generated from a branch simulation off of /JET/csm/ccm3911
+with ccm3.10.2 called /JET/csm/ccm3102. The data was for year 21 (16 years into the simulation
+as it started from year 5 with arbitrary initial conditions for LSM) of this simulation, but the date 
+was relabeled to year zero.
+===============================================================================
+File:                   SEP1.T31L18.112000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:
+File type:              64 bit CCM history tape netCDF
+Resolution:             T31
+What is it:             18 level, initial conditions file for full-grid simulati
+ons.
+                        Generated from SEP1.T42L30.072000.nc using
+"create_template.nc", "interpic", and "definesurf" from CCM3.10.51.
+===============================================================================
+File:                   SEP1.T21L18.112000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:
+File type:              64 bit CCM history tape netCDF
+Resolution:             T21
+What is it:             18 level, initial conditions file for full-grid simulati
+ons.
+                        Generated from SEP1.T42L30.072000.nc using
+"create_template.nc", "interpic", and "definesurf" from CCM3.10.51.
+===============================================================================
+File:                   SEP1.T5L18.112000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:
+File type:              64 bit CCM history tape netCDF
+Resolution:             T5
+What is it:             18 level, initial conditions file for full-grid simulati
+ons.
+                        Generated from SEP1.T42L30.072000.nc using
+"create_template.nc", "interpic", and "definesurf" from CCM3.10.51.
+===============================================================================
+File:                   SEP1.T42L26.112000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             26 level, initial conditions file. This was interpolated from
+			the 30 level file SEP1.T42L30.072000.nc which came from the /JET/csm/ccm3102
+control simulation.
+===============================================================================
+File:                   SEP1.T42L30.r1up.072000.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:  
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             30 level, initial conditions file for reduced-grid simulations.
+			This was generated from a branch simulation off of /ROSINSKI/csm/ccm3911_r1up
+with ccm3.10.2 called /ROSINSKI/csm/ccm3102_r1up_br. The data was for year 21 (16 years into the simulation
+as it started from year 5 with arbitrary initial conditions for LSM) of this simulation, but the date 
+was relabled to year zero.
+===============================================================================
+
+File:                   SEP1.T42L30_diffPHIS.081999.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.31
+Becomes obsolete with:  (CCM3.9.6 use SEP1.T42L30.051700.definesurf.nc)
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             30 level, initial conditions file for
+		          Sep/1st conditions, with diffusive filter
+on PHIS, and cloudwater stored.  This was run from a 5 year spin-up run 
+with standalone CCM and LSM.  The case name was /JET/csm/prgcld01, which 
+was run from the immediate precurser to CCM3.7 (ccm3_6_20_brnchT_scycRad1_13)
+The exact file was retrieved by doing a branch run (called /ERIK/csm/prgcldbr)
+from prgcld01 with the same code and creating the initial file after a one 
+month simulation. The monthly file was verified to be bit-for-bit with prgcld01.
+LSM was started from the CCM3.5 spinup, and the Orbital parameters were 
+set to 1950 conditions and solar constant to 1367 W/m2.  The standard
+Shea, Trenberth, Reynolds climatological SST dataset was used with the NOAA
+Ozone dataset for 1990 conditions.
+
+ NCDATA = 'SEP1.T42L30_diffPHIS.0599.nc'
+ BNDTVS = 'T42M5079.nc'
+ BNDTVO = 'noaao3.1990.21999.nc'
+ finidat   =  'CCM3.5LSMICSEP1.0198.nc'
+
+ IYEAR_AD = 1950
+ SCON   = 1.367e6
+===============================================================================
+File:                   SEP1.T42.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.31
+Becomes obsolete with:  (CCM3.7 use SEP1.T42L30_diffPHIS.081999.nc)
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             18 level, initial conditions file for
+		          Sep/1st conditions.  This was run from a
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a, which was run from straight CCM3.3.31
+code.  LSM was started from arbitrary initial conditions,
+standard namelist values as per sld012a were used with
+orbital parameters set to 1950 conditions and solar constant
+to 1367. W/m2
+
+ NCDATA = 'SEP1.T42.0697.nc'
+ BNDTVS = 'STR-sst.T42.0596.nc'
+ BNDTVO = 'ozn.0596.r8.nc'
+
+ IYEAR_AD = 1950
+ SCON = 1.367e6
+
+===============================================================================
+File:                   CCM3.5LSMICSEP1.0198
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  (CCM3.7 use CCM3.7LSMICSEP1.081999.nc)
+File type:              CRAY COS-blocked binary
+Resolution:             T42
+What is it:             LSM initial conditions file for 
+			   Sep/1st conditions.  This was run from a 
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a.  More details on this is given in
+the explaination of the SEP1.T42.0198.nc file.
+
+The exact filename was:
+
+/ERIK/csm/cls3331a/lnd/rest/lsmr_00050826_00000
+
+So technically it is for conditions on Aug/26th.
+
+===============================================================================
+File:                   CCM3.10LSMICSEP1.072000.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/lsm1
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:  
+File type:              64 bit LSM restart netCDF
+Resolution:             T42
+What is it:             LSM initial conditions file for full-grid simulations.
+			This was generated from a branch simulation off of /JET/csm/ccm3911
+with ccm3.10.2 called /ROSINSKI/csm/ccm3102_r1up_br. The data was for year 21 (16 years into the simulation
+as it started from year 5 with arbitrary initial conditions for LSM) of this simulation, but the date 
+was relabled to year zero.
+===============================================================================
+File:                   CCM3.10LSMICSEP1.r1up.072000.nc
+Location(s):            /fs/cgd/csm/inputdata/lnd/lsm1
+Originator:             Erik Kluzek
+Model requirements:     CCM3.9.6
+Becomes obsolete with:  
+File type:              64 bit LSM restart netCDF
+Resolution:             T42
+What is it:             LSM initial conditions file for reduced-grid simulations.
+			This was generated from a branch simulation off of /ROSINSKI/csm/ccm3911_r1up
+with ccm3.10.2 called /ROSINSKI/csm/ccm3102_r1up_br. The data was for year 21 (16 years into the simulation
+as it started from year 5 with arbitrary initial conditions for LSM) of this simulation, but the date 
+was relabled to year zero.
+===============================================================================
+File:                   CCM3.7LSMICSEP1.081999.nc
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Erik Kluzek
+Model requirements:     CCM3.
+Becomes obsolete with:  (CCM3.8 use CCM3.8LSMICSEP1.010600.nc)
+File type:              64 bit LSM restart file in netCDF
+Resolution:             T42
+What is it:             Initial conditions file for
+		          Sep/1st conditions, with diffusive filter
+on PHIS.  This was run from a 5 year spin-up run 
+with standalone CCM and LSM.  The case name was /JET/csm/prgcld01, which 
+was run from the immediate precurser to CCM3.7 (ccm3_6_20_brnchT_scycRad1_13)
+The exact file was retrieved by doing a branch run (called /ERIK/csm/prgcldbr)
+from prgcld01 with the same code and creating the initial file after a one 
+month simulation. The monthly file was verified to be bit-for-bit with prgcld01.
+LSM was started from the CCM3.5 spinup, and the Orbital parameters were 
+set to 1950 conditions and solar constant to 1367 W/m2.  The standard
+Shea, Trenberth, Reynolds climatological SST dataset was used with the NOAA
+Ozone dataset for 1990 conditions.  See SEP1.T42L30.diffPHIS.081999.nc.
+
+===============================================================================
+File:                   DEC1.T42.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.31
+Becomes obsolete with:  (CCM3.7 go to 30 level model with diffusive filter on PHIS)
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             18 level, initial conditions file for
+		          Dec/1st conditions.  This was run from a
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a, which was run from straight CCM3.3.31
+code.  LSM was started from arbitrary initial conditions,
+standard namelist values as per sld012a were used with
+orbital parameters set to 1950 conditions and solar constant
+to 1367. W/m2
+
+ NCDATA = 'SEP1.T42.0697.nc'
+ BNDTVS = 'STR-sst.T42.0596.nc'
+ BNDTVO = 'ozn.0596.r8.nc'
+
+ IYEAR_AD = 1950
+ SCON = 1.367e6
+
+===============================================================================
+File:                   CCM3.5LSMICDEC1.0198
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  
+File type:              CRAY COS-blocked binary
+Resolution:             T42
+What is it:             LSM initial conditions file for 
+			   Dec/1st conditions.  This was run from a 
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a.  More details on this is given in
+the explaination of the DEC1.T42.0198.nc file.
+
+The exact filename was:
+
+/ERIK/csm/cls3331a/lnd/rest/lsmr_00051204_00000
+
+So technically it is for conditions on Dec/04th.
+
+===============================================================================
+File:                   JAN1.T42.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     CCM3.3.31
+Becomes obsolete with:  (CCM3.7 go to 30 level model with diffusive filter on PHIS)
+File type:              64 bit CCM history tape netCDF
+Resolution:             T42
+What is it:             18 level, initial conditions file for
+		          Jan/1st conditions.  This was run from a
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a, which was run from straight CCM3.3.31
+code.  LSM was started from arbitrary initial conditions,
+standard namelist values as per sld012a were used with
+orbital parameters set to 1950 conditions and solar constant
+to 1367. W/m2
+
+ NCDATA = 'SEP1.T42.0697.nc'
+ BNDTVS = 'STR-sst.T42.0596.nc'
+ BNDTVO = 'ozn.0596.r8.nc'
+
+ IYEAR_AD = 1950
+ SCON = 1.367e6
+
+===============================================================================
+File:                   CCM3.5LSMICJAN1.0198
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  
+File type:              CRAY COS-blocked binary
+Resolution:             T42
+What is it:             LSM initial conditions file for 
+			   Jan/1st conditions.  This was run from a 
+5 year spin-up run with standalone CCM and LSM.  The case name
+was /ERIK/csm/cls3331a.  More details on this is given in
+the explaination of the JAN1.T42.0198.nc file.
+
+The exact filename was:
+
+/ERIK/csm/cls3331a/lnd/rest/lsmr_00051224_00000
+
+So technically it is for conditions on Dec/24th.
+===============================================================================
+File:                   SEP1.T42L26.1097.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jerry Olson
+Model requirements:     ccm3.3.20
+Becomes obsolete with:  (CCM3.9.6 use SEP1.T42L30.051700.definesurf.nc)
+File type:              netcdf
+Resolution:             T42 26 levels with PHIS "spectrally" truncated to T63
+What is it:             atm Initial conditions to be used with SLD branch
+                        (same as SEP1.T42L26.0897.nc except with T63 PHIS)
+===============================================================================
+File:                   SEP1.T42L26.0897.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jerry Olson
+Model requirements:     ccm3.3.20
+Becomes obsolete with:  (use SEP1.T42L26.1097.nc)
+File type:              netcdf
+Resolution:             T42 26 levels
+What is it:             atm Initial conditions to be used with SLD branch
+===============================================================================
+File:                   NOV1.T42x21L44.0698.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.5
+Becomes obsolete with:  
+File type:              netcdf                                           
+Resolution:             T42x21 (64 x 64) 44 levels
+What is it:             Initial conditions dataset for Nov/1 for middle atmosphere runs.
+	Converted Byron's CCM2 case m37 over to netCDF and used interpic, and definesurf
+	to get the dimensions ordered right and extra fields put on.
+===============================================================================
+File:                   T42x21M5079.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.5
+Becomes obsolete with:  
+File type:              netcdf                                           
+Resolution:             T42x21 (64 x 64)
+What is it:             SST dataset.
+===============================================================================
+File:                   SEP1.T05.0198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.5
+Becomes obsolete with:  
+File type:              netcdf                                           
+Resolution:             T05 18 levels
+What is it:             Initial conditions dataset for Sep/1 at T5 resolution.
+	Interpolated from the SEP1.T42.0198.nc case.
+===============================================================================
+File:                   lsmi_arbini.T42.COS
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     CCM3.3
+Becomes obsolete with:  (use )
+File type:              COS-blocked
+Resolution:             T42
+What is it:             An example lsm initial dataset
+===============================================================================
+File:                   noaamisc.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     No committed CCM code can yet use these data
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=1, lev=56, lat=36, time=12
+What is it:             2-d NOAA dataset containing CH4 and N2O concentrations,
+			and loss frequencies for CH4, N2O, CFC11, and CFC12,
+			converted to netcdf
+===============================================================================
+File:                   noaao3.120yr.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     No committed CCM code can yet use these data
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=36, lev=30, lat=36, time=1452
+What is it:             3-d NOAA Ozone dataset converted to netcdf.  
+			120 years of monthly data.
+===============================================================================
+File:                   noaao3.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     CCM3_3_1
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=1, lev=56, lat=36, time=12
+What is it:             2-d NOAA ozone dataset converted to netcdf
+===============================================================================
+File:                   ozn.0596.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     CCM3_3_1
+Becomes obsolete with:  (CCM3.7 use noaao3.1990.21999.nc)
+File type:              netcdf
+Resolution:             lon=1, lev=23, lat=64, time=12
+What is it:             ozn.T42.0596 run through 64-bit ccm2nc
+===============================================================================
+File:                   SEP1.T42L30_diffPHIS.0599.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  (CCM3.7 use SEP1.T42L30_diffPHIS.081999.nc)
+File type:              netcdf
+Resolution:             T42 30 levels
+What is it:             atm Initial conditions for a 30 level case.  Has
+levels in the boundary layer from the standard 26 level version.  PHIS was
+swapped out for PHIS with diffusive filter applied to it.
+
+This is now the standard IC file for CCM3.7.
+===============================================================================
+File:                   SEP1.T42L30.1198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  (CCM3.7 use SEP1.T42L30_diffPHIS.0599.nc)
+File type:              netcdf
+Resolution:             T42 30 levels
+What is it:             atm Initial conditions for a 30 level case.  Has
+levels in the boundary layer from the standard 26 level version.
+===============================================================================
+File:                   SEP1.T42L36.1198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.3.31
+Becomes obsolete with:  (CCM3.9.6)
+File type:              netcdf
+Resolution:             T42 36 levels
+What is it:             atm Initial conditions for a 36 level case. Bottom 24 
+levels are the same as the SEP1.T42L30.1198.nc file, but this one has 6 extra
+layers in the stratosphere that extend up to 0.56 hPa. And levels in the 
+stratoshere above 87.82 hPa are changed slightly.
+===============================================================================
+File:                   SEP1.T42L30_t63PHIS.1198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.5 2-time level SLD (2dtsld_hortal or olson_v016)
+Becomes obsolete with:  (use SEP1.T42L26.0198.nc) 
+File type:              netcdf
+Resolution:             T42 30 levels
+What is it:             atm Initial conditions for a 30 level case.  Has extra
+levels in the boundary layer from the standard 26 level version.  
+
+Uses the T63 PHIS field, so that it can be used with the 2-time level SLD version of CCM3.
+===============================================================================
+File:                   SEP1.T42L36_t63PHIS.1198.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Erik Kluzek
+Model requirements:     ccm3.5 2-time level SLD (2dtsld_hortal or olson_v016)
+Becomes obsolete with:  (yes)
+File type:              netcdf
+Resolution:             T42 36 levels
+What is it:             atm Initial conditions for a 36 level case. Bottom 24 
+levels are the same as the SEP1.T42L30.1198.nc file, but this one has 6 extra
+layers in the stratosphere that extend up to 0.56 hPa. And levels in the 
+stratoshere above 87.82 hPa are changed slightly.
+
+Uses the T63 PHIS field, so that it can be used with the 2-time level SLD version of CCM3.
+===============================================================================
+File:                   SEP1.T42L26.0897.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jerry Olson
+Model requirements:     ccm3.3.20
+Becomes obsolete with:  (yes)
+File type:              netcdf
+Resolution:             T42 26 levels
+What is it:             atm Initial conditions to be used with SLD branch
+===============================================================================
+File:                   lsmi_arbini.T42.COS
+Location(s):            /fs/cgd/csm/inputdata/lsm/lsm1
+Originator:             Jim Rosinski
+Model requirements:     CCM3.3
+Becomes obsolete with:  (yes)
+File type:              COS-blocked
+Resolution:             T42
+What is it:             An example lsm initial dataset
+===============================================================================
+File:                   noaamisc.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     No committed CCM code can yet use these data
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=1, lev=56, lat=36, time=12
+What is it:             2-d NOAA dataset containing CH4 and N2O concentrations,
+			and loss frequencies for CH4, N2O, CFC11, and CFC12,
+			converted to netcdf
+===============================================================================
+File:                   noaao3.120yr.nc
+Location(s):            /fs/cgd/csm/inpu/atm
+Originator:             Jim Rosinski
+Model requirements:     No committed CCM code can yet use these data
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=36, lev=30, lat=36, time=1452
+What is it:             3-d NOAA Ozone dataset converted to netcdf.  
+			120 years of monthly data.
+===============================================================================
+File:                   noaao3.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     CCM3_3_1
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=1, lev=56, lat=36, time=12
+What is it:             2-d NOAA ozone dataset converted to netcdf
+===============================================================================
+File:                   noaao3.1990.21999.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Mariana Vertenstein
+Model requirements:     CCM3_3_1
+Becomes obsolete with:  
+File type:              netcdf
+Resolution:             lon=1, lev=56, lat=36, time=12
+What is it:             2-d NOAA ozone dataset converted to netcdf. Extract
+out 1990 to use as climatological ozone.
+
+This is the standard Ozone dataset to use with CCM3.7.
+===============================================================================
+File:                   ozn.0596.r8.nc
+Location(s):            /fs/cgd/csm/inputdata/atm/ccm3
+Originator:             Jim Rosinski
+Model requirements:     CCM3_3_1
+Becomes obsolete with:  (CCM3.7 use noaao3.1990.21999.nc)
+File type:              netcdf
+Resolution:             lon=1, lev=23, lat=64, time=12
+What is it:             ozn.T42.0596 run through 64-bit ccm2nc
+===============================================================================
+File:			pcmdio3.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Jim Rosinski
+Model requirements: 	CCM3_3_1
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		lon=1, lev=59, lat=64, time=12
+What is it:    	2-d Ozone dataset from PCMDI converted to netcdf
+===============================================================================
+File:			T42M5079.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		John Truesdale
+Model requirements: 	CCM3.3.5
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		T42
+What is it:    	Climatological sea surface temperatures (SST) for 
+			CCM3 with the data ocean model (DOM) option.
+                :Conventions = "NCAR-CSM" ;
+                :source = "Data converted from CCM History Tape Format" ;
+                :history = "\n",
+    "Tue May  6 17:05:32 1997> /fs/cgd/home0/rosinski/ccm2nc/ccm2nc -xz T42M5079 T42M5079.nc" ;
+
+	This is the basic T42 Shea Trenberth Reynolds (STR) dataset with some small changes
+	by Dennis Shea to ensure there is a continuous field (required by the new model).
+===============================================================================
+File:			topo.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		John Truesdale
+Model requirements: 	CCM3.3.5 to CCM3.5.17 (after that with definesurf)
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		10 minute
+What is it:    		Global land mask  and topographic heights in hundreds of feet.
+			Definesurf uses this file to create ORO and PHIS values for 
+			interpolated CCM initial condition files.  The file this dataset
+			comes from is NCAR dataset DS754.0, converted to netCDF.
+			Here's some information about the DS754.0 dataset...
+
+TITLE:          U.S. NAVY GLOBAL ELEVATION DATA, 10-MIN (1984DEC)
+FORMAT REFS:    GLOBAL 10-MINUTE ELEVATION, APRIL 82, UPDATE DEC 84
+===============================================================================
+File:			bats.data, flak.1x1, olson.data, swmp.1x1,webb.1x1
+Location(s):		/fs/cgd/csm/inputdata/lsm/lsm1
+Originator: 		Gordon Bonan
+Model requirements: 	CCM3.3
+Becomes obsolete with:
+File type: 		ASCII
+Resolution: 		1x1 degree
+What is it:    	
+	Datasets needed for the arbitrary initialization of LSM in CCM.
+
+bats.data:	BATS (Biosphere Atmosphere Transfer Scheme) soil colors.
+		(Dickinson, R.E. 1983. Land surface processes and climate-surface
+		albedos and energy balance. Adv. Geophys. 25:305-353)
+flak.1x1:	Percent of grid-cell covered with inland water (lake).
+		(Cogley, J.G. 1991. GGHYDRO - Global Hydrographic Data
+		Release 2.0. Trent Climate Note 91-1, Dept. Geography,
+		Trent University, Peterborough, Ontario.)
+olson.data:	Surface land-use types. 0.5x0.5 degree grid.
+		(Olson, J.S., Watts, J.A., and Allison, L.J. 1983. Carbon
+		in live vegetation of major world ecosystems. ORNL-5862. Oak
+		Ridge National Laboraotry, Oak Ridge, TN.)
+webb.1x1:	Sand, silt, clay dataset.
+		(Webb, R.S., Rosenzweig, C.E., and Levine, E.R. 1993. Specifying land
+		surface characteristics in general circulation models: soil profile
+		data set and derived water-holding capacities. Global
+		Biogeochemical Cycles 7:97-108.)
+swmp.1x1:	Percent of grid-cell covered with wetlands.
+		(Cogley, 1991)
+
+===============================================================================
+File:			drainage.p5xp5.nc
+Location(s):		/fs/cgd/csm/inputdata/lsm/lsm1
+Originator: 		Mariana Vertenstein
+Model requirements: 	CCM3.3.3
+Becomes obsolete with:
+File type: 		netCDF
+Resolution: 		0.5x0.5 degree
+What is it:    	
+	Drainage matrix file signifying which ocean basin each 0.5x0.5
+degree grid box on the globe drains into.
+
+The basins are as follows:
+                DRNMAT:basin_1 = "basin 1   Eurasian Arctic" ;
+                DRNMAT:basin_2 = "basin 2   N. American Arctic" ;
+                DRNMAT:basin_3 = "basin 3   N. American Atlantic" ;
+                DRNMAT:basin_4 = "basin 4   European Atlantic" ;
+                DRNMAT:basin_5 = "basin 5   S. American Atlantic" ;
+                DRNMAT:basin_6 = "basin 6   African Atlantic" ;
+                DRNMAT:basin_7 = "basin 7   African Indian" ;
+                DRNMAT:basin_8 = "basin 8   Asian Indian" ;
+                DRNMAT:basin_9 = "basin 9   Asian Pacific" ;
+                DRNMAT:basin_10 = "basin 10  N. American Pacific" ;
+                DRNMAT:basin_11 = "basin 11  S. American Pacific" ;
+                DRNMAT:basin_12 = "basin 12  Australian Southern" ;
+                DRNMAT:basin_13 = "basin 13  Antarctic Southern" ;
+                DRNMAT:basin_14 = "basin 14  Mediterranean" ;
+                DRNMAT:basin_15 = "basin 15  Caspian Sea" ;
+                DRNMAT:basin_16 = "basin 16  Black Sea" ;
+                DRNMAT:basin_17 = "basin 17  Red Sea / Persian Gulf" ;
+                DRNMAT:basin_18 = "basin 18  Baltic Sea" ;
+                DRNMAT:basin_19 = "basin 19  Hudson Bay" ;
+===============================================================================
+File:			lr.2x2.5.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		2x2.5 degrees (91 lats x 144 lons), 30 levels
+What is it:    	        High resolution initial conditions for use with Lin-Rood
+			dynamics in CCM.
+===============================================================================
+File:			lr.65x128.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		65 lats x 128 lons, 30 level (basically a T42 dataset)
+What is it:    	        T42 equivalent initial conditions for Lin-Rood dynamics
+			Lin-Rood datasets include pole points, thus the extra
+                        latitude.
+===============================================================================
+File:			lr.t42.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:  Probably should be deleted, but it still works.
+File type: 		netcdf
+Resolution: 		64 lats x 128 lons, 30 level
+What is it:    	        A first attempt at T42 initial conditions for Lin-Rood.
+			Probably not valid because the latitude spacing is
+			incorrect when compared with non-LR T42 initial datasets.
+			I suggest using the 65x128 initial conditions instead.
+===============================================================================
+File:			lr.t5.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		8x16, 18 level
+What is it:    	        T5 equivalent initial conditions for use with Lin-Rood
+			dynamics.  If it blows up on you, try raising the nsplit
+			value in the namelist...
+===============================================================================
+File:			lr.SST2x2.5.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		John Truesdale
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		2x2.5 degree (91 lats x 144 lons)
+What is it:    	        Sea surface temperatures for use with Lin-Rood. This
+			dataset includes valid pole points.
+===============================================================================
+File:			lr.SST65x128.badlats.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:  When a version that has correct latitudes is created.
+File type: 		netcdf
+Resolution: 		65 lats x 128 lons
+What is it:    	        Sea surface temperatures for use with Lin-Rood. Note
+			that the latitude spacing is based on a gaussian grid,
+			not a regular grid as required by Lin-Rood dynamics.
+===============================================================================
+File:			lr.namelist.t5
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+What is it:    	        Example namelist for running CCM with Lin-Rood dynamics
+			and T5 resolution initial conditions.
+===============================================================================
+File:			lr.namelist.t42
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+What is it:    	        Example namelist for running CCM with Lin-Rood dynamics
+			and T42 resolution initial conditions.
+===============================================================================
+File:			lr.namelist.2x2.5
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+What is it:    	        Example namelist for running CCM with Lin-Rood dynamics
+			and 2x2.5 degree resolution initial conditions.
+===============================================================================
+File:			lr.t5.template.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		8x16, 18 level.
+What is it:    	        A template file for use with the interpic tool, for
+			creating Lin-Rood initial conditions files of this
+			resolution.
+===============================================================================
+File:			lr.t42.template.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		T42, 64x128 30 level
+What is it:    	        A template file for use with the interpic tool, for
+			creating Lin-Rood initial conditions files of this
+			resolution.
+===============================================================================
+File:			lr.65x128.template.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		65 lats x 128 lons, 30 level (T42 equivalent)
+What is it:    	        A template file for use with the interpic tool, for
+			creating Lin-Rood initial conditions files of this
+			resolution.
+===============================================================================
+File:			lr.2x2.5.template.nc
+Location(s):		/fs/cgd/csm/inputdata/atm/ccm3
+Originator: 		Glenn Grant
+Model requirements: 	CCM3.10.20
+Becomes obsolete with:
+File type: 		netcdf
+Resolution: 		2 x 2.5 degrees (91 lats x 144 lons), 30 level
+What is it:    	        A template file for use with the interpic tool, for
+			creating Lin-Rood initial conditions files of this
+			resolution.
+===============================================================================

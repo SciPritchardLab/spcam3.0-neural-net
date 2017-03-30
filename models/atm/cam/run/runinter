@@ -1,0 +1,8 @@
+#! /usr/bin/csh
+setenv MP_EUILIB us
+setenv MP_NODES 2
+setenv MP_TASKS_PER_NODE 1
+setenv MP_PROCS 2
+setenv MP_RMPOOL 1
+setenv MP_EAGER_LIMIT  65536
+timex  poe cam<namelist

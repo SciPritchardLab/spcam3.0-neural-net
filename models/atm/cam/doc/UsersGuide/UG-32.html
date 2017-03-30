@@ -1,0 +1,215 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-32.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-32.html,v 1.60.2.16 2003/06/13 15:44:18 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.4.8 Example 8 -- Debugging Run</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-33.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-30.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-21.html>2.4 Example Namelists</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<h3><a NAME="HEAD_9"></a>2.4.8 Example 8 -- Debugging Run</h3>
+
+The following namelist can be utilized when the user wants to examine
+model behavior on a nstep by step basis.  The first history file series is
+not archived to the Mass Store. The disk copy will not be deleted and
+can be analyzed.  Only 10 timesteps will be executed, with history
+data written every timestep. Output will be line-buffered to ensure
+printout will be dumped each timestep.  For efficiency, no restart
+data will be written.
+
+<p>
+To obtain this namelist, the user may invoke <b>build-namelist</b> with
+command line arguments. However, since the number of command line arguments
+for this case are numerous, an easier solution is for the user to first create a 
+namelist file, <b>namelist_input</b>, with the following contents:
+
+<p><B><TT>&nbsp;&amp;camexp</TT></B>
+<br><b><tt>&nbsp;caseid = 'run08'</tt></b>
+<br><b><tt>&nbsp;nrefrq = 0</tt></b>
+<br><b><tt>&nbsp;mss_irt = 0</tt></b>
+<br><b><tt>&nbsp;linebuf = .TRUE.</tt></b>
+<br><b><tt>&nbsp;ndens = 1</tt></b>
+<br><b><tt>&nbsp;mfilt = 10</tt></b>
+<br><b><tt>&nbsp;nhtfrq = 1</tt></b>
+<br><b><tt>&nbsp;nelapse= 10</tt></b>
+<br><b><tt>&nbsp;/</tt></b>
+
+<p>
+The user may then invoke <tt><b>build-namelist</b></tt> as follows:
+
+<pre><b>
+ % setenv CSMDATA /data
+ % build-namelist -infile namelist_input
+</b></pre>
+
+<p>
+The user should invoke this command from the same directory from which
+<tt><b>configure</b></tt> was invoked.
+
+<p>
+<hr>
+<p>
+
+<p><b><tt>&nbsp;&amp;camexp</tt></b>
+<br><b><tt>&nbsp;caseid = 'run08'</tt></b>
+<br><b><tt>&nbsp;absems_data = '/data/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc'</tt></b>
+<br><b><tt>&nbsp;ncdata = '/data/atm/cam2/inic/gaus/cami_0000-09-01_64x128_T42_L26_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvs = '/data/atm/cam2/sst/sst_HadOIBl_bc_64x128_clim_c020411.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvo = '/data/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc'</tt></b>
+<br><b><tt>&nbsp;nsrest = 0</tt></b>
+<br><b><tt>&nbsp;nrefrq = 0</tt></b>
+<br><b><tt>&nbsp;mss_irt = 0</tt></b>
+<br><b><tt>&nbsp;linebuf = .TRUE.</tt></b>
+<br><b><tt>&nbsp;ndens = 1</tt></b>
+<br><b><tt>&nbsp;mfilt = 10</tt></b>
+<br><b><tt>&nbsp;nhtfrq = 1</tt></b>
+<br><b><tt>&nbsp;nelapse= 10</tt></b>
+<br><b><tt>&nbsp;iyear_ad = 1950</tt></b>
+<br><b><tt>&nbsp;/</tt></b>
+
+<p><b><tt>&nbsp;&amp;clmexp</tt></b>
+<br><b><tt>&nbsp;fpftcon = '/data/lnd/clm2/pftdata/pft-physiology'</tt></b>
+<br><b><tt>&nbsp;fsurdat = '/data/lnd/clm2/srfdata/cam/clms_64x128_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;finidat = '/data/lnd/clm2/inidata_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc'</tt></b>
+<br><b><tt>&nbsp;/</tt></b>
+<p>
+<hr>
+<dl>
+<dt>
+
+<p>
+<b><tt>MSS_IRT</tt></b></dt>
+<p>
+<dd>
+When <tt>MSS_IRT=0</tt>, output history and restart files are only
+written to local disk and not archived to the Mass Store.</dd>
+
+<p>
+<dt>
+<b><tt>NDENS</tt></b></dt>
+<p>
+<dd>
+History output data is in NetCDF double precision (NDENS=1) in order
+to maintain full accuracy.</dd>
+
+<p>
+<dt>
+<b><tt>MFILT</tt></b></dt>
+<p>
+<dd>
+10 time samples of unpacked data will be written to each history file.</dd>
+
+<p>
+<dt>
+<b><tt>LINEBUF</tt></b></dt>
+<p>
+<dd>
+Printout will be flushed with each log output line generated.</dd>
+
+<p>
+<dt>
+<b><tt>NREFRQ</tt></b></dt>
+<p>
+<dd>
+A value of zero prevents restart files from being written.</dd>
+
+<p>
+<dt>
+<b><tt>NHTFRQ</tt></b></dt>
+<p>
+<dd>
+History data is written every timestep.</dd>
+
+</dl>
+<a NAME="HEADING33_0"></a>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-33.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-30.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.60.2.16 $ $Date: 2003/06/13 15:44:18 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

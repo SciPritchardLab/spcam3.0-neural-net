@@ -1,0 +1,17 @@
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/physics/cam1
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/physics/crm
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/dynamics/sld
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/control
+/Users/mark/mmf/cam3_sp/models/atmlnd_share
+/Users/mark/mmf/cam3_sp/models/csm_share
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/utils
+/Users/mark/mmf/cam3_sp/models/utils/timing
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/advection/slt
+/Users/mark/mmf/cam3_sp/models/atm/cam/src/ocnsice/dom
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/main
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/biogeophys
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/biogeochem
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/mksrfdata
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/ecosysdyn
+/Users/mark/mmf/cam3_sp/models/lnd/clm2/src/riverroute
+/Users/mark/mmf/cam3_sp/models/ice/csim4

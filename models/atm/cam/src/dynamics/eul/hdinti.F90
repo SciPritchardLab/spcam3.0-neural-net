@@ -1,0 +1,80 @@
+#include <misc.h>
+#include <params.h>
+
+subroutine hdinti(rearth, deltat)
+
+!----------------------------------------------------------------------- 
+! 
+! Purpose: 
+! Time independent initialization for the horizontal diffusion.
+! 
+! Method: 
+! 
+! Author: 
+! Original version:  D. Williamson
+! Standardized:      J. Rosinski, June 1992
+! Reviewed:          B. Boville, J. Hack, August 1992
+! Reviewed:          B. Boville, April 1996
+!
+!-----------------------------------------------------------------------
+!
+! $Id: hdinti.F90,v 1.1.44.2 2003/12/15 18:52:50 hender Exp $
+! $Author: hender $
+
+   use shr_kind_mod, only: r8 => shr_kind_r8
+   use pmgrid
+   use pspect
+   use comhd
+   implicit none
+!------------------------------Arguments--------------------------------
+!
+! Input arguments
+!
+   real(r8), intent(in) :: rearth               ! radius of the earth
+   real(r8), intent(in) :: deltat               ! time step
+!
+!---------------------------Local workspace-----------------------------
+!
+   integer k                 ! level index
+   integer n                 ! n-wavenumber index
+!
+!-----------------------------------------------------------------------
+!
+! Top level for del**4 diffusion, set for 18-level model
+!
+   kmnhd4 = 4
+!
+! Bottom level for increased del**2 diffusion (kmxhd2 < kmnhd4)
+!
+   kmxhd2 = 2
+!
+! Initialize physical constants for courant number based spect truncation
+!
+   nmaxhd = ptrk
+   cnlim  = 0.999          ! maximum allowable Courant number
+   cnfac  = deltat*float(nmaxhd)/rearth
+!
+! Initialize arrays used for courant number based spectral truncation
+!
+   do k=1,plev
+      nindex(k) = 2*nmaxhd
+   end do
+!
+! Set the Del^2 and Del^4 diffusion coefficients for each wavenumber
+!
+   hdfst2(1) = 0.
+   hdfsd2(1) = 0.
+!
+   hdfst4(1) = 0.
+   hdfsd4(1) = 0.
+   do n=2,pnmax
+      hdfst2(n) = dif2 * (n*(n-1)  ) / rearth**2
+      hdfsd2(n) = dif2 * (n*(n-1)-2) / rearth**2
+
+      hdfst4(n) = dif4 * (n*(n-1)*n*(n-1)  ) / rearth**4
+      hdfsd4(n) = dif4 * (n*(n-1)*n*(n-1)-4) / rearth**4
+   end do
+!
+   return
+end subroutine hdinti
+

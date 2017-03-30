@@ -1,0 +1,339 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-102.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-102.html,v 1.53.2.11 2003/01/03 22:34:38 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>3. Simple Code Modifications</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="test-model.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-85.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-102.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<P>
+<HR NOSHADE SIZE=3><A NAME="HEADING101_0"></A>
+<H1><A NAME="MARKER_9_101"></A>3. Simple Code Modifications</H1>
+
+<HR NOSHADE>
+
+<P>
+The most common changes to the model are the addition of new output
+variables, the addition of transported constituents, the modification
+of history file contents, the modification of the model resolution, and
+the addition of a new parameterization. This section provides some
+guidelines for making these kinds of changes.  For more details on the
+scientific and algorithmic structure of the model see the CAM2.0.2
+Scientific Description.
+
+<H2><A NAME="MARKER_9_102"></A>3.1 Using the Scripts with Modified Code</H2>
+
+If the user wishes to include modified code, a disk directory or
+directories should first be created where all the modified code will
+reside.  See the <a href="UG-16.html#usr_src>"-usr_src"</a> option in 
+<A HREF=UG-16.html#TABLE2_2><b>Table 2.2</b>Commandline arguments to configure</A> for documentation on
+using configure to use directories with modified source code.
+
+<H2><A NAME="MARKER_9_146"></A>3.2 Adding New Output Variables</H2>
+
+<p>
+This section describes how to add a variable to a history file.&nbsp;
+If the field is in the Master Field List (see 
+<A HREF="UG-45.html#TABLE2_7">Table 2.7</A>), the user must modify
+the code by uncommenting the <TT>outfld</TT> call for that field and
+must also add it to the history output via namelist variable(s) 
+<TT>FINCL(1-6).</TT> 
+
+<P>
+If the field is not on the&nbsp;<A NAME="MARKER_10_150"></A>Master
+Field List, the user must add it to the list by modifying routine
+<TT>bldfld</TT>.&nbsp; Within <TT>bldfld</TT>, fields are added to the
+Master Field List by calling <TT>addfld</TT>.&nbsp; Six
+<A NAME="MARKER_10_151"></A> pieces of information are passed to
+<TT>addfld</TT> in an argument list:
+<OL>
+<LI>
+Field name:</LI>
+<BR>8-character field name, left-justified, alphanumeric or spaces only.
+<LI>
+Field units:</LI>
+<BR>8-character units description. See <A HREF="#TABLE3_1">Table 3.1</A>
+<LI>
+Number of vertical levels in the field.</LI>
+<LI>
+Default averaging flag. See <a href=UG-45.html#SEC2_5_1_2>Section
+2.5.1.2</a> for more information.
+<LI>Field descriptor:</LI>
+<BR>up to 128-characters
+<LI>Parallel decomposition type (i.e. is this a physics or dynamics variable)
+</OL>
+
+<A NAME="TABLE3_1"></A><B>Table 3.1: Units of History File Fields</B>
+<TABLE BORDER WIDTH="85%" >
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">
+<CENTER><B>Abbreviation</B></CENTER>
+</TD>
+
+<TD VALIGN=CENTER WIDTH="46%">
+<CENTER><B>Description</B></CENTER>
+</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">m</TD>
+<TD VALIGN=CENTER WIDTH="46%">meter</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">kg</TD>
+<TD VALIGN=CENTER WIDTH="46%">kilogram</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">s</TD>
+<TD VALIGN=CENTER WIDTH="46%">second</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">K</TD>
+<TD VALIGN=CENTER WIDTH="46%">degree Kelvin</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">percent</TD>
+<TD VALIGN=CENTER WIDTH="46%">percent</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">fraction</TD>
+<TD VALIGN=CENTER WIDTH="46%">fraction</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">gram</TD>
+<TD VALIGN=CENTER WIDTH="46%">gram</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">um</TD>
+<TD VALIGN=CENTER WIDTH="46%">micro meter</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">N</TD>
+<TD VALIGN=CENTER WIDTH="46%">Newton</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">Pa</TD>
+<TD VALIGN=CENTER WIDTH="46%">Pascal</TD>
+</TR>
+
+<TR>
+<TD VALIGN=CENTER WIDTH="54%">W</TD>
+<TD VALIGN=CENTER WIDTH="46%">Watt</TD>
+</TR>
+</TABLE>
+
+<p>
+Two examples extracted from <TT>bldfld</TT> are shown below:&nbsp;
+<A NAME="MARKER_10_152"></A>.  Notice that the arguments passed to
+<TT>addfld</TT> are the 8-character field name, the 8-character field
+units, the number of vertical levels, the default averaging flag, a
+long name, and the decomposition type.
+<P>
+<B><TT>
+<pre>
+call addfld('TS      ', 'K       ', 1,'A', 'Surface temperature', phys_decomp )
+call addfld('U       ', 'K       ', plev,'A', 'Zonal wind'      , dyn_decomp  )
+</pre>
+</TT></B>
+
+<P>
+The user<A NAME="MARKER_10_153"></A> must then add an <TT>outfld</TT>
+call for the field at an appropriate location in the code.  &nbsp; For
+example, the <TT>outfld</TT> call for the field <TT>T</TT>, taken from
+<TT>diagnostics.F90</TT>, is shown below:&nbsp;
+<A NAME="MARKER_10_154"></A> <P><B><TT>
+<pre>
+call outfld('T       ',  state%t, pcols, lchnk )
+</pre>
+</TT></B>
+
+<P>
+The arguments in the call to <TT>outfld</TT> are the 8-character field
+name, the variable array in which it is stored, the first dimension of
+the data array, and the chunk index.
+
+<P>
+Once these steps are taken, the field may be added to the desired
+history file by using namelist variable <TT>FINCL(1-6)</TT>
+or by modifying routine, <TT>h_default</TT>, which defines
+default history tape contents.
+<BR>
+
+<H2><A NAME="MARKER_2_173"></A>3.3 Trouble-Shooting Model Changes</H2>
+
+If the cause of abnormal termination is unclear, the user should first
+ensure that the model is run single-threaded with SPMD off.&nbsp;
+Abnormal termination in a multi-tasked job can result in confusing
+ancillary error messages.
+
+<P>
+We address several possible causes of model failure. Resource
+allocation errors will be addressed first, followed by remedies for
+suspected coding errors. Finally, analysis tools are described for
+physics formulation errors (i.e., where there is an error in
+modifications to a prognostic variable calculation).
+<BR>
+
+<H3><A NAME="MARKER_2_174"></A>3.3.1 Resource Allocation Errors</H3>
+
+<P>
+A system resource problem which may occur on SUN architectures is that
+the default stack size on the SUN is sometimes too small for larger
+resolution runs or when running on multiple processors.&nbsp; The
+model usually fails with a segmentation fault.&nbsp; The user should
+try increasing the stack size if this problem occurs.  The stack size
+can be set to its maximum by using the <TT>limit</TT> command.
+Typing <TT>limit</TT> alone will print the system resource
+limits.&nbsp; To set the stack size to its maximum type <TT>limit
+stacksize unlimited </TT>.&nbsp;
+
+<p>
+When running the message passing code on multiple processors it is
+necessary to place the <tt>limit</tt> command in the user's shell
+startup script.&nbsp; Since the message passing software usually
+starts new processes, the user must make sure that these processes
+have the larger stack size when started by MPI.&nbsp; An easy way to
+determine that new shells have the larger stack size is to execute the
+command <TT>rsh <I>machine </I>limit </TT>(where <I>machine </I>is the
+name of a computer on which to start the remote shell.)&nbsp;
+
+Once the stack size has been increased try running the model
+again.&nbsp; If the stack size was too small before it should run to
+completion.&nbsp;
+
+<H3><A NAME="MARKER_9_179"></A>3.3.2 Coding Errors</H3>
+
+<P>
+We suggest that for debugging purposes only statically allocated
+memory locations and/or stack space be initialized to
+"indefinite". Furthermore,array bounds checking should be turned on if
+possible. The standard Makefile achieves this if <b>configure</b> is
+invoked with the <b>-debug</b> option.
+
+<P>
+If the model is running but producing incorrect or suspicious history
+files, a quick and easy-to-use diagnostic program,&nbsp;<B>cprnc</B>,
+is available. This program provides a statistical analysis of
+differences in history file data. No command line arguments are&nbsp;
+required. <B>cprnc</B> compares fields of the same name on each file,
+printing out statistics about the number of differences found,
+location and magnitude of worst absolute difference, location and
+magnitude of worst relative difference, RMS difference, maximum and
+minimum field values, and average field values.
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-102.html#MARKER_9_102>3.1 Using the Scripts with Modified Code</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-102.html#MARKER_9_146>3.2 Adding New Output Variables</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-102.html#MARKER_2_173>3.3 Trouble-Shooting Model Changes</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="test-model.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-85.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-102.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.53.2.11 $ $Date: 2003/01/03 22:34:38 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

@@ -1,0 +1,250 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-72.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-72.html,v 1.45.2.4 2003/01/03 22:34:49 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.7 Troubleshooting Guide</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-85.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-70.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<H2>2.7 Troubleshooting Guide</H2>
+This section presents information which should help with some common problems
+users encounter when running the CAM.
+<A name=PLATFORMS></A>
+<H4>2.7.1 Platforms CAM2.0.2 ported to</H4>
+CAM2.0.2 is fully ported and supported on the IBM-SP, SGI-Origin, Solaris, Compaq-alpha-cluster,
+and Linux-PC with the Portland group FORTRAN-90 and "C" compilers, Linux-PC with the Lahey 
+compiler, and Linux-PC with Portland group FORTRAN-90 and the GNU "C" compilers.
+<A name=BUGS></A>
+<H4>2.7.2 Known problems</H4>
+<p>
+<ul>
+<li>Potential problem on all platforms getting environment variables when
+running with distributed memory parallelism (SPMD mode).
+<p>
+The model code requires that certain environment variables be available.
+When running in "SPMD mode" each processing task has to establish these
+values. Some machines have trouble when processing slaves try to get environment 
+variables. For example, using the UNIX shell "bash" on a Linux platform
+with the Lahey compiler -- the model fails since the slave processes are
+unable to obtain the environment variables. This problem can be related to 
+the UNIX shell that the user is using. Running on Linux with the Lahey compiler
+and the "tcsh" shell doesn't cause the same problem that running "bash" does.
+Users are cautioned that other combinations of UNIX shells and platforms may 
+result in this same problem.
+<li>Problem compiling "history.F90" on IBM-SP with DEBUG mode and SPMD on.
+<p>
+The model has undergone extensive testing on IBM platforms both at NCAR and
+at several other institutions. One problem discovered is a problem compiling
+the "history.F90" module when using the more extensive "DEBUG mode" compiler
+options (this mode is enabled by setting the environment variable DEBUG to "TRUE")
+and with the SPMD distributed memory configuration. The compiler will
+sometimes abort with the error "INTERNAL COMPILER ERROR". This problem is
+due to a problem with the IBM FORTRAN-90 compiler, and has been reported
+to IBM. In many cases this problem is inconsistent, so recompiling will
+sometimes (not always) work. As a work around the user could also compile
+"history.F90" without the DEBUG option on. This problem was reported to IBM
+and they have fixed the problem in newer versions of the compiler (or with
+the appropriate "E-fixes" applied to older compilers).
+<li>Problem building ESMF library with some versions of gmake.
+<p>
+Certain versions of gmake have been shown to have trouble with date-stamps.
+The Earth System Modeling Framework (ESMF) library has trouble with these versions
+and will not build.  The version of gmake with the fix is 3.79.1, the bug
+was introduced somewhere between 3.78.1 and 3.79. So to fix the problem you
+merely need to update to a newer version.
+</ul>
+<A name=CONTROL></A>
+<H4>2.7.3 General</H4>
+The first step in troubleshooting a failed model run is to check the basics.&nbsp;
+Look at the logs for error messages.&nbsp; Make sure the model executable
+is up to date with any source code changes.&nbsp; Rebuild the model cleanly
+(i.e. issue a "gmake clean" before rerunning the script)
+if you are unsure of the state of any code. Ask yourself what has changed
+since the last successful run.
+<P>Other times CAM may fail for no obvious reason or perhaps the error
+message returned is cryptic or misleading.&nbsp; It has been our experience
+that the majority of these types of symptoms can be attributed to an incorrect
+allocation of hardware and/or software resources (e.g. the user sets the
+value of $OMP_NUM_THREADS to a value inconsistent with the number of physical
+CPUs per node). Most often an incorrect setting
+for the per-thread stack size will cause the model to fail with a segmentation
+fault, allocation error, or stack pointer error.&nbsp; Usually the default
+setting for this resource is too low and must be adjusted by setting the
+appropriate environment variables.&nbsp; Values in the range of 40-70 Mbytes
+seem to work well on most architectures.&nbsp; As a simple troubleshooting
+step the user may try adjusting this resource, or the process stack size,
+for their particular application.&nbsp; Here is a list of suggested runtime
+resource settings affecting the process and/or thread stack sizes.
+<H4><A NAME="STACK"></A>2.7.4 How to increase the stacksize on different platforms</H4>
+
+<UL>
+<LI>Compaq
+
+<BLOCKQUOTE>limit stacksize unlimited
+<BR>setenv MP_STACK_SIZE 17000000</BLOCKQUOTE>
+
+<LI>IBM
+<BLOCKQUOTE>limit stack size unlimited
+<BR>setenv XLSMPOPTS "stack=40000000"</BLOCKQUOTE>
+
+<LI> SGI origin
+
+<BLOCKQUOTE>limit stack size unlimited
+<BR>setenv MP_SLAVE_STACKSIZE 40000000</BLOCKQUOTE>
+
+<LI>SUN
+
+<BLOCKQUOTE>limit stacksize unlimited</BLOCKQUOTE>
+
+<LI>PC/Linux
+
+<BLOCKQUOTE>limit stacksize unlimited
+<BR>setenv MPSTKZ 40000000</BLOCKQUOTE>
+</UL>
+<H4><A NAME="SEC2.7_5"></A>2.7.5 General problems on different platforms</H4>
+Most distributed-memory platforms also provide runtime settings to enable
+a user to override the multiprocessing defaults and customize the machine
+parallelism to a particular application.&nbsp; CAM performance can be adversely
+affected by an incorrect configuration of the machine parallelism.&nbsp;
+The run scripts provided in the distribution create an executable that
+will run in a hybrid mode on distributed architectures, using MPI for communication
+between nodes and OpenMP directives on processes within a node.&nbsp; When
+running in hybrid mode the user should set the number of MPI tasks per
+node to be 1.&nbsp; Thread-based OpenMP multitasking will utilize all processors
+on the node.&nbsp; If the user makes the appropriate changes to the Makefile
+to disable OpenMP and use only MPI, the number of MPI tasks per node should
+be set equal to the number of physical processors per node.
+<P>In addition to properly configuring machine resources, we've identified
+the following problems often encountered when building and running CAM
+on the machines here at NCAR.
+<UL>
+<LI>PC/Linux
+
+<UL>
+<LI>
+The number of underscore characters appended to Fortran external names
+is different for default configurations of the NetCDF and MPI libraries.&nbsp;
+libnetcdf.a wants to build with 1 underscore appended to Fortran external
+names, while libmpich.a wants to build with 2.&nbsp; The default CAM build
+procedure assumes 1 underscore. You can change this by adding the compiler
+directive "-Msecond_underscore" to the environment variable "USER_FLAGS".
+This directive produces objects with subroutine names have two underscores
+appended.</LI>
+</UL>
+</UL>
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-72.html#PLATFORMS>2.7.1 Platforms CAM2.0.2 ported to</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-72.html#BUGS>2.7.2 Known problems</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-72.html#CONTROL>2.7.3 General</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-72.html#STACK>2.7.4 How to increase the stacksize on different platforms</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-72.html#SEC2.7_5>2.7.5 General problems on different platforms</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-85.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-70.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.45.2.4 $ $Date: 2003/01/03 22:34:49 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

@@ -1,0 +1,718 @@
+Original author:        Erik Kluzek
+Creation date:  02/26/1998
+Version: $Id: README,v 1.15.2.1 2003/06/13 15:42:51 hender Exp $
+Description:
+
+This file describes the configuration management practices and development
+practices of the CAM users-guide documentation.  It also describes the files
+and directory organization of the files here.  All of which of course deal with
+the CAM user-guide documentation.
+
+
+=================================================================================
+			Table of Contents
+
+Contents
+I.	General overview
+II.	Alternative management possibilities
+III.	What's archived and why
+IV.	Files and directories
+V.	Required HTML coding standards
+VI.	Procedure to convert HTML source files into word
+VII.	Procedure to convert Word-97 files into HTML source
+IIX.	Naming conventions under CVS for the CAM documentation.
+IX.	Review process and development checklist
+X.	How to deal with CVS
+
+=================================================================================
+
+I.	General overview
+
+	There are five goals with the configuration of the CAM Users Guide 
+documentation
+
+	1.) Maintain a on-line web-based HTML version
+	2.) Have a mechanism to easily create a good formatted printed copy from 
+		the web-based version.  Without having to maintain two copies of the 
+		files, but still getting both a good on-line version and a good
+		printed copy with page numbers and formatting etc.
+	3.) Have the on-line version easily updatable so updated documentation
+		on the latest versions of the CAM is immediatly available to the
+ 		CMS scientists and NCAR CSM community.  And keep the documentation
+		updated as the code changes.
+	4.) Maintain the possibility to update the documentation for older versions
+		of the code (especially public release versions) as error are found.
+	5.) Have the possibility to view versions of the documentation for specific
+		older versions of the model.
+
+	Creating a version that will both function as a web-based version AND
+printed copy is the biggest maintainance problem.  The configuration plan
+is to make the web-based version the source, with updates to the printed version
+occuring less frequently.  The printed version is stored under Word-97, as word
+can read HTML source straight away.  The HTML version has conversion programs
+(currently Perl scripts) to convert from the HTML to a copy more easily read
+by Word.  Primarilly taking out the special formatting, putting the multiple files
+into a smaller number of files that word can deal with etcetera.
+
+	To accomplish the configuration management goals for the CAM users' guide
+the following guidelines have been established.
+
+	1.) HTML source, Word-97 source, conversion programs, images and image 
+	source files will all be stored under CVS.
+
+	2.) The process to convert from HTML to word and back will be clearly 
+	defined, and documented. And will be done with the help of conversion
+	programs.
+
+	3.) Model tag names will be put on Users Guide configurations to enable
+	extracting versions of the documentation that goes with specific versions
+	of the model.
+
+	4.) CVS branches will be used to put updates to older model versions.
+	(example. cam1_8_latest)
+
+	5.) Versions of the documentation will be checked out for specific major
+	versions of the model.  Public released versions will be checked out in
+	places that are accessable by the public.
+
+	6.) The latest version of the documentation will be automatically updated
+	to the CAM development page.  This will be viewable at NCAR sites only!
+
+=================================================================================
+
+
+II.	Alternative management possibilities
+
+	One of the main goals is to make the CAM UG source generally available
+to all of the code developers so we can make obvious changes -- on the fly --
+as those changes are made.  The primary reason for that is that with CAM now
+being a part of CSM, we have devlopers and scientists using NCAR development
+versions -- without documentation.  By documentating on the fly we can provide
+documentation to these users, with a minimum of effort.  Since we need to
+develop the documentation in the end anyway, we might as well do it as we go
+along.  This also cuts down on the effort required at the end of a public 
+release.
+
+	With this in mind the source code HAS to be managed under something
+available on UNIX workstations.  That means'
+
+	HTML
+	Framemaker
+	Tex
+	
+	Framemaker is a good product, but people didn't like it, and the 
+conversion from Framemaker to HTML is unsatisfactory and difficult.  Also
+although Framemaker can do "hot-links" that we could put various versions of
+the documentation in, it couldn't be read by the general public.  HTML
+allows the public to read an on-line document.  Tex
+is a possibility as there are converters back and forth from Tex to HTML.
+I figure HTML is a little more widely known and if we make the on-line version
+the "source" version we might as well make it HTML.
+
+	On the paper end we could use Tex, or a PC based tool, such as Word etc.
+We chose Word because that is what the admin's use, it has powerful automatic
+formatting features, and it can read HTML directly.  The current procedures
+could allow us to use a different tool in place of Word as well.  The key
+problem is that the paper-copy and the web-based copy are two different 
+things, and there will be changes needed between the two.  Being able to
+take advantage of automatic formatting available in PC based word processors
+just makes sense.
+
+=================================================================================
+
+III.	What's archived and why
+
+	Under CVS we archive all the source files dealing with the user guide.
+This includes the HTML source files, conversion programs, scripts and files 
+associated with the Web-based search engine, the images, image source files
+(for example power-point files), and Word-97 source (ie. *.doc) files. Intermediate
+files produced in the process of converting from HTML to word and back are not
+saved.  The word-97 source files ARE archived under CVS even though new word
+files can be created from the conversion programs.  The Word-97 source is 
+archived so that format changes and other changes necissary to go to the word
+document are saved.  By converting the latest HTML source with the conversion 
+programs the latest changes to Word can be entered by "Compare documents" and
+reviewing the changes from the HTML intermediate files to the Word-97 document.
+
+	Binary files are the Word-97 source (*.doc files), images (*.gif and *.jpg),
+and in most cases image source files (commonly *.ppt or powerpoint files).  Binary
+files should not be updated often, as CVS stores binary files not in terms of
+differences, but maintaining the contents of the entire source file for each 
+version.  Thus creating many versions of binary source creates large repositories.
+But, we do want to store a complete package of the files necissary to create 
+both the final documentation and the files necissary to support it (such as the
+power point files to create images, or the search engine configuration files).
+
+
+=================================================================================
+
+IV.	Files and directories
+
+These files are archived under CVS
+Basic HTML and Word-97 source files.
+
+README ------------------ This file
+check_list -------------- Author/reviewer checklist for updates
+UG-*.html --------------- List of Users guide HTML files
+table_of_contents.html -- HTML table of contents
+index.html -------------- HTML index
+cover.html -------------- HTML cover
+cam_word0.doc ----------- The Users-Guide Word-97 document
+cam_word.ps ------------- Postscript version of the Users Guide
+
+Files for dealing with the Glimpse Search engine to search for topics on the 
+starting page.
+
+ghreindex* -------------- Script that creates the index for the Glimpse Search 
+				Engine.
+archive.cfg ------------- Glimpse search engine configuration file
+.glimpse_exclude -------- List and types of files to exclude from search engine
+
+Perl scripts to convert the HTML source to Word-97 and back
+
+html2word.pl* ----------- Script to help convert from HTML source to word-97.
+				Basically it gets rid of Navigation buttons and puts
+				all the little files into several big files.
+word2html.pl* ----------- Takes cam_word*.html files output from Word-97 or
+				html2word.pl and converts them back to UG*.html 
+				HTML source files.  Adding back the navagation buttons
+				and page formatting.
+Web_File.pm ------------- Perl module used by html2word.pl and word2html.pl
+
+The following is the images directory with the HTML-viewable images and image
+source files.
+
+images/ ----------------- Directory of images
+{variable name}.gif (ie. BEVAP.gif) -------- Images for variables names used in
+				output namelist table.
+matter_flux_units.gif --- Units for matter flux.
+prod_units.gif ---------- Units for production.
+Fig{#}_{name}.gif (ie. FigB1b_init.gif) ---- Images for the figures.
+figures-pwr-pnt.ppt* ---- Power point source for images.
+cover.gif --------------- Main globe cover image.
+globe.gif --------------- small CAM globe used as icon for search page.
+content.gif ------------- Icon for table of contents navigation icon
+index.gif --------------- Icon for index navigation icon.
+next.gif ---------------- Icon for navigation "next page" icon
+prev.gif ---------------- Icon for navigation "next page" icon
+top.gif ----------------- Icon for navigation "top of guide" icon
+up.gif ------------------ Icon for navigation "up to top of this section" icon
+
+The following are output of the word2html.pl script as an intermediate product
+to converting to Word-97.
+
+cam_word0.html --------- The Users-Guide in HTML, but without navigation
+				buttons and seperate page formatting.
+
+
+=================================================================================
+
+V.	Required HTML coding standards
+
+Tables:  For the conversion to word to work properly, all columns need widths
+	(ussually expressed as a percentage (ie. "20%") associated with them.
+	Also tables have to have widths expressed in pixels, not just % of window.
+	It seem's WIDTH=650 is a good size to use.  Although this does require
+	making your browser a little bigger than the default size.
+
+Images: Again for the conversion to Word to work properly, images must have their
+	widths and heights explicitly set.  HSPACE, and VSPACE should also be set.
+	And captions for images should be set just with Bold type (rather than 
+	a CAPTION).
+
+Markers: Markers need to be unique throughout the entire HTML source.  Markers
+	also need to be in all CAPS.  So for example Figure markers should look
+	like ("#FIGIII_1").  Markers on tables need to be outside the actual
+	table, so before the TABLE is defined.  And "-" or "." should not be used
+	in markers use "_".  The markers we are currently using are #MARKER_#_#
+	#FIG#_# and #TABLE#_#.
+
+Horizontal lines (HR): the keywords NOSHADE, and SIZE don't work in Word.  So
+	we have to avoid using them.
+
+non-standard HTML: Only standard HTML code should be used.  So HTML editors have
+	to be checked to ensure they don't produce non-standard HTML code that
+	can only be used from Netscape or Internet Explorer.
+
+	Some examples of non-standard HTML:
+
+	<DIV>
+
+=================================================================================
+
+VI.	Procedure to convert HTML source files into word
+
+Steps:
+	1.) Use "html2word.pl" to convert UG*.html into cam_word0.html.
+	2.) Merge the changes in cam_word.html into the cam_word.doc Word source 
+		files.  Or if the changes are extensive just start over
+		from the newly formed cam_word.html, convert it to word
+		and overwrite the old cam_word.doc file.
+	3.) Change style of hyperlinks.  To get rid of the underline.
+	4.) To save to a file to print-out you print it out to a file
+		using a POSTSCRIPT printer (such as renoir).
+	5.) Commit the "gzipped" version of the word-file and PS-file.
+	
+1.) Use "html2word.pl" to convert UG*.html into cam_word*.html.
+
+	To convert the UG-*.html and associated files to word, you simply run
+the "html2word.pl" Perl script as follows.
+
+[207]0-mercury:/home/erik/camUsersGuide> html2word.pl
+
+The scripts are designed to run on the CGD Sun's ONLY!  So you shouldn't expect it
+to work on winterpark or antero.  Mainly this is because the /home and /data
+disks are exported to the NT workstations, so you can immediatly view the files on
+CGD NT workstations in Word.
+
+The output will be the cam_word.html file and the following standard output.
+So it lists each file it processes, and mentions when it creates a new HTML
+file to put into word. 
+
+2.) Merge the changes in cam_word.html into the cam_word.doc Word source 
+    files.
+
+You can use "revisions" in word to do this.  Although extensive changes would
+probably better be served by starting over.  The problem with revisions in word
+is that it only recognizes differences from what you started from, so you have
+to approve or disapprove all changes and that requires knowing which ones to
+keep and which ones to discard.  To make it even more difficult changes are
+flipped, so that "approving" a change brought in from the web means pushing
+the "disapprove" button.  The only way to view what's going on is to push the
+"original" button so you can see what you started with.
+
+Changes that need to be merged in are any font changes, page breaks, letting
+word create the table of contents.  And possibly any cross-referencing or 
+indexing.  This is the advantage of using "revisions" in that it keeps formatting
+and font changes from the original document, it just merges in text changes
+(unfortunatly this includes asking about all the hard-page breaks as well).
+
+	A. Starting over:
+
+	When creating the docuemnt  over from the html file you have
+	to add the section and page breaks, and add all of the "pagenumbering".
+	Section breaks should  occur such that the page appears on the "right"
+	side of the double sided page.  Section breaks occur between the
+	first two pages (so you can turn pagenumbering off), the begining
+	section wherelower-case roman numerals are used, and the beginging
+	of chapters.  Other cases sometimes require page-breaks to make the document
+	format nicely. For example, the examples should have page breaks
+	so that the namelists go on a single page.  New sections require
+	you to reset the pagenumbering (even if only to continute the
+	numbers from the previous section).  Also use word to create a table
+	of contents and to attach cross-references to the page numbers for the 
+	TABLES and FIGURES (when creating the cross references it will
+	list all of the markers, markers starting with TABLE are tables
+	, and those starting with FIG are figures).
+
+3.) Change style of hyperlinks.
+
+Change the style of the hyperlinks to eliminate the underline.  This is done
+by pushing, "Style", picking hyperlink style, "Modify", "Font" and change underline
+from "single" to "none".
+	
+4.) To save to a file to print-out you print it out to a file
+	using a POSTSCRIPT printer (such as renoir).
+
+To get a postscript file. Use "print", check the "print to a file" box,
+and print it out to "renoir" so it comes out as a PostScript file
+rather than a "PCL" or some other file format.
+
+5.) Commit the "gzipped" version of the word-file and PS-file.
+
+Do the following to commit the compressed version of the word-file and
+PS-file.
+
+gzip cam_word.doc
+gzip cam_word.ps
+cvs commit cam_word.doc.gz cam_word.ps.gz
+
+
+=================================================================================
+
+VII.	Procedure to convert HTML source files into word
+
+Steps:
+	1.) Use "html2word.pl" to convert UG*.html into cam_word*.html.
+	2.) Merge the changes in cam_word*.html into the cam_word*.doc Word source 
+		files.
+	3.) Change style of hyperlinks.
+	
+1.) Use "html2word.pl" to convert UG*.html into cam_word*.html.
+
+	To convert the UG-*.html and associated files to word, you simply run
+the "html2word.pl" Perl script as follows.
+
+[207]0-mercury:/home/erik/camUsersGuide > html2word.pl
+
+The scripts are designed to run on the CGD Sun's ONLY!  So you shouldn't expect it
+to work on winterpark or antero.  Mainly this is because the /home and /data
+disks are exported to the NT workstations, so you can immediatly view the files on
+CGD NT workstations in Word.
+
+The output will be the cam_word*.html files and the following standard output.
+So it lists each file it processes, and mentions when it creates a new HTML
+file to put into word.
+
+Sample output of the script.
+
+Open new output file: cam_word.html
+new up a Web_File object: 
+File: (1) cover.html
+File: (2) table_of_contents.html
+File: (3) UG-4.html
+File: (4) UG-5.html
+File: (5) UG-6.html
+File: (6) UG-7.html
+.
+.
+.
+File: (121) UG-122.html
+File: (122) UG-123.html
+File: (123) index.html
+
+The output cam*.html files then have HTML comment markers to define various
+characteristics of where the "internal files" begin and end.  Typically they
+are of the form
+
+<!begin_of_file: filename>
+
+THESE MARKERS MUST NOT BE DELETED OR CHANGED -- OTHERWISE YOU WILL NOT BE ABLE
+TO SUCCESFULLY CONVERT BACK TO THE ORIGINAL SOURCE!!!
+
+2.) Merge the changes in cam_word*.html into the cam_word*.doc Word source 
+	files.
+
+Once the cam*.html files are created they can be loaded into the latest Word-97
+source as follows.
+
+	It's recommended to save a version of your Word source document
+	before doing the merging.  To do that do the following.
+
+	In MS-Word at the top menu go to "File"
+					 "Versions"
+					 "Save"
+
+	This way you can go back to your original version if you make a mistake.
+
+	To merge the changes from the cam*.html files into your word file.
+
+	At the top menu go to "Tools"
+				 "Track Changes"
+				 "Compare Documents"
+
+	Load the associated cam*.html file, and the differences will be highlighted.
+
+	To decide which changes to accept and which to reject do the following.
+	(you can't just accept all changes as some of the changes will be
+	permement formatting changes needed for the paper copy).
+
+	At the top menu go to "Tools"
+				 "Track Changes"
+				 "Accept or reject changes"
+
+	Use the "Find" button to go back and forth among the changes.  Changes
+	will be highlighted and are in the opposite sense of what you expect.
+	Accepting changes that have a strike line through them means accepting
+	the given text.  Accepting changes without the strike line means rejecting
+	the addition of the given text.  You can also use the "Undo" button and
+	go both forward and backward among the changes.
+
+3.) Change style of hyperlinks.
+
+	The color of the hyperlinks is changed to black, during the conversion
+process, but they are still underlined.  To remove the underline in Word.
+
+	Go to the main menu under "Format"
+					"Style"
+	Pick the "Hyperlink" style.
+	push the "Modify" button.
+	Change the underline to "none".
+
+	Then hit apply to apply it to the text.
+
+This way hyperlinks won't have an underline beneath them, nor a special color.
+Although they will still be active and go to the original HTML source files
+(ie. the UG-*.html files).
+
+=================================================================================
+
+VII.	Procedure to convert Word-97 files into HTML source
+
+Steps:
+	1.) Save Word document as HTML.
+	2.) Get rid of word generated table of contents and index.
+	3.) Convert cam_word*.html files into UG-*.html via "word2html.pl"
+
+1.) Save Word document as HTML.
+
+	If editing changes are performed in MS-Word that need to go back into 
+the HTML source, do the following.
+
+	In MS-Word at the top menu go to "File"
+					 "Save as HTML"
+
+	You should overwrite the associated "cam_word*.html" file.
+
+2.) Get rid of word generated table of contents and index.
+
+Get rid of the table of contents that word generated and the
+index that word generated.  The index is not needed for the 
+HTML version as we have a search engine. The table of contents
+is not needed as the word2html.pl script creates the table of 
+contents.
+
+3.) Convert cam_word*.html files into UG-*.html via "word2html.pl"
+
+On the UNIX workstation, run the "word2html.pl" program.
+
+[216]0-mercury:/home/erik/camUsersGuide > word2html.pl
+
+Sample output from the conversion program..."
+
+new up a Web_File object: 
+infile: cam_word.html
+File: cover.html
+File: table_of_contents.html
+File: UG-4.html
+File: UG-5.html
+File: UG-6.html
+File: UG-7.html
+.
+.
+.
+File: UG-122.html
+File: UG-123.html
+File: index.html
+Hit end of input file: 
+
+If you simply convert files with no changes with html2word.pl and then
+immediately use word2html.pl to convert them back -- you should get no
+changes to verify this do that and then execute the following CVS command
+
+cvs diff -kk
+
+You should see the same differences you saw before the conversion process.
+If not there is a bug in the conversion programs that should be fixed.
+
+IMPORTANT THE HTML SOURCE FILES CONTAIN LINES SUCH AS
+
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+
+NOTHING SHOULD BE EDITED BEFORE THESE LINES AND NOTHING SHOULD BE CHANGED
+ON THESE LINES.  THE CONVERSION ROUTINES RELY ON THESE LINES TO KNOW HOW
+TO DEAL WITH THE FORMATTING AND NAVIGATION BUTTONS!
+
+Likewise there are lines at the end of the files such as...
+
+<!End_of_the_page: -- do not edit anything below!!!>
+
+Lines after this point should not be changed either.  Changes that should
+occur in either of these places should take place in the conversion programs.
+
+=================================================================================
+
+IIX.	Naming conventions under CVS for the CAM documentation.
+
+	The naming convention for the document go under 3 classes.
+
+	A.) CAM version names.
+	B.) Latest documentation for a given public released (or important)
+	version.
+	C.) Documentation development version.
+
+A.) CAM version names.
+
+	This is for versions of the documentation that goes with a given version
+	of the CAM model.  As changes are made to the model they can immediatly
+	be made in the documentation as well.
+
+	Examples:  cam1_8
+
+B.) Latest documentation for a given public released (or important) version.
+
+	Important versions of the model (typically major releases) will have
+	a branch associated with them for changes to their documentation.
+	These names give the version of the CAM they apply to and the word
+	"latest" -- to denote they are on a branch for the latest updates to
+	the documentation for that given version.
+
+	Examples: cam1_8_latest
+
+C.) Documentation development version.
+
+	Development documenation for a given version has the tag for the version
+	it is being developed for and the development number it is along the way.
+
+	Examples: cam1_8_dev1
+
+
+	There is no reason to support branch names to the documentation.
+	Developers supporting branches can support documentation for their
+	branches in their own fashion.  When it's time to add their
+	documentation into the main trunk is when they're documentation
+	will come into the CVS archive.
+
+
+Authorization is required for tagging major releases.  Major releases should only
+be tagged, when a given public release is being sent out, and only when the
+documentation is "finished", reviewed and considered complete and done.  Thus
+only the people responsible for Software Configuration Management of the CAM
+documentation are authorized to tag major releases (versions with latest in
+them, and model major versions (ie. cam1_8).
+
+=================================================================================
+
+IX.	Review process and development checklist
+
+
+In order to keep the document clear, consise, and well-thought-out.  It
+must go under periodic review.  Primarily the review process will be before
+a new major public release is prepared.  Each section will be thourghly
+examined and updated.  As well as reviewed carefully by another individual.
+And the overall document will be reviewed by others in the CMS section.
+
+The other time review is necissary is when new sections need to be added.
+Or when extensive additions need to be added to a section.  The changes
+should be reviewed with the other CAM document authors before they are
+added in.  Also the group should meet and discuss where best and how best
+to add the new section in.
+
+The checklist is an aid to the development of the document.  It has
+rows for each section or task, and columns for individual's to be assigned
+the changes for that section.  And also columns to denote when the changes
+are done, and a review column to denote when the section successfully passed
+the review of another individual.
+
+=================================================================================
+
+X.	How to deal with CVS
+
+Basic CVS commands as applied to the CAM documentation are as follows.
+More help is given under...
+
+http://www.cgd.ucar.edu/~cam/cvs/
+
+Although it is more geared toward getting CAM source code.
+
+1.) Checkout files
+2.) Add new files
+3.) Remove files.
+4.) Update -- merge in the changes from the latest files, 
+5.) Commit changes.
+6.) Tag the result with a name
+7.) Analysis: differences, logs, status, annotate.
+
+1.) Checkout files
+
+	To checkout files simply do the following in your $HOME on one of
+the CGD Sun UNIX workstations...
+
+source ~cam/inicvs
+cvs checkout -kk camUsersGuide
+
+You want to checkout under your CGD home so that you can read the files on
+CGD PC's for input into MS-Word.
+
+We use the "-kk" option so that it doesn't expand any of the RCS keywords 
+"$Id: README,v 1.15.2.1 2003/06/13 15:42:51 hender Exp $", "$Author: hender $", "$Date: 2003/06/13 15:42:51 $" etcetera.  The purpose of the RCS keywords is
+to give date and revision informations for users who view the automatic 
+checked out copies.  Expanded RCS keywords don't work well with the conversion
+programs, so it's best to get rid of them.
+
+2.) Add new files
+
+	To add a new HTML or image source file.  Simply add it on the UNIX side
+and do the following UNIX command.  Word source files should not be added, only
+text added into the cam_word*.html or cam_word*.doc files.
+
+	cvs add -kk {filename}
+
+	Binary files should be added as...
+
+	cvs add -kb {filename}
+
+	There are default rules for taking care of binary files 
+	(*.gif, *.jpg, *.ppt, cam_word*.doc), so this step isn't too critical
+	but in general it's a good idea.
+	
+3.) Remove files.
+
+	To remove a file.  Remove it on the UNIX side, then remove it from
+CVS as follows.
+
+	/bin/rm {filename}
+	cvs rm {filename}
+
+4.) Update -- merge in the changes from the latest files, 
+
+	To get the latest changes merged into your files do the following...
+
+	cvs update -kk -A -d -P
+
+	To get a specific version of the document do the following...
+
+	cvs update -kk -r {tag_name}
+
+5.) Commit changes.
+
+
+	To commit your changes we suggest you first go over the changes and
+make sure they are correct.  
+
+
+	To list the files that changed do a ...
+
+	cvs -n update
+
+	Files listed with a "M" in front of them were modified by you.
+	Files listed with a "?" are not currently in CVS.  If they should
+		be added add them with a "cvs add"
+	Files listed with a "U" in front of them have been updated in CVS.
+		In order to commit your changes you will need to update to
+		the repository.  See the section under "cvs update"
+
+	To get the changes you made do a 
+
+	cvs diff -kk -c
+
+	After you are sure these are correct, commit the changes with the
+	following
+
+6.) Tag the result with a name
+
+	After you have successfully committed your changes into CVS you should
+tag the result.  This way we can go back and get a complete set of files for
+that given configuration.  See the chapter on "Naming conventions" to see
+what names you should pick for various purposes.
+
+
+	cvs tag {cvs_tag_name}
+
+	Example: cvs tag cam1_8_dev1
+
+7.) Analysis: differences, logs, status, annotate.
+
+To do a difference with the files in the repository
+
+cvs diff -c -kk
+
+To get a log on the changes in a given file
+
+cvs log 
+
+
+To get the status of your files (dates, tag names, status compared to repository etc.)
+
+cvs status
+
+To get a listing of what author is responsible for the latest version of each
+LINE in a given file.
+
+cvs annotate {filename}
+
+=================================================================================
+

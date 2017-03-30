@@ -1,0 +1,392 @@
+\documentclass[]{article}
+\usepackage{html}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+\bodytext{BGCOLOR=white LINK=#083194 VLINK=#21004A}
+
+\begin{titlepage}
+
+\begin{latexonly}
+\noindent {\bf Community Climate System Model} \\
+\noindent National Center for Atmospheric Research, Boulder, CO \\
+\vspace{2in}
+\end{latexonly}
+
+\begin{center}
+{\Large\bf CAM Build Script Requirements} \\
+\medskip
+{\it Author Erik Kluzek}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section{Synopsis}
+
+This document is the requirements for the configure/build/run set of scripts
+to support using CAM.
+
+\section{Description}
+
+Requirements are enemerated with a short title and a longer description. Attributes
+then describe their status (proposed, accepted, deleted, or implemented), and
+testing (describing how this particular requirement can be verified).
+
+\section{Requirements}
+
+\subsection{System Constraints}
+
+\begin{enumerate}
+
+{\bf\em \item Purpose} \\
+Provide a set of robust scripts to help the user create build and run any desired model
+configuration on any of the supported platforms at any of the supported labs. And also
+make it easy to setup at non-supported sites.
+
+{\bf\em \item Supported Platforms}\\
+Platforms that the scripts should work on are as follows:\\
+\begin{itemize}
+  \item IBM-SP
+  \item SGI
+  \item Compaq-Alpha
+  \item Linux-Portland group compiler
+  \item Linux-Lahey compiler
+  \item Solaris
+\end{itemize}
+(status: accepted)
+
+{\bf\em \item Supported Labs}\\
+The scripts should work on all supported platforms at the following labs.\\
+\begin{itemize}
+  \item NCAR
+
+  \item ORNL
+
+  \item LLNL
+
+  \item NERSC
+
+  \item NASA-DAO
+\end{itemize}
+
+(status: accepted)
+
+{\bf\em \item Users}\\
+The system will be built with the following users in mind:
+\begin{itemize}
+\item University Students -- Graduate and undergraduate university students
+	completely unfamiliar with CAM, and limited programming experience.
+\item University Researchers -- University proffesors and scientific researchers
+	familiar with older versions of the CCM and experience with FORTRAN programming.
+\item Scientists -- CCSM Scientists familiar with the science in the latest version of CAM
+	with extensive programming experience, but less familiar with the implimentation
+	details of the current model.
+\item Developers -- Software Engineers who are experts in the current version of CAM, 
+       and have extensive FORTRAN and shell programming experience.
+
+\end{itemize}
+Thus the gamet of novice to expert users are targeted. Only the developer class is
+expected to actually change the scripts. The scripts should be flexible and robust
+enough that other users would be able to use them without changes.
+\\
+(status: proposed)
+
+{\bf\em \item Assumptions}\\
+The user will not be able to use these tools to create un-supported build configurations.
+Warnings will be issued if the user tries to do so, and the closest supported configuration 
+will be generated. Perl, standard Perl modules, GNU Make, MPI, and NetCDF libraries will 
+be assumed to be loaded on the system. If possible scripts will terminate with an error
+if these packages are missing.
+\\
+(status: proposed)
+
+\subsection{Functional Requirements}
+
+{\bf\em \item Separation of steps}\\
+Separate the configure, build-executable, build-namelist, and run-model steps, into
+either separate scripts or as different options in one or more scripts. \\
+(status: implemented,
+use cases: configure.pl, Makefile, build-namelist.pl, run-model.pl testing: run each 
+separately)
+
+{\bf\em \item Test scripts built on top of configure/build/run scripts}\\
+Scripts for testing (both system and unit tests) should be built on top of the 
+configure/build/run scripts. \\
+(status: implemented, use cases: CAM\_test.pm, test-model.pl)
+
+{\bf\em \item Interactive option prompting for input}\\
+Scripts should have a mode where they prompt for needed input, as well
+as a mode where everything is provided in the script. Thus users can either provide
+input with command-line options, set environment variables, be prompted for input,
+or hard-code settings into the script itself for the a given case.\\
+(status: implemented use cases: configure.pl, run-model.pl)
+
+{\bf\em \item Interactive and batch modes available for scripts}\\
+Interactive mode as well as batch mode should be available for all tools and scripts. \\
+(status: implemented use cases: run-model.pl, test-model.pl, *\_batch.csh)
+
+{\bf\em \item Configure doesn't effect configuration files if run more than once and setup the same}\\
+There should be the ability to run the configure step more than once, without impacting building 
+the executable unless the configuration is changed. \\
+(status: implemented, testing: run configure then build several times, ensure only builds 
+when needed)
+
+{\bf\em  \item Scripts abort on error or missing information}\\
+If user doesn't provide needed information or information is incorrect scripts will terminate
+or provide reasonable defaults at the earliest opportunity (library paths wrong for example).\\
+(status: not completely implemented yet, testing: set various settings wrong run script and
+make sure it catches the problem)
+
+{\bf\em \item Namelist use default settings and datasets}\\
+Namelist creation should include standard default settings and standard datasets when available
+and applicable. Pathnames to default datasets should use the standard CCSM directory
+structure.\\
+(status: implemented, use cases: Default*.xml files testing: need to ensure different cases 
+and model resolutions work)
+
+{\bf\em \item Error checking on namelists}\\
+If datasets in namelist aren't provided or there are obvious problems the script should terminate
+with an error. Duplicated namelist-items (including different case) should be caught. Any required
+input datasets should be ensured they are on the namelist and queried for existance. Required
+namelist items should be checked or provided.
+\\
+(status: implemented, testing: run build-namelist with common known problems)
+
+{\bf\em \item Option to copy configuration and input files to script location}\\
+Since the model is often built and run on a disk that is scrubbed, there should be an option
+to copy (or soft-link) configuration and input files to the directory scripts are called from.\\
+(status: not implemented, testing: run with and without option, ensure files are correctly
+dealt with)
+
+{\bf\em \item Must be able to simultaneously build and run on different platforms in the same directory}\\
+Using the same NFS mounted source directory the user must be able to run the same scripts on 
+different platforms at the same time.
+\\
+(status: implemented, testing: run test-model.pl or run-model.pl on different platforms at same time) 
+
+{\bf\em \item Provide a directory with modified code}\\
+There should be a way of providing a directory where modified code resides to use
+in place of standard code.\\
+(status: implemented, use cases: MODEL\_MODDIR environment variable, testing: use MODEL\_MODDIR
+to ensure uses right code)
+
+{\bf\em \item Dependencies are generated from the Makefile automatically}\\
+The Makefile should automatically figure out the dependencies between source files
+and update the list of dependencies automatically.
+\\
+(status: implemented, testing: make realclean, make)
+
+{\bf\em \item Platform is automatically detected by configure, make, and run process}\\
+The configure, Makefile, and run steps should automatically detect the platform running
+on and setup for running on that given platform.
+\\
+(status: implemented, testing: configure.pl, make, and run-model.pl on different platforms)
+
+{\bf\em \item Scripts don't modify the users environment}\\
+Scripts should not set environment variables that change the users environment after they
+have been run.
+\\
+(status: proposed, testing: ensure scripts don't set any environment variables after running)
+
+{\bf\em \item Support simple run-script that can be easily used on any platform at any site}\\
+There should be a simple script to build and run the model that new users would be able to
+easily use that can be used to easily run any model configuration on any platform at all
+supported sites, and can be easily adapted to run at other sites.
+\\
+(status: almost implimented (need to improve run-model.pl), testing: ensure run-model.pl 
+continues to work everywhere)
+
+{\bf\em \item Support script resubmission}\\
+Run scripts need the ability to resubmit themselves after they complete, provided the first
+submission was successful. Implied with this is a mechanism to automatically stop resubmission 
+when the simulation has proceeded far enough.
+\\
+(status: implimented, testing: ensure run-model.pl resubmission feature works)
+
+{\bf\em \item Archive log-file information}\\
+Run-scripts should be able to archive the log files to MSS easily with some kind
+of identifiable naming convention. Also log-files should contain a copy of the namelist
+and the latest description of the ChangeLog as a way to identify which model version
+was used for this simulation.
+\\
+(status: implimented, testing: ensure run-model.pl archives logs)
+
+{\bf\em \item For the LLNL "Compass" machines, must be able to detect if dmpirun or prun is used
+to submit.}\\
+Some of the LLNL machines Compass use "prun" and some use "dmpirun". Detecting which is used
+needs to be detected at run-time, since when submitting to Compass you can't determine
+beforehand which machine you will end up running on.
+\\
+(status: implimented, testing: see if it runs on Compass)
+
+{\bf\em \item Library settings in some cases come from system environment variable settings.}\\
+Some of the LLNL machines Compass use "prun" and some use "dmpirun". Detecting which is used
+needs to be detected at run-time, since when submitting to Compass you can't determine
+beforehand which machine you will end up running on.
+\\
+(status: implimented, testing: Testing on these platforms ()
+
+{\bf\em \item Detect system environment variables for some systems} \\
+Some systems (such as NERSC IBM, or NCAR SGI) use the "modules" package to set environment
+variables to determine the location of standard library packages. The scripts need
+to detect these environment variables and use them for the relevent locations.
+\\
+(status: implimented, testing: see if it runs on these machines)
+
+{\bf\em \item Ability to store log-files in directory seperate from build/run location} \\
+Some machines require that you run on directories that are immediatly scrubbed after
+a batch submission. In other cases the model is run on directories that may be scrubbed
+but the user may want to archive these files on a more permenent disk.
+\\
+(status: implimented, testing: test to see if you can change LOG\_DIR)
+
+{\bf\em \item Use consistent interface to shared-memory and distributed-memory variables to
+determine behavior} \\
+Since shared-memory and distributed-memory environment variables (setting number of
+threads, number of tasks per node, number of tasks on a node etcetera) are different on
+different platforms the scripts should provide a way to set these variables in a 
+consistent manner across all platforms. This way the user doesn't have to know the specifics
+about how this is implimented on a particular platform, but can use one mechanism to control
+these settings for all platforms.
+\\
+(status: implimented, testing: test to see if you can them)
+
+{\bf\em \item Scripts should have the ability to clean out the old build directory} \\
+The scripts should have a simple option to ensure a clean build by deleting the previous
+object and module files. A similar option needs to be maintained for run-time files
+as well.
+\\
+(status: implimented, testing: test clean-option)
+
+{\bf\em \item Have the build-step in the scripts produce a log file} \\
+When the model executable is built, create a log-file with a date in it, so
+that you can examine it to understand the details of what might have gone wrong.
+\\
+(status: implimented, testing: look at compile\_log.atm)
+
+\subsection{Non-Functional Requirements}
+
+{\bf\em \item Scripts use environment variables, command-line options, Configuration
+files, and default configuration files to determine settings}\\
+Scripts should allow the use of a limited set of environment variables
+to determine some settings. Environment variables should only be allowed for system
+dependencies such as compilers, compiler-options, location of GNU-Make, etcetera. 
+Command-line options should also be allowed in scripts to override
+default settings, as well as directly editing configuration files. All default settings
+should all be set in a set of default configuration files. 
+(status: implemented, use cases: configure.pl, Makefile, build-namelist.pl, run-model.pl 
+testing: run scripts both ways)
+
+{\bf\em \item User should not have to edit scripts at all}\\
+The user should not have to edit any scripts in order to build or run particular configurations.
+The user-interface to the scripts should allow the ability of the user to specify
+the specifics of the model configuration they wish to run based on the user-interface 
+outlined in requirement 2.
+(status: implemented, use cases: run-model.pl, test-model.pl)
+
+{\bf\em \item Modular and extensible}\\
+Users should be able to take modular components of the scripts to create their own extensions
+or modifications to the existing build toolkit. \\
+(status: implemented, use cases: run-model.pl, vs test-model.pl, cam-run.pl)
+
+\subsection{Project Issues}
+
+{\bf\em \item Standardized data formats used}\\
+If datasets are used, standard data formats such as XML should be used. And parsers for
+these formats can be found from existing open-source or other free software.
+\\
+(status: implemented, use cases: atmlndnl.pm uses XML files and the CPAN XML::Lite parser)
+
+{\bf\em \item User Documentation}\\
+User documentation created from scripts using Perl-doc. This allows the automatic
+creation of documentation in both man-page and HTML formats.
+(status: )
+
+{\bf\em \item User-interface for all scripts consistent across all platforms}\\
+User-interface for scripts on all supported platforms is the same.\\
+(status: implemented, use cases: run-model.pl)
+
+{\bf\em \item Defaults for supported labs are easily provided}\\
+Defaults for supported labs will be provided easily. \\
+(status: implemented, use cases: run-model.pl, test-model.pl, CAM\_lab.pm)
+
+{\bf\em \item Needed settings for non-supported labs are easily provided}\\
+Settings needed for non-supported labs can be easily provided. \\
+(status: implemented, testing: run with LAB=default, make sure can provide needed settings 
+by hand)
+
+{\bf\em \item Adding new platforms is easy}\\
+Adding a new platform in the scripts should be straight-forward. \\
+(status: implemented , use cases: CAM.pm, CAM\_run.pm, CAM\_lab.pm see
+section "How to add another platform" below on how to do this) 
+
+
+\end{enumerate}
+
+\section{Glossary}
+
+\begin{tabular}{r p{3.3in} p{4in}}
+
+{\bf autoconf:} & A GNU utility program that helps to maintain source code build configurations
+for different platforms. \\ \\
+
+{\bf configure:} & Create the files needed in order to build the model executable. This
+includes determining which code needs to be compiled and resolution. It ussually involves
+creating the CPP files and Makefile. \\ \\
+
+{\bf CPAN:} & Comprehensive Perl Archive Network. A web-accessible site that contains
+a host of code written in Perl by others to do various things. Since, people around the
+world use and contribute to software here, it tends to be well-tested and of high-quality.
+If you can find something to use from here it's likely that you can save time from having
+to write the code yourself. \\ \\
+
+{\bf CPP:} & "C" Pre-processor. A standard syntax for "editing" source code
+by replacing special "CPP" syntax with code that can be compiled.  \\ \\
+
+{\bf C-shell:} & A particular UNIX shell that is often used for creating utility scripts. \\ \\
+
+{\bf distributed-memory:} & Parallel processing on machines where the memory is not
+shared between processors. This is done by passing data between the different CPU's. \\ \\
+
+{\bf Environment variables:} & Variables that are set in the UNIX shell that retain
+their value in sub-processes. \\ \\
+
+{\bf GNU:} & A set of UNIX shell programs and utilities created using a Open-source
+code paradigm by the Free Software Foundation. (The acyonym stands for GNU's NOT UNIX). \\ \\
+
+{\bf Makefile:} & A utility to maintain a consistent build mechanism for program
+source codes. \\ \\
+
+{\bf Object Oriented and Objects:} & A programming methodology, where data and methods
+are tied together. An object creates a set of data that it will use object methods to
+operate on. The data in the object is private to the object. \\ \\
+
+{\bf Perl:} & A scripting language (Practical Extraction and Report Language). \\ \\
+
+{\bf soft-link:} & A UNIX command that provides a "hook" to a file in another location.
+It creates a new name that allows you to access a file in another location. \\ \\
+
+{\bf SPMD:} & Single Program Multiple Data. A method of distributed memory programming
+where a single program is used, but different machine CPU's operate on different parts
+of the data. \\ \\
+
+{\bf XML:} & eXtensible Markup Language. A industry standard language that allows the
+creation of simple text databases. \\ \\
+
+\end{tabular}
+
+\section{Review Status}
+
+\noindent {\bf Requirements Review} \\
+
+\begin{tabular}{r p{1.3in} p{2in}}
+{\bf Review Date:} & Feb/22/2002 \\ \\
+{\bf Reviewers:}   & Brian Eaton         & NCAR \\
+                   & Mariana Vertenstein & NCAR
+\end{tabular}
+
+\end{document}

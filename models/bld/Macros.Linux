@@ -1,0 +1,68 @@
+#===============================================================================
+# CVS $Id: Macros.Linux,v 1.1.4.4 2003/06/13 16:08:27 hender Exp $
+# CVS $Source: /fs/cgd/csm/models/CVS.REPOS/shared/bld/Macros.Linux,v $
+# CVS $Name:  $
+#===============================================================================
+# Makefile macros for "Linux", supports portland + gnu 
+#===============================================================================
+
+INCLDIR    := -I. -I/soft/apps/packages/netcdf-3.5.0/include -I/usr/include -I${INCROOT} -I/soft/apps/packages/mpich-gm-1.2.5..9-pre6-gm-1.6.3-pgi-4.0/include
+SLIBS      := -L/soft/apps/packages/netcdf-3.5.0/lib -lnetcdf 
+
+ULIBS      := -L$(LIBROOT) -lesmf
+CPP        := NONE
+CPPFLAGS   := -DLINUX -DPGF90 -DNO_SHR_VMATH
+CPPDEFS    := -DLINUX
+CC         := mpicc
+CFLAGS     := -c
+ifeq ($(CC),pgcc)
+   CFLAGS  += -fast
+else
+   CFLAGS  += -DUSE_GCC
+endif
+FIXEDFLAGS :=
+FREEFLAGS  := -Mfree
+FC         := mpif90
+FFLAGS     := -c -r8 -i4 -Kieee -Mrecursive -Mdalign -Mextend
+#             -g -Ktrap=fp -Mbounds
+MOD_SUFFIX := mod
+LD         := $(FC)
+#LDFLAGS    := -L/usr/local/gm/lib -lgm -lpthread
+#LDFLAGS    := -L/usr/local/gm/lib -lgm 
+ifeq ($(CC),gcc)
+   LDFLAGS += -g77libs="-L/usr/local/pgi/linux86/lib -lpgf90 -lpgf90rtl -lpgftnrtl -lpgc"
+endif	
+
+ifeq ($(MACH),jet)
+INCLDIR    := -I. -I/usr/local/netcdf/include -I/usr/include -I${INCROOT} -I/usr/local/mpich-pgi/include
+SLIBS      := -L/usr/local/netcdf/lib -lnetcdf -L/usr/local/mpich-pgi/lib -lmpich  -llapack -lblas
+CC         := pgcc 
+FC         := pgf90
+LDFLAGS    := -L/usr/local/gm/lib -lgm 
+endif
+
+
+#FC         := lf95
+#FFLAGS     := -c -g -CcdRR8 --trace --trap -DLINUX
+#LDFLAGS    := --staticlink
+
+ifeq ($(MODEL),pop)
+   CPPDEFS    := $(CPPDEFS) -DPOSIX -Dimpvmix -Dcoupled \
+                 -DNPROC_X=$(NX) -DNPROC_Y=$(NY)
+   FIXEDFLAGS := -byteswapio
+endif
+
+ifeq ($(MODEL),csim)
+   CPPDEFS    := $(CPPDEFS) -Dcoupled -DNPROC_X=$(NX) -DNPROC_Y=$(NY) -D_MPI
+   FIXEDFLAGS := -byteswapio
+endif
+
+ifeq ($(THREAD),TRUE)
+#  CPPFLAGS   := $(CPPFLAGS) -D_OPENMP
+   CPPDEFS    := $(CPPDEFS) -D_OPENMP -DTHREADED_OMP
+   FREEFLAGS  := $(FREEFLAGS) -mp
+   LDFLAGS    := $(LDFLAGS) -mp
+endif 
+
+ifeq ($(DEBUG),TRUE)
+endif

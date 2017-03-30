@@ -1,0 +1,276 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-28.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-28.html,v 1.61.2.16 2003/06/13 15:44:08 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.4.5 Example 5 -- Branch Run</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-29.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-27.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-21.html>2.4 Example Namelists</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<H3><A NAME="MARKER_9_56"></A>2.4.5 Example 5 -- Branch Run</H3>
+
+In the following example, a new case is "branched" from the run given
+in <A HREF="UG-23.html">Example 1</A>. Branching allows the user to
+change any history file related namelist variables while continuing
+from a chosen point in a previous run.&nbsp; Other namelist variables
+<b>should not be modified</b>.
+
+To obtain this namelist, the user may invoke <b>build-namelist</b> with
+command line arguments. However, since the number of command line arguments
+for this case are numerous, an easier solution is for the user to first create a 
+namelist file, <b>namelist_input</b>, with the following contents:
+
+<p><B><TT>&nbsp;&amp;camexp</TT></B>
+<br><b><TT>&nbsp;caseid = 'run05'</TT></B>
+<br><b><TT>&nbsp;nrevsn = '/<I>USERNAME</I>/csm/camrun/atm/rest/camrun.cam2.r.0000-09-02-00000'</b></tt>
+<br><b><TT>&nbsp;nsrest = 3</TT></B>
+<br><b><TT>&nbsp;nelapse = -30</TT></B>
+<br><b><TT>&nbsp;nhtfrq = 72,18,18</TT></B>
+<br><b><TT>&nbsp;ndens = 2,2,2</TT></B>
+<br><b><TT>&nbsp;mfilt = 10,30,30</TT></B>
+<br><b><TT>&nbsp;fincl2 = 'PRECL:I','PRECC:I','CLOUD:I'</TT></B>
+<br><b><TT>&nbsp;fincl3 = 'PRECL:M','PRECC:M','CLOUD:M'</TT></B>
+<br><b><TT>&nbsp;fexcl1 = 'PRECL','PRECC','CLOUD'</TT></B>
+<br><b><TT>&nbsp;mss_wpass = 'mypass'</TT></B>
+<br><b><TT>&nbsp;/</TT></B>
+<br><b><TT>&nbsp;&amp;clmexp</tt></b>
+<br><b><TT>&nbsp;nrevsn = '/<I>USERNAME</I>/csm/camrun/lnd/rest/camrun.clm2.r.0000-09-02-00000'</tt></b>
+<br><b><TT>&nbsp;/</tt></b>
+
+<p>
+The user may then invoke <tt><b>build-namelist</b></tt> as follows:
+
+<pre><b>
+ % setenv CSMDATA /data
+ % build-namelist -runtype branch -infile namelist_input
+</b></pre>
+
+<p>
+The user should invoke this command from the same directory from which
+<tt><b>configure</b></tt> was invoked.
+
+<p>
+A branch run must always start a new case, so the namelist variable
+<TT>CASEID </TT>must be modified.&nbsp; In this example, some fields
+are excluded from the first history file series and placed on the 
+second and third file series with a write frequency of 18 timesteps. Note the
+use of <TT>NSREST=3</TT> for a branch run, and the additional values
+assigned to <TT>NDENS</TT>, <TT>MFILT</TT>, and <TT>NHTFRQ</TT> for
+the history files.&nbsp;<A NAME="MARKER_10_58"></A>
+
+<p>
+<hr>
+<p>
+
+<p><B><TT>&nbsp;&amp;camexp</TT></B>
+<br><b><TT>&nbsp;caseid = 'run05'</TT></B>
+<br><b><tt>&nbsp;absems_data = '/data/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc'</tt></b>
+<br><b><tt>&nbsp;ncdata = '/data/atm/cam2/inic/gaus/cami_0000-09-01_64x128_T42_L26_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvs = '/data/atm/cam2/sst/sst_HadOIBl_bc_64x128_clim_c020411.nc'</tt></b>
+<br><b><tt>&nbsp;bndtvo = '/data/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc'</tt></b>
+<br><b><TT>&nbsp;nrevsn = '/<I>USERNAME</I>/csm/camrun/atm/rest/camrun.cam2.r.0000-09-02-00000'</b></tt>
+<br><b><TT>&nbsp;nsrest = 3</TT></B>
+<br><b><TT>&nbsp;nelapse = -30</TT></B>
+<br><b><TT>&nbsp;nhtfrq = 72,18,18</TT></B>
+<br><b><TT>&nbsp;ndens = 2,2,2</TT></B>
+<br><b><TT>&nbsp;mfilt = 10,30,30</TT></B>
+<br><b><TT>&nbsp;fincl2 = 'PRECL:I','PRECC:I','CLOUD:I'</TT></B>
+<br><b><TT>&nbsp;fincl3 = 'PRECL:M','PRECC:M','CLOUD:M'</TT></B>
+<br><b><TT>&nbsp;fexcl1 = 'PRECL','PRECC','CLOUD'</TT></B>
+<br><b><TT>&nbsp;mss_wpass = 'mypass'</TT></B>
+<br><b><TT>&nbsp;iyear_ad = 1950</TT></B>
+<br><b><TT>&nbsp;/</TT></B>
+
+<P><B><TT>&nbsp;&amp;clmexp</TT></B>
+<br><b><TT>&nbsp;nrevsn = '/<I>USERNAME</I>/csm/camrun/lnd/rest/camrun.clm2.r.0000-09-02-00000'</tt></b>
+<br><b><tt>&nbsp;fpftcon = '/data/lnd/clm2/pftdata/pft-physiology'</tt></b>
+<br><b><tt>&nbsp;fsurdat = '/data/lnd/clm2/srfdata/cam/clms_64x128_c020514.nc'</tt></b>
+<br><b><tt>&nbsp;finidat = '/data/lnd/clm2/inidata_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc'</tt></b>
+<br><b><TT>&nbsp;/</TT></B>
+
+<P>
+<HR>
+<p>
+
+<DL>
+<DT>
+<B><TT>CASEID</TT></B></DT>
+<p>
+<DD>
+A branch run must always start a new case.</DD>
+
+<p>
+<DT>
+<B><TT>NSREST</TT></B></DT>
+<p>
+<DD>
+<tt>NSREST=3</tt> indicates a "branch" run, which starts from a specific
+set of restart datasets and creates a new case.</DD>
+
+<p>
+<DT>
+<B><TT>NREVSN</TT></B></DT>
+<p>
+<DD>
+This run uses the master restart file
+<TT>camrun.cam2.r.0000-09-02-00000</TT> from 
+<a href="UG-23.html">Example 1</a> to provide the restart dataset
+required for starting a branch run.&nbsp; <I>USERNAME</I> in this
+example refers to the users login.&nbsp; A branch run also requires
+that <TT>NREVSN</TT> be separately specified in the CLM2.1 namelist
+input. This example uses the CLM2.1 restart file written in
+<a href="UG-23.html">Example 1</a>.</DD>
+
+<p>
+<DT>
+<B><TT>NHTFRQ</TT></B></DT>
+<p>
+<DD>
+The history file write frequency will be every 72 timesteps (1 day)
+for the first file series and every 18 timesteps (6 hours) for the second
+and third file series.</DD>
+
+<p>
+<DT>
+<B><TT>NDENS</TT></B></DT>
+<p>
+<DD>
+&nbsp;All history file series fields will be in single precision.</DD>
+
+<p>
+<DT>
+<B><TT>MFILT</TT></B></DT>
+<p>
+<DD>
+Ten time samples will be written to the first history file. Thirty
+time samples will be written to the second and third history
+files.</DD>
+
+<p>
+<DT>
+<B><TT>FINCL2</TT></B></DT>
+<p>
+<DD>
+This list specifies the addition of three fields to the default second
+history tape.&nbsp; The <TT>:I </TT>after each field indicates that its
+values should be recorded instantaneously and not as time-averaged field.</DD>
+
+<p>
+<DT>
+<B><TT>FINCL3</TT></B></DT>
+<p>
+<DD>
+Like FINCL2, except fields are defined for the third history file, and
+each is to be recorded as point-by-point minima rather than instantaneous.</DD>
+
+<p>
+<DT>
+<B><TT>FEXCL1</TT></B></DT>
+<p>
+<DD>
+To save file storage space, some fields are eliminated from the
+first history file series.</DD>
+
+<p>
+<DT>
+<B><TT>MSS_WPASS</TT></B></DT>
+<p>
+<DD>
+The NCAR Mass Store write password for all output datasets is set to
+'mypass'.
+</DD>
+
+</DL>
+
+<A NAME="HEADING29_0"></A>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-29.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-27.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-21.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.61.2.16 $ $Date: 2003/06/13 15:44:08 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

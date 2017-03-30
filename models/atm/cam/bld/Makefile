@@ -1,0 +1,365 @@
+#-----------------------------------------------------------------------
+# Makefile for building CAM on various platforms.
+#
+# This makefile assumes the existence the file:
+#
+# Filepath      The directories, listed one per line, that contain the source
+#               code required to build CAM.  This list is used to set the
+#               VPATH variable which is used by GNU make to search for
+#               dependencies (after it looks in the directory from which
+#               it was invoked).  This list of directories, prepended with ./,
+#               is also used to construct the list of search directories 
+#               used by the preprocessor (as specified by -I command-line options).
+#
+# The following macros may be set in the user's environment:
+#
+
+# ROOTDIR       Root directory for the CAM source distribution.  If ROOTDIR is not
+#               set the makefile searches for it in a file called "Rootdir".
+# EXENAME       Name to call the executable.  Default: atm
+# MODEL_EXEDIR  Directory to build the executable in.  Default: ./
+# INC_NETCDF    Directory containing the NetCDF include files.  Default: /usr/local/include
+# LIB_NETCDF    Directory containing the NetCDF library.  Default: /usr/local/lib
+# MOD_NETCDF    Directory containing the NetCDF module files.  Default: /usr/local/lib
+# INC_MPI       Directory containing the MPI include files.  Default: /usr/local/include
+# LIB_MPI       Directory containing the MPI library.  Default: /usr/local/lib
+# ESMF_ROOT     Root directory of ESMF source tree.  Default: $(ROOTDIR)/models/utils/esmf
+# ESMF_BLD      Upper level build directory for ESMF
+#               The ESMF .o files are built in $(ESMF_BLD)/obj
+#               The ESMF .m files are built in arch dependent subdirs of $(ESMF_BLD)/mod
+#               The ESMF library is built in architecture and optimization
+#               dependent subdirectories of $(ESMF_BLD)/lib
+#               Default: ./esmf
+# DEBUG         Set to TRUE to turn on compiler debugging options.  Default: FALSE 
+# SPMD          Whether to build in SPMD mode or not. 	[values TRUE FALSE]
+#               Default: read from ./misc.h
+#               N.B. To ensure consistency between the Makefile and misc.h the SPMD
+#                    macro should not be set.  This forces it to be read from misc.h.
+# SMP           Set to TRUE to enable building in SMP mode (uses OpenMP).  
+#               Currently implemented for IBM, SGI, linux-pgf90. (default is TRUE on IBM and 
+#               linux-pgf90, and depends on SPMD setting on SGI).
+# USER_FC       Allow user to override the default Fortran compiler specified in Makefile.
+# USER_CC       Allow user to override the default C compiler specified in Makefile (linux only).
+# USER_CFLAGS   Additional C compiler flags that the user wishes to set.
+# USER_FFLAGS   Additional Fortran compiler flags that the user wishes to set.
+# USER_LDLAGS   Additional load flags that the user wishes to set.
+# F_OPTIMIZATION_OVERRIDE
+#               Use this to replace default Fortran compiler optimization.  
+# NO_SWITCH     On Compaq if the hardware switch is not available
+#               set this env variable to "TRUE".
+#
+# Note: The ESMF library is included in the CAM distribution in 
+#       $ROOTDIR/models/utils/esmf and is built using this makefile.  
+#------------------------------------------------------------------------
+
+# Set up special characters
+null  :=
+space := $(null) $(null)
+comma := $(null),$(null)
+
+# Determine distribution root directory
+ifeq ($(ROOTDIR),$(null))
+ROOTDIR := $(shell cat Rootdir)
+endif
+
+# Check for override of default Fortran compiler optimizations
+ifneq ($(F_OPTIMIZATION_OVERRIDE),$(null))
+FORTRAN_OPTIMIZATION := $(F_OPTIMIZATION_OVERRIDE)
+endif
+
+# Check for the NetCDF library and include directories 
+ifeq ($(LIB_NETCDF),$(null))
+#LIB_NETCDF := /usr/local/lib
+LIB_NETCDF := $(shell nc-config --flibs) # for libs
+endif
+
+ifeq ($(INC_NETCDF),$(null))
+#INC_NETCDF := /usr/local/include
+INC_NETCDF := $(shell nc-config --prefix)/include # for include
+endif
+
+ifeq ($(MOD_NETCDF),$(null))
+MOD_NETCDF := $(LIB_NETCDF)
+endif
+
+# Check for the MPI library and include directories 
+ifeq ($(LIB_MPI),$(null))
+LIB_MPI := /usr/local/lib
+endif
+
+ifeq ($(INC_MPI),$(null))
+INC_MPI := /usr/local/include
+endif
+
+# Build the ESMF library
+ifeq ($(ESMF_ROOT),$(null))
+ESMF_ROOT := ${ROOTDIR}/models/utils/esmf
+endif
+
+ifeq ($(ESMF_BLD),$(null))
+ESMF_BLD := $(shell (mkdir ./esmf 2>/dev/null;cd ./esmf;pwd))
+endif
+
+ESMF_BOPT := O
+ifeq ($(DEBUG),TRUE)
+  ESMF_BOPT := g
+endif
+ESMF_MOD := $(ESMF_BLD)/mod/mod$(ESMF_BOPT)
+ESMF_LIB := $(ESMF_BLD)/lib/lib$(ESMF_BOPT)
+
+# Check for directory in which to put executable
+ifeq ($(MODEL_EXEDIR),$(null))
+MODEL_EXEDIR := .
+endif
+
+# Check for name of executable
+ifeq ($(EXENAME),$(null))
+EXENAME := atm
+endif
+
+# Check if SPMD is defined in "misc.h"
+# Ensure that it is defined and not just "undef SPMD" set in file
+ifeq ($(SPMD),$(null))
+	SPMDSET := $(shell /bin/grep SPMD misc.h)
+	ifneq (,$(findstring define,$(SPMDSET)))
+		SPMD := TRUE
+	else
+		SPMD := FALSE
+	endif
+endif
+
+# Load dependency search path.
+dirs := . $(shell cat Filepath)
+
+# Set cpp search path, include netcdf
+cpp_dirs := $(dirs) $(INC_NETCDF) $(INC_MPI)
+cpp_path := $(foreach dir,$(cpp_dirs),-I$(dir)) # format for command line
+
+# Expand any tildes in directory names. Change spaces to colons.
+VPATH    := $(foreach dir,$(cpp_dirs),$(wildcard $(dir))) 
+VPATH    := $(subst $(space),:,$(VPATH))               
+
+#------------------------------------------------------------------------
+# Primary target: build the model
+#------------------------------------------------------------------------
+all: $(MODEL_EXEDIR)/$(EXENAME)
+
+# Get list of files and build dependency file for all .o files
+#   using perl scripts mkSrcfiles and mkDepends
+
+SOURCES   := $(shell cat Srcfiles)
+
+# Newer makes set the CURDIR variable.
+CURDIR := $(shell pwd)
+
+$(CURDIR)/Depends: $(CURDIR)/Srcfiles $(CURDIR)/Filepath
+	$(ROOTDIR)/models/atm/cam/bld/mkDepends Filepath Srcfiles > $@
+
+$(CURDIR)/Srcfiles: $(CURDIR)/Filepath
+	$(ROOTDIR)/models/atm/cam/bld/mkSrcfiles > $@
+
+OBJS      := $(addsuffix .o, $(basename $(SOURCES)))
+
+CPPDEF    := -DCAM -DNO_SHR_VMATH -DHIDE_SHR_MSG
+
+$(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf_c++ -lnetcdff -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+
+debug: $(OBJS)
+	echo "FFLAGS: $(FFLAGS)"
+	echo "LDFLAGS: $(LDFLAGS)"
+	echo "OBJS: $(OBJS)"
+
+test_fc: test_fc.o
+	$(FC) -o $@ test_fc.o $(LDFLAGS)
+test_nc: test_nc.o
+	$(FC) -o $@ test_nc.o -L$(LIB_NETCDF) -lnetcdf $(LDFLAGS)
+test_mpi: test_mpi.o
+	$(FC) -o $@ test_mpi.o $(LDFLAGS)
+
+# Architecture-specific flags and rules
+#
+# Determine platform 
+UNAMES := $(shell uname -s)
+
+
+#------------------------------------------------------------------------
+# Linux
+#------------------------------------------------------------------------
+
+ifeq ($(UNAMES),Linux)
+
+#ESMF_ARCH = linux
+
+# if the compiler is not specified, choose PGI pgf90
+
+#ifeq ($(USER_FC),$(null))
+#  FC := pgf90
+#  FPGI := pgi
+#else
+#  FC := $(USER_FC)
+#endif
+
+# USER_FC set to mpipgf90 is for LLNL MCR system. Define FPGI to correspond to
+# pgf90 or mpipgf90. Define FLLNL to correspond to mpipgf90 or mpiifc.
+
+#ifeq ($(FPGI),$(null))
+#  ifeq ($(FC),mpipgf90)
+#    FPGI := pgi
+#    FLLNL := llnl
+#  else
+#    FPGI := notpgi
+#  endif
+#endif
+
+# if USER_CC is set, use it.  Otherwise use pgcc if pgf90 is the Fortran compiler,
+# and cc if not
+
+#ifeq ($(USER_CC),$(null))
+#  ifeq ($(FPGI),pgi)
+#    CC := pgcc
+#  else
+#    CC := cc
+#  endif
+#else
+#  CC := $(USER_CC)
+#endif
+
+# Figure out the ESMF architecture.
+#ifeq ($(FPGI),pgi)
+#  ifeq ($(CC),pgcc)
+#    ESMF_ARCH = linux_pgi
+#  else
+#    ESMF_ARCH = linux_gnupgf90
+#  endif
+#endif
+
+#CFLAGS = $(cpp_path) -DLINUX $(CPPDEF)
+#ifeq ($(CC),pgcc)
+#  CFLAGS += -fast
+#endif
+
+# pgf90
+# -DPGF90 is for phcs and gauaw which normally use r16 arithmetic but is unavailable under pgf90
+
+#ifeq ($(FPGI),pgi)
+
+#  ifeq ($(SMP),$(null))
+#    SMP := TRUE
+#  endif
+#  mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
+#  FFLAGS    := $(cpp_path) $(mod_path) -r8 -i4 $(CPPDEF) -Mrecursive -Mdalign -Mextend -DLINUX \
+	       -DPGF90
+#  ifeq ($FC),mpipgf90)
+#    $FFLAGS += -byteswapio
+#  endif
+#  FREEFLAGS := -Mfree
+#  LDFLAGS :=
+
+#  ifeq ($(DEBUG),TRUE)
+#    FFLAGS      += -g -Ktrap=fp -Mbounds
+#    SPEC_FFLAGS := $(FFLAGS) 
+#  else
+#    SPEC_FFLAGS := $(FFLAGS) 
+# Check for override of default Fortran compiler optimizations
+#    ifeq ($(F_OPTIMIZATION_OVERRIDE),$(null))
+#TBH:  override to -O0 due to failure of fv06 test
+#      FORTRAN_OPTIMIZATION := -fast
+#    endif
+#    FFLAGS += $(FORTRAN_OPTIMIZATION)
+#  endif
+
+#  ifeq ($(SMP),TRUE)
+#    FFLAGS += -openmp
+#    LDFLAGS += -openmp
+#  endif
+
+#endif
+
+
+#ifeq ($(FLLNL),$(null))
+#  LMPI := -lmpich
+#else
+#  LMPI := -lmpi
+#endif
+
+# Flags common to all compilers
+
+#ifeq ($(SPMD),TRUE)
+#  FFLAGS  += -I$(INC_MPI)
+#  LDFLAGS += -L$(LIB_MPI) $(LMPI)
+#else
+#  FFLAGS  += -DHIDE_MPI
+#endif
+
+#ifeq ($(SMP),TRUE)
+#  # THREADED_OMP and THREADED_PTHREADS are used by the timing library
+#  ifeq ($(CC),pgcc)
+#    CFLAGS += -DTHREADED_OMP
+#  else
+#    CFLAGS += -DTHREADED_PTHREADS
+#  endif
+#endif
+
+# MSP hardwired values INTEL at stampede
+ESMF_ARCH = linux_intel
+FC := mpif90
+CC := mpicc
+CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS
+mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
+FFLAGS := $(cpp_path) -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -ftz -traceback -xHost -extend-source -openmp 
+FREEFLAGS := -recursive
+LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -openmp
+
+.SUFFIXES:
+.SUFFIXES: .F .F90 .c .o
+
+#ifeq ($(FC),pgf90)
+#
+# To fix hanging problem when using sld dynamics, compile sgexx without "-fast"
+#
+
+#sgexx.o: sgexx.F
+#	$(FC) -c $(SPEC_FFLAGS) $<
+#endif
+
+.F90.o:
+	$(FC) -c $(FREEFLAGS) $(FFLAGS) $<
+.F.o:
+	$(FC) -c $(FFLAGS) $<
+.c.o:
+	$(CC) -c $(CFLAGS) $<
+
+endif
+
+#------------------------------------------------------------------------
+# Targets/rules that depend on architecture specific variables.
+#------------------------------------------------------------------------
+
+# The ESMF library is not made to be built in parallel, so specify only one job is to run.
+$(ESMF_LIB)/$(ESMF_ARCH)/libesmf.a:
+	cd $(ESMF_ROOT); \
+           echo "Build the ESMF library."; \
+           echo "ESMF is NOT supported by the CCSM project, but by the ESMF core team in NCAR/SCD"; \
+           echo "See http://www.esmf.ucar.edu"; \
+           $(MAKE) -j 1 BOPT=$(ESMF_BOPT) ESMF_BUILD=$(ESMF_BLD) ESMF_DIR=$(ESMF_ROOT) ESMF_ARCH=$(ESMF_ARCH);
+
+time_manager.o : $(ESMF_LIB)/$(ESMF_ARCH)/libesmf.a
+
+RM := rm
+# Add user defined compiler and load flags if set, and replace FC if USER option set.
+CFLAGS  += $(USER_CFLAGS)
+FFLAGS  += $(USER_FFLAGS)
+LDFLAGS  += $(USER_LDFLAGS)
+ifneq ($(USER_FC),$(null))
+FC := $(USER_FC)
+endif
+
+clean:
+	$(RM) -rf esmf
+	$(RM) -f Depends Srcfiles *.o *.mod *.stb *.f90 $(MODEL_EXEDIR)/$(EXENAME)
+
+realclean: clean
+
+include $(CURDIR)/Depends

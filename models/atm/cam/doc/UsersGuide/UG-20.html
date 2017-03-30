@@ -1,0 +1,1659 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-20.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-20.html,v 1.93.2.28 2003/09/22 17:44:14 hender Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.2 Model Namelist Variables</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-20a.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-19.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+<h2><a NAME="MARKER_9_155"></a>2.2 Model Namelist Variables</h2>
+
+A model run is controlled using the CAM namelist <tt>CAMEXP</tt> and
+the CLM namelist, <tt>CLMEXP</tt>.  The focus of this section is to
+describe the variables that constitute the CAM namelist input.&nbsp;
+For specific namelist examples, see&nbsp; "Section 2.4 Namelist Examples".
+<p>The<tt> CAMEXP</tt> namelist control variables are broken into the
+following categories:
+<ul>
+<li>
+<a href="#RUN_TYPE">Run type </a></li>
+
+<li>
+<a href="#RUN_TYPE">Time Management </a></li>
+
+<li>
+<a href="#MARKER_2_13">Input Datasets</a></li>
+
+<li>
+<a href="#MARKER_2_21">File&nbsp; Archive Control</a></li>
+
+<li>
+<a href="#HIST_OPTIONS">History File Options</a></li>
+
+<li>
+<a href="#RESTART">Restart File Options</a></li>
+
+<li>
+<a href="#DYNAMICS">Dynamics controls</a></li>
+
+<li>
+<a href="#PHYSICS">Physics controls</a></li>
+
+<li>
+<a href="#CONSTITUENTS">Non-water constituents</a></li>
+
+<li>
+<a href="#MEMORY">Memory Control</a></li>
+
+<li>
+<a href="#PERFORMANCE">Performance Tuning</a></li>
+
+<li>
+<a href="#ORBIT_INPUT">Orbital parameters</a></li>
+</ul>
+
+<p>
+<b> Numerous namelist variables are not documented below although they
+appear in the CAM2.0.2 release code. We do not ensure that the model
+will run or that the resulting simulation will be scientifically
+valid if the user decides to use any of the these undocumented
+variables. The CCSM Software Engineering Group (CSEG) will not provide
+support for use of any undocumented variables or features.</b>
+
+<p>
+Table 2.4 displays supported variables contained in the
+<tt>CAMEXP</tt> namelist.  Variables are grouped according to the
+above categories. Namelist variable names displayed in <b>BOLD</b>
+font must be defined in order for the model to run.&nbsp; Namelist
+options added since CAM2.0.2 are marked with a&nbsp;<img
+SRC="/icons/images/new_tiny2.gif" > &nbsp; Most of the variables in
+<tt>CAMEXP</tt> are single-valued, but some are array-valued. Included
+in the table are the following pieces of information:
+<ul>
+<li>
+Variable description</li>
+
+<li>
+Variable name.</li>
+
+<li>
+Variable type (<i>Character, Integer, Real, or Logical</i>). If the variable
+is of type character, then its declared length is displayed along with
+the variable type (e.g. <tt>CTITLE</tt> is 80 characters in length, therefore
+Char*80 is entered in the "Type" column).</li>
+
+<li>
+Default value.</li>
+
+<li>
+Examples from <a href="UG-21.html">Sec. 2.4</a>&nbsp; demonstrating usage.</li>
+
+<br>&nbsp;
+</ul>
+
+CAM is capable of executing using default values for most of the
+namelist variables (most default values are only appropriate at the
+T42/26-level resolution). However, some of the namelist variables must
+be explicitly set by the user in order for the model to execute.
+The only <tt>CAMEXP</tt> variables that <b>must</b> be specified are:
+<ul>
+<li> <tt>CASEID</tt></li>
+<li> <tt>NESTEP</tt> or <tt>NELAPSE</tt> or STOP_YMD and <tt>STOP_TOD</tt></li>
+<li> <tt>NCDATA</tt></li>
+<li> <tt>BNDTVS</tt></li>
+<li> <tt>BNDTVO</tt></li>
+<li> some combination of the orbital parameters <tt>IYEAR_AD</tt>, <tt>MVELP</tt>, <tt>ECCEN</tt>, and
+<tt>OBLIQ</tt> (as discussed at the bottom of <tt>Table 2.4</tt>)</li> 
+</ul>
+<P>
+
+Before discussing the namelist variables, a brief summary is given of
+the types of model runs. An initial run starts the model from an
+initial conditions dataset.  As the model executes, history datasets,
+restart datasets and initial condition datasets are periodically
+written.  (see <A HREF="UG-45.html">"Model Output Datasets"</A>) and
+<A HREF="UG-45.html#HEAD_3">"Model generated initial condition dataset
+files" </A> for more details).
+<P>
+In addition to initial simulations, there are two types of
+continuation runs: restart and branch. A restart run is an exact
+continuation of a previous simulation from its point of
+termination. Namelist variables other than <TT>NESTEP</TT>,
+<TT>NELAPSE</TT>, and <TT>NSREST</TT> <B>should never</B> be modified
+for restart runs.  A branch run, on the other hand, is a new case that
+uses restart data from a previous simulation to begin the integration.
+Since a branch run <B>must</B> be a new case, the length of the
+history interval and the output history fields do not have to be the
+same as in the control simulation.  For example, the branching option
+can be used to output selected fields more frequently than was the
+case in the control run.  <B>Only history file namelist options should
+be modified for branch runs</B>. If the user desires to modify other
+options, such as physics control variables, a new initial run should
+be done using initial datasets generated by the control run.
+
+The user should also note that any namelist variable that can be used
+as a part or all of a UNIX pathname
+(e.g. <tt>CASEID</tt>,<tt>NREVSN</tt>,..)  should only contain
+characters that are acceptable in UNIX path names.
+<p>
+The description of the land model namelist is given below in
+<a href="#TABLE2_5">Table 2.5</a>. The land model namelist should
+follow the atmospheric model namelist.
+
+<p><a NAME="TABLE2_4"></a>
+<p><b>Table 2.4: CAMEXP namelist Input Variables</b>
+
+<dl>
+
+<center><dt><hr><a NAME="RUN_TYPE"></a><b>RUN TYPE</b></dt><hr></center>
+
+<p>
+<dt> <b><tt>CASEID</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*32 </tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b> </dd></dt>
+
+<dt><dd>Example(s):&nbsp <a href="UG-23.html">&nbsp;Ex.1</a> </dd></dt>
+
+<dt> <dd> Description: &nbsp; Case identifier (saved in history file
+header record) and normally used as part of the MSS path name (see
+the ARCHIVE_DIR namelist option). By default also used in output
+filenames (see the HFILENAME_SPEC namelist option).
+<p>
+
+<p>
+<dt><tt>CTITLE</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*80</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>blanks</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-23.html">Ex.1</a> </dd></dt>
+
+<dt><dd>Description: &nbsp; Case title </dd> </dt>
+<p>
+
+<p>
+<dt><tt>NSREST</tt> </dt>
+
+<dt><dd>Type: &nbsp;<tt>I</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0&nbsp;</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-23.html">&nbsp;Ex.1</a>,
+&nbsp;<a href="UG-26.html">Ex.3</a>, &nbsp;
+<a href="UG-28.html">Ex.5</a> </dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Run type:&nbsp;
+0=initial&nbsp;, 1=restart&nbsp;, 3=branch&nbsp;
+</dd></td>
+<p>
+
+<center><dt><hr><a NAME="RUN_TYPE"></a><b>TIME MANAGEMENT</b></dt><hr></center>
+
+<p>
+<dt><b><tt>STOP_YMD</tt></b></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b> if
+<tt>NELAPSE</tt> and <tt>NESTEP</tt> not set. </dd></dt>
+
+<dt><dd>Description: &nbsp; Stopping date for run encoded in yearmmdd
+format.  Either <tt>NELAPSE</tt>, <tt>NESTEP</tt> or <tt>STOP_YMD (and
+possibly STOP_TOD</tt>) must be set if not running through flux
+coupler. (<tt>STOP_YMD,STOP_TOD</tt>) takes precedence if
+set. <tt>STOP_YMD</tt> is not required or used when running in coupled
+mode. </dd></dt>
+<p>
+
+<p>
+<dt><b><tt>STOP_TOD</tt></b></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Stopping time of day for run in seconds
+since 0Z.  Not used when running through flux coupler. </dd></dt>
+<p>
+
+<p>
+<dt><b><tt>NESTEP</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b> if
+<tt>NELAPSE</tt> and <tt>STOP_YMD</tt> not set. </dd></dt>
+
+
+<dt><dd>Description: &nbsp; Ending timestep. <br>If positive the
+ending absolute timestep (from the start of the initial run). If
+negative the ending absolute (from the start of the initial run)
+number of days to process. .<a NAME="MARKER_10_9"></a>&nbsp; Either
+<tt>NELAPSE</tt>, <tt>NESTEP</tt> or (<tt>STOP_YMD,STOP_TOD</tt>) must
+be set if not running through flux
+coupler. (<tt>STOP_YMD,STOP_TOD</tt>) take precedence if
+set. <tt>NESTEP</tt> is not required or used when running in coupled
+mode.  </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="MARKER_10_10"></a><b><tt>NELAPSE</tt></b>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer </tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b> if <tt>NESTEP</tt> or
+<tt>STOP_YMD</tt> not set.&nbsp;</dd></dt>
+
+
+<dt><dd>Description: &nbsp; Elapsed time to run. <br> In iterations
+(positive) or days (negative) to run. May be entered instead of
+<tt>NESTEP</tt> or <tt>STOP_YMD</tt> and <tt>STOP_TOD</tt>.&nbsp;
+ Note, <tt>NESTEP</tt> is not required
+or used when running in coupled mode.  </dd> </dt>
+<p>
+
+<p>
+<dt><tt>DTIME</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>1200. for EUL; 3600. for SLD and fv</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp <a href="UG-23.html">Ex.1</a></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Length of model timestep in seconds. <br> CAUTION: Changing this variable
+directly impacts the physical parameterizations in the model and may
+impact the climate. <br>Changing resolution usually requires a change in
+<tt>DTIME</tt>.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>START_YMD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: Use date from initial condition dataset.</dd></dt>
+
+
+
+<dt><dd>Description: &nbsp; Starting date for run as
+<tt>yyyymmdd</tt>. If not input, value is set to <tt>NCDATE</tt> from
+initial dataset header.  </dd></dt>
+<p>
+
+<p>
+<dt><tt>START_TOD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: Use time of day from initial condition dataset.</dd></dt>
+
+
+
+<dt><dd>Description: &nbsp; Starting time-of-day (seconds). If not
+input, value is set to <tt>NCSEC</tt> from initial dataset header.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>REF_YMD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: Use starting date</dd></dt>
+
+
+
+<dt><dd>Description: &nbsp;Reference date for run as <tt>yyyymmdd</tt>. 
+The reference date is the reference for the time variable output on
+the history files.
+</dd></dt>
+<p>
+
+
+<p>
+<dt><tt>REF_TOD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: Use starting time of day.</dd></dt>
+
+
+
+<dt><dd>Description:&nbsp; Reference time-of-day (seconds).
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>CALENDAR</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*32</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>"NO_LEAP"</tt></dd></dt>
+<dt><dd>Valid values: &nbsp; <tt>"NO_LEAP"</tt> or <tt>"GREGORIAN"</tt></dd></dt>
+
+
+
+<dt><dd>Description: &nbsp;
+Calendar type 'NO_LEAP' for consistent 365-days per year or 'GREGORIAN' to include
+leap-years. Note that if "GREGORIAN" is selected although leap-years will be used
+in the calender manager the calculation of the earth's orbit still assumes 365 day
+years.
+</dd></dt>
+<p>
+
+<center><dt><hr><a NAME="MARKER_2_13"></a><b>INPUT DATASETS</b></dt><hr></center>
+
+<p>
+<dt><b><tt>BNDTVO</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b></dd></dt>
+
+<dt><dd>Example(s): &nbsp;
+<a href="UG-23.html">Ex.1</a></a></td>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; Full pathname of time-variant ozone mixing
+ratios boundary dataset (NetCDF format).&nbsp; </dd> </dt>
+<p>
+
+<p>
+<dt><b><tt>BNDTVS</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>None</tt>,&nbsp; <b>Setting is Required (unless running with CCSM)</b> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-25.html">Ex.2</a>,
+&nbsp;<a href="UG-30.html">Ex.7</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; Full pathname of time-variant sea-surface
+temperature and sea-ice concentration boundary dataset (NetCDF format).&nbsp; </dd> </dt>
+<p>
+
+<p>
+<dt><a NAME="ABSEMS_DATA"></a><tt><b>ABSEMS_DATA</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;None, <b>Setting is Required</b> </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of absorption/emission dataset.
+This file is a required input dataset. It consists of terms used for
+determining the absorptivity and emissivity of water vapor in the longwave
+parameterization of radiation.  </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="CO_EMIS"></a><tt><b>CO_EMIS</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;See DefaultCAMEXPNamelist.xml </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of carbon emission dataset. </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="DMS_EMIS"></a><tt><b>DMS_EMIS</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;See DefaultCAMEXPNamelist.xml </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of DMS emission dataset. </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="SOIL_EROD"></a><tt><b>SOIL_EROD</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;See DefaultCAMEXPNamelist.xml </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of soil erodibility dataset. </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="OXID"></a><tt><b>OXID</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;See DefaultCAMEXPNamelist.xml </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of oxidant dataset. </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="SOX_EMIS"></a><tt><b>SOX_EMIS</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;See DefaultCAMEXPNamelist.xml </dd></dt>
+
+<dt><dd>Description: &nbsp; Filename of SOx emission dataset. </dd></dt>
+<p>
+
+<p>
+<dt><b><tt>NCDATA</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b></dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-25.html">Ex.2</a>,
+</td>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; Full pathname of initial dataset (NetCDF
+format).&nbsp; </dd> </dt>
+<p>
+
+<p>
+<dt><tt>OZNCYC</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.TRUE.&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Flag for yearly cycling of ozone data. If set to <tt>.FALSE.</tt>,
+a multi-year dataset is assumed.</td>
+</dd> </dt>
+<p>
+
+<p>
+<dt><tt>SSTCYC</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.TRUE.&nbsp;</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-30.html">Ex.7</a></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Flag for yearly cycling of SST data. If set to <tt>.FALSE.</tt>,
+a multi-year dataset is assumed. <b>Not used if running with CCSM.</b>
+</dd> </dt>
+<p>
+
+<center><dt><hr><a NAME="MARKER_2_21"></a></a><b>MASS STORE CONTROLS</b></dt><hr></center>
+
+<p>
+<dt><tt>ARCHIVE_DIR</tt></dt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>/$USER/csm/caseid/ (where caseid if the caseid
+from the namelist and $USER is the username converted to uppercase.</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Head mass store archival directory name. CAM history files will be stored
+under $ARCHIVE_DIR/atm/hist, restart files under $ARCHIVE_DIR/atm/rest, and
+initial files under $ARCHIVE_DIR/atm/init. Land-model output files will be stored
+under similar directory names with "lnd" to specify the land-model subdirectory.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>MSS_IRT</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>365&nbsp;</tt></dd></dt>
+
+<dt><dd>Example(s): 
+&nbsp;<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-25.html">Ex.2</a>,
+&nbsp;<a href="UG-29.html">Ex.6</a>,
+&nbsp;<a href="UG-32.html">Ex.9</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Retention period in days for history and restart files stored on NCAR
+Mass Store. If <tt>MSS_IRT=0</tt>, no history or restart files will be
+archived.
+</dd> </dt>
+<p>
+
+<p>
+<dt><tt>MSS_WPASS</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*8</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>blanks</tt></dd></dt>
+
+<dt><dd>Example(s): 
+&nbsp;<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-28.html">Ex.5</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+NCAR Mass Store write password for all output datasets. Must remain
+the same throughout a case run, or a continuation run will not update
+original history files.
+</dd> </dt>
+<p>
+
+<center><dt><hr><a NAME="HIST_OPTIONS"></a><b>HISTORY FILE OPTIONS</b></dt><hr></center>
+
+<p>
+<dt><a NAME="empty_htapes"></a><tt>EMPTY_HTAPES</tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.FALSE.</tt></dd></dt>
+
+
+
+<dt><dd>Description: &nbsp; 
+If set don't put any of the variables on the history tapes by
+default. Only output the variables that the user explicitly lists in
+the <a href=#FINCL1><tt>fincl#</tt></a> namelist items.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="HFILENAME_SPEC"></a><tt>HFILENAME_SPEC(ptapes)</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>"%c.cam2.h%t.%y-%m","%c.cam2.h%t.%y-%m-%d-%s","%c.cam2.h%t.%y-%m-%d-%s",...&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Array of history filename specifiers. Filename,
+specifiers give generic formats for the filenames with the specific dates,
+file-series number, and caseid, filled in when the files are created. The 
+following strings are expanded when the filename is created:
+<ul>
+<li>%c = caseid
+<li>%t = tape series number (0-5)
+<li>%y = year (normally 4 digits, more digits if needed)
+<li>%m = month
+<li>%d = day
+<li>%s = seconds into current day
+<li>%% = % symbol
+</ul>
+For example, for a simulation with caseid="test" and current date of
+0000/12/31 0:00UT, the monthly average files with a filename specifier
+of "%c.cam2.h%t.%y-%m.nc" expand into "test.cam2.h0.0000-12.nc", daily
+files with a filename specifier of "%c.cam2.h%t.%y-%m-%d-%s.nc" expand
+to ""test.cam2.h0.0000-12-31-00000.nc". Spaces are not allowed in
+filename specifiers. Although the character "/" is allowed in the
+specifier, it will be interpreted as a directory name and the
+corresponding directories will have to be created in the model
+execution directory (directory given to configure with -cam_exedir option) before model execution.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="MFILT"></a><tt>MFILT(ptapes)</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>30,30,30,...</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+&nbsp;<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-28.html">Ex.5</a>,
+&nbsp;<a href="UG-32.html">Ex.9</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Array of number of time samples to write to each history 
+files series (a time sample is the history output from a given
+timestep).
+</dd> </dt>
+<p>
+
+<p>
+<dt><a NAME="NDENS"></a><tt>NDENS(ptapes)</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>2,2,2,...</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+&nbsp;<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-28.html">Ex.5</a>,
+&nbsp;<a href="UG-32.html">Ex.9</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Array specifying output format for each history
+file series. Valid values are 1 or 2. "1" implies output to be written out
+in 64-bit NetCDF format, and "2" writes data out in 32-bit NetCDF
+format.
+</dd> </dt>
+<p>
+
+<a name=INITHIST></a>
+<p>
+<dt><tt>INITHIST</tt></dt>
+<dt><dd>Type: &nbsp;<tt>Char*8</tt> </dd></dt> 
+<dt><dd>Default: 'NONE'</dd></dt>
+<dt><dd>Valid values: 'NONE', '6-HOURLY', 'DAILY', 'MONTHLY', 'YEARLY'</dd></dt>
+<dt><dd>Description: &nbsp; 
+Frequency that initial files will be output:&nbsp;&nbsp; 6-hourly, daily, monthly, yearly, or never.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>AVGFLAG_PERTAPE(ptapes)</tt></dt>
+<dt><dd>Type: &nbsp;<tt>Char*1</tt> </dd></dt> 
+<dt><dd>Default: &nbsp; Use default averaging flags for each variable</dd></dt>
+<dt><dd>Valid values: 'A', 'I', 'X', 'M'</dd></dt>
+<dt><dd>Description: &nbsp; 
+To set the averaging flag for all variables on a particular history
+files series. Valid values include: Average (A), Instantaneous (I),
+Maximum (X), or Minimum (M). If averaging flags for specific variables are selected
+using the FINCL options the flags
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="NHTFRQ"></a><tt>NHTFRQ(ptapes)</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0,-24,-24,-24...</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+&nbsp;<a href="UG-23.html">Ex.1</a>,
+&nbsp;<a href="UG-28.html">Ex.5</a>,
+&nbsp;<a href="UG-32.html">Ex.9</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Array of time sample, write frequencies, for each
+history files series.  If <tt>NHTFRQ(1)=0</tt>, the file will be a monthly
+average.  Only the first file series may be a monthly average.  If
+<tt>NHTFRQ(i)>0</tt>, frequency is input as number of timesteps.  If
+<tt>NHTFRQ(i)&lt;0</tt>, frequency is input as number of hours.
+</dd> </dt>
+<p>
+
+<p>
+<dt><tt>FINCL1,FINCL2,FINCL3,FINCL4,FINCL5,FINCL6</tt>
+<a NAME="FINCL1"></a>(pflds)</tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*8</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>blanks</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp; 
+&nbsp;<a href="UG-28.html">Ex.5</a>,
+&nbsp;<a href="UG-29.html">Ex.6</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp; 
+List of fields to include on the history files. The added fields must
+be in Master Field List see <a href="UG-45.html#TABLE2_7">Table
+2.7</a> for the list of fields that can be added as well as which
+fields are on the first history file series by default  (FINCL1). 
+<a href="UG-45.html#TABLE2_8">Table 2.8</a> gives the list of fields on
+the second history file series by default (FINCL2). Using a ":" following a
+field gives the averaging flag for the output field. Valid flags are:
+I for instantaneous, A for average, M for minimum, and X for
+maximum. See <a href="UG-45.html#SEC2_5_1_2">Section 2.5.1.1</a> for
+more information on the averaging flag.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>FEXCL1,FEXCL2,FEXCL3,FEXCL4,FEXCL5, FEXCL6</tt>
+<a NAME="FEXCL1"></a>(pflds)</tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*8</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>blanks</tt></dd></dt>
+
+<dt><dd>Example(s): 
+&nbsp;<a href="UG-29.html">Ex.6</a>
+ </dd></dt>
+
+<dt><dd>Description: &nbsp; List of fields to exclude on the default
+history files (must be in Master Field List). The default history
+files include a monthly series and a daily series. For a list of what
+fields are included on the first history file series and the second history
+file series by default see <a href="UG-45.html#TABLE2_7">Table 2.7</a> and 
+<a href="UG-45.html#TABLE2_8">Table 2.8</a>.  </dd></dt>
+<p>
+
+<p>
+<dt><tt>PRECC_THRESH</tt>
+<a NAME="PRECC_THRESH"></a></tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.1</tt></dd></dt>
+
+<dt><dd>Example(s): 
+ </dd></dt>
+
+<dt><dd>Description: &nbsp; Precipitation threshhold for use with
+the PRECCINT and PRECCFRQ fields for history files.
+</dd></dt>
+<p>
+
+<dt><hr><center><a NAME="RESTART"></a><b>RESTART FILE OPTIONS</b></dt><hr></center>
+
+<p>
+<dt><tt>NREFRQ</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>1</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; 
+Frequency of restart dataset writes. <b>This variable can only be 1 or
+0</b>. If 1, restart files are written and archived for every
+archive of the first history file series. If this variable is 0, then no
+restarts are written.
+</dd></dt>
+<p>
+
+<p>
+<dt><b><tt>NREVSN</tt></b></dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b> for branch run.</dd></dt>
+
+<dt><dd>Description: &nbsp; Full pathname of master restart file from
+which to branch.&nbsp; </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="REST_PFILE"></a><tt>REST_PFILE</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;'$HOME/cam2.CASEID.rpointer' </dd></dt>
+
+<dt><dd>Description: &nbsp; Full pathname of restart pointer file. </dd></dt>
+<p>
+
+
+<dt><hr><center><a NAME="DYNAMICS"></a><b>DYNAMIC CONTROLS</b></dt><hr></center>
+
+<p>
+<dt><tt>DIF2</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>2.5E5 for EUL; 0. for SLD*</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp;del<sup>2</sup> horizontal diffusion coefficient. Not
+used for fv dynamics.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>DIF4</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>1.E16 for EUL; 0. for SLD*</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp;del<sup>4</sup> horizontal diffusion coefficient. Not
+used for fv dynamics.
+</dd></dt>
+<p>
+
+
+<p>
+<dt><tt>EPS</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.06</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;Time filter coefficient.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>DIVDAMPN</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.0</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Number of days (from timestep 0) to run
+divergence damper. Use only if model is blowing up because of spin-up
+problems. Suggested value: 10. (Value must be greater than 0.) Not
+used for fv dynamics.  </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="IORD"></a><tt><b>IORD</b></tt>
+</dt>
+
+<dt><dd>Type: &nbsp;<tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>4</tt></dd></dt>
+<dt><dd>Requirements: Only for fv dynamics</dd></dt>
+
+<dt><dd>Description: &nbsp;
+East-west transport (used with Finite-Volume (fv)) dynamical core only.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="JORD"></a><tt><b>JORD</b></tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>4</tt> </dd></dt>
+<dt><dd>Requirements: Only for fv dynamics</dd></dt>
+
+<dt><dd>Description: &nbsp; North-south transport (used with
+Finite-Volume (fv)) dynamical core only.  </dd></dt>
+<p>
+
+<p>
+<dt><tt>KMXHDC</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>1&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Number of levels over which to apply
+Courant limiter, starting at top of model.  </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="KORD"></a><tt><b>KORD</b></tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>4</tt></dd></dt>
+<dt><dd>Requirements: Only for fv dynamics</dd></dt>
+
+<dt><dd>Description: &nbsp;
+Vertical mapping (used with Finite-Volume (fv)) dynamical core only.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>NSPLIT</tt> </dt>
+
+<dt><dd>Type: &nbsp;<tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>UNDEFINED&nbsp;</tt></dd></dt>
+
+<dt><dd>Requirements: &nbsp; fv dynamics only</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;
+Lagrangian time splits when using Finite-Volume dynamics. If zero or not specified, a
+best-estimate will be automatically calculated.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="USE_ETA"></a><tt>USE_ETA</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.</tt> </dd></dt>
+
+<dt><dd>Requirements: &nbsp;Only for fv dynamics</dd></dt>
+
+<dt><dd>Description: &nbsp;
+If defined to TRUE, use the vertical coordinate (eta) values 
+defined in the finite volume dynamical core code rather than the values defined 
+on the input dataset (used with
+Finite-Volume (fv)) dynamical core only.
+</dd></dt>
+<p>
+
+<dt><hr><center><a NAME="PHYSICS"></a><b>PHYSICS CONTROLS</b></dt><hr></center>
+
+<p>
+<dt></a><tt>ADIABATIC</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, do not run model physics, only
+run the dynamical core. In this mode, water vapor is advected as a
+passive tracer.  </dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_SULFUR</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on sulfur prognostic aerosols.
+</dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_FEEDBACK_SULFUR</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on feedback of sulfur prognostic 
+aerosols.  May only be true if AERO_SULFUR is also true.  
+</dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_CARBON</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on carbon prognostic aerosols.
+</dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_FEEDBACK_CARBON</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on feedback of carbon prognostic 
+aerosols.  May only be true if AERO_CARBON is also true.  
+</dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_SEA_SALT</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on sea salt prognostic aerosols.
+</dd></dt>
+<p>
+
+
+<p>
+<dt></a><tt>AERO_FEEDBACK_SEA_SALT</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.FALSE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp; If true, turn on feedback of sea salt prognostic 
+aerosols.  May only be true if AERO_SEA_SALT is also true.  
+</dd></dt>
+<p>
+
+
+<p>
+<dt><a NAME="CO2VMR"></a><tt>CO2VMR</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>3.550e-4</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp;<a href="UG-27.html">Ex.4</a> </dd></dt>
+
+<dt><dd>Description: CO<sub>2</sub> volume mixing ratio&nbsp;
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>CH4VMR</tt> </dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>1.714e-6</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-27.html">Ex.4</a></dd></dt>
+
+<dt><dd>Description:CH<sub>4</sub> volume mixing ratio. &nbsp;
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>F11VMR</tt> </dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.280e-9</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp;<a href="UG-27.html">Ex.4</a>
+</dd></dt>
+
+<dt><dd>Description: &nbsp;CFC<sub>11</sub> volume mixing ratio.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>F12VMR</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.503e-9</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp;<a href="UG-27.html">Ex.4</a> </dd></dt>
+
+<dt><dd>Description: &nbsp;CFC<sub>12</sub> volume mixing ratio.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>IRADAE</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>-12&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp;
+Frequency of absorptivity/emissivity calculations
+in iterations (if positive) or model hours (if negative). To avoid having
+the abs/ems values saved on the restart output, this variable should divide
+evenly into <tt>MFILT(1)*NHTFRQ(1)</tt>.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>IRADLW</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>-1</tt> </dd></dt>
+
+<dt><dd>Example(s): &nbsp;
+</dd></dt>
+
+<dt><dd>Description: &nbsp;
+Frequency of long-wave radiation calculation
+in timesteps (if positive) or model hours (if negative).
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>IRADSW</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>-1&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;
+Frequency of short-wave radiation calculation
+in timesteps (if positive) or model hours (if negative).
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>ITSST</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>1&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;Frequency of SST update in timesteps.
+</dd></dt>
+<p>
+
+
+<p>
+<dt><tt>N2OVMR</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.311e-6</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp;<a href="UG-27.html">Ex.4</a></dd></dt>
+
+<dt><dd>Description: &nbsp;N<sub>2</sub>O volume mixing ratio.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>NLVDRY</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>3&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Number of layers from the top of the model
+over which to do dry convective adjustment. Must be less than
+<tt>plev</tt> (the number of vertical levels).  </dd></dt>
+<p>
+
+<p>
+<dt><tt>PERTLIM</tt></dt>
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+<dt><dd>Default: &nbsp;0.0 </dd></dt>
+<dt><dd>Description: &nbsp; 
+Perturb the initial conditions for temperature randomly by up to the given amount.
+Only applied for initial simulations.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="prognostic_icesnow"></a><tt>PROGNOSTIC_ICESNOW</tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.TRUE.&nbsp;</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;
+Accumulate snow over sea-ice (with a 0.5m maximum). If
+<tt>.FALSE.</tt> then use a climatology for snow depth.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="reset_csim_iceprops"></a><tt>RESET_CSIM_ICE_PROPS</tt>
+
+<dt><dd>Type: &nbsp;<tt>Logical</tt> </dd></dt>
+
+<dt><dd>Default: &nbsp; <tt>.FALSE.&nbsp;</tt>n</dd></dt>
+
+<dt><dd>Description: &nbsp;
+Reset the CSIM ice-model properties. Snow-cover is set to
+zero, and ice-temperatures are all set to freezing. This is important when starting
+from an initial dataset that isn't in equilibrium. This is used, for example, when 
+starting from initial conditions that are interpolated from a different resolution.
+</dd></dt>
+<p>
+
+<p>
+<dt><a NAME="SCON"></a><tt>SCON</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>1.367E6</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-27.html">Ex.4</a> </dd></dt>
+
+<dt><dd>Description: &nbsp;Solar constant (W/m<sup>2</sup>).
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>TAUVIS</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0.14</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Visible optical depth.
+</dd></dt>
+<p>
+
+
+<dt><hr><center><a NAME="CONSTITUENTS"></a><b>NON-WATER CONSTITUENTS</b></dt><hr></center>
+
+<p>
+<dt><tt>NUSR_ADV</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;number of user defined advected tracers
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>NUSR_NAD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;number of user defined non-advected tracers
+</dd></dt>
+<p>
+
+<p>
+<a NAME="READTRACE"></a>
+<dt><tt>READTRACE</tt> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.TRUE.&nbsp;</tt> </dd></dt>
+
+<dt><dd>Description: &nbsp;
+If true and <tt>PCNST+PNATS .GT. 1</tt>, obtain all initial tracer
+data from initial conditions dataset.
+</dd></dt>
+<p>
+
+<p>
+<dt><tt>TRACE_TEST1</tt>,<tt>TRACE_TEST2</tt>,<tt>TRACE_TEST3&nbsp;</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.FALSE.</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; If <tt>TRACE_TEST1</tt> is true, turn on
+test tracer code with 1 tracer (<tt>PCNST=2</tt>).&nbsp;If
+<tt>TRACE_TEST2</tt> is true, turn on test tracer code with 2
+tracers(<tt>PCNST=3</tt>).&nbsp; If <tt>TRACE_TEST3</tt> is true, turn on
+test tracer code with 3 tracers(<tt>PCNST=4</tt>).&nbsp; NOTE: these
+variables are to be used for testing/debugging purposes only. Leave
+settings to <tt>FALSE </tt>during production runs.  </dd></dt>
+<p>
+
+
+
+<dt><hr><center><a NAME="MEMORY"></a><b>MEMORY CONTROL</b></dt><hr></center>
+
+<p>
+<dt><tt>LINEBUF</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Logical</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>.FALSE.</tt></dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-32.html">Ex.9</a></dd></dt>
+
+<dt><dd>Description: &nbsp; If true, force buffer flush of stdout with
+each new-line generated (useful for debugging).&nbsp; </dd></dt>
+<p>
+
+<p>
+<dt><a NAME="PRINT_STEP_COST"></a><tt>PRINT_STEP_COST</tt>
+</dt>
+
+<dt><dd>Type: &nbsp; <tt>Logical</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>.TRUE.</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;If true, print CPU timing per model timestep.
+</dd></dt>
+<p>
+
+
+
+<dt><hr><center><a NAME="PERFORMANCE"></a><b>PERFORMANCE TUNING</b></dt><hr></center>
+
+<p>
+<dt><tt>PHYS_LOADBALANCE</tt></dt>
+
+<dt><dd>Type: &nbsp;<tt>Integer</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>0</tt></dd></dt>
+
+<dt><dd>Description: &nbsp; Select different options for organization of 
+physics chunks.  Each uses a different scheme for static load balancing.&nbsp; </dd></dt>
+<p>
+
+<p>
+<dt><tt>PHYS_CHNK_PER_THD</tt></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>1</tt></dd></dt>
+
+<dt><dd>Description: &nbsp;Select target number of chunks per thread.  
+Must be positive
+</dd></dt>
+<p>
+
+
+
+<dt><hr><center><a NAME="ORBIT_INPUT"></a><b>ORBITAL PARAMETERS</b></dt><hr></center>
+
+<p>
+<dt><b><tt>ECCEN</tt></b></dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required (if IYEAR_AD not set)</b></dd></dt>
+
+<dt><dd>Example(s): &nbsp;<a href="UG-27.html">Ex.4</a> </dd></dt>
+
+<dt><dd>Description: &nbsp; Earth's eccentricity of
+orbit.&nbsp;(unitless: typically 0. to 0.1).&nbsp; </dd></dt>
+<p>
+
+<p>
+<dt><b><tt>IYEAR_AD</tt></b></dt>
+
+<dt><dd>Type: &nbsp; <tt>Integer</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp;<tt>None</tt>,&nbsp; <b>Setting is Required (unless ECCEN, OBLIQ and MVELP
+are set)</b> </dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-23.html">Ex.1</a>, &nbsp;
+<a href="UG-27.html">Ex.4</a></dd></dt>
+
+<dt><dd>Description: &nbsp; Year (AD) used to compute earth's orbital
+parameters. If not set, then use the values from the eccen, mvelp, and
+obliq namelist parameters.&nbsp; <i>If only <tt>IYEAR_AD</tt> is set,
+orbital parameters will be computed automatically (based on Berger,
+1977). If one of&nbsp;<tt> OBLIQ, ECCEN, OR MVELP</tt> is
+set, all three must be set.&nbsp; If all four of the above
+are set by the user, <tt>IYEAR_AD</tt> takes precedence.&nbsp;</i>
+
+</dd></dt>
+<p>
+
+<p>
+<dt><b><tt>MVELP</tt></b></dt>
+
+<dt><dd>Type: &nbsp;<tt>Real</tt> </dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required (if IYEAR_AD not set)</b></dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-27.html">Ex.4</a></dd></dt>
+
+<dt><dd>Description: &nbsp; Earth's moving vernal equinox at
+perihelion (degrees: 0. to 360.0).&nbsp; </dd></dt>
+<p>
+
+<p>
+<dt><b><tt>OBLIQ</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Real</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required (if IYEAR_AD not set)</b></dd></dt>
+
+<dt><dd>Example(s): &nbsp; <a href="UG-27.html">Ex.4</a></dd></dt>
+
+<dt><dd>Description: &nbsp; Earth's orbital&nbsp; angle of
+obliquity&nbsp; <br>(degrees: -90. to +90., typically 22. to 26.).
+</dd></dt>
+<p>
+
+</dl>
+<hr>
+
+<p>
+The set of <tt>CLMEXP</tt> namelist variables that must be specified
+depends on whether or not a CLM2.0 surface dataset is available at the
+desired model resolution. If such a dataset exists, then the minimum
+set <tt>CLMEXP</tt> of namelist variables that must be specified are
+<ul>
+<li><tt>FPFTCON</tt></li> Specifying the filepath to the plant function types dataset.
+<li><tt>FSURDAT</tt></li> Specifying the filepath to the CLM surface dataset.
+</ul>
+<br>
+If a CLM surface dataset is to be created at run time, then the
+following CLM namelist variables must be specified: 
+<ul>
+<li><tt>FPFTCON</tt></li> Specifying the filepath to the plant function types dataset.
+<li><tt>MKSRF_FVEGTYP</tt></li> Specifying the file to the high resolution vegetation type dataset.
+<li><tt>MKSRF_FSOITEX</tt></li> Specifying the file to the high resolution soil texture dataset.
+<li><tt>MKSRF_FSOICOL</tt></li> Specifying the file to the high resolution soil color dataset.
+<li><tt>MKSRF_FLANWAT</tt></li> Specifying the file to the high resolution lake water dataset.
+<li><tt>MKSRF_FURBAN</tt></li> Specifying the file to the high resolution urban area dataset.
+<li><tt>MKSRF_FGLACIER</tt></li> Specifying the file to the high resolution glacier dataset.
+<li><tt>MKSRF_FLAI</tt></li> Specifying the file to the high resolution leaf area index dataset.
+</ul>
+
+The above datasets define the time invariant surface information, but do not
+provide initial condition information for the land model. Initial conditions
+are specified with the namelist variable "FINIDAT". When initial conditions
+are given, the surface dataset, and plant function types still need to be
+specified.
+<ul>
+<li><tt>FINIDAT</tt></li> Specifying the filepath to initial condition dataset.
+</ul>
+<b>NOTE: When the user provides FSURDAT or FINIDAT datasets to the model the surface land mask
+and orography MUST agree with the land mask and orography of the atmospheric model initial
+conditions dataset (ncdata).</b> Furthermore, the land informaton must agree between the
+FINIDAT and FSURDAT datasets as well. For more informaton on CLM namelist options see
+the CLM2
+Documentation at 
+<p>
+<a href="http://www.ccsm.ucar.edu/models/ccsm2.0/clm/">http://www.ccsm.ucar.edu/models/ccsm2.0/clm/</a>.
+<p>
+Note, that several namelist items are only used when running CLM offline, or coupled.
+Below we only document the variables needed when running CLM as part of CAM.
+
+<p><a NAME="TABLE2_5"></a>
+<p><b>Table 2.5: CLMEXP namelist Input Variables</b>
+<hr>
+
+<dl>
+
+<p>
+<dt> <b><tt>FINIDAT</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 </tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: Initial dataset of the land surface model state (initial
+temperatures, soil water content etcetera). If this dataset is not provided
+the model will use reasonable values to start from. Note, that some features of
+the land-surface model take several simulation years to "spin-up" before they
+reach equilibrium.
+</dd></dt>
+
+<p>
+<dt> <b><tt>FPTFTCON</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 </tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt>,&nbsp; <b>Setting is Required</b></dd></dt>
+
+<dt><dd>Description: Dataset of plant-function types.
+</dd></dt>
+
+<p>
+<dt> <b><tt>FSURDAT</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 </tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: Time invariant surface dataset for this resolution.
+Has basic description of land surface vegetation types, fractions, soil colors,
+soil texture etcetera. If this dataset is not provided on an initial run the
+high resolution datasets MKSRF_FVEGTYP, MKSRF_FSOITEX, MKSRF_FSOICOL, MKSRF_FLANWAT,
+MKSRF_FURBAN, MKSRF_FGLACIER, and MKSRF_FLAI will be used to create the surface
+dataset. On a continuation run (branch or restart) this dataset MUST be provided.
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FVEGTYP</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Vegetation Type dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FSOITEX</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Soil Texture dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FSOICOL</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Soil Color dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FLANWAT</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Land water (lake and river) dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FURBANP</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Urban Area dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FGLACIER</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Glacier dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+<p>
+<dt> <b><tt>MKSRF_FLAI</tt></b> </dt>
+
+<dt><dd>Type: &nbsp; <tt>Char*256 (Required if FSURDAT not defined)</tt></dd></dt> 
+
+<dt><dd>Default: &nbsp; <tt>None</tt></dd></dt>
+
+<dt><dd>Description: High resolution Leaf Area Index (LAI) dataset needed
+to determine the time-invariant surface dataset (FSURDAT).
+</dd></dt>
+
+
+</dl>
+<hr>
+
+<p>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-20a.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-19.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.93.2.28 $ $Date: 2003/09/22 17:44:14 $ $Author: hender $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

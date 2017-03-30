@@ -1,0 +1,51 @@
+A production version of CAM can be built by entering the following commands
+from the command line:
+
+% $CAM_ROOT/models/atm/cam/bld/configure
+% make
+
+This assumes:
+
+1) The shell variable CAM_ROOT has been set to the root directory of the CAM
+   distribution.  The root directory is the top level directory that is created
+   when the distribution is untarred.  It contains the subdirectories
+   models and scripts.
+2) make is a GNU Make (check by issuing "make -v").
+
+A namelist that will run CAM for a day is produced by issuing the command:
+
+% setenv CSMDATA top_level_data_dir
+% $CAM_ROOT/models/atm/cam/bld/build-namelist
+
+This assumes that the environment variable CSMDATA has been set to the top
+level directory where the CAM data distribution has been untarred.  The top
+level directory contains the subdirectories atm and lnd.
+
+To run CAM interactively for a day issue the command:
+
+% ./cam < namelist
+
+The configure and build-namelist scripts are fully documented in the CAM
+User's Guide.
+
+
+Example self-contained run scripts are provided for the three architectures
+available at NCAR on which CAM is known to run.  These are IBM SP, SGI
+Origin, and PC running Linux.  On a PC, either pgf90 (Portland Group) or lf95
+(Lahey) compilers may be used.  The scripts are run-ibm.csh, run-pc.csh, and 
+run-sgi.csh.
+
+Each script is set up to run the production configuration (T42L26 with
+Eulerian dynamics).  Minimal changes to the scripts should be necessary if they
+are run with this configuration on most machines at NCAR.  In order to run
+on machines at other locations, issues such as the location of the netcdf
+library, differences in the queueing system, and interface to a data
+archival device may need to be addressed.  Changing the model resolution or
+underlying dynamical core is easily accomplished by supplying appropriate
+arguments to the configure utility.
+
+Optimal execution speed of CAM is obtained on an IBM SP with a multitasking
+strategy that is hybrid OpenMP/MPI.  On an SGI Origin, pure OpenMP yields the
+best speed.
+
+

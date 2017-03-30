@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<!--
+
+       DefaultCLMEXPNamelist.xml                        Jan/2002
+
+       Values to use by default for creation of CLM model namelists.
+       The element names are the same as the corresponding namelist
+       variables.  Values that depend on the model configuration use
+       attributes to express the dependency.  The recognized attributes
+       are: DYNAMICS, RESOLUTION, PLEV, and PHYSICS.
+
+       $Id: DefaultCLMEXPNamelist.xml,v 1.1.6.12 2003/12/22 21:10:43 jmccaa Exp $
+-->
+<clmexp>
+
+<!-- Root directory of initial and boundary datasets from CAM distribution -->
+<csmdata>/fs/cgd/csm/inputdata</csmdata>
+
+<!-- The default filenames are given relative to the root directory
+     for the CLM2 data in the CAM distribution, i.e.,
+     {csmdata}/lnd/clm2  where {csmdata} is the content of the
+     csmdata element.
+-->
+
+<!-- Plant function types (relative to {csmdata}/lnd/clm2) -->
+<fpftcon>pftdata/pft-physiology</fpftcon>
+
+<!-- Initial condition datasets (relative to {csmdata}/lnd/clm2) -->
+<finidat                RESOLUTION="64x128">inidata_2.1/cam/clmi_0000-09-01_64x128_T42_USGS_c030609.nc</finidat>
+
+<!-- Surface datasets (relative to {csmdata}/lnd/clm2) -->
+<fsurdat                RESOLUTION="128x256">srfdata/cam/clms_128x256_c031031.nc</fsurdat>
+<fsurdat                RESOLUTION="64x128" >srfdata/cam/clms_64x128_USGS_c030605.nc</fsurdat>
+<fsurdat                RESOLUTION="32x64"  >srfdata/cam/clms_32x64_c030919.nc</fsurdat>
+<fsurdat DYNAMICS="fv"  RESOLUTION="4x5"    >srfdata/cam/clms_4x5_c030919.nc</fsurdat>
+<fsurdat DYNAMICS="fv"  RESOLUTION="2x2.5"  >srfdata/cam/clms_2x2.5_c031104.nc</fsurdat>
+
+<!-- Datasets needed to create surface datasets (relative to {csmdata}/lnd/clm2) -->
+<mksrf_fvegtyp>rawdata/mksrf_pft.nc</mksrf_fvegtyp>
+<mksrf_fsoitex>rawdata/mksrf_soitex.10level.nc</mksrf_fsoitex>
+<mksrf_fsoicol>rawdata/mksrf_soicol_clm2.nc</mksrf_fsoicol>
+<mksrf_flanwat>rawdata/mksrf_lanwat.nc</mksrf_flanwat>
+<mksrf_furban>rawdata/mksrf_urban.nc</mksrf_furban>
+<mksrf_fglacier>rawdata/mksrf_glacier.nc</mksrf_fglacier>
+<mksrf_flai>rawdata/mksrf_lai.nc</mksrf_flai>
+
+</clmexp>

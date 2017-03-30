@@ -1,0 +1,3157 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-45.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-45.html,v 1.79.2.24 2003/01/03 22:34:46 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.5 Model Output Datasets</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-70.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-33.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+
+</a><h2>2.5 Model Output Datasets</h2>
+
+CAM2.0.2 produces a series of NetCDF-format history files containing
+atmospheric gridpoint data generated during the course of a run. It
+also produces a series of binary restart files necessary to continue a
+run once it has terminated successfully. The format of both of
+these types of datasets are described below.  <br>&nbsp;
+
+<a NAME="HISTORYFILES"></a><h3>2.5.1 Model History Files</h3>
+
+History files contain model data values written at specified times during
+a run. The user can specify the frequency at which the data is written.
+Options are also available to record averaged, instantaneous, maximum,
+or minimum values on a field-by-field basis.&nbsp; If the user wishes to
+see a field written at additional time frequencies (e.g. daily, hourly),
+additional history files must be declared.
+
+<p>
+History files may be visualized using various commercial or freely
+available tools..
+<a NAME="MARKER_10_61"></a> Examples include the 
+<a href="http://www.cgd.ucar.edu/csm/cmps/">"CCSM Component Model
+Processing Suite (CMPS)", NCAR Graphics package</a>, FERRET, ncview,
+MATLAB, AVS, IDL, and Yorick. For a list of software tools for
+interacting with NetCDF files view the UNIDATA NetCDF web-site: 
+<a href="http://www.unidata.ucar.edu/packages/NetCDF/software.html">http://www.unidata.ucar.edu/packages/NetCDF/software.html</a>.
+
+<p>
+Aside from the default history file series the user may specify up
+to four additional history file series for a total of up to six 
+history file series. The frequency at which these history file series
+aare written as well as the contents and averaging options are specified
+using the same namelist variables described for modifying the
+first and second history file series.
+<a href="#TABLE2_7">Table 2.7</a> lists the fields that
+can be output on any of the six history files as well as which fields
+are output by default on the first file series. The list of fields output on
+the second file series is given in <a href="#TABLE2_8">Table 2.8</a>.  
+
+<h4><a NAME="SEC2_5_1_1"></a>2.5.1.1 Master Field List</h4> 
+
+<a href="#TABLE2_7">Table 2.7</a> contains a list of fields, referred
+to as the "Master Field List", that can be written to history
+files. 
+
+<p>
+The first column indicates whether the field will automatically be
+included on the first history file series. Fields not on by default may be
+included via the namelist variable <tt>FINCL1</tt> (see 
+<a href="UG-29.html">"Example 6 -- History File Specifications"
+</a>).&nbsp; Conversely, any default fields may be removed using
+namelist variable <tt>FEXCL1</tt>&nbsp; Some fields are active by
+default only for a given model configuration (i.e. only for the CCSM
+coupled model configuration) or when a given namelist setting is
+chosen. The configurations outlined in the first column denote under
+which conditions the given field is active. "CCSM-only" indicates that
+the field is active only when the model is compiled with the CPP
+token, <t>COUP_CSM</tt>, defined.  "FV only" indicates that the
+variable is only used with with finite-volume dynamics.
+
+<p>
+The second column lists the names of the output variables. Some field
+names appearing in the second column contain two upper case letters
+followed by two lower case <tt>x</tt>'s (e.g. <tt>TRxx</tt>,
+<tt>DCxx</tt>, etc.). These fields correspond to passive tracer
+constituents that may be transported. In the history file, the two
+<tt>x</tt>'s will be replaced by the name of the given tracer (i.e. Q,
+CWAT, CH4, N2O, TEST1, TEST2, TEST3, and in the case of advected or
+non-advected tracers ADV or NAD followed by the tracer number).
+
+<p>
+The third column associates the history file field name with its
+mathematical symbol as given in <i>Scientific Description of the NCAR
+Community Atmospheric Model (CAM2)</i> (2002).
+
+<p>
+The fourth column provides a brief description of the field. In the
+column labeled "NL" a "1" indicates a single-level field and an "N"
+indicates a multilevel field (on <tt>plev</tt> vertical levels). The
+default averaging flag is also given here, unless it is a time-average.
+Since, most fields are time-averages by default we only describe the
+ones that are not a time average. The flags available are: Instantaneous (I),
+Average (A), Maximum (X), and Minimum (M). See <a href="SEC_2_5_1_2">Section 2.5.1.2</a>
+for more information on changing the default averaging flag for a given variable.
+
+<p>
+The last column in the table shows the physical units associated with
+each field.
+
+<p>
+A namelist option is available to produce a&nbsp;
+<a NAME="MARKER_10_82"></a>monthly-averaged history file for the first
+file series. For example, by
+setting <tt>NHTFRQ(1)=0</tt>, the fields on the second history file
+will be output over the period beginning from the first timestep of
+the current month up to and including the last timestep of that
+month. Each monthly history file will contain exactly one time slice
+of data, regardless of the value of <tt>MFILT(1)</tt>. Note that
+the option to output monthly datasets is only valid for the first
+file-series. Also note that the type of averaging done is dependent
+on the default average flag for the variable in question.
+
+<p>
+<a NAME="new"></a>Fields with&nbsp;<img
+SRC="/icons/images/new_tiny2.gif" > are new fields that have been
+added since CAM2.0.  
+
+<p><a NAME="TABLE2_7"></a> <p>
+
+<b>Table 2.7: Master Field List</b> 
+
+<ul>The table is divided into the following sections: 
+<a href="#BASIC">basic state variables</a>, 
+<a href="#DERIVED">derived variables</a>, 
+<a href="#TRACER_TEND">water vapor and tracers</a>, 
+<a href="#DIFFUSION">horizontal diffusion</a>, 
+<a href="#PRECIP">precipitation</a>, 
+<a href="#SURFACE">surface variables</a>, 
+<a href="#PBL">planetary boundary layer fields</a>, 
+<a href="#CONV">convection</a>, <a href="#RAD">radiation</a>, 
+<a href="#CLOUD">clouds</a>, and <a href="#TEND">tendencies</a>.</ul>
+
+<table BORDER WIDTH="80%" NOSAVE >
+<tr>
+<td VALIGN=CENTER WIDTH="9%">
+<center><b>Default File?</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="8%">
+<center><b>Field Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="15%">
+<center><b>Symbol</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="45%">
+<center><b>Field Description</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="4%">
+<center><b>NL</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="19%">
+<center><b>Units</b></center>
+</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="BASIC"></a><b>Basic State variables</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Q</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">q</td>
+
+<td VALIGN=CENTER WIDTH="45%">Specific humidity. As with
+other tracers fields with the names DCQ and SFQ will also be created.
+</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">&nbsp;Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ADV##</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">q</td>
+
+<td VALIGN=CENTER WIDTH="45%">User advected tracers, named by their
+constituent number. As with other tracers fields with the names DCADV## and
+SFADV## will also be created.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">&nbsp;Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>NAD##</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">q</td>
+
+<td VALIGN=CENTER WIDTH="45%">User non-advected tracers, named by their
+constituent number. As with other tracers, fields with the names DCNAD## and
+SFNAD## will also be created.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">&nbsp;Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>T</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T</td>
+
+<td VALIGN=CENTER WIDTH="45%">Temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TSICE</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>sea-ice</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Sea-ice surface Temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>U</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">u</td>
+
+<td VALIGN=CENTER WIDTH="45%">Zonal wind component&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>V</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">v</td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional wind component&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s&nbsp;</td>
+</tr>
+
+<tr>
+<td><i><b>yes</b> [FV only]</i></td>
+
+<td><tt>US</tt></td>
+
+<td>u<sub>s</sub></td>
+
+<td>Zonal wind component, staggered grid</td>
+
+<td>N</td>
+
+<td>m/s</td>
+</tr>
+
+<tr>
+<td><i><b>yes</b> [FV only]</i></td>
+
+<td><tt>VS</tt></td>
+
+<td>v<sub>s</sub></td>
+
+<td>Meridional wind component, staggered grid</td>
+
+<td>N</td>
+
+<td>m/s</td>
+</tr>
+
+<tr>
+<td><b><i>no</i></b> <i>[FV only]</i></td>
+
+<td><tt>FU</tt></td>
+
+<td>fu</td>
+
+<td>Zonal wind forcing<br>
+(Output as instantaneous field by default)</td>
+
+<td>N</td>
+
+<td>m/s</td>
+</tr>
+
+<tr>
+<td><i><b>no</b> [FV only]</i></td>
+
+<td><tt>FV</tt></td>
+
+<td>fv</td>
+
+<td>Meridional wind forcing<br>
+(Output as instantaneous field by default)</td>
+
+<td>N</td>
+
+<td>m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">P<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface pressure</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TS1</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>1</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Ice temperature (level 1)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TS2</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>2</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Ice temperature (level 2)&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TS3</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>3</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Ice temperature (level 3)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TS4</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>4</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Ice temperature (level 4)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ETADOT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/ETA_DOT.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical motion on half levels</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">1/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="DERIVED"></a><b>Derived variables</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Q850</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">850 mb specific humidity</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub></td>
+</tr>
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Z700</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">Z (700 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Geo-potential height at 700 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Z300</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">Z (300 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Geo-potential height at 300 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>U850</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">U (850 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Zonal wind at 850 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>U200</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">U (200 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Zonal wind at 200 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>V850</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">V (850 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional wind at 850 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>V200</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">V (200 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional at 200 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>T850</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T (850 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Temperature at 850 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>T300</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T (300 mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Temperature at 300 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TMQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">p</td>
+
+<td VALIGN=CENTER WIDTH="45%">Total precipitable water</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>OMEGA850</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">omega(850mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical velocity at 850 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>OMEGA600</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">omega(600mb)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical velocity at 600 mb pressure surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECTMX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">-</td>
+
+<td VALIGN=CENTER WIDTH="45%">Maximum Total Precipitation (Large scale + convective)<br>
+(Output as maximum field by default)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TSMN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>smin</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Minimum daily surface temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TSMX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>smax</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Maximum daily surface temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFHTMN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>2mmin</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Minimum daily reference height temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFHTMX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">T<sub>2mmax</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Maximum daily reference height temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Z500</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">500 mb geo-potential height</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Z050</tt><img SRC="/icons/images/new_tiny2.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">50 mb geo-potential height</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>v</i>T</td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional heat transport</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K * m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VU</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>v</i>u</td>
+
+<td VALIGN=CENTER WIDTH="45%">Product of meridional and zonal winds</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup>/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VZ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>vz</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional transport of gravitational potential
+energy</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>3</sup>/s<sup>3</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>vq</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional water transport</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>OMEGAT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>omegaT</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Product of vertical updraft and temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa * K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>WSPEED</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Wind-speed (sqrt(U<sup>2</sup> + V<sup>2</sup>)</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup>/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ZZ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>zz</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Square of geo-potential height</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>TT</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Square of temperature</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>RELHUM</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>RH</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative humidity</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>Z3</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><i>z</i></td>
+
+<td VALIGN=CENTER WIDTH="45%">Geo-potential height (above sea level)</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>MQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/MQ.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Water mass</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>yes</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PSL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">P<sub>sl</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Sea level pressure</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>OMEGA</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/OMEGA.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical pressure velocity</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="TRACER_TEND"></a><b>Water Vapor and
+Tracers</b></center><br>
+<center>("xx" replaced by tracer name [i.e. Q, CWAT etcetera])</center>
+</td>
+</tr>
+
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DCxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/DC.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Tracer tendency from precipitation physics</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DTCOND</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/DTCOND.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>T</i> tendency from precipitation physics</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TAxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TA.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Total advection tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VDxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical diffusion tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>HAxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Horizontal advection tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VAxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertical advection tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>O3VMR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">O<sub>3</sub> Volume mixing ratio</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DFxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">SLT fixer tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TExx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Time tendency of tracer</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SFxx</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Tracer surface fluxes (pcnst-1 values)</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/m<sup>2</sup>)/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="DIFFUSION"></a><b>Horizontal Diffusion</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DUH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>u</i> horizontal diffusive heating rate</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DVH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>v</i> horizontal diffusive heating rate</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DTH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/DTH.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>T</i> horizontal diffusion</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="PRECIP"></a><b>Precipitation</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i><b>yes</b></i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>EVAPPCT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Percent of Zhang-MacFarlane precipitation that
+is evaporated.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">percent</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no [CCSM-only]</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECLav</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Average large-scale precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no [CCSM-only]</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECCav&nbsp;</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Average convective precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">P<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Large-scale stable precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">P</td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECCINT</tt>&nbsp;</tt><img SRC="/icons/images/new_tiny2.gif"></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective-scale precipitation (when rate > PRECC_THRESH mm/hr).
+To get intensity (average intensity of precipitation events), divide by PRECCFRQ. </td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">mm/hr</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECLINT</tt>&nbsp;</tt><img SRC="/icons/images/new_tiny2.gif"></td>
+
+<td VALIGN=CENTER WIDTH="15%">P<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Large-scale stable precipitation (when rate > PRECL_THRESH mm/hr).
+To get intensity (average intensity of precipitation events), divide by PRECLFRQ. </td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">mm/hr</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECCFRQ</tt>&nbsp;</tt><img SRC="/icons/images/new_tiny2.gif"></
+td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective-scale precipitation frequency (when > 0.1 mm/hr). Fraction
+of the time that convective precipitation exceeds a rate of 0.1mm/hr over the output interval.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECLFRQ</tt>&nbsp;</tt><img SRC="/icons/images/new_tiny2.gif"></
+td>
+
+<td VALIGN=CENTER WIDTH="15%">P<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Large-scale stable precipitation frquency (when > 0.1 mm/hr). Fraction
+of the time that large-scale precipitation exceeds a rate of 0.1mm/hr over the output interval.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Fraction</td>
+</tr>
+
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECSL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Large-scale stable snowfall</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRECSC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective snowfall</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFDQR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Rain-out (condensation)</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DQP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">R<sub>cs</sub>+R<sub>ls</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>q</i> tendency from rain-out&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>EVAPR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Local evaporation of precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub>/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PRAIN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Rate of conversion of condensate to precipitation</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub>/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="SURFACE"></a><b>Surface variables</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>LANDM</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Land-Ocean transition mask: Ocean (0), Continent (1), transition (0-1)<br> 
+(Output as instantaneous field by default)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">unitless</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PHIS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/PHIS.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface geo-potential<br>
+(Output as instantaneous field by default)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup>/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i><b>yes</b></i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ICEFRAC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Fraction of grid-square covered by sea-ice</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i><b>yes</b></i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>OCNFRAC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Fraction of grid-square covered by ocean</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i><b>yes</b></i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>LANDFRAC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Fraction of grid-square covered by land. Note the
+total of ICEFRAC+LANDFRAC+OCNFRAC must equal 1.0.
+</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SNOWHLND</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">S<sub>n</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Water equivalent snow depth over land</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SNOWHICE</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">S<sub>n</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Water equivalent snow depth over sea-ice</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFHT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface dependent reference height temperature
+(for comparison to observed near-surface air temperature data).</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFHTMN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Minimum reference height temperature over
+the files associated time frequency.<br> 
+(Output as minimum field by default)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFHTMX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Maximum reference height temperature over
+the files associated time frequency.<br> 
+(Output as maximum field by default)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFMNAV</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Daily minimum reference height temperature.
+The output frequency and type of the file determines if it's an average
+or minimum/maximum over another time frequency. If the output file is a
+monthly average this will be the monthly average of the daily minimum temperature.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TREFMXAV</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Daily maximum reference height temperature.
+The output frequency and type of the file determines if it's an average
+or minimum/maximum over another time frequency. If the output file is a
+monthly average this will be the monthly average of the daily minimum temperature.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no [CCSM-only]</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>UBOT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Bottom level eastward wind</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no [CCSM-only]</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VBOT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Bottom level northward wind</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no [CCSM-only]</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>QBOT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Bottom level specific humidity</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SHFLX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/SENS.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface sensible heat flux&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>LHFLX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/LATENT.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface latent heat flux&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>QFLX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/QFLX.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface water flux</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/m<sup>2</sup>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SGH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Standard deviation of orography</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TAUX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TAUX.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Zonal surface stress</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">N/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TAUY</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TAUY.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Meridional surface stress</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">N/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>UTGW</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/UTGW.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Gravity wave drag <i>u</i> tendency&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VTGW</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/VTGW.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Gravity wave drag<i> v</i> tendency&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TAUGWX</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TAUGWX.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Gravity wave drag zonal surface stress</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">N/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TAUGWY</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TAUGWY.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Gravity wave drag meridional surface stress</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">N/m<sup>2</sup></td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="PBL"></a><b>Planetary Boundary Layer</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>PBLH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Height of planetary boundary layer</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>USTAR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">u<sup>*</sup></td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface friction velocity</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CGH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">PBL nonlocal transport, heat</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CGQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">PBL nonlocal transport, humidity</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">1/m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CGS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Counter-gradient coefficient on surface kinematic
+fluxes</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">s/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TPERT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/TPERT.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">PBL plume temperature perturbation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>QPERT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/QPERT.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">PBL plume moisture perturbation</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>KVH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">K<MATH><sub>&amp;theta;</sub></MATH></td>
+
+<td VALIGN=CENTER WIDTH="45%">Diffusivity for heat</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup>/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>KVM</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">K<sub>m</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Diffusivity for momentum</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m<sup>2</sup>/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DUV</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>u</i> vertical diffusion</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DVV</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>v</i> vertical diffusion</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>DTV</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>T</i> vertical diffusion tendency&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="CONV"></a><b>Convection</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ZMDQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Q tendency - Zhang moist convection</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ZMDT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">T tendency - Zhang moist convection</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFDT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/CMFDT.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>T</i> tendency from Hack moist convection</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFDQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/CMFDQ.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>q</i> tendency from Hack moist convection&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFMC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">M<sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Total convective mass flux&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">(Kg/Kg<sub>air</sub>)/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFSL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sub>s-Ll</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective liquid water static energy flux</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CMFLQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sub>q+l</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective total water flux&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="RAD"></a><b>Radiation</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>N</sub>(P<sub>s</sub>)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Net downward solar flux at surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLNS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>s</sub>)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Net upward longwave flux at surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLNT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>T</sub>)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Net upward longwave flux at top of model</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLUT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>T</sub>)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Upward longwave flux at top of model</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSDS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Flux Shortwave Downwelling at Surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNIRTOA</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Near-IR shortwave flux absorbed at TOA</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNRTOAC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Clear-sky near-IR shortwave flux absorbed
+at TOA</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNRTOAQ</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Near-IR Shortwave flux absorbed at TOA >=
+0.7 microns</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Net downward solar flux at top of model</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNTOA</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>N</sub>(P<sub>T</sub>)</td>
+
+<td VALIGN=CENTER WIDTH="45%">Net downward solar flux at top of atmosphere</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLNTC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>T</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Net clearsky upward longwave flux at top
+of model.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNTC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>N</sub>(P<sub>T</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Net clearsky downward solar flux at top of
+model.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNTOAC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>N</sub>(P<sub>TOA</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Net clearsky downward solar flux at top of
+atmosphere.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLNSC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>S</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Net clearsky upward longwave flux at surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FLUTC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>L</sup><sub>N</sub>(P<sub>T</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Upward clearsky longwave flux at top of model</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSDSC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>D</sub>(P<sub>S</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Downwelling clearsky downward solar flux at surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSNSC</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">F<sup>S</sup><sub>N</sub>(P<sub>S</sub>)<sub>clr</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Net clearsky downward solar flux at surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>HR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Heating rate.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SRFRAD</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%"><img SRC="images/SRFRAD.gif" ></td>
+
+<td VALIGN=CENTER WIDTH="45%">Radiative flux absorbed at the surface</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>QRS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">Q<sub>s</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Solar heating rate</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>QRL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">Q<sub>lw</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Longwave heating rate</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SOLIN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">S<sub>I</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Solar insolation&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SOLL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Downward near IR direct solar to surface.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SOLS</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Downward visible direct solar to surface.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SOLLD</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Downward near IR diffuse solar to surface.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="4%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>SOLSD</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Downward visible diffuse solar to surface.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="4%">W/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>REL</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Effective radius</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">microns</td>
+</tr>
+
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="CLOUD"></a><b>Clouds</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CWAT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Grid average condensed water mixing ratio.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">&nbsp;Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLDTOT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sup>T</sup><sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Total cloud cover</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLDLOW</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sup>L</sup><sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Low cloud cover (lower than 700 mb)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLDMED</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sup>M</sup><sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Medium cloud cover (700 to 400 mb)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLDHGH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sup>H</sup><sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">High cloud cover (400 to 50 mb)</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CNVCLD</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sub>cc</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Convective cloud fraction</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>LWSH</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Liquid water scale height</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">m</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLOUD</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">A<sub>c</sub></td>
+
+<td VALIGN=CENTER WIDTH="45%">Cloud fraction</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FICE</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Fraction of cloud which is ice.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ICWMR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">In-cloud condensed water mixing ratio.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ICIMR</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">In-cloud ice-phase mixing ratio.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>GCLDLWP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Grid average condensed water path.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">g/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TGCLDLWP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertically integrated grid average liquid water path.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">g/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TGCLDCWP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertically integrated grid average condensed water path.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">g/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TGCLDIWP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Vertically integrated grid average ice phase path.</td>
+
+<td VALIGN=CENTER WIDTH="4%">1&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">g/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>ICLDLWP</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">In-cloud condensed water path.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="19%">g/m<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></B</I></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CLDST</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Stratus total cloud cover.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></I></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FWAUT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative importance of warm cloud auto conversion</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></I></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSAUT</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative importance of ice auto conversion</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FRACW</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative importance of the collection of
+liquid by rain</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSACW</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative importance of the collection of
+liquid by snow</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>FSACI</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Relative importance of the collection of
+ice by snow.</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">FRACTION</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><b><i>yes</i></b></B</I></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>CME</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Local condensation of cloud water</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">Kg/Kg<sub>air</sub>/s</td>
+</tr>
+
+<tr NOSAVE>
+<td VALIGN=CENTER COLSPAN="6" WIDTH="100%" NOSAVE HALIGN="CENTER">
+<center><a NAME="TEND"></a><b>Tendencies</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>UTEND</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>u</i> tendency</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>VTEND</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>v</i> tendency</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">m/s<sup>2</sup></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>TTEND</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%"><i>T</i> tendency</td>
+
+<td VALIGN=CENTER WIDTH="4%">N</td>
+
+<td VALIGN=CENTER WIDTH="19%">K/s</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="9%"><i>no</i></td>
+
+<td VALIGN=CENTER WIDTH="8%"><tt>LPSTEN</tt></td>
+
+<td VALIGN=CENTER WIDTH="15%">&nbsp;</td>
+
+<td VALIGN=CENTER WIDTH="45%">Surface pressure tendency</td>
+
+<td VALIGN=CENTER WIDTH="4%">1</td>
+
+<td VALIGN=CENTER WIDTH="19%">Pa/s</td>
+</tr>
+</table>
+
+<h4><a NAME="SEC2_5_1_2"></a>2.5.1.2 Changing characteristics of default output fields</h4> 
+
+There are several ways that namelist options can modify the
+characteristics of the default output fields. Output fields can be
+added or deleted from a file, the averaging flag can be changed and
+the output frequency can be varied.  In addition, the number of
+time-samples on a file and the precision of the output data (double or
+single NetCDF) can be changed. To add additional fields to the first
+history file, the user should use the namelist variable <tt>
+<a href="UG-20.html#FINCL1">FINCL1</a></tt>.  <tt>
+<a href="UG-20.html#FEXCL1">FEXCL1</a></tt> can be used to delete fields
+that are on the default list of fields on the first history file series.  The
+averaging flag may also be specified with the FINCL1 option and
+determines how the data is averaged over the output frequency. Values
+recorded for fields on a history file can be represented in one of
+four different ways.&nbsp; Data may be time averaged since the last
+write to the history file, instantaneous, or appear as a
+point-by-point maximum or minimum over the time interval.&nbsp; The
+representation may be specified in the namelist by including a colon
+followed by the single character flag for each averaging type after
+the field name.&nbsp; The characters are as follows: 'A' means
+averaged over the interval, 'I' for instantaneous, 'M' for
+point-by-point minimum, and 'X' for point-by-point maximum.&nbsp; An
+example of this specification would be:
+
+<p>
+<tt>FINCL1 = 'T:I'</tt> 
+
+<p>
+This specifies that temperature is to be recorded as instantaneous
+values on the first history file.  
+
+<p>
+The frequency at which data is written to the history file is
+specified by <tt><a href="UG-20.html#NHTFRQ">NHTFRQ(i)</a></tt>. For
+example, consider the namelist input shown in 
+<a href="UG-28.html#MARKER_10_58">Example 5</a>. Here,
+<tt>NHTFRQ(1)=72</tt>. Every 72 timesteps a time sample of data is
+written to the first history file series, with each field being time
+averaged over the previous 72 timesteps.&nbsp; If <tt>NHTFRQ(1) = 0,
+</tt>then the data for the first history file will be written out on
+monthly boundaries.
+
+<p>
+The number of time samples written to a single history file series,
+is set via namelist variable&nbsp; <tt>
+<a href="UG-20.html#MFILT">MFILT(i)</a></tt>.&nbsp; The packing densities
+of model history files is set with namelist variable variable&nbsp;
+<a NAME="MARKER_2_70"></a><tt>
+<a href="UG-20.html#NDENS">NDENS(i)</a></tt> which can have values of "1"
+or "2".&nbsp;&nbsp; "1" implies output should be written out in 64-bit
+NetCDF format, and "2" writes data out in 32-bit NetCDF format.
+
+<p>
+Refer to <a href="UG-45.html#TABLE2_7">Table 2.7</a> in 
+<a href="UG-20.html#MARKER_9_155">Sec. 2.2&nbsp;</a> for a complete
+description of all history file namelist variables.  <br>&nbsp;
+
+<h4><a NAME="HEAD_b"></a>2.5.1.3 History Files 2 through 6</h4> 
+
+Up to six different types of history files may be written out by the
+model during a model run. The capability to write additional history
+files provides the user with the flexibility to vary the frequency at
+which various history data are written. Additional files may contain
+the same or different fields as compared with the first history
+file.&nbsp; These fields may be written on different timesteps, and
+have different averaging periods. Furthermore, each file may contain a
+different number of time samples.
+
+<p>
+The following table lists the fields that are output by default on the
+second history file series. By default the second history file series produce
+daily output.  This can be changed by modifying the value of the
+namelist variable <a href="UG-20.html#NHTFRQ">NHTFRQ(2)</a>. The table
+lists the output averaging flag as well as the field name. The
+averaging flags are: I for instantaneous, A for average, M for
+minimum, and X for maximum. See 
+<a href="UG-45.html#SEC2_5_1_1">Section 2.5.1.1</a> for more information
+on the averaging flag.
+
+<p><a NAME="TABLE2_8"></a>
+
+<p>
+<b><sup>Table 2.8: Fields output by default on second history file series (default
+frequency is daily)</sup></b>
+<tt>
+<table BORDER WIDTH="80%" NOSAVE >
+<tr>
+<th>Field name</th><th width="80%">Average flag (Average, Instantaneous, Maximum or Minimum)</th>
+</tr>
+<tr>
+<td>FLNT</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>PRECT</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>PSL</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>TREFHT</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>TREFHTMN</td><td width="80%">Minimum</td>
+</tr>
+<tr>
+<td>TREFHTMX</td><td width="80%">Maximum</td>
+</tr>
+<tr>
+<td>TSMN</td><td width="80%">Minimum</td>
+</tr>
+<tr>
+<td>TSMX</td><td width="80%">Maximum</td>
+</tr>
+<tr>
+<td>OMEGA850</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>OMEGA600</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>QFLX</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>TS</td><td width="80%">Average</td>
+</tr>
+<tr>
+<td>TMQ</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>T850</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>T300</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>U850</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>U200</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>V850</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>V200</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>Z700</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>Z500</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+<td>Z300</td><td width="80%">Instantaneous</td>
+</tr>
+<tr>
+</table>
+</tt>
+
+
+
+<p>
+<a NAME="HEAD_3"></a>
+<h4>2.5.1.4 Model generated initial condition dataset files</h4>
+
+During a model simulation, initial condition datasets are generated
+periodically by default. These datasets are simply history
+files containing instantaneous values for only those fields that are
+required to begin an initial run. The naming convention for these
+files (which is different for the other history files) is
+<tt>$CASE.cam2.i.yyyy-mm-dd-sssss.nc,</tt> where <tt>$CASE</tt> is the
+caseid, <tt>yyyy</tt> is the year (note, more than 4 digits will be
+used if needed), <tt>mm</tt> is the month, <tt>dd</tt> is the day and
+<tt>sssss</tt> is the seconds.  The output frequency of the files is
+controlled by namelist variable <tt>
+<a href="UG-20.html#INITHIST">INITHIST</a></tt> and is independent of the
+output frequency of other history files.<a NAME="MARKER_9_88"></a>
+
+<h4>2.5.1.5 Naming the History Files</h4> 
+
+History volumes will be named according to the history filename
+specifier.  The <a href=UG-20.html#HFILENAME_SPEC>history filename
+name specifier</a> is documented in <a href=UG-45.html#TABLE2_7>Table
+2.7</a>. By default if the first history file series contains monthly
+output, history filenames will be of the form
+
+<br><br><b>caseid.cam2.h0.yyyy-mm.nc<br><br></b> 
+
+where caseid, yyyy, and mm correspond to the case-name, current year,
+and current month respectively. For example, if caseid="cambld", and
+current date is September, 1989 the filename becomes
+
+<br><br><b>cambld.cam2.h0.1989-09.nc<br><br></b> 
+
+Non-monthly file-series are named with a full date expression as
+follows:
+
+<br><br> <b>caseid.cam2.h#.yyyy-mm-dd-sssss.nc<br><br></b>
+
+Here, # is the file series number minus one, dd is the current day,
+and sssss is the number of seconds into the current day. For example,
+for the second file-series and a current date of September, 1, 1989,
+0Z the filename becomes:<br><br>
+<b>cambld.cam2.h1.1989-09-01-00000.nc<br><br></b>
+<br>
+
+<A NAME="RESTARTFILES"></A>
+<H3>2.5.2 Restart Datasets</H3>
+
+There are four types of restart datasets generated by the model: 
+master, primary, secondary, and history buffer restart files. Each
+dataset is in binary format and contain grid-point data and other
+information necessary to continue or branch a model run. 
+
+<P>
+Upon restart, a simple ASCII text file (the "restart pointer file") is
+read to obtain the full pathname of the most recently written master
+restart file. Only the name of the master restart file is needed as
+input for a continuation run. The other files needed for restart (such
+as secondary restart files, or history files that need to be opened) are
+also listed in the restart pointer file. The Master restart file itself
+includes the full archive path to the files that actually need to be opened.
+
+<P>
+Master and primary restart files are always written during a model
+run. A secondary restart file is written if
+absorptivity/emissivity is not be calculated on the first
+timestep after restart, and therefore must be saved on a restart
+dataset. For a stand-alone run this occurs if the first history file series
+write frequency, <TT>NHTFRQ(1)</TT>, is not a multiple of the
+absorptivity/emissivity calculation frequency, <TT>IRADAE</TT> (note
+that for a CCSM flux coupled run, only the flux coupler determines
+when the restart files are written). It is advisable to avoid this
+situation if possible, since this dataset is relatively large even for
+the standard T42 model.
+
+<P>
+A history buffer restart file is written in order to retain the
+accumulated values in the history buffers if restart files are to be
+written on a timestep when one or more history file time samples are
+not written. A separate restart dataset is written for each 
+history file. Each history buffer restart file contains the portion of
+the history buffers pertaining to that history file.
+
+<P>
+All restart files have names of the form
+<TT>$CASE.cam2.r.yyyy-mm-dd-sssss,</TT> but with the ".r."  changed to
+the appropriate restart filename. For example, ".r." is for the master
+restart filename, while , ".ra." corresponds to the
+absorptivity/emissivity restart filename, and ".rh0." is the first history
+file series restart filename.  In the root name, <TT>$CASE</TT>
+refers to the caseid, <TT>yyyy</TT> corresponds to the year (note more
+than 4 digits for the year will be used if necessary), <TT>mm</TT> is
+the month, <TT>dd</TT> is the day and <TT>sssss</TT> is the seconds of
+the date <TT>yyyymmdd</TT>.  The following is an example of the restart 
+files written during a simulation.
+<UL>
+<LI>
+<TT>$CASE.cam2.r.1001-01-3600 </TT> - master restart file</LI>
+
+<LI>
+<TT>$CASE.cam2.ra.1001-01-3600 </TT>- absorptivity/emissivity restart file</LI>
+
+<LI>
+<TT>$CASE.cam2.rh0.1001-01-3600</TT> - history buffer restart file for first
+history file</LI>
+
+<LI>
+<TT>$CASE.cam2.rh1.1001-01-3600</TT> - history buffer restart file for second
+history file</LI>
+</UL>
+
+<A NAME="MASS_STORE"></A>
+<H3>2.5.3 Mass Store Archiving</H3>
+
+If history files and restart datasets are to be archived on the NCAR Mass
+Storage System, they will be transferred asynchronously to the MSS as they
+are completed. If namelist variable <TT>MSS_IRT</TT> is zero, history and restart files
+will not be archived.
+Mass Store pathnames for these transfers are 
+generated using the <TT>ARCHIVE_DIR</TT> namelist setting. By default, <TT>ARCHIVE_DIR</TT>
+is set to <B><TT>/$USERNAME/csm/$CASE/atm/hist</TT></B>. As a result history files will be archived in the Mass Store
+ directory&nbsp;
+<A NAME="MARKER_10_126"></A>
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B><TT>/$USERNAME/csm/$CASE/atm/hist</TT></B><B><TT></TT></B>
+<P>Restart files will be archived in the Mass Store directory
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B><TT>/$USERNAME/csm/$CASE/atm/rest</TT></B>.
+<P>And finally initial files will be archived in the Mass Store directory
+<P>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <B><TT>/$USERNAME/csm/$CASE/atm/init</TT></B>.
+<P><TT>$USERNAME</TT> is the upper-case equivalent of the user's login name,
+i.e., the user's root directory on the Mass Store System, and
+<TT>$CASE</TT>
+is the case identifier and is set via the namelist input. It is recommended
+that the user specify a non-blank write password using the namelist variable
+<TT>MSS_WPASS</TT>
+(see <A HREF="UG-45.html#TABLE2_7">Table 2.7 </A>). File passwords are
+the only form of security available on the Mass Storage System. If the
+write password is not set, any other user can overwrite or change the files
+after they have been archived..
+<P>
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-45.html#HISTORYFILES>2.5.1 Model History Files</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-45.html#RESTARTFILES>2.5.2 Restart Datasets</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-45.html#MASS_STORE>2.5.3 Mass Store Archiving</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-70.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-33.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.79.2.24 $ $Date: 2003/01/03 22:34:46 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

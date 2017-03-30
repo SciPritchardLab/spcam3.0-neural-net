@@ -1,0 +1,46 @@
+
+	CAM "unit_testers" directory
+
+	The purpose of this module is to "unit-test" individual components of the CAM
+model. The definition of "unit-tests" that we will use is the definition    
+Steve McConnell uses in "Code Complete" "A unit-test test either a single subroutine 
+or module". There are other types of useful tests that may tests certain "test-only" 
+configurations -- but they are different animals. This directory should be used only
+for "unit-tests" that are designed to test a single module or subroutine. For a unit-test
+to work it may require other pieces, but as much as possible a unit-test should stand
+on it's own.
+
+        Unit tests are a good way to flush out bugs earlier in the development       
+cycle rather than finding problems midway through a long simulation. Maintaining     
+unit-tests allows us to continue using developed tests throughout the life-cycle     
+of a given subroutine or module. It also allows the expertise of the individual      
+who designed the module to go into the unit-tests (so that others can ensure answers 
+are correct without needing a lot of knowledge a-priori). And finally, unit-tests    
+provide a good way to understand how a given module should be used. The unit-test    
+itself documents clearly how the subroutine or module should be called.              
+
+	This module is designed to go underneath the "test/unit" directory.
+Tests should go under the relevent source directory that applies. Unit-tests for utility
+code (such as csm_share, timing, and pilgrim libraries) should reside under the utility
+in question.
+
+REQUIREMENTS FOR UNIT-TESTS:
+
+1.) Comply with directives given in the CCSM-developers guide
+
+2.) Have documentation on how to use it.                                             
+                                                                                     
+3.) Check error conditions so that an error will print out problems.                 
+                                                                                     
+4.) Prompt for any input in a useful way. (so you don't have to read the            
+	code to figure out you have to enter something).                                     
+                                                                                     
+5.) Have a Makefile associated with it. It may be useful to leverage off the
+	main Makefile so that the compiler options are the same and so that
+	platform dependencies don't have to be maintained twice. Also unit-test
+	should run with compiler debug options (bounds checking etc).
+
+	Erik Kluzek
+
+	Jun/21/2001
+

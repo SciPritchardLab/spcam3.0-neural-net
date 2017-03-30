@@ -1,0 +1,618 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-20a.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-20a.html,v 1.1.2.8 2003/10/22 22:53:06 rosinski Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.3 Model Input Datasets</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-21.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-20.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<h2><a NAME="MARKER_9_41"></a>2.3 Model Input Datasets</h2> 
+
+CAM2.0.2 is a combination of atmosphere, land, ocean and sea-ice
+components. In what follows we discuss the input datasets required by
+each of these components. CSMDATA refers to the root directory where
+the distribution datasets have been untarred by the user.
+
+<h3><a NAME="HEAD_2_3_1"></a>2.3.1 Atmosphere Component Datasets</h3> 
+
+Input datasets needed for the atmospheric component provide initial
+state data, ozone boundary data and water vapor
+absorptivity/emissivity data.  Only the ozone dataset contains
+time-variant input data which is based on a 365 day year with no leap
+years. All initial and boundary datasets are in NetCDF format.
+<p>
+In general, input dataset names follow the convention:
+<p>
+<tt><b>&lt;type&gt;&lt;simulation date&gt;&lt;resolution&gt;&lt;Spectral truncation&gt;
+&lt;Vertical levels&gt;&lt;creation date&gt;</tt></b>
+Where
+<ul>
+<li>Simulation date = The specific date that the given dataset is valid for. In the
+case of initial condition datasets this is typically given in YYYY-MM-DD form. 
+Datasets that are valid over a span of dates typically list the year range.
+<li>Resolution = Number of latitudes by the number of longitudes for the grid being used
+(i.e. 64x128, 32x64 etcetera).
+<li>Spectral truncation = For Spectral dynamical cores (eul or sld) the spectral
+truncation applied to the dataset (T42, T63 etcera). This is only given if the
+dataset in question has had spectral truncation applied to it.
+<li>Vertical levels = Number of vertical levels (L26, L18 etc.)
+<li>Creation date = The date the file was created in cYYMMDD format.
+</ul>
+
+<h4><a NAME="HEAD_2_3_1_1"></a>2.3.1.1 Initial Conditions Dataset</h4> 
+
+The initial conditions, dataset is specified by namelist variable
+<tt>NCDATA</tt>. This dataset contains initial values of the
+prognostic variables
+<tt>U</tt>,&nbsp;<tt>V</tt>,&nbsp;<tt>T</tt>,&nbsp;<tt>Q</tt>,&nbsp;
+<tt>PS</tt>,&nbsp;<tt>TSICE</tt>,&nbsp;<tt>SNOWHICE</tt>&nbsp;
+and <tt>TS1</tt> through <tt>TS4</tt>, the surface geo-potential field
+<tt>PHIS</tt>, the grid-box land fraction <tt>LANDFRAC</tt>, the land
+ocean transition mask <tt>LANDM</tt>, and the standard deviation of
+geo-potential height <tt>SGH</tt>. When running flux-coupled the fields:
+TSICE, SNOWHICE, LANDFRAC and TS1 through TS4 are not included on the dataset.
+<b>Required</b> initial fields are
+outlined in <b> Table 2.6</b>.
+
+<p>
+<a NAME="TABLE2_6"></a><b>Table 2.6: Atmospheric Component Initial Dataset Fields</b>
+
+<table BORDER WIDTH="90%" >
+<tr>
+<td VALIGN=CENTER WIDTH="20%">
+<center><b>History file&nbsp;</b>
+<br><b>Field Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="10%">
+<center><b>Variable Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="70%">
+<center><b>Description</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER COLSPAN="3">
+<center><b>Multi-Level Fields</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>T</tt></td>
+
+<td VALIGN=CENTER><i>T</i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_5"></a>Temperature&nbsp; <tt>(K)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>U</tt></td>
+
+<td VALIGN=CENTER><i>u</i></td>
+
+<td VALIGN=CENTER>Zonal Wind component <tt>(m/sec)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>V</tt></td>
+
+<td VALIGN=CENTER><i>v</i></td>
+
+<td VALIGN=CENTER>Meridional Wind component&nbsp; <tt>(m/sec)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>Q</tt></td>
+
+<td VALIGN=CENTER><i>q</i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_8"></a>Water vapor specific humidity
+<tt>(Kg<sub>H2O</sub>/Kg<sub>air</sub>)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER COLSPAN="3">
+<center><b>Single Level Fields</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>PHIS</tt></td>
+
+<td VALIGN=CENTER><img SRC="images/PHIS.gif" ></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Surface geo-potential <tt>(m<sup>2</sup>/s<sup>2</sup>)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>PS</tt></td>
+
+<td VALIGN=CENTER><i>P<sub>s</sub></i></td>
+
+<td VALIGN=CENTER>Surface pressure&nbsp; <tt>(Pa)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>SGH</tt></td>
+
+<td VALIGN=CENTER>SGH</td>
+
+<td VALIGN=CENTER>Standard deviation of geo-potential height&nbsp; <tt>(m)</tt></td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>LANDM</tt></td>
+
+<td VALIGN=CENTER>landm</td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_11"></a>Land Ocean transition mask:
+<br>= 0&nbsp;&nbsp; ocean&nbsp;
+<br>= 1&nbsp;&nbsp; continent&nbsp;
+<br>= 0-1 transition</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TS</tt></td>
+
+<td VALIGN=CENTER><i>T<sub>s</sub></i></td>
+
+<td VALIGN=CENTER>Surface temperature.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TSICE</tt></td>
+
+<td VALIGN=CENTER><i>T<sub>ice</sub></i></td>
+
+<td VALIGN=CENTER>CSIM sea-ice model snow/ice surface temperature (not stored on
+CCSM flux-coupled simulations).</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>SNOWHICE</tt></td>
+
+<td VALIGN=CENTER>&nbsp;</td>
+
+<td VALIGN=CENTER>Snow depth over ice</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>LANDFRAC</tt></td>
+
+<td VALIGN=CENTER>&nbsp;</td>
+
+<td VALIGN=CENTER>Land fraction</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TS1,TS2,TS3,TS4</tt></td>
+
+<td VALIGN=CENTER><i>T<sub>s</sub></i></td>
+
+<td VALIGN=CENTER>Four CSIM sea-ice <a NAME="MARKER_2_12"></a>subsurface temperature
+levels (not stored on CCSM flux-coupled simulations) <tt>(K)&nbsp;</tt>
+</td>
+</tr>
+</table>
+
+<p>
+
+At times it may be desirable to start the model from a more exact state of the
+atmosphere, with some of the fast processes (spin-up time < 1 day) also represented
+on the initial conditions file.  <b> Table 2.6a</b> lists <b>optional</b> fields which the
+model will read if they exist on the file.  Fields which don't exist will be set
+to arbitrary values as indicated in the table:
+
+<p>
+<a NAME="TABLE2_6a"></a><b>Table 2.6a: Optional Atmospheric component
+initial dataset fields (representing "fast" processes)</b>
+
+<table BORDER WIDTH="90%" >
+<tr>
+<td VALIGN=CENTER WIDTH="20%">
+<center><b>History file&nbsp;</b>
+<br><b>Field Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="10%">
+<center><b>Variable Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="70%">
+<center><b>Description</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER COLSPAN="3">
+<center><b>Multi-Level Fields</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>CLDLIQ</tt></td>
+
+<td VALIGN=CENTER><i>q(:,:,,ixcldliq,:)</i></td>
+
+<td VALIGN=CENTER>Cloud liquid water mass mixing ratio
+<tt>(Kg<sub>liq</sub>/Kg<sub>air</sub>)</tt>;
+ &nbsp;&nbsp;&nbsp; set to 0. if <tt><a href="UG-20.html#READTRACE">READTRACE</a>=.false. </tt>
+ or field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>CLDICE</tt></td>
+
+<td VALIGN=CENTER><i>q(:,:,,ixcldice,:)</i></td>
+
+<td VALIGN=CENTER>Cloud ice mass mixing ratio
+<tt>(Kg<sub>ice</sub>/Kg<sub>air</sub>)</tt>;
+ &nbsp;&nbsp;&nbsp; set to 0. if <tt><a href="UG-20.html#READTRACE">READTRACE</a>=.false. </tt>
+ or field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>CLOUD</tt></td>
+
+<td VALIGN=CENTER> cld</td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Cloud fraction ;
+ &nbsp;&nbsp;&nbsp; set to 0. if  field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>QCWAT</tt></td>
+
+<td VALIGN=CENTER><i> q<sub>cwat</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Specific humidity associated with cloud water routines ;
+<tt>(Kg<sub>H2O</sub>/Kg<sub>air</sub>)</tt>; &nbsp;&nbsp;&nbsp; set to Q if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TCWAT</tt></td>
+
+<td VALIGN=CENTER><i> T<sub>cwat</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Temperature associated with cloud water routines ;
+<tt>(K)</tt>; &nbsp;&nbsp;&nbsp; set to T if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>LCWAT</tt></td>
+
+<td VALIGN=CENTER> lcwat</td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Total cloud water amount
+ (liquid + ice) associated with cloud water routines ;
+<tt>(Kg<sub>cwat</sub>/Kg<sub>air</sub>)</tt>; &nbsp;&nbsp;&nbsp; set to <tt> "CLDLIQ+CLDICE"</tt>
+ if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER COLSPAN="3">
+<center><b>Single Level Fields</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>PBLH</tt></td>
+
+<td VALIGN=CENTER> pblht</td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>PBL height <tt>(m)</tt>;
+ &nbsp;&nbsp;&nbsp; set to 0. if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TPERT</tt></td>
+
+<td VALIGN=CENTER><i> T<sub>pert</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Perturbation temperature (eddies in PBL) <tt>(K)</tt>;
+ &nbsp;&nbsp;&nbsp; set to 0. if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>QPERT</tt></td>
+
+<td VALIGN=CENTER><i> q<sub>pert</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Perturbation specific humidity (eddies in PBL) <tt>(KG<sub>H2O</sub>/KG<sub>air</sub>)</tt>;
+ &nbsp;&nbsp;&nbsp; set to 0. if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TSICERAD</tt></td>
+
+<td VALIGN=CENTER><i> T<sub>ice_rad</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Radiatively equivalent Surface T over seaice <tt>(K)</tt>;
+ &nbsp;&nbsp;&nbsp; set to <tt>TSICE</tt> if field not on file</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER><tt>TBOT</tt></td>
+
+<td VALIGN=CENTER><i> T<sub>bot</sub></i></td>
+
+<td VALIGN=CENTER><a NAME="MARKER_2_9"></a>Lowest model level temperature <tt>(K)</tt>;
+ &nbsp;&nbsp;&nbsp; set to <tt><i>T(:,plev,:)</i></tt> if field not on file</td>
+</tr>
+
+
+</table>
+
+<p>
+By default, the model periodically
+writes an instantaneous initial conditions file containing all the fields in
+<b>Table 2.6</b> and <b>Table 2.6a</b> for possible use as initial datasets in other runs.
+The frequency with which these datasets are written is controlled by the namelist
+variable  <tt><a href="UG-20.html#INITHIST">INITHIST</a></tt>.
+
+<p>
+
+Finite-volume dynamics uses the same set of prognostic variables as
+shown above, except that U and V are on a staggered grid and are
+identified with names US and VS.&nbsp; When running with finite-volume
+dynamics, the initial dataset must contain US and VS; U and V are
+ignored.
+
+<p>
+All fields are instantaneous values.&nbsp; In addition to the
+fields listed above, the initial dataset contains information on the
+model date, the dimensionality of the fields,
+the spectral truncation, and the latitudes, longitudes, and vertical
+levels of the data.
+
+<p>
+A T42 (64 latitudes x 128 longitudes grid resolution) 26-level initial
+dataset is provided with the CAM2.0.2 distribution:
+<p>
+<b><tt>CSMDATA/atm/cam2/inic/gaus/cami_0000-09-01_64x128_T42_L26_c020514.nc</b></tt>.
+<p>
+
+Other initial datasets at different model resolutions can also be
+found in the directories
+<p>
+<b><tt>CSMDATA/atm/cam2/inic/gaus</b></tt> 
+<p>
+and
+<p>
+<b><tt>CSMDATA/atm/cam2/inic/fv</b></tt> 
+<p>
+
+
+<h4><a NAME="HEAD_2_3_1_2"></a>2.3.1.2 Ozone Dataset</h4>
+
+The ozone boundary dataset contains ozone volume mixing ratios which
+are constant for a given latitude.  This dataset is defined on a
+pressure grid (unlike the hybrid grid of the model). These values are
+interpolated to the model vertical levels at each model grid
+point. The ozone dataset is in NetCDF format and contains the fields
+<tt>PS </tt>and <tt>OZONE</tt>. <tt>PS </tt> is a constant 1000 mb
+pressure field needed for interpolation.&nbsp; The ozone dataset is
+specified by namelist variable <tt>BNDTVO</tt>. Unlike the initial
+conditions file, CAM is capable of interpolating the ozone dataset to
+any vertical and or horizontal resolution so the user need not specify
+new ozone datasets when changing model resolution.&nbsp; The default
+ozone dataset provided with the distribution is
+<p>
+<b><tt>CSMDATA/atm/cam2/ozone/pcmdio3.r8.64x1_L60_clim_c970515.nc</b></tt>.
+<p>
+
+<h4><a NAME="HEAD_2_3_1_3"></a>2.3.1.3 Water vapor absorptivity/emissivity dataset</h4> 
+
+This is a lookup table for water vapor absorption. It is specified by
+setting the namelist variable, <tt>ABSEMS_DATA</tt>.  The default
+dataset provided with the dataset distribution can be found in
+<p>
+<b><tt>CSMDATA/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc</b></tt>.
+<p>
+
+<h4><a NAME="HEAD_2_3_1_4"></a>2.3.1.4 Aerosol Mass dataset</h4>
+
+[Science description if any goes here].  As of CAM2.0.2.dev40, CAM requires
+the input aerosol dataset to be resolution-dependent.  Memory and startup CPU
+overheads proved to be a bottleneck in the original implementation.  Now
+horizontal interpolation to the target CAM grid and vertical integrals are
+done offline.  Code and README describing the procedure are in subdirectory
+cam/tools/interpaerosols of the CAM distribution.
+<p>
+<b><tt>CSMDATA/atm/cam2/rad/abs_ems_factors_fastvx.052001.nc</b></tt>.
+<p>
+
+<h3><a NAME="HEAD_2_3_2"></a>2.3.2 Ocean Component Datasets</h3>
+
+The ocean component is a data ocean model which reads in input sea
+surface temperature (SST) data. Running the data ocean component
+requires a time-variant SST dataset. The SST dataset <b> must be at
+the model resolution</b> and is specified by the namelist variable
+<tt>BNDTVS</tt>.
+
+<p>
+The standard SST dataset is a climatological dataset containing 12
+monthly time samples. The model can also read multi-year SST
+datasets.&nbsp; If a multi-year SST dataset is used, the namelist
+variable, <tt>SST_CYC</tt> must be set to <tt>.false.</tt> (it's
+default value is <tt>.true.</tt>).
+
+<p>
+An SST dataset on a (64 X 128) Gaussian grid can be found in
+<p>
+<b><tt>CSMDATA/atm/cam2/sst/sst_HadOIBl_bc_64x128_clim_c020411.nc</b></tt>.
+<p>
+Other SST datasets, at different model resolutions, can also be found
+in this directory.
+
+<h3><a NAME="HEAD_2_3_3"></a>2.3.3 Sea-Ice Component Datasets</h3>
+
+The sea-ice component in CAM2.0.2 is a simplified version of the CCSM
+CSIM4 code. This component requires ice coverage data. The ice
+coverage data is contained in the same file as the SST data required
+by the ocean component. For the standard configuration, ice-coverage
+data is found in
+<p>
+<b><tt>CSMDATA/atm/cam2/sst/sst_HadOIBl_bc_64x128_clim_c020411.nc</b></tt>.
+<p>
+   
+<h3><a NAME="HEAD_2_3_4"></a>2.3.4 Land Component Datasets</h3>
+ 
+For a full discussion of CLM2.1 input datasets see the CLM2.1 User's
+Guide at <br>
+<a href="http://www.cgd.ucar.edu/tss/clm/distribution">http://www.cgd.ucar.edu/tss/clm/distribution</a><br>
+CLM2.1 always requires a dataset providing plant functional type
+physiological constants. This dataset is specified via the CLM2.1
+namelist variable <tt>FPFTCON</tt>.
+
+<p>
+A time-invariant CLM surface dataset will be generated at run time
+if the CLM namelist variable <tt>FSURDAT</tt> is set to blank. If
+this is the case, additional settings must be provided for
+<tt>MKSRF_FGLACIER</tt>, <tt>MKSRF_FLAI</tt>, <tt>MKSRF_FLANWAT</tt>,
+<tt>MKSRF_FSOICOL</tt>, <tt>MKSRF_FSOITEX</tt>, <tt>MKSRF_FURBAN</tt>,
+<tt>MKSRF_FVEGTYP</tt>.  If a surface dataset at the model resolution
+already exists, then <tt>FSURDAT</tt> should be set appropriately.
+The default land surface dataset provided with the distribution is 
+<p>
+<b><tt>CSMDATA/lnd/cam/srfdata/cam/clms_64x128_c020514.nc</tt></b>.
+<p>
+Other provided surface datasets at other model resolutions can also be
+found in this directory.
+
+<p>
+CLM2.1 initial conditions will be generated at run time if the CLM2.1
+namelist variable <tt>FINIDAT</tt> is blank (the default setting). 
+It is important to note that due to the differences in data
+structures, CLM2.1 initial datasets are not in the same form as CLM2.0
+initial datasets. The directory models/lnd/clm2/tools/convert_inic contains
+routines needed to perform the conversion of CLM2.0 initial datasets
+to CLM2.1 form. The README file in that directory contains
+necessary information to build and utilize the conversion tool.
+If spun up values exist for a model run, then <tt>FINIDAT</tt> should be
+correspondingly set.  The default initial dataset provided with the
+distribution is: 
+<p>
+<b><tt>CSMDATA/lnd/clm2/inidat_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc</tt></b>.
+<p>
+This initial dataset <b>should only be used</b> in conjunction with
+the default CLM2.1 surface dataset given above.
+
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-20a.html#HEAD_2_3_1>2.3.1 Atmosphere Component Datasets</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-20a.html#HEAD_2_3_1_1>2.3.1.1 Initial Conditions Dataset</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-20a.html#HEAD_2_3_2>2.3.2 Ocean Component Datasets</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-20a.html#HEAD_2_3_3>2.3.3 Sea-Ice Component Datasets</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-20a.html#HEAD_2_3_4>2.3.4 Land Component Datasets</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-21.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-20.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.1.2.8 $ $Date: 2003/10/22 22:53:06 $ $Author: rosinski $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

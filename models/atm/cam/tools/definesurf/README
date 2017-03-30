@@ -1,0 +1,26 @@
+Running gnumake in this directory will create an executable named
+"definesurf".  Its function is to compute required CAM initial dataset
+variables SGH, PHIS, and LANDFRAC from a high-resolution topography dataset,
+and LANDM_COSLAT from a T42 "master", then add or replace the values on an
+existing initial dataset.  SGH is the standard deviation of PHIS used in the
+gravity wave drag scheme.  PHIS is the geopotential height.  LANDFRAC is land
+fraction.  LANDM_COSLAT is a field derived from LANDFRAC which is required by
+the prognostic cloud water parameterization.  There is a cosine(latitude)
+dependence built in to the function.
+
+The high resolution topography dataset used by definesurf is named topo.nc
+and is included as part of the CAM distribution in the datasets tar
+file. topo.nc was derived from the U.S. Navy Global Elevation 10-MIN dataset
+DS754.0 Please refer to the following NCAR website for more information:
+
+http://www.scd.ucar.edu/dss/catalogs/geo.html
+
+The algorithms within this code should be considered experimental.  For
+example, a 1-2-1 smoothing operator (sm121, called from subroutine sghphis)
+is applied twice in succession to the topography variance field regardless of
+horizontal resolution.  The SGH field (sqare root of the variance) is then
+set to zero (in subroutine fmain) over all points which are not land.  Also,
+a spectral filter will be applied to the PHIS field within the CAM at model
+startup if PHIS was defined from the high resolution topography dataset.  The
+model determines this by checking for the presence of netcdf attribute
+"from_hires" on initial dataset variable PHIS.

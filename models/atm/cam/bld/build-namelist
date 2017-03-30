@@ -1,0 +1,281 @@
+#!/usr/bin/env perl
+#=======================================================================
+#
+#  This is a script to build a namelist.
+#
+# Usage:
+#
+# perl build-namelist.pl [options]
+#
+# For help on options do:
+#
+# perl build-namelist.pl -help
+#
+#=======================================================================
+use strict;
+#use warnings;
+#use diagnostics;
+
+use Cwd;
+use Getopt::Long;
+use English;
+
+#-----------------------------------------------------------------------------------------------
+
+my $ProgName;
+($ProgName = $PROGRAM_NAME) =~ s!(.*)/!!; # name of program
+my $ProgDir = $1;                         # name of directory where program lives
+
+my $cfg_cache = "config_cache.xml";       # Default name of configuration cache file
+my $nlfilename = "namelist";              # Default name of output namelist file
+
+sub usage {
+    die <<EOF;
+SYNOPSIS
+     $ProgName [options]
+OPTIONS
+     -cam_cfg "dir"        Directory containing CAM configuration scripts.
+     -case "name"          Case identifier up to 32 characters
+     -config "file"        Read the given config cache file to get the configuration
+                           of the CAM executable.  Default: $cfg_cache.
+     -csmdata "dir"        Head directory location of CCSM input data.
+                           Can also be set by using the CSMDATA environment variable.
+     -h                    Print usage to STDOUT.
+     -i                    Turns on interactive prompting to modify a namelist.
+     -infile "file"        Specify a namelist file to read values from.
+     -namelist "namelist"  Specify namelist settings using FORTRAN namelist syntax, e.g.,
+                              -namelist "&camexp nelapse=-10, trace_gas=.true. /"
+     -o "file"             Filename of output namelist.  Default: $nlfilename
+     -runtype "type"       Type of simulation (initial, restart, or branch)
+     -ncdata_vers "number" Version number of initial condition data file to use (integers >1)
+     -s                    Turns on silent mode - only fatal messages issued.
+     -test                 Enable checking that initial and boundary datasets exist on local filesystem.
+     -v n                  Set verbosity to level n.  1 (default), 2 or 3.
+
+Note: The precedence for setting the values of namelist variables is:
+      1. interactive prompting,
+      2. specific namelist options set on the command-line (-case, -runtype, and ncdata_vers),
+      3. values set using the -namelist option,
+      4. values read from the file specified by -infile,
+      5. hard-coded values from defaults files in the CAM configuration
+         script directory.
+EOF
+}
+
+#-----------------------------------------------------------------------------------------------
+
+my $cwd = getcwd();  # current working directory
+
+# Parse command-line options.
+my %opts = ( config       => $cfg_cache,
+	     help         => 0,
+	     interactive  => 0,
+	     out          => $nlfilename,
+	     silent       => 0,
+	     test         => 0,
+	    );
+
+GetOptions(
+    "cam_cfg=s"                 => \$opts{'cam_cfg'},
+    "case=s"                    => \$opts{'case'},
+    "config=s"                  => \$opts{'config'},
+    "csmdata=s"                 => \$opts{'csmdata'},
+    "h|help"                    => \$opts{'help'},
+    "i|interactive"             => \$opts{'interactive'},
+    "infile=s"                  => \$opts{'infile'},
+    "namelist=s"                => \$opts{'namelist'},
+    "o|out=s"                   => \$opts{'out'},
+    "runtype=s"                 => \$opts{'runtype'},
+    "ncdata_vers=i"             => \$opts{'ncdata_vers'},
+    "s|silent"                  => \$opts{'silent'},
+    "test"                      => \$opts{'test'},
+    "v|verbose=s"               => \$opts{'verbose'},
+)  or usage();
+
+# Give usage message.
+usage() if $opts{'help'};
+
+# Check for unparsed arguments
+if (@ARGV) {
+    print "ERROR: unrecognized arguments: @ARGV\n";
+    usage();
+}
+
+# Define print levels:
+# 0 - only issue fatal error messages
+# 1 - only informs what files are created (default)
+# 2 - echo verbosely
+$opts{'printlev'} = 1;
+if ($opts{'silent'}) { $opts{'printlev'} = 0; }
+if ($opts{'verbose'}>=2) { $opts{'printlev'} = $opts{'verbose'}; }
+
+# End of line
+my $eol = "\n";
+if ($opts{'interactive'}) { $eol = "\n\n"; }
+
+#-----------------------------------------------------------------------------------------------
+# Make sure we can find required perl modules and configuration files.
+my $cfgdir;                         # directory containing CAM configuration scripts
+if (defined $opts{'cam_cfg'}) {
+    $cfgdir = $opts{'cam_cfg'};
+} elsif (defined $ENV{CAM_CFGDIR}) {
+    $cfgdir = "$ENV{CAM_CFGDIR}";
+} elsif (defined $ENV{CAM_ROOT}) {
+    $cfgdir = "$ENV{CAM_ROOT}/models/atm/cam/bld";
+} else {
+    if ($ProgDir) { $cfgdir = $ProgDir; }
+    else { $cfgdir = $cwd; }
+}
+
+my $die_message =
+"** This file is supplied with the CAM source distribution in the\n"          .
+"** directory containing the CAM configuration scripts.  This directory can\n" .
+"** be specified as follows (highest to lowest precedence):\n"                 .
+"** - by the command-line option -cam_cfg\n"                                   .
+"** - by the environment variable CAM_CFGDIR\n"                                .
+"** - by the environment variable CAM_ROOT (the configuration\n"               .
+"**   script directory is CAM_ROOT/models/atm/cam/bld)\n"                      .
+"** The default value is the directory the contains the $ProgName script. \n";
+
+(-f "$cfgdir/CAM_namelist.pm")  or  die <<"EOF";
+** Cannot find perl module \"CAM_namelist.pm\" in directory \"$cfgdir\" **
+$die_message
+EOF
+(-f "$cfgdir/XML/Lite.pm")  or  die <<"EOF";
+** Cannot find perl module \"XML/Lite.pm\" in directory \"$cfgdir\" **
+$die_message
+EOF
+$cfgdir = absolute_path($cfgdir);
+
+if ($opts{'printlev'}>2) {
+  print "Setting CAM configuration script directory to $cfgdir$eol";
+}
+
+#-----------------------------------------------------------------------------------------------
+# Add $cfgdir to the list of paths that Perl searches for modules
+unshift @INC, $cfgdir;
+require XML::Lite;
+require CAM_namelist;
+
+#-----------------------------------------------------------------------------------------------
+# Validate specified option values.
+validate_options("command line", \%opts);
+
+# Command-line option processing:
+
+my $nl = CAM_namelist->new( \%opts );
+
+$nl->set_namelists;    # Define the namelist / read in config cache file
+
+$nl->build;            # Build the model namelist
+
+#-----------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------
+
+
+sub absolute_path {
+#
+# Convert a pathname into an absolute pathname, expanding any . or .. characters.
+# Assumes pathnames refer to a local filesystem.
+# Assumes the directory separator is "/".
+#
+  my $path = shift;
+  my $cwd = getcwd();  # current working directory
+  my $abspath;         # resulting absolute pathname
+
+# Strip off any leading or trailing whitespace.  (This pattern won't match if
+# there's embedded whitespace.
+  $path =~ s!^\s*(\S*)\s*$!$1!;
+
+# Convert relative to absolute path.
+
+  if ($path =~ m!^\.$!) {          # path is "."
+      return $cwd;
+  } elsif ($path =~ m!^\./!) {     # path starts with "./"
+      $path =~ s!^\.!$cwd!;
+  } elsif ($path =~ m!^\.\.$!) {   # path is ".."
+      $path = "$cwd/..";
+  } elsif ($path =~ m!^\.\./!) {   # path starts with "../"
+      $path = "$cwd/$path";
+  } elsif ($path =~ m!^[^/]!) {    # path starts with non-slash character
+      $path = "$cwd/$path";
+  }
+
+  my ($dir, @dirs2);
+  my @dirs = split "/", $path, -1;   # The -1 prevents split from stripping trailing nulls
+                                     # This enables correct processing of the input "/".
+
+  # Remove any "" that are not leading.
+  for (my $i=0; $i<=$#dirs; ++$i) {
+      if ($i == 0 or $dirs[$i] ne "") {
+	  push @dirs2, $dirs[$i];
+      }
+  }
+  @dirs = ();
+
+  # Remove any "."
+  foreach $dir (@dirs2) {
+      unless ($dir eq ".") {
+	  push @dirs, $dir;
+      }
+  }
+  @dirs2 = ();
+
+  # Remove the "subdir/.." parts.
+  foreach $dir (@dirs) {
+    if ( $dir !~ /\.\./ ) {
+        push @dirs2, $dir;
+    } else {
+        pop @dirs2;   # remove previous dir when current dir is ..
+    }
+  }
+  if ($#dirs2 == 0 and $dirs2[0] eq "") { return "/"; }
+  $abspath = join '/', @dirs2;
+  return( $abspath );
+}
+
+#-------------------------------------------------------------------------------
+
+sub valid_option {
+
+    my ($val, @expect) = @_;
+    my ($expect);
+
+    $val =~ s/^\s+//;
+    $val =~ s/\s+$//;
+    foreach $expect (@expect) {
+	if ($val =~ /^$expect$/i) { return $expect; }
+    }
+    return undef;
+}
+
+#-------------------------------------------------------------------------------
+
+sub validate_options {
+
+    my ($source, $opts) = @_;
+    my ($opt, $old, @expect);
+    
+    # runtype
+    $opt = 'runtype';
+    @expect = ('initial', 'restart', 'branch');
+    if (defined $opts->{$opt}) {
+	$old = $opts->{$opt};
+	$opts->{$opt} = valid_option($old, @expect)
+	    or die "invalid value of $opt ($old) specified in $source\n".
+                   "expected one of: @expect\n";
+    }
+    # ncdata_vers
+    $opt = 'ncdata_vers';
+    @expect = ('1', '2');
+    if (defined $opts->{$opt}) {
+	$old = $opts->{$opt};
+	$opts->{$opt} = valid_option($old, @expect)
+	    or die "invalid value of $opt ($old) specified in $source\n".
+                   "expected one of: @expect\n";
+    }
+
+}
+
+
+__END__

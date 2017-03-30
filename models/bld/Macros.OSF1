@@ -1,0 +1,54 @@
+#===============================================================================
+# CVS $Id: Macros.OSF1,v 1.7.2.6 2003/06/13 16:08:27 hender Exp $
+# CVS $Source: /fs/cgd/csm/models/CVS.REPOS/shared/bld/Macros.OSF1,v $
+# CVS $Name:  $
+#===============================================================================
+# Makefile macros for "ute," an SGI O2000 system at NCAR
+# Notes:
+#===============================================================================
+
+INCLDIR    := -I/usr/local/include -I/usr/include -I${INCROOT}
+SLIBS      := -L/usr/local/lib    \
+              -lmpi -lnetcdf -lelan -lelan3 -ldxml -llapack -lblas
+ULIBS      := -L$(LIBROOT) -lesmf -lmct -lmpeu -lmph
+CPP        := /usr/bin/cpp
+CPPFLAGS   := -C -P
+CPPDEFS    := -DOSF1 -DMSS
+CC         := cc
+CFLAGS     := -c -DOSF1 -O
+FIXEDFLAGS := -fixed -extend_source
+FREEFLAGS  := -free
+FC         := f90
+#FFLAGS     := -c -O5 -fast -arch ev6 -real_size 64 -fpe2
+#FFLAGS     := -c -O5 -fast -arch ev6 -real_size 64 -fpe2 -convert big_endian
+FFLAGS     := -c -O4 -fast -arch ev6 -real_size 64 -fpe2 -convert big_endian -assume byterecl
+MOD_SUFFIX := mod
+LD         := $(FC)
+LDFLAGS    := -mp
+
+
+ifeq ($(MODEL),clm)
+   CPPDEFS :=  $(CPPDEFS)
+endif
+
+ifeq ($(MODEL),pop)
+   CPPDEFS :=  $(CPPDEFS) -DPOSIX -Dimpvmix -Dcoupled -DNPROC_X=$(NX) -DNPROC_Y=$(NY)
+endif
+
+ifeq ($(MODEL),csim)
+   CPPDEFS :=  $(CPPDEFS) -Dcoupled  -DNPROC_X=$(NX) -DNPROC_Y=$(NY) -D_MPI
+endif
+
+ifeq ($(THREAD),TRUE)
+#  CPPFLAGS := $(CPPFLAGS) -D_OPENMP
+   CPPDEFS  := $(CPPDEFS) -D_OPENMP -DTHREADED_OMP
+   FFLAGS   := $(FFLAGS) -mp
+endif
+
+ifeq ($(MACH),prospect)
+   SLIBS      := $(SLIBS) -lmss
+endif
+
+ifeq ($(MACH),falcon)
+   SLIBS      := -L/usr/local/lib64/r4i4 $(SLIBS) 
+endif

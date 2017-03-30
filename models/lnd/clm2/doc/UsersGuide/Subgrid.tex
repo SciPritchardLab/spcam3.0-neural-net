@@ -1,0 +1,119 @@
+\section{CLM2.1 Data Structures}
+\label{sec_data_structures}
+
+In what follows, we provide a brief summary of the new CLM2.1 data
+structures. Understanding of these data structures is essential before
+the user attempts to modify code and/or add new history output fields
+to the model.
+
+The subgrid hierarchy in CLM2.1 is composed of gridcells, landunits,
+columns and plant functional types (pfts).  Each gridcell can have a
+different number of landunits, each landunit can have a different
+number of columns and each column can have multiple pfts.  This
+results in efficient memory allocation, and allows for the
+implementation of many different types of subgrid representation.
+
+The first subgrid level, the landunit, is intended to capture the
+broadest spatial patterns of subgrid heterogeneity.  These broad
+patterns include the physically distinct surface types that were
+treated as special cases in the previous versions of CLM2.0
+(e.g. glaciers and lakes).  In terms of CLM2.0
+variables, the central distinguishing characteristic of the landunit
+subgrid level is that this is where physical soil properties are
+defined: texture, color, depth, pressure-volume relationships, and
+thermal conductivity.  In CLM2.1, landunits are used to represent the
+special landcover types (e.g. glacier and lakes), with a single
+additional landunit for the gridcell vegetated area.
+
+The second subgrid level, the column, is intended to capture potential
+variability in the soil and snow state variables within a single
+landunit.  The central characteristic of the column subgrid level is
+that this is where the state variables for water and energy in the
+soil and snow are defined, as well as the fluxes of these components
+within the soil and snow.  Regardless of the number and type of pfts
+occupying space on the column, the column physics operates with a
+single set of upper boundary fluxes, as well as a single set of
+transpiration fluxes from multiple soil levels.  These boundary fluxes
+are weighted averages over all pfts.
+
+The third and final subgrid level is referred to as the plant
+functional type (pft), but it also includes the treatment for bare
+ground.  It is intended to capture the biophysical and biogeochemical
+differences between broad categories of plants, in terms of their
+functional characteristics.  All fluxes to and from the surface 
+are defined at the pft level, as are the vegetation state variables
+(e.g. vegetation temperature, canopy water storage, and carbon and
+nitrogen states for the leaf, stem, and roots).
+
+In addition to state and flux variable data structures for conserved
+components at each subgrid level (energy water, carbon, nitrogen,
+etc.), each subgrid level also has a physical state data structure for
+handling quantities that are not involved in conservation checks
+(diagnostic variables).  For example, soil texture is defined through
+physical state variables at the landunit level, the number of snow
+layers and the roughness lengths are defined as physical state
+variables at the column level, and the leaf area index and the
+fraction of canopy that is wet are defined as physical state variables
+at the pft level.
+
+The hierarchical subgrid data structures are implemented in the code
+through the modules {\bf clmtype.F90}, {\bf clm\_mapping.F90} and {\bf
+clmpoint.F90} (all in the {\bf /src/main} subdirectory). The new code
+makes extensive use of the Fortran 90 implementation of the derived
+data type.  This permits the user to define new data types that can
+consist of multiple standard data types (integers, doubles, strings)
+as well as other derived data types.
+
+This subgrid hierarchy is implemented in CLM2.1 as a set of nested
+derived types.  The entire definition is contained in module {\bf
+clmtype.F90}. Extensive use is made of pointers, both for dynamic
+memory allocation and for simplification of the derived type
+referencing within subroutines.  The use of pointers for dynamic
+memory allocation ensures that the number of subgrid elements at each
+level in the hierarchy is flexible and resolved at run time, thereby
+eliminating the need to statically declare arrays of fixed dimensions
+that might end up being sparsely populated.  The use of pointers for
+referencing members of the derived data type within the subroutines
+provides a coherent treatment of the logical relationships between
+variables (e.g., the user cannot inadvertently change a pft-level
+variable within a subroutine that is supposed to operate on the column
+states and fluxes), and a more transparent representation of the core
+algorithms (it is easy to tell when the code is in a column or pft
+loop).
+
+The module, {\bf clmtype.F90}, is organized such that derived types
+which are members of other derived types are defined first (a Fortran
+90 compiler requirement).  In particular, the energy and mass
+conservation data types are defined first, followed by data types
+constituting the pft level, column level, landunit level, gridcell
+level and the model domain level. Finally, the hierarchical
+organization of these types is defined, starting with the model domain
+level, which consists in part of a pointer to an array of gridcells,
+each of which consists in part of a pointer to an array of landunits,
+each of which has a pointer to an array of columns, which each have a
+pointer to an array of pfts.  The last section of {\bf clmtype.F90}
+includes additional data structures that map the hierarchical
+organization to simple 1d vectors at each level for history, restart
+and initial file output.  
+
+The basic functions of subroutine {\bf clm\_map()} in {\bf
+clm\_mapping.F90} are memory allocation for the subgrid hierarchy and
+initialization of areas and weights associated with each subgrid
+component. Use is made of input gridded datasets defining the spatial
+distribution of pfts and other surface types (glacier, lake, etc.).
+This is the primary routine that needs to be modified in order to
+accommodate different subgrid representations using the data
+structures defined in {\bf clmtype.F90}.
+
+Module {\bf clmpoint.F90} creates arrays of one-dimensional real and
+integer pointers for various {\bf clmtype} derived type
+components. These arrays are integral to the CLM2.1 history file
+handler logic as well as the restart and initial file generation. The
+exact usage of these arrays in the model's history file logic is
+discussed in more detail in section \ref{sec_history_file}.
+
+Finally, CLM2.1 includes the module, {\bf pft2columnMod.F90}, which
+contains methods for averaging fluxes and states between levels in the
+hierarchy (currently pft to column in the current implementation).  It
+is intended that similar routines for averaging from column to
+landunit and from landunit to gridcell will be added later.

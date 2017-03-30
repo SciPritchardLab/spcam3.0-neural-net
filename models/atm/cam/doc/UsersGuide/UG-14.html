@@ -1,0 +1,365 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-14.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-14.html,v 1.69.2.13 2003/01/03 22:34:40 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>2.1 How to Configure, Build and Run CAM2.0.2</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-16.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+<BR>
+<DT>
+<A HREF=UG-13.html>2. Using CAM2.0.2</A>
+<DD>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<h2><a NAME="HEAD_A"></a>2.1 How to Configure, Build and Run CAM2.0.2</h2>
+
+<p>
+Overview of building CAM. Building and running CAM takes place in
+the following steps.
+<b>
+<ul>
+<li>Configure
+<li>Build model
+<li>Build namelist
+<li>Execute model
+</ul>
+</b>
+<p>
+<b>Configure</b> includes setting the compile-time parameters such
+as resolution, dynamical core to use (Eulerian Spectral, Semi-Lagrangian Spectral,
+or Finite-Volume), type of parallelism to employ (shared-memory and/or distributed
+memory), number of constituents, and number of vertical levels. This
+step is done most easily by invoking the <tt><b>configure</b></tt>
+script that creates the files necissary for the build step to take place.
+<p>
+<b>Build model</b> includes compiling and linking the executable using the
+GNU-make utility. The configure script creates a copy of the Makefile in
+the directory where the build is to take place. The user then need only change
+to this directory and execute <tt><b>gmake</b></tt>.
+<p>
+<b>Build namelist</b> includes creating the input namelist and ensuring input
+datasets are available.
+<p>
+<b>Execute model</b> includes the actual invokation of the executable. When
+running using distributed memory parallelism this step requires knowledge of
+how your machine invokes MPI executables. When using shared-memory parallelism
+using Open-MP you may also set the number of Open-MP threads.
+<p>
+It is assumed that the user has access to the utilities <b>tar</b>,
+Free Software Foundation <b>gunzip </b>and <b>gmake (GNU make)</b>,
+and <b>Perl5</b>.&nbsp; The scripts written in
+perl need at least Perl5.4 to work.
+
+<h3><a NAME="HEADI_OBTAIN"></a>2.1.1 Obtaining and unpacking the source code and datasets</h3>
+
+<p>
+Download CAM source code and datasets from.
+<p>
+<a href="http://www.ccsm.ucar.edu/models/atm-cam/">http://www.ccsm.ucar.edu/models/atm-cam/
+</a>
+<p>
+The download of the source code is called "cam2.0.2_source.tar.gz" and the
+download of the standard datasets (for running the model using the Eulerian-spectral
+dynamics at T42 resolution with 26 levels) is called "cam2.0.2_standard_datasets.tar.gz".
+For running the model at non-standard resolutions or with the other dynamical cores
+use the dataset called "cam2.0.2_nonstandard_datasets.tar.gz".
+<p>
+To untar the source dataset you execute the following command.
+<p>
+<b>
+<tt>
+gunzip -c cam2.0.2_source.tar.gz | tar xvf -
+</tt>
+</b>
+<p>
+To untar the input datasets you execute the following command.
+<p>
+<b>
+<tt>
+gunzip -c cam2.0.2.standard_datasets.tar.gz | tar xvf -
+</tt>
+</b>
+<p>
+To untar the non-standard input datasets you execute the following command
+in the same directory as the standard datasets. Thus the non-standard and
+standard datasets will reside in the same directory structure.
+<p>
+<b>
+<tt>
+gunzip -c cam2.0.2.standard_datasets.tar.gz | tar xvf -
+</tt>
+</b>
+<p>
+If the user needs to run the model at resolutions that aren't provided
+in the above set of datasets they will need additional datasets. The user
+will need to create an atmospheric initial-condition dataset as well as
+a SST dataset for this resolution. The user could do this by interpolating the
+datasets that are provided. Currently we do not provide tools to do this 
+interpolation. Also when running at a different resolution land model datasets 
+will need to be created from the high resolution datasets. The high resolution
+datasets can be downloaded from.
+<p>
+<a href="http://www.cgd.ucar.edu/tss/clm/distribution">
+http://www.cgd.ucar.edu/tss/clm/distribution</a>
+<p>
+<b>
+<tt>
+gunzip -c CLM2.1_inputdata.tar.gz | tar xvf -
+</tt>
+</b>
+<p>
+Next set the environment variable "CSMDATA" to the location of the input datasets.
+Using "c-shell" this is done as follows. The user may want to set this value in
+their .login or .cshrc so that it will always be available after logging in.
+<p>
+<b>
+<tt>
+setenv CSMDATA `pwd`/inputdata
+</tt>
+</b>
+<li>
+<p>
+The directory structure of the input datasets is as follows:
+<ul>
+<li>inputdata -- Top level directory where CSMDATA points to
+<li>inputdata/atm -- Datasets for atmosphereic models
+<li>inputdata/atm/cam2 -- Datasets specifically for CAM
+<li>inputdata/atm/cam2/inic -- Atmosphereic initial condition datasets
+<li>inputdata/atm/cam2/ozone -- Ozone datasets
+<li>inputdata/atm/cam2/rad -- Radiation datasets
+<li>inputdata/atm/cam2/sst -- Sea Surface temperature datasets
+<li>inputdata/lnd -- Datasets for land models
+<li>inputdata/lnd/clm2 -- Datasets for CLM
+<li>inputdata/lnd/clm2/srfdata/cam -- Time-invariant surface datasets
+<li>inputdata/lnd/clm2/inidata/cam -- Land-model initial condition datasets
+</ul>
+<h3><a NAME="HEADI_OBTAIN"></a>2.1.2 Directory Hierarchy</h3>
+
+<p>Once the source tar-ball is untarred, the directory hierarchy for 
+"<b>CAM2.0.2</b>" is as follows. The directories in <b>bold font</b> are
+the top level directories for the CAM atmospheric model code. The 
+directory hierarchy closely parallels the directory hierarchy for
+CCSM2 and as such seperates code out by model component.
+
+<br>&nbsp;
+<p><a NAME="TABLE2_1"></a><b>Table 2.1:&nbsp; Directory Hierarchy</b>
+<table BORDER CELLSPACING=2 CELLPADDING=4 WIDTH="80%" >
+<tr>
+<td VALIGN=CENTER WIDTH="21%">
+<center><b>Directory name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="79%">
+<center><b>Synopsis</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/atm/cam/bld/</b></td>
+<td VALIGN=CENTER WIDTH="79%">Scripts to build and execute the model</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/atm/cam/src/</b></td>
+<td VALIGN=CENTER WIDTH="79%">Atmosphere model main source code directory</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/advection/slt</td>
+<td VALIGN=CENTER WIDTH="79%">Semi-Lagrangian Transport advection routines 
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/control</td>
+<td VALIGN=CENTER WIDTH="79%">Control code</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/dynamics/eul</td>
+<td VALIGN=CENTER WIDTH="79%">Eulerian dynamics</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/dynamics/fv</td>
+<td VALIGN=CENTER WIDTH="79%">Finite-Volume dynamics</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/dynamics/sld</td>
+<td VALIGN=CENTER WIDTH="79%">Semi-Lagrangian dynamics</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/ocnsice/dom</td>
+<td VALIGN=CENTER WIDTH="79%">Data Ocean Model</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/physics/cam1</td>
+<td VALIGN=CENTER WIDTH="79%">Physics routines (e.g., radiation, convection)</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/src/utils</td>
+<td VALIGN=CENTER WIDTH="79%">CAM specific utilities</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/atm/cam/tools/</b></td>
+<td VALIGN=CENTER WIDTH="79%">Directory of tools (such as history compare routines)</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/atm/cam/tools/cprnc</td>
+<td VALIGN=CENTER WIDTH="79%">History file comparison program. Normally
+used to compare code modifications to a "base-line" code. Prints out summary
+of differences.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/atmlnd_share</b></td>
+<td VALIGN=CENTER WIDTH="79%">Code shared between the land and atmosphere components. &nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/csm_share</b></td>
+<td VALIGN=CENTER WIDTH="79%">Code shared by all the geophysical model
+components of the Community Climate System Model (CCSM)(e.g.
+code for CCSM message passing and orbital calculations)</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/lnd/clm2</b></td>
+<td VALIGN=CENTER WIDTH="79%">Community Land Model (CLM2.1) code</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/ice/csim4</b></td>
+<td VALIGN=CENTER WIDTH="79%">Community Sea-Ice Model (CSIM4) code</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%"><b>models/utils<b></td>
+<td VALIGN=CENTER WIDTH="79%">Independent utility codes</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/utils/esmf</td>
+<td VALIGN=CENTER WIDTH="79%">General purpose Earth System Modeling Framework (ESMF) utilities.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="21%">models/utils/timing</td>
+<td VALIGN=CENTER WIDTH="79%">General purpose timing library.</td>
+</tr>
+
+
+</table>
+
+<p>
+<!End_of_the_page: -- do not edit anything below!!!>
+<HR>
+<CENTER><H2>Sub Sections</H2></CENTER>
+<DL>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-14.html#HEADI_OBTAIN>2.1.1 Obtaining and unpacking the source code and datasets</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-14.html#HEADI_OBTAIN>2.1.2 Directory Hierarchy</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-16.html>2.1.2 Using the Build/Run Scripts in the "bld" Directory</A>
+<DD>
+<BR>
+<DT>
+&nbsp;&nbsp;&nbsp;
+<A HREF=UG-19.html>2.1.3 Running CAM as part of the CCSM coupled model system</A>
+<DD>
+</DL>
+<P>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="UG-16.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-13.html"><IMG SRC="images/up.gif" 
+ALT = "Go to top of this section"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.69.2.13 $ $Date: 2003/01/03 22:34:40 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

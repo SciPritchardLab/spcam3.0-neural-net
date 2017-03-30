@@ -1,0 +1,23 @@
+Description: 		
+(DELETE THIS LINE)	What the changes represent and why they were done.
+(DELETE THIS LINE)	(Remember CVS already logs your login, the date, the exact 
+(DELETE THIS LINE)	differences, and the files changed)
+
+Authorization for changes: (Tony Craig -- yes / no)
+(DELETE THIS LINE)	Since these codes effect potentially all model
+(DELETE THIS LINE)	components, significant changes to these codes
+(DELETE THIS LINE)	should be approved by CSM project leads. Also
+(DELETE THIS LINE)	code should be developed on a branch before being
+(DELETE THIS LINE)	put onto the csm_share trunk. Only CCSM liasons
+(DELETE THIS LINE)	should commit changes to "csm_share".
+
+Merging:	
+(DELETE THIS LINE)	Did you merge (ie. update) with a previous version?
+(DELETE THIS LINE)	(If you did extensive merging between versions or branches.
+(DELETE THIS LINE)	What did you merge between?  What testing did you do on 
+(DELETE THIS LINE)	the merged result?)
+
+Testing done?  	
+(DELETE THIS LINE)	We assume this version will at least compile link and run
+(DELETE THIS LINE)	on at least the IBM (blackforest).
+Description of tests and results:

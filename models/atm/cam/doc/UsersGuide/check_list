@@ -1,0 +1,185 @@
+Original author:	Erik Kluzek
+Creation date:	02/26/1998
+Version: $Id: check_list,v 1.2 1998/03/13 23:52:56 erik Exp $
+Description:
+
+Checklist of items to go over in the documentation for the CCM3.5 release
+This is basically just a list of the table of contents with a few extra items
+thrown in.  People sign up for items and mark when they are checked off.
+
+
+=================================================================================
+
+See the README file for standard practice of file conversion, dealing with CVS
+and the general setup and management of these files.
+
+Sign up for an item by putting your name in the "assign" column.
+After you're finished changing an item and have checked it in, mark the "Chngd"
+(changed) column.  After that point someone else should review it.  Dave and 
+the other scientists will of course review the whole thing, but we should check
+each others work as we go along.  Some of the items in the list only require 
+some review, others require complete reworking including possibly adding and 
+changing sections.  Adding sections is something we should do with group planning
+and effort, to ensure the final document is cohesive and well thought out.
+Also if you realize there are additional items that should be checked go ahead
+and add them to this list.
+
+Names
+
+Erik 	= Erik Kluzek
+jet  	= John Truesdale
+wmson 	= Dave Williamson
+Rosins	= Jim Rosinski
+mverts = Mariana Vertenstein
+paulad = Paula Drager Fisher
+olson	= Jerry Olson
+
+=================================================================================
+
+Item								Assign	Chngd	Reviewd
+_________________________________________________________________________________
+Finalize the CCM3.0 HTML and Word-97 copies		Erik	----	----
+
+(MUST be done before we start our final edits to ensure that the current plan of
+going back and forth between Word and HTML is a good one).
+
+Make sure all links work					Erik	----	----
+Make sure all images appear					Erik	----	----
+Ensure we can convert into and out of Word-97 easily	Erik	----	----
+Get a paper copy that works well				Paulad ----   ----
+Ensure all code fragments/output/input are updated	----	----	----
+Ensure references to machines are updated.		----	----	----
+
+(ie. list of machines we support and antero rather than Shavano etc.)
+
+
+Acknowledgments 						Erik
+Table of Contents						Erik 
+List of Figures						Erik 
+List of Tables						Erik 
+How To Use This Guide					Erik 
+I. Introduction						Erik
+A. Historical Development of the CCM3 			Erik
+B. Overview of Running CCM3.5 				mverts
+C. Overview of the Structure of CCM3.5 			mverts
+D. Summary 							mverts
+II. Using CCM3.5 						rosin
+A. How to Build and Run CCM3.5 				mverts
+1. Interactively Creating and Running CCM3.5 		mverts
+(a) Interactively Creating the Executable 		mverts
+(b) Interactively Running the Executable 			mverts
+2. Creating and Running the Executable in Batch Mode 	mverts
+3. Message Passing Using MPI 				jet
+B. Model Input Variables - Namelist Input 		olson/Erik
+Namelist table order:
+								olson
+								erik
+								mvertens
+								rosin
+								jet
+C. Initialization and Continuation Runs 			mverts
+1. Definitions. 						Olson
+2. Example Runs: Setting the Input Variables 		jet
+(a) Example 1 -- Initial Run, One Day 			jet
+(b) Example 2 -- Initial Run, T21 on a SUN or RS-6000 	jet
+(c) Example 3 -- Restart Run, 30 Days 			jet
+(d) Example 5 -- Branch Run 				jet
+(e) Example 6 -- Initial Run, Add Fields to History File jet 
+(f) Example 7 -- Run with Multiyear SST Dataset 		jet
+(g) Example 8 -- Generate a Monthly-Averaged History File jet
+(h) Example 9 -- Debugging Run 				jet
+D. Model Input Datasets 					jet
+1. Initial Dataset 						jet
+2. Boundary and Prescribed-Value Datasets 		jet
+(a) Time-Variant Sea-Surface Temperature (SST) Datase 	jet
+(b) Time-Variant Ozone, Prescribed-Value Dataset 	rosin
+3. Land Surface Model (LSM) Datasets 			mverts
+(a) FSURDAT: The required time-invariant LSM boundary dataset. mverts
+(b) FINIDAT: The optional LSM initial dataset. 		mverts
+4. Slab Ocean Model (SOM) Datasets 			Erik
+(a) NCDATA: The SOM initial dataset. 			Erik
+(b) TVBDS: The time-varying SOM boundary dataset 	Erik
+E. Model Output Datasets 					Rosin
+1. Model History Files 					rosin
+(a) Primary History File 					rosin
+(b) Auxiliary History Files 				rosin
+(c) Naming the Primary and Auxiliary History Files 	rosin
+2. Restart Datasets 						mverts
+(a) Types of Restart Files 					mverts
+(b) Naming of Restart Files					mverts 
+3. Mass Store Archiving of History and Restart Files. 	jet
+F. Model Printed Output 					rosin
+1. Printout from a CCM3.5 Run 				rosin
+2. Model Error Messages 					jet
+G. Using the Slab Ocean Model (SOM) 			Erik
+H. Getting Help 						erik
+(a) The CCM Web Page 					erik
+(b) The ccm-users e-mail Group 				erik
+III. CCM3.5 Internals 					rosin
+A. Design Philosophy of CCM3.5 				rosin
+B. Model Code Flow 						rosin
+1. Initialization 						rosin
+2. Time Integration 						rosin
+(a) Latitude Scans 						rosin
+(b) Spectral Space Computations 				rosin
+(c) Computational Driving Routines for Each Latitude 	rosin
+C. Data Structures 						rosin
+1. Vertical Coordinate 					rosin
+2. Grid-point Data Structures 				rosin
+(a) Model Buffer 						rosin
+(b) History Buffer 						rosin
+(c) Absorptivity/Emissivity Arrays 			rosin
+(d) Out-of-Core Data Storage: The SSD Work Units 	rosin
+(e) Local Workspace 						rosin
+(f) In-Core Grid-point Arrays 				rosin
+3. Spectral Data Structures 				rosin
+4. Other Common Blocks and Header Files: The Parameteri rosin
+D. CCM3.5 Multitasking Strategy 				rosin
+1. Shared-Memory Multitasking 				rosin
+(a) Shared-Memory Management 				rosin
+2. Distributed Memory Multitasking 			jet
+(a) Distributed Memory Management 				jet
+(b) Distributed Memory I/O 					jet
+E. Details of CCM3.5 Input and Output Datasets 		jet
+1. History Files 						jet
+(a) History File Format 					jet
+(b) History File Header Records 				jet
+(c) Latitude Data Records 					jet
+(d) History Buffer 						jet
+(e) History File Code Flow 					jet
+2. Initial and Boundary Condition Datasets 		jet
+3. Restart Files 						mverts
+(a) Restart File Contents 					mverts
+(b) Restart Code Flow 					mverts
+F. CCM3.5 Disk and Mass Store File Management 		rosin
+1. CCM3.5 Disk File Management on an NCAR Cray 		rosin
+2. Use of the NCAR Mass Storage System 			rosin
+3. Issuing Shell Commands from the Model 			rosin
+IV. Changing the Model 					mverts
+A. Modifying the Code 					mverts
+B. Adding New Variables 					mverts
+C. Adding Constituents to the Model: The Semi-Lagrangi	mverts
+1. Initializing New Constituent Data Fields 		mverts
+2. Surface Fluxes, Sources, and Sinks 			mverts
+3. Adjustment Processes 					mverts
+4. Global Minima 						mverts
+D. Changing Resolution 					rosin
+E. Adding Parameterizations 				rosin
+F. Trouble-Shooting Model Changes 				jet
+1. Resource Allocation Errors 				jet
+2. Coding Errors 						jet
+3. Formulation Errors 					jet
+G. CCM3.5 Coding Standard 					jet
+1. Code Appearance 						jet
+2. Other Fortran Considerations 				jet
+3. Program Routine Names and Variable Names 		jet
+4. Code Structure 						jet
+References 							wmson
+Appendix A: Glossary 					-----
+Appendix B: CCM3.5 Calling Tree 				rosin
+Appendix C: CCM3.5 Printed Output 				rosin
+Index 								-----
+_________________________________________________________________________________
+
+
+End of check-list

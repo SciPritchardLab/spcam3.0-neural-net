@@ -1,0 +1,491 @@
+<!------------------------------------------------------------------->
+<!---								----->
+<!---  cam_doc/UG-121.html					----->
+<!---								----->
+<!---  HTML version of the documentation on the NCAR global	----->
+<!---  atmospheric model CAM2.0.					----->
+<!---								----->
+<!---  Version control information:				----->
+<!---								----->
+<!---  $Id: UG-121.html,v 1.54.2.12 2003/01/03 22:34:39 erik Exp $			----->
+<!---								----->
+<!------------------------------------------------------------------->
+<HTML>
+<HEAD>
+<TITLE>Appendix A: Glossary</TITLE>
+</HEAD>
+<BODY BGCOLOR = "WHITE">
+<A NAME=TOP_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#BOTTOM_OF_PAGE"><IMG SRC="images/bottom_of_page.gif" 
+ALT = "Go to the bottom of this page. See the search engine and sub-section links."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="appendixb.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-120.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<CENTER><H3>Previous Section Headers</H3></CENTER>
+<H4><DL>
+<BR>
+<FONT=+1>
+<DT>
+<A HREF=index.shtml>User's Guide to NCAR CAM2.0</A>
+<DD>
+</FONT>
+<BR>
+</H4></DL>
+<HR>
+<!the navigation buttons and general format are edited>
+<!in the word2html.pl and Web_File.pm Perl5 script.>
+<!Beginning_of_the_page: -- do not edit anything above!!!>
+<p>
+<hr NOSHADE SIZE=3>
+<h1>Appendix A: Glossary</h1>
+
+<hr NOSHADE>
+<br>&nbsp;
+<br>&nbsp;
+<table BORDER CELLSPACING=2 CELLPADDING=4 WIDTH="85%" >
+<tr>
+<td VALIGN=CENTER WIDTH="20%">
+<center><b>Name</b></center>
+</td>
+
+<td VALIGN=CENTER WIDTH="80%">
+<center><b>Synopsis</b></center>
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>branch run</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A type of continuation run of the CAM. A
+branch run starts a new case using the restart files from a previous model
+run. This is used primarily when you wish to exactly reproduce a control
+simulation, but change the output fields.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CAM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Community Atmosphere Model; the latest
+atmosphere model code which can be run as part of the CCSM or as
+a stand-alone atmosphere model for climate prediction.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>case</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A term used to denote a model experiment,
+including one initial run and as many continuation runs as required to
+conclude the experiment. A model case is cataloged using the <tt>CASEID</tt>
+namelist variable. By default the <tt>caseid</tt> is included in
+the output filenames and mass store archive path.
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>cc</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">"C" language compiler.
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CCM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Community Climate Model; the predecessor
+model code of CAM used in making climate predictions.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CCSM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Community Climate System Model. The set of
+geophysical models for atmosphere, land, ocean, and sea-ice to model
+the climate system. CAM is the atmosphere model component for the CCSM.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CPP</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">C preprocessor.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>continuation run</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A type of run that uses a restart file from
+a previous run to initialize the data fields (no initial dataset is read).
+Restart and branch runs are each possible types of a continuation run.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CSEG</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">CCSM Software Engineering Group. The
+group of software developers at NCAR responsible for maintaining and
+developing the CCSM codes.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CLM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">The Community Land Model a land surface model.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CPU</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Central Processing Unit.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>CSIM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Community Sea-Ice Model.</td>
+</tr>
+
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>distributed memory</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Multi-processing on multiple CPU's using
+the SPMD programming model.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>DOM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Data Ocean Model. Ocean component of stand-alone
+CAM that reads in SST information from an input dataset.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>ECMWF</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">European Center for Medium Range Weather
+Forecasting</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>ESMF</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Earth System Modeling Framework</td>
+</tr>
+
+<tr>
+<td><b>FV</b></td>
+
+<td>The Finite-Volume (also referred to as Lin-Rood) dynamical core.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>flux-coupled</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A simulation with the atmosphere model
+where the model is linked to a system of geo-physical models (land, ocean,
+and sea-ice). When run in this manner each seperate component is built 
+as a seperate executable, and each component communicates with each
+other in Multiple Program - Multiple Data (MPMD) mode. See also CCSM.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>GNU</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">GNU's not UNIX. A set of Open-Source freely
+provided utilities for UNIX.
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>gzip</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">GNU decompression utility similar to UNIX
+uncompress. Takes a file and inflates it to it's full size so that it can
+be used. Files are compressed to save disk space and save on network file
+transfer times.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>header file</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A file containing CPP tokens to set the
+particular model resolution and configuration named with a "<tt>.h</tt>" 
+suffix (e.g. <tt>misc.h</tt>).
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>heap</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Memory that is dynamically allocated by the
+system. Unlike stack memory, heap memory can be allocated or de-allocated
+at any point during program execution.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>history file</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">The output NetCDF dataset that the model produces
+to record the model simulation field values with time.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>initial run</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A startup simulation using a
+initial-condition dataset.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>LSM</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">The NCAR Land Surface Model. This model was
+used with the CCM the predecessor to CAM.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>module</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A FORTRAN-90 construct containing data and
+subroutines and functions that operate on that data. This is a somewhat object-oriented
+approach to datastructures.  The data can be specified
+as private to the module or public for access by other subroutines. 
+Outside subroutines can specify the limited set of variables they wish
+to capture. This ability provides a better approach to handling data and
+is the preferred method for dealing with data over COMMON blocks.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>MPI</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Message Passing Interface. A standardized
+library for distributed memory parallel processing.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>MPMD</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Multiple Program Multiple Data. Parallel
+programming model with several distinct executable programs operating on
+different sets of data.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>mpxlf90</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">FORTRAN-90 compiler for IBM AIX with 
+message passing (MPI) libraries included.
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>mpxlf90_r</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Thread-safe FORTRAN-90 compiler for IBM AIX with 
+message passing (MPI) libraries included, and allowing for Open-MP threading.
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>MSS</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">The NCAR Mass Store System.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>multi-tasked</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A program configured to execute on several
+distributed processors simultaneously. See distributed memory.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>NCAR</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">National Center for Atmospheric Research</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>NetCDF</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Network Common Data Format. Self describing,
+platform independent binary data format (created by UNIDATA).</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>OpenMP</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Open specification for
+Multi-Processing. Set of compiler directives for shared-memory
+parallel processing, that is supported by most compiler venders.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>PBL</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Planetary Boundary Layer.
+</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>pcnst</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Number of advected constituents carried in
+the model.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>pgf90</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Portland Group's FORTRAN-90 compiler, 
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>plat</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Number of Gaussian latitudes on the transform
+grid.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>plev</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Number of vertical model levels.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>plon</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Number of longitudes on the transform grid</td>
+</tr>
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>restart run</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A type of continuation run of the CAM. A
+restart run continues a previous run from its point of termination, by
+reading most recent restart</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>single-threaded</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Parallel-processing term. Refers to the
+parts of shared memory processed code that executes on only one processor.&nbsp;</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>shared-memory</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Parallel-processing term. Refers to using
+a machine where multiple CPU's share the same memory.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>SLT</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Semi-Lagrangian Transport.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>SPMD</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Single Program Multiple Data.</td>
+</tr>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>stack</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Memory local to a subroutine or function.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>stand-alone</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Running the model not in flux-coupled
+mode as described above, but as a single-executable with land,
+thermodynamic sea-ice, and data ocean models as subroutines of the
+main executable.</td>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>STDERR</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Standard error. Output stream that error
+messages are sent to. Usually, this is the users terminal.
+</td>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>STDOUT</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">Standard output. Default output stream that 
+messages are sent to. Usually, this is the users terminal.
+</td>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>transform grid</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A grid used to evaluate all nonlinear and
+diabatic forcing terms in physical space.</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>UNIDATA</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">University Atmospheric Data access project funded
+by the National Science Foundation (NSF).</td>
+</tr>
+
+<tr>
+<td VALIGN=CENTER WIDTH="20%"><b>UNIX</b></td>
+
+<td VALIGN=CENTER WIDTH="80%">A modern operating system shared
+and supported by most supercomputers.
+</td>
+</tr>
+</table>
+<br>
+<!End_of_the_page: -- do not edit anything below!!!>
+<A NAME=BOTTOM_OF_PAGE><P>
+<HR>
+&nbsp;<A HREF="#TOP_OF_PAGE"><IMG SRC="images/top_of_page.gif" 
+ALT = "Go to the top of this page. See links to previous section headers."
+ALIGN=BOTTOM></A>
+<BR>
+<A HREF="appendixb.html"><IMG SRC="images/next.gif" 
+ALT = "Go to next page"
+ ALIGN=BOTTOM></A>
+<A HREF="UG-120.html"><IMG SRC="images/prev.gif" 
+ALT = "Go to previous page"
+ ALIGN=BOTTOM></A>
+<A HREF="index.shtml"><IMG SRC="images/top.gif" 
+ALT = "Go to top page"
+ ALIGN=BOTTOM></A>
+<A HREF="table_of_contents.html"><IMG SRC="images/content.gif" 
+ALT = "Go to table of contents"
+ ALIGN=BOTTOM></A>
+<BR>
+<P>
+&nbsp;<A HREF="search.html"><IMG SRC="images/cam.jpg" 
+ALT = "Search for keywords in the CAM2.0 Users Guide"
+ALIGN=BOTTOM>Search page</A>
+
+<P>
+<P>
+Questions on these pages can be sent to...
+<A href="mailto:erik@ucar.edu">erik@ucar.edu</A> .
+<HR>
+<ADDRESS>$Name:  $ $Revision: 1.54.2.12 $ $Date: 2003/01/03 22:34:39 $ $Author: erik $</ADDRESS>
+<HR\>
+</BODY>
+</HTML>

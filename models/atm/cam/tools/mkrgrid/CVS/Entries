@@ -1,0 +1,18 @@
+/Makefile/1.6.8.1/Sat Jun 15 13:50:05 2002//Tcam_dev
+/README/1.2/Tue Nov  6 18:52:18 2001//Tcam_dev
+/constants.f90/1.1.44.1/Sat Jun 15 13:50:06 2002//Tcam_dev
+/control.f90/1.2/Thu May 18 19:35:40 2000//Tcam_dev
+/cubinterp.f90/1.1.44.1/Sat Jun 15 13:50:06 2002//Tcam_dev
+/fmain.f90/1.2/Thu May 18 19:35:41 2000//Tcam_dev
+/fortfft.F/1.1.44.1/Sat Jun 15 13:50:06 2002//Tcam_dev
+/fourier.f90/1.1.44.1/Sat Jun 15 13:50:06 2002//Tcam_dev
+/gridspecs.f90/1.1/Wed May 17 19:21:14 2000//Tcam_dev
+/interp_driver.f90/1.2.44.1/Sat Jun 15 13:50:07 2002//Tcam_dev
+/lininterp.f90/1.1.44.1/Sat Jun 15 13:50:07 2002//Tcam_dev
+/mkrgrid.f90/1.2/Thu May 18 19:35:41 2000//Tcam_dev
+/nl.r1up/1.1/Wed May 17 19:21:16 2000//Tcam_dev
+/rgconvert.f90/1.2.22.1/Sat Jun 15 13:50:07 2002//Tcam_dev
+/shr_kind_mod.f90/1.1.2.1/Sat Jun 15 13:50:08 2002//Tcam_dev
+/timing_stubs.f90/1.2/Thu Sep  6 21:28:11 2001//Tcam_dev
+/wrap_nf.f90/1.1.44.1/Sat Jun 15 13:50:08 2002//Tcam_dev
+D

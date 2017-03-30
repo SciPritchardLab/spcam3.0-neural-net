@@ -1,0 +1,3882 @@
+===============================================================
+clm2_deva_36
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Aug 22 09:55:45 MDT 2003
+Model: CLM
+Version: CLM2.deva.36
+One-line Summary: updated to dust model changes made in cam2_0_2_dev27
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Put in dust changes (imbedded within DUST cpp directives) that were inserted into
+   cam2_0_2_dev27. This was done to make the clm code in the cam_dev and clm_dev branches
+   consistent. 
+2) Testing done:
+   Ran test-model.pl successfully on ibm, sgi and linux and verified that the results were
+   bfb with clm2_deva_35.	
+===============================================================
+	
+===============================================================
+clm2_deva_35
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Aug 19 12:11:06 MDT 2003
+Model: CLM
+Version: CLM2.deva.35
+One-line Summary: fixed local noon history output problem in compete mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux(lf95)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Keith Oleson
+Changes answers: no (bit-for-bit) 
+1) Fixed history output bug for local noon fields  
+   FSDSNDLN, FSDSVDLN, FSRNDLN, FSRVDLN  
+   Problem was that column average was being output in compete mode - and that included
+   when those averages were taken - roundoff level differences from spval occured. This then
+   led to values that should have been spval being used in the time average. For now, the simple
+   fix was to simply insist that only pft level values would be output. The column averages were
+   also removed from routine pft2column.F90.
+2) Tests:
+   Ran test-model.pl successfully on the ibm, sgi and linux(lf95) and verified that when comparing
+   to clm2_deva_34 - only the above fields were different.
+===============================================================
+	
+===============================================================
+clm2_deva_34
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Aug 15 14:50:23 MDT 2003
+Model: CLM
+Version: CLM2.deva.34
+One-line Summary: put in fix to BareGroundFluxes bug
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: Yes - (bug fix)
+Changes made:
+1) Put in bug fix to BareGroundFluxesMod.F90 so that z0hg and z0qg at the column
+   level would not be set by pft level quantities. This changes answers to more
+   than roundoff.
+2) Put in bug fix in Biogeophysics2Mod.F90 so that would not divide by
+   zero when calculating the ratio of soil evaporation for a pft relative 
+   to the total of all evaporating PFTs. This would occur if the weight
+   became 0. in the dgvm calculation. This results in bfb answers in non-dgvm mode.
+3) Testing done:
+   a) ran test-model.pl on the ibm with just change (2) and verified that bfb
+      answers were still obtained relative to clm2_deva_33.
+   b) ran test-model.pl successfully on the ibm, sgi and linux(lf95).
+===============================================================
+	
+===============================================================
+clm2_deva_33
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Jul 17 16:15:35 MDT 2003
+Model: CLM
+Version: CLM2.deva.33
+One-line Summary: fixed a bug in dgvm history output in compete mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Put in a change to DGVMMod.F90 to fix a bug in history file output
+   in  compete mode (the default now).
+2) Modified CLM_namelist.pm to use spun up initial datasets for T42 testing.
+3) Testing done:
+   Ran test-model.pl successfully in T42 mode on linux (lf95), sgi and ibm
+   Verified that the results were bfb with clm2_deva_32
+===============================================================
+	
+===============================================================
+clm2_deva_31
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Jun 10 14:11:00 MDT 2003
+Model: CLM
+Version: CLM2.deva.31
+One-line Summary: moved l%lps soil properties to c%cps
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux(lf95)
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Made the following clmtype variables column physical state properties
+   rather than land physical state properties (will need this for the urban
+   parameterization).
+2) Fixed DGVM restart problem in compete mode:
+   Modified restFileMod.F90 and DGVMMod.F90 so that average over all
+   column pfts for h2ocan (needed by begwb computation in routine
+   driver.F90) is done in restfileMod.F90 only for non-DGVM mode and in
+   resetWeightstDGVM (in module DGVMMod.F90) for DGVM mode (since this
+   needs to be done after the weights are reset in the DGVM case).
+3) Modified tssbef dimension in clmtype.F90 to be consistent 
+   new:    real(r8):: tssbef(-nlevsno+1:nlevsoi)   !soil/snow temperature before update
+   old:    real(r8):: tssbef(-nlevsno:nlevsoi)     !soil/snow temperature before update
+4) Testing done:
+   Ran test-model.pl successfully in T42 mode on linux (lf95), sgi and ibm
+   Verified that the results were bfb with clm2_deva_30	
+===============================================================
+	
+===============================================================
+clm2_deva_30
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri May 23 12:16:49 MDT 2003
+Model: CLM
+Version: CLM2.deva.30
+One-line Summary: made pft decomposition always the default
+(one-line description of changes: Makefile, include files, directories, etc.)
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+Changes made:
+1) Changed lnd_grid.F90 so that the default 1d decomposition to be across 
+   pfts rather than landunits. Introduced the cpp variable, LANDUNIT_DECOMP,
+   to trigger switching between landunit and pft level decompositions.
+   By default, LANDUNIT_DECOM is not defined.
+   Did 10 day timings with offline code on ibm-sp (blackforest)
+   with 2 nodes and obtained the following timings (in secs):
+      -------------------------------------------
+      decomp    driver  loop1  loop2   rtm  hbuf
+      -------------------------------------------
+      2x4-lnd:    136      99     8     12    14
+      2x4-pft:    144     105     9     12    14
+      4x2-lnd:    148      74     8     19    38
+      4x2-pft:     97      69     5     10     9
+      8x1-lnd:    136      95     5     32     8
+      8x1-pft:    109      68     8     53    17
+   The timings above are the maximum across the different mpi tasks.
+   These will not be completely load balanced since the mpi decomposition
+   is over pfts but the open mp threads are over columns - since the
+   loops are over columns. It is clear that the pft decomposition is significantly
+   better. Timings were not done since the new clm2.2 physics was added. The
+   new physics added more work to the pft level calculations and therefore 
+   decomposing the mpi tasks such that each task has roughly the same number
+   of pfts leads to better performance.
+2) Testing done:
+   Ran test-model.pl sucessfully at T42 on ibm,sgi and linux(lf95) and obtained
+   bfb results with clm2_deva_28.
+===============================================================
+	
+===============================================================
+clm2_deva_29
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri May 16 11:07:32 MDT 2003
+Model: CLM
+Version: CLM2.deva.29
+One-line Summary: changed calculation of surface temperature sent back to atm in cam and ccsm mode
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: yes
+Machines tested: IBM, SGI, Linux(lf95)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Changed the way the the surface radiative temperature is reported
+   back to the atm (for both cam as well as ccsm mode). Before, the
+   gridcell radiative temperature was computed as the gridcell averages
+   of the pft radiative temperatures (each pft radiative temperature was
+   obtained as (lwup_pft/sb)**.25). Now the gridcell radiative
+   temperature is computed from (lwup_gridcell/sb)**.25. To make the	
+   whole communication scheme more consistent, the clmtype data
+   structures l2as and l2af were modified to only include fields that were
+   communicated back to the atm. A new module, lnd2atmMod.F90 was also created
+   to fill in the values for l2as and l2af. The routines that send the
+   fields back to the atm in lp_coupling.F90 and clm_csmMod.F90 were also
+   modified to now use l2as and l2af.
+2) Changed t_rad_pft and t_rad_column names in clmtype.F90 to t_rad.
+3) Modified mksrfdatMod.F90 so that the addition of wetlands put in 
+   clm2_deva_15 (and clm2_deva_25) were commented out since they gave 
+   rise to too much negative runoff in the simulations. Also put in feature
+   in surfFileMod.F90 so that the fractional land from the high resolution
+   pft dataset is written to the surface file for diagnostic purposes.	 
+4) Testing done:
+   offline: ran test-model.pl successfully and ibm,sgi,linux(lf95) and
+       Verified bfb results with clm2_deva_28.
+   cam: 
+       - Verified that cam2_0_2_dev18_brnchT_sci7 results were bfb with clm2_dev_29 (for 2 days)
+         when starting from a spun up initial land dataset. Only the cam history file fields
+         TS,TSMN and TSMX were changed.
+       - Had to make the following changes to the land model code in cam2_0_2_dev18_brnchT_sci7:
+          -  had to modify routine [alltoall_clump_to_chunk_init] in module lp_couping.F90 to send
+             gridcell average of (lwup/sb)**1/4 (this is only done at the initial time and
+             is necessary because in initext.F90 lwup is relcalculated from tsxy - this 
+             feature should be removed in a future release).
+          -  had to modify inicFileMod.F90 to set read_variable = .false.
+    ccsm:
+       - Verified that F case produced bfb results over 5 days when
+         comparing ccsm2_1_dev17 with ccsm2_1_beta17 using clm2_deva_29 for
+         the land model code. Started from arbitrary initialization in the land model code.
+         Verified that the only fields that changed on cam history files were TS, TSMN and TSMX
+         (only verified this on ibm blackforest)
+       - Verified that F case with clm2_deva_29 and ccsm2_1_beta17 produced successful restarts 
+         after 5 days.
+         (only verified this on ibm blackforest)
+       - Had to make the following changes to the ccsm2_1_beta17 land model code
+         to produce bfb results
+          -  had to modify routine [csm_sendalb] in module clm_csmMod.F90 to send
+             gridcell average of (lwup/sb)**1/4 (this is only done at the initial time and
+             is necessary because in initext.F90 lwup is relcalculated from tsxy - this 
+             feature should be removed in a future release).
+          -  had to modify iniTimEVar.F90 to calculate eflx_lwrad_out from t_grnd for
+             arbitrary initialization
+===============================================================
+	
+===============================================================
+clm2_deva_28
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Apr 29 15:07:22 MDT 2003
+Model: CLM
+Version: CLM2.deva.28
+One-line Summary: put in fix for DGVM to restart bfb in arbitrary initialization mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes 
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Put in fix so that DGVM running in both compete and non-compete mode using
+   arbitrary initialization would have bfb restarts if restart is done
+   before LPJ is called the first time (original method resulted in roundoff level changes
+   on restart in this case).
+2) Modified clm_csmMod.F90 so that 2m reference humidity would get passed to 
+   coupler and global averages of states as well as fluxes would be computed.
+   (This must still be tested in coupled mode to verify bfb).
+3) Testing: (only compete mode tested)
+   ran test-model.pl -res T42 (compete mode is default) successfully on ibm,sgi and linux(lf95)
+   verified that results were bfb with clm2_deva_27
+   ran test-model.pl -res amaz (compete mode is default) successfully on ibm,sgi and linux(lf95)
+===============================================================
+	
+===============================================================
+clm2_deva_27
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Apr 25 09:57:21 MDT 2003
+Model: CLM
+Version: CLM2.deva.27
+One-line Summary: made compete the default mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself (Keith Oleson for 2m reference humidity)
+Changes answers: no (bit-for-bit) 
+1) Make compete mode the default mode
+   - removed CPP variable COMPETE 
+   - introduced CPP variable NOCOMPETE
+   - if NOCOMPETE is defined, then each column has one pft
+     otherwise, each landunit has one column
+   - changed test-model.pl scripts to implement these changes
+2) Coupled model changes:
+   - Modified RtmMod.F90 to no longer deallocate latixy_r and longxy_r
+     This was causing a memory problem in the coupled model calculation due 
+     to the fact the model was attempting to use these arrays
+     in routine [csm_initialize] but they were dellocated in routine
+     [Rtmlandgrid] (this only arose when cpl6 was introduced into the model).
+     The long term solution is to switch the order of calls. This should only
+     be a short term fix.
+   - Fixed minor bug in program_csm.F90.
+3) Put in 2m reference humidity calculation (Keith Oleson). 
+   Did not add code yet to send this to flux coupler. This will be done
+   in next commit.	  
+4) Testing Done:
+   - Ran test-model.pl successfully on ibm,sgi and linux(lf95).
+   - Verified that at T42 global resolution, clm2_deva_27 and clm2_deva_26
+     gave bfb the same results in both compete and non-compete mode
+     on ibm, sgi and linux.
+   - Verified that on amazon regional grid, clm2_deva_27 and clm2_deva_26
+     gave bfb the same results in non-compete mode on ibm.
+   - Found bug that must be resolved - on amazon regional grid, clm2_deva_27
+     (and clm2_deva_26) showed round off level differences in restart.
+     This was only tested on the ibm. This bug will be fixed in next commit.
+===============================================================
+	
+===============================================================
+clm2_deva_26
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Apr 14 13:27:01 MDT 2003
+Model: CLM
+Version: CLM2.deva.26
+One-line Summary: put in fix for negative roundoff level h2osoi_ice
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Keith Oleson, Tony Craig
+Changes answers: Yes (new-physics)
+Changes made:
+1) Keith Oleson fixed SoilHydrologyMod.F90 to remove roundoff level 
+   negative soil ice that appeared in the output file (this was introduced
+   in clm2.1. The problem was that snow sublimation could have a 
+   positive roundoff level value even if h2osoi_ice was zero at every level.
+   The following fix was introduced: 
+   old code:
+        h2osoi_ice(1) = h2osoi_ice(1) + (qflx_dew_snow-qflx_sub_snow)* &
+             dtime
+   new code: 
+        h2osoi_ice(1) = h2osoi_ice(1) + (qflx_dew_snow*dtime)
+        if (qflx_sub_snow*dtime .gt. h2osoi_ice(1)) then
+          qflx_sub_snow = h2osoi_ice(1)/dtime
+          h2osoi_ice(1) = 0._r8
+        else
+          h2osoi_ice(1) = h2osoi_ice(1) - (qflx_sub_snow*dtime)
+        end if
+2) Fixed bugs in global sums clm_csmMod.F90.
+3) Testing done:
+   Ran couped mode 5 day simulation - IibmT42_gx1v3 - with info_debug flag=2
+   in cpl.setup.csh. Did not do any restart tests.
+   Ran test-model.pl in T42 mode successfully on ibm, sgi and linux.
+===============================================================
+	
+===============================================================
+clm2_deva_25
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr 10 13:53:00 MDT 2003
+Model: CLM
+Version: CLM2.deva.25
+One-line Summary: fixed problem in generation of new surface datasets
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, inux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Sam Levis, Keith Oleson
+Changes made:
+1) modified mksrfdatMod.F90 to fix the problems of very small wtxy values being
+   generated in surfFileMod.F90
+   Two problems were present in the clm2_deva_24 version.
+   a) If landfrac(i,j) = 1.0,  pctlnd_pft(i,j)/100 could be 99.99999999999999
+      due to roundoff in the division, thereby giving rise to a value > 0.
+      in the difference (when the value should have actually been 0. for the
+      difference. A truncation of .001 was therefore implemented for the difference.
+   b) Fields in surfFileMod.F90 are single precision. The old implementation
+      could give rise to a new pctgla of 99.99999999999999 which would then
+      be truncated to 1.0 for single precision. However, a very small pctwet
+      would also occur (1.e-14). This would result in negative weights for the
+      vegetated portion rather than 0. 
+   The following scheme was implemented that fixed these problems.
+     old:
+                if ((landfrac(i,j) - pctlnd_pft(i,j)/100. > 0.) .and. &
+                     pctlak(i,j)==0.) then
+     new:
+                 if (((landfrac(i,j) - pctlnd_pft(i,j)/100.) > 0.001) .and. &
+                       pctlak(i,j)==0. .and. pctgla(i,j)<100. .and. &
+                       pcturb(i,j)<100. .and. pctwet(i,j)<100. ) then
+2) Modified BiogeochemistryMod.F90, Biogeophysics1Mod.F90, histFldsMod.F90 and 
+   pft2columnMod.F90 so that FPSN is now calculated without the cpp variable, 
+   BGC, having to be defined.
+3) Testing done:
+   generated new surface dataset: clms_64x128_c030407.nc and verified
+   that it could run in cam mode successfully
+   ran test-model.pl in T42 model on linux, ibm and sgi and verified
+   that the results were bfb with clm2_deva_23	  
+===============================================================
+	
+===============================================================
+clm2_deva_24
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Apr  4 13:58:25 MST 2003
+Model: CLM
+Version: CLM2.deva.24
+One-line Summary: added t_rad_pft to initial file 
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Jerry Olson
+Changes answers: no (bit-for-bit) 
+1) Added t_rad_pft to initial dataset (Jerry Olson). With this addition, 
+   an initial run starting from an initial dataset produces only
+   roundoff level differences with respect to a continuation run
+   that was done starting from the restart file that was generated
+   with the initial file (this was verified by Jerry Olson running
+   in cam mode). This addition to the initial file is backwards compatible.
+   If t_rad_pft is not on the initial file, than t_rad_pft will be set to
+   t_grnd.
+2) Set t_rad_pft to t_grnd in arbitrary initialization.
+3) Modified lp_coupling.F90 and clm_csmMod.F90 so that t_rad_pft is sent
+   at nstep=0 to cam and the flux coupler rather than t_grnd. This has
+   not been tested yet in ccsm mode. 
+4) Modified controlMod.F90 so that initial files could be created yearly,
+   monthly, daily and every 6 hours.
+5) Testing done:
+   Ran test-model.pl in T42 mode and verified that bfb results were obtained
+   when compared to clm2_deva_23. This was done on linux, sgi and ibm.
+===============================================================
+	
+===============================================================
+clm2_deva_23
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr  3 14:37:46 MST 2003
+Model: CLM
+Version: CLM2.deva.23
+One-line Summary: put in mods to lake levels and fractional snow cover over ground
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself,Keith Oleson
+Changes answers: Yes (new-physics)
+Changes made:
+The following changes came from Keith Oleson.
+1) Modified lake levels so that the top layer has a thickness of 0.1m rather 
+   than 1.0m. This fixes the problem of lakes that remain permanently frozen.
+2) Modified computation of fractional snow cover over ground. This reduces 
+   warm winter time bias and improves simulation of snow depth.	
+3) Added FSNO to history file 
+4) Testing done:
+   Ran test-model.pl in T42 mode successfully on linux, ibm and sgi.
+===============================================================
+	
+===============================================================
+clm2_deva_22
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr  3 13:17:24 MST 2003
+Model: CLM
+Version: CLM2.deva.22
+One-line Summary: enabled DGVM code to work in compete mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Sam Levis
+Changes answers: no (bit-for-bit) 
+Name of tests cases on NCAR Mass-Store: (For changes that change answers)
+Changes made:
+1) Modified code so that DGVM could work in compete mode.
+   Introduced subroutine resetWeightsDGVM() in module DGVMMod.F90 that resets the
+   DGVM subgrid weights using the new value of "fpcgrid" (a pft level variable that 
+   determines the pft weight relative to the containing landunit).
+   Subroutine  resetWeightsDGVM is now called from routines lpjreset2 (in module DGVMMod, 
+   restart_dgvm (in module restDGVMMod) and inicrd (in module inicFileMod). Initially, 
+   When the model starts up the DGVM weights are set equal to 1/maxpatch_pft
+   in routine surfrd in module surfFileMod. They are reset in inicrd (for an initial run)
+   or restart_dgvm (for a restart run) depending on the value of "fpcgrid". When lpj is
+   invoked at the end of the year, "fpcgrid" changes and resetWeightsDGVM() must be called 
+   again. Introducing one routine to relcalculate the weights unifies the process by which
+   these weights are calculated. Routine resetWeightsDGVM() works in both compete and non-compete
+   mode. 
+   Modified the following routines to implement these changes:
+      introduction of resetWeigftsDGVM: 
+         ecosysdyndgvm/DGVMMod.F90
+         ecosysdyndgvm/restDGVMMod.F90
+         main/inicFileMod.F90
+      other code cleanup:	
+         ecosysdyndgvm/EcosystemDynDGVMMod.F90
+         ecosysdyndgvm/LightMod.F90
+         main/clm_mapping.F90
+2) Testing done:
+   o Ran test-model.pl in amazon mode on linux (lf95), ibm, sgi and verified that
+     - dgvm history file created on year boundary was the same as clm2_deva_19
+       (on linux, BEGWATER and ENDWATER were different at one point in the last decimal place)
+     - 1d history output was bit-for-bit compared to clm2_deva_19
+     - 2d history output was at most roundoff compared to clm2_deva_19
+       (on sgi and linux, only roundoff changes appeared; on ibm 2d output was bfb)
+       (roundoff changes due to differences in the way wtxy is computed)
+     - log output was bit-for-bit compared to clm2_deva_19
+     - clm initial file created at year boundary was bit-for-bit compared to clm2_deva_19
+       (except for cols1d_wtlnd and pfts1d_wtlnd which were computed incorrectly in clm2_deva_19
+        for the history file in DGVM mode)
+       (note that WTCOLXY is no longer on the clm2_deva_22 initial file)
+     - validated that 1d hsitory files were bfb upon restart
+     - validated that compete mode worked and restarted with DGVM (only on ibm)
+   o Ran test-model.pl on linux (lf95), ibm and sgi in T42 mode. Verified bfb when compared
+     to clm2_deva_19.
+===============================================================
+	
+===============================================================
+clm2_deva_21
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Apr  1 11:19:24 MST 2003
+Model: CLM
+Version: CLM2.deva.21
+One-line Summary: created histFldsMod.F90 - all history file initialization now done here.
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Added new module, histFldsMod.F90 where all model inialization
+   of history file variables is done. Module, histFileMod.F90 is now
+   reserved for generic history file routines (as accumulMod.F90 is
+   reserved for generical accumulation routines. All history file
+   variables are now initialized and declared in one place.
+
+2) Removed histVarConst.F90. All special settings for history file
+   variables (e.g. over lake) is now done when the history file variable
+   is declared. As an example, here is code to initialize snow temperature
+   setting all values over lake to spval (1.e.36).
+        mpicom, MPI_REAL8       
+ 
+   !---snow temperature
+    !---when defining pointers, set constant values (e.g. over lake) if needed
+    if (ic_ces_t_snow == not_set) then
+       ic_ces_t_snow = pointer_index()
+       allocate (clmptr_rs(ic_ces_t_snow)%val(begc:endc)) 
+       do ci = begc,endc
+          c => cpoint(ci)%c
+          clmptr_rs(ic_ces_t_snow)%val(ci)%p => c%ces%t_snow
+          if (c%l%lps%lakpoi) c%ces%t_snow = spval
+       end do
+    end if
+    hpindices = (/-1, -1, ic_ces_t_snow, not_valid/)
+    call masterlist_addfld (fname='TSNOW', type1d='column', units='K', numlev=1, &
+         avgflag='A', long_name='snow temperature', hpindices=hpindices)          
+    call masterlist_make_active (name='TSNOW   ', tape_index=1) 
+     
+    Note that the above code contains all information necessary to initialize
+    the history variable.
+
+3) Fixed bug in inicFileMod.F90 so that Rtm data read in from an
+   initial file would be broadcast to all processors. This only effected
+   history output and not communication with the flux coupler (since only the
+   master processor communicates with the flux coupler at this point). 
+
+4) Tests done:
+   ran test-model.pl -res T42 and test-model.pl -res amazon and successfully
+   and verified that the results were bfb with clm2_deva_19. Ran on linux(apache),
+   sgi(chinookfe) and ibm(babyblue).	
+===============================================================
+===============================================================
+clm2_deva_20
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Mar 31 13:33:39 MST 2003
+Model: CLM
+Version: CLM2.deva.20
+One-line Summary: completely rewrote accumulator module
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Sam Levis, Keith Oleson
+Changes answers: no (bit-for-bit) 
+Name of tests cases on NCAR Mass-Store: (For changes that change answers)
+Changes made:
+	
+1) Completely rewrote accumulator logic so that accumulator can
+   now handle all subgrid types as well as multi-level accumulator
+   fields. All parameters have been elminated and all memory allocation
+   is dynamic.
+
+2) Module accumulMod.F90 now contains only utility routines
+   to initialize, update and extract accumulation fields.
+   
+  a) Routine init_accum_field initializes an accumulator field with
+     the following interface:
+
+     subroutine init_accum_field(name, units, desc, &
+       accum_type, accum_period, numlev, subgrid_type, init_value)
+
+       character(len=*), intent(in) :: name           !field name
+       character(len=*), intent(in) :: units          !field units
+       character(len=*), intent(in) :: desc           !field description      
+       character(len=*), intent(in) :: accum_type     !field type: tavg, runm, runa, ins
+       integer , intent(in) :: accum_period           !field accumulation period
+       character(len=*), intent(in)   :: subgrid_type !["gridcell","landunit","column" or "pft"]
+       integer , intent(in) :: numlev                 !number of vertical levels 
+       real(r8), intent(in) :: init_value             !field initial or reset value
+
+   b) Interface update_accum_field is a interface that updates the accumulator field and
+      is overload to take either single-level or multi-level fields as input. 
+
+     interface update_accum_field   ! Updates the current value of an accumulator field
+        module procedure update_accum_field_sl  ! Update single-level accumulator field
+        module procedure update_accum_field_ml  ! Update multi-level accumulator field
+     end interface
+
+     the above subroutines have the following interface: 
+     subroutine update_accum_field_sl (name, field, nstep)
+        character(len=*), intent(in) :: name       !field name
+        real(r8), pointer, dimension(:) :: field   !field values for current time step
+        integer , intent(in) :: nstep              !time step index
+
+     subroutine update_accum_field_ml (name, field, nstep) has the following interface:
+        character(len=*), intent(in) :: name       !field name
+        real(r8), pointer, dimension(:,:) :: field !field values for current time step
+        integer , intent(in) :: nstep              !time step index
+
+   c) Interface _accum_field is a interface that extracts the accumulator field and
+      is overload to take either single-level or multi-level fields as input. 
+
+     interface extract_accum_field
+        module procedure extract_accum_field_sl ! Extract current val of single-level accumulator field
+        module procedure extract_accum_field_ml ! Extract current val of multi-level accumulator field
+     end interface
+
+     subroutine extract_accum_field_sl (name, field, nstep)
+        character(len=*), intent(in) :: name     !field name
+        real(r8), pointer, dimension(:) :: field !field values for current time step
+        integer , intent(in) :: nstep            !timestep index
+
+
+     subroutine extract_accum_field_ml (name, field, nstep)
+        character(len=*), intent(in) :: name       !field name
+        real(r8), pointer, dimension(:,:) :: field !field values for current time step
+        integer , intent(in) :: nstep              !timestep index
+
+
+
+3) Module accFldsMod.F90 now contains routines that initialize, update and extract
+   specific accumulator fields using the routines provided in module accumulMod.F90.
+    public :: initAccFlds      ! Initialization of accumulator fields
+    public :: initAccClmtype   ! Initialize of clmtype variables obtained from accum fields
+    public :: updateAccFlds    ! Update accumulator fields using clmtype variables as input
+                               ! Extract accumulator fields and place values in clmtype variables 
+
+4) Revmoed routine accumDGVMMod.F90 and placed logic in accFldsMod.F90
+
+5) Modified driver.F90 and initializeMod.F90 to account for changes in accumulator logic.
+
+6) Testing done:
+   Ran test-model.pl -res T42 and test-model.pl -res amazon and compared that results are bfb
+   with clm2_deva_19 on linux(apache), sgi(chinookfe) and ibm(babyblue).
+   Ran a one year test of DGVM at amazon resolution with clm2_deva_19 and clm2_deva_20 
+   starting from  clm2_1_amazon.i.1982-01-01-00000.c021112.nc and verified that the DGVM history 
+   files after 1 year were bfb with clm2_deva_19
+===============================================================
+	
+===============================================================
+clm2_deva_19
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Mar 20 15:58:36 MST 2003
+Model: CLM
+Version: CLM2.deva.19
+One-line Summary: introduced TREFMNAV and TREFMXAV on history file
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Keith Oleson
+Changes answers: no (bit-for-bit) 
+1) Included TREFMNAV and TREFMXAV (the daily minimum or maximum or the hourly
+   averaged 2m air temperature) on the history file. This included adding
+   the hourly averaged 2m temperature to the accumulator. Removed all cpp ACCUM
+   variables from the code. By default the accumulator now includes the calculation
+   of the hourly averaged 2m air temp. It may also include DGVM accumulated fields
+   if the cpp variable DGVM is defined. 
+2) Testing done:
+ - Verified that the following namelist resulted in self-consistent output. 
+       hist_dov2xy(1) = .false.
+       hist_nhtfrq(1) = -72     
+       hist_mfilt(1)  =  1
+       hist_dov2xy(2) = .false.
+       hist_fincl2    = 'TSA'
+       hist_nhtfrq(2) = -1
+       hist_mfilt(2)  =  72
+       hist_dov2xy(3) = .false.
+       hist_fincl3    = 'TSA','TREFMNAV','TREFMXAV'
+       hist_nhtfrq(3) = -24
+   Verified that h1 TSA hourly values resulted in the correct TREFMNAV and
+   TREFMXAV values obtained in h2. Verified that the daily averages of 
+   TREFMNAV and TREFMXAV from h2 resulted in the 3-day average in h0.
+ - Ran test-model.pl at T42 and verified bfb with respect to clm2_deva_19 on 
+   ibm(blackforest), sgi(chinkookfe) and linux(apache). Since time step is
+   1800 secs (48 time steps/day), only the history output at time step 50 will
+   have values of TREFMX and TREFMN that do not correspond to spval.
+===============================================================
+	
+===============================================================
+clm2_deva_18
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Mar 17 12:57:32 MST 2003
+Model: CLM
+Version: CLM2.deva.18
+One-line Summary: improved initialization of history file variables
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Peter Thornton
+Changes answers: no (bit-for-bit) 
+1) Rewrote clmpoint.F90 and histFileMod.F90 so that all initialization
+   of history file variables now occurs in histfileMod.F90. The module,
+   clmpoint.F90, only initializes the pointers to the subgrid types - 
+   gpoint,lpoint,cpoint and ppoint.
+   As an example, the vegetation temperature is now initialized as follows
+   in histFileMod.F90.
+    !---vegetation temperature
+    if (ic_ces_pes_a_t_veg == not_set) then
+       ic_ces_pes_a_t_veg = pointer_index()
+       allocate (clmptr_rs(ic_ces_pes_a_t_veg)%val(begc:endc)) 
+       do ci = begc,endc
+          c => cpoint(ci)%c
+          clmptr_rs(ic_ces_pes_a_t_veg)%val(ci)%p => c%ces%pes_a%t_veg
+       end do
+    endif
+    if (ip_pes_t_veg == not_set) then
+       ip_pes_t_veg = pointer_index()
+       allocate (clmptr_rs(ip_pes_t_veg)%val(begp:endp))
+       do pi = begp,endp
+          p => ppoint(pi)%p
+          clmptr_rs(ip_pes_t_veg)%val(pi)%p => p%pes%t_veg
+       end do
+    endif
+    hpindices = (/-1, -1, ic_ces_pes_a_t_veg, ip_pes_t_veg/)
+    call masterlist_addfld (fname='TV', type1d='column', units='K', numlev=1, &
+         avgflag='A', long_name='vegetation temperature', hpindices=hpindices)    
+2) Removed usage of clmptr_rs from driver.F90, RtmMod.F90 and accumulMod.F90.
+   Now use ppoint, cpoint, lpoint and ggoint as pointers.
+   Only histFileMod.F90 now uses clmptr_rs and clmptr_ra.
+3) Modified restFileMod.F90 to read in fnamer up to 256 characters.
+4) In coupled mode, modified surfFileMod.F90 as follows: if the land fraction
+   obtained from the coupled model is greater than 1.e-8 and the difference 
+   between the land fraction read in from the land surface dataset and the coupled
+   model land fraction is greater than 1.e-12, the model will stop.
+5) Changed usage of special value (spval) so that only clm_varcon.F90 would be
+   used to obtain spval.
+6) Fixed bug in program_csm.F90 so that cpl6 could run in non-SPMD mode.
+7) Tests performed: ran test-model.pl and compared to clm2_deva_16 to verify bfb for
+   cases T42, T42compete and amazon on ibm(babyblue), linux(apache) and sgi(chinookfe).
+===============================================================
+	
+===============================================================
+clm2_deva_17
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Mar 13 11:32:51 MST 2003
+Model: CLM
+Version: CLM2.deva.17
+One-line Summary: put in cpl6 mods and introduced DriverInitMod in biogeophys
+Requires change in build system: no
+Tested to work coupled with CCSM: yes 
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Put in cpl6 mods. This affected the files:
+   clm_csmMod.F90, initializeMod.F90, program_csm.F90 and spmdMod.F90
+   Also modified clm_csmMod.F90 to include global sums of fluxes.
+   Verified that new code compiled and ran in ccsm mode (case F). Did not
+   examine results since answers will change with respect to tag ccsm2_1_beta13.
+2) Modified surfFileMod.F90 in ccsm mode so that landfrac and cam_landfrac no
+   longer have to match exactly (this is due to roundoff level differences that
+   can result in landfrac when different number of processors are used
+   in coupled mode. The new error condition is now: 
+    (cam_landfrac(i,j)>1.e-8 .and. abs(cam_landfrac(i,j)-landfrac(i,j))>1.e-12) 
+3) Introduced file bioggeophys/DriverInitMod.F90 and modified driver.F90. 
+   Variables that needed to be initialized at the beginning of every time step 
+   are now in DriverInitMod.F90.
+4) Updated esmf code to ESMF_0_0_2p8. This results in fewer files in the esmf 
+   directory.
+5) Tests run:
+   Ran test-model.pl for T42 case only and compared to clm2_deva_16 successfully 
+   on ibm(babyblue), linux(apache) and sgi(chinookfe). 
+   Ran coupled model F test on ibm with ccsm2_1_beta12 and clm2_deva_17
+   inserted in models/lnd/clm2/src. Code compliled and ran on blackforest.
+===============================================================
+	
+===============================================================
+clm2_deva_16
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Mar  7 11:31:31 MST 2003
+Model: CLM
+Version: CLM2.deva.16
+One-line Summary: implemented new csoilc and fix for bulk density of snow
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Keith Oleson
+Changes answers: Yes (new-physics)
+Changes made:
+1) Bulk density of newly fallen dry snow has been modified
+   to be continuous (Hydrology1Mod.F90)
+2) Implemented new parameterization for variation of csoilc 
+   with canopy density from X. Zeng, University of Arizona
+   (implemented by Keith Oleson) 
+3) Put in minor fixes in clmpoint.F90 and mvegFilMod.F90 to fix 
+   compiler warnings (verified that these fixes did not change answers)
+4) Tests:
+   Ran test-model.pl (T42, no compete) successfully on 
+   ibm(babyblue), sgi(chinookfe) and linux(apache)
+===============================================================
+	
+===============================================================
+clm2_deva_15
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Mar  6 14:33:04 MST 2003
+Model: CLM
+Version: CLM2.deva.15
+One-line Summary: improved initialization of clmtype, improved surface dataset generation
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+	
+1) Changed surface datasets generation code to have following modifications
+   (mksrfdat.F90)
+
+  - Assume wetland and/or lake when input landmask says land and pft 
+    dataset landmask says ocean 
+      pctwet(i,j)   = 100. - pctlak(i,j)
+ -  If the input landfrac is greater than the pft dataset landfrac, then 
+    convert the discrepancy to wetland. Only convert gridcells where there
+    is no lake.  
+
+ - Also changed global history attribute (History) in surface file to (History_Log). 
+   NCO operator suite did not work with History as global attribute.
+
+ - A new clm fv 2x2.5 surface dataset was generated using the new code and 
+   showed that the above features were implemented correctly.
+   clm surface dataset:
+       /fs/cgd/csm/inputdata/lnd/clm2/srfdata/cam/clms_2x2.5_USGS_c030304.nc
+   (the following cam initial dataset was used to obtain clm surface dataset
+      /fs/cgd/csm/inputdata/atm/cam2/inic/fv/cami_0000-09-01_2x2.5_L26_c021209_USGS.nc)
+
+2) Totally rewrote the initialization routines for clmtype (introduced new
+   module clmtypeInitMod) so that all derived types (including averages) would
+   be initialized to NaN. Introduced the following routines in clmtypeInitMod
+    private ::  init_energy_balance_type
+    private ::  init_water_balance_type
+    private ::  init_pft_pstate_type
+    private ::  init_pft_ecophys_constants
+    private ::  init_pft_DGVMecophys_constants
+    private ::  init_pft_estate_type
+    private ::  init_pft_wstate_type
+    private ::  init_pft_pdgvstate_type
+    private ::  init_pft_eflux_type
+    private ::  init_pft_mflux_type
+    private ::  init_pft_wflux_type
+    private ::  init_pft_cflux_type
+    private ::  init_pft_vflux_type
+    private ::  init_pft_dflux_type
+    private ::  init_column_pstate_type
+    private ::  init_column_estate_type
+    private ::  init_column_wstate_type
+    private ::  init_column_cstate_type
+    private ::  init_column_eflux_type
+    private ::  init_column_wflux_type
+    private ::  init_landunit_pstate_type
+    private ::  init_gridcell_pstate_type
+    private ::  init_atm2lnd_state_type
+    private ::  init_lnd2atm_state_type
+    private ::  init_atm2lnd_flux_type
+    private ::  init_lnd2atm_flux_type
+    private ::  init_gridcell_wflux_type
+
+  As an example, pft physical state variables are now initialized both
+  at the pft level and as well as averaged to the column level:
+    do pi = begp,endp
+       p => ppoint(pi)%p
+       call init_pft_pstate_type(p%pps)
+    end do
+    do ci = begc,endc
+       c => cpoint(ci)%c
+       call init_pft_pstate_type(c%cps%pps_a)
+    end do
+
+3) Added landfrac as a derived type component of gridcell physical state
+
+4) Changed following pointers to simpler form:
+
+    ppoint%pft(pi)%c=>ppoint(pi)%p
+    cpoint%col(ci)%c=>cpoint(ci)%c
+    lpoint%lnd(li)%l=>lpoint(li)%l
+    gpoint%grd(gi)%g=>gpoint(gi)%g
+
+5) added pointers to next level up (e.g. column points to containing land unit directly)
+   clm_mapping.F90 and clmtype.F90
+
+6) Tests (ran test-model.pl and compared with clm2_deva_14):
+   (an X designates a successful test)
+   (an - designates that the test was not done)
+
+   machine         T42 (BGC,RTM)  T42compete (BGC,RTM)  amazon (ACCUM,DGVM,no RTM) 
+   -------------------------------------------------------------------------------
+   ibm(babyblue)   X              X                     X
+   linux(apache)   X              X                     X
+   sgi(chinookfe)  X              -                     -
+===============================================================
+	
+===============================================================
+clm2_deva_14
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Mar  3 15:19:44 MST 2003
+Model: CLM
+Version: CLM2.deva.14
+One-line Summary: added stability correction for 2m air temperature, added new history fields
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Lnux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Peter Thornton
+Changes answers: 
+   No (bit-for-bit) (except for TSA) for non-DGVM
+   Yes (new-physics) (since TSA and therefore T10,AGDD0,AGDD5 change) for DGVM
+Name of tests cases on NCAR Mass-Store: (For changes that change answers)
+Changes made:
+1) Modularized clm_mapping.F90 - different landunits are now set up in subroutines
+    landunit_veg_compete() - sets up a vegetated landunit with competition
+    landunit_veg_noncompete() - sets up a vegetated landunit without competition
+    landunit_special() - sets up a special (i.e. non-vegetated landunit)
+2) Removed itypwat, itypveg as part of clmtype:
+   lps%itypwat changed to landunit types
+   pps%itypveg removed since it is redundant with pps%itype  
+   Added the following landunit types:
+   landunits types (lps%itype) can have values of (see clm_varcon.F90)
+          (note shallow lakes not currently implemented)
+    1  => (istsoil) soil (vegetated or bare soil landunit)
+    2  => (istice)  land ice
+    3  => (istdlak) deep lake
+    5  => (istwet)  wetland
+    6  => (isturb)  urban 
+   column types (cps%itype) can have values of
+    1 => in compete mode
+    pft type values => in non-compete mode
+   pft types (pps%itype) can have values of
+    0  => not vegetated
+    1  => needleleaf evergreen temperate tree
+    2  => needleleaf evergreen boreal tree
+    3  => needleleaf deciduous boreal tree
+    4  => broadleaf evergreen tropical tree
+    5  => broadleaf evergreen temperate tree
+    6  => broadleaf deciduous tropical tree
+    7  => broadleaf deciduous temperate tree
+    8  => broadleaf deciduous boreal tree
+    9  => broadleaf evergreen shrub
+    10 => broadleaf deciduous temperate shrub
+    11 => broadleaf deciduous boreal shrub
+    12 => c3 arctic grass
+    13 => c3 non-arctic grass
+    14 => c4 grass
+    15 => corn
+    16 => wheat
+3) Moved initialized of land unit type from iniTimeConst.F90 to
+   landunit routines in clm_mapping.F90
+4) Fixed RTM bug when COMPETE is defined - c%cps%wtxy was never set. Only on
+   SGI running with debug on did this get set to NaN. Now initialize it in
+   routine landunit_veg_compete().
+5) Added the following history fields to the model:
+   SABV     solar rad absorbed by veg
+   SABG     solar rad absorbed by ground
+   FSH_V    sensible heat from veg
+   FSH_G    sensible heat from ground
+   FSDSVD   direct vis incident solar radiation
+   FSDSND   direct nir incident solar radiation
+   FSDSVI   diffuse vis incident solar radiatio
+   FSDSNI   diffuse nir incident solar radiation
+   FSRVD    direct vis reflected solar radiation
+   FSRND    direct nir reflected solar radiation
+   FSRVI    diffuse vis reflected solar radiation
+   FSRNI    diffuse nir reflected solar radiation
+   FSDSVDLN direct vis incident solar radiation at local noon
+   FSDSNDLN direct nir incident solar radiation at local noon
+   FSRVDLN  direct vis reflected solar radiation at local noo
+   FSRNDLN  direct nir reflected solar radiation at local noon
+6) Added 2m air temperature stability correction calculation.
+7) Added more checks for memory allocation errors.
+8) Tests (ran test-model.pl and compared with clm2_deva_11):
+  Note: felds that are different with respect to clm2_deva_11 are in ()
+  Note: compete had a bug- c%cps%wtxy was never set - by default on ibm and linux
+        was zero
+  Note: T10 is the 10 day accumulated TSA, and AGDD0 and AGdd5 depend on T10.
+  Note: amazon run started from clm2_1_amazon.i.1982-01-01-00000.c021112.nc on 19971231
+        and ran for 2 days (the hv file at 19980101.nc were identical - this is because
+        differences T10, AGDD0 and AGDD5 will not effect a amazon regional DGVM 
+        calculation)
+
+  machine       T42 (BGC,RTM)  T42compete (BGC,RTM)    amazon (ACCUM,DGVM,no RTM) 
+  -------------------------------------------------------------------------------
+  babyblue      (TSA)          (TSA,QCHANR,QCHOCNR)    (TSA,T10,AGDD0,AGDD5)
+  apache                       (TSA,QCHANR,QCHOCNR)    (TSA,T10,AGDD0,AGDD5)
+  chinookfe     (TSA)          (TSA,QCHANR,QCHOCNR)    (TSA,T10,AGDD0,AGDD5)
+===============================================================
+	
+===============================================================
+clm2_deva_13
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Feb 14 10:31:42 MST 2003
+Model: CLM
+Version: CLM2.deva.13
+One-line Summary: improved initialization of pointers in clmpoint.F90
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Improved the initialization of pointer values in clmpoint.F90
+   Now pointer name values are initialized as follows:
+   1) declare them at  the top of the module
+        integer :: ip_pps_rsw 
+   2) the following call in subroutine init_pointer_indices
+        ip_pps_rsw = pointer_index(lastindex)
+   Subroutine init_pointer_indices is called from clmpoint_init
+2) Fixed a bug in atmdrvMod.F90 for the PERGRO option 
+3) Updated the Users Guide to incorporate clmpoint.F90 changes
+4) Testing:
+   ran test-model.pl successfully with the res option set to 
+   [T42, T42compete and amazon] and compared to clm2_deva_12 on 
+   IBM, SGI and Linux (lf95) turned on the BGC option.
+   The problem in ibm in DustMod.F90 with debugging
+   enabled turned out to only occur when -lmass was enabled. 
+   When stk_nbr=  0.973683311915889312E-02, the computation of 
+   10.0_r8**(-3.0_r8/stk_nbr) caused a crash. Currently, -lmass has been 
+   taken out of the Makefile (the consultants were notified). 
+===============================================================
+	
+===============================================================
+clm2_deva_12
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Jan 30 14:44:33 MST 2003
+Model: CLM
+Version: CLM2.deva.12
+One-line Summary: put rain-snow branch mods onto development branch
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: yes
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself, oleson
+Changes answers: no (bit-for-bit) - in offline mode
+        yes (new-physics) in cam, ccsm mode
+Name of tests cases on NCAR Mass-Store: /OLESONcsm/cam202clm209rs
+Changes made:
+1) Made land accept simultaneous nonzero rain and snow from atm
+   in ccsm or cam mode. This basically involved setting the fraction of 
+   liquid water in snow to 0 for ccsm or cam mode (the calculation for
+   "flfall" has been moved to atmdrvMod). In the new scheme, the
+   ice and liquid water onto the ground are simply proportional
+   to the fraction of incoming precipitation that is snow and rain,
+   respectively. In offline mode, the calculation is still done the
+   same so bfb results are maintained in offline mode.
+   Involved changes to  atmdrvMod.F90, clm_csmMod.F90, clmtype.F90, 
+   clmtype_init.F90, lp_coupling.F90 and Hydrology1Mod.F90
+2) Bug fix in accumulMod.F90 to enable to run in DGVM mode (due to
+   changes for clm2_deva_11).
+3) testing:
+   test-model.pl -c ~/src/clm2_deva_10 ran successfully for (BGC enabled)
+       T42, T42compete and amazon 
+   T42 test done on ibm(blackforest), sgi(chinookfe) and linux(apache-lf95)
+   T42compete test done on ibm(blackforest)
+   amazon test done on ibm(blackforest) 
+4) 20 year run in cam mode (see /OLESONcsm/cam202clm209rs) was analyzed
+   by Keith Oleson and Gordon Bonan and indicated that the climated was
+   unchanged by this modification.	  
+===============================================================
+	
+===============================================================
+clm2_deva_11
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Jan 27 10:26:01 MST 2003
+Model: CLM
+Version: CLM2.deva.11
+One-line Summary: put in memory reducing modifications and fixed offline error growth
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Put in changes to clmpoint.F90 that result in 30% n memory reduction.
+   (Also needed modifications to accumulMod.F90, driver.F90, histFileMod.F90
+    and RtmMod.F90)  
+   - Memory for multi level arrays not allocated
+   - Separate pointer arrays for multilevel and single level pointers
+     into clm derived type
+     clmptr_rs (pointer to real scalar) 
+     clmptr_ra (pointer to real array) 
+   - Removed integer pointer arrays
+2) Modified atmdrvMod.F90, clm_varctl.F90 and controlMod.F90
+   Put in code to enable offline perturbation growth.
+   Bottom level forcing temperature is perturbed on first time step.
+   Introduced new namelist variable "pertlim".
+   Modified HydrologyLakeMod.F90 so that perturbation growth for 145
+   time steps was well behaved. 
+3) Modified areaMod.F90 so that maxovr is now an input variable rather
+   than a parameter. This involved modifying  mkglacier.F90,  mkgridMod.F90,  
+   mklai.F90,  mklanwat.F90,  mkpft.F90, mksoicol.F90,  mksoitex.F90, 
+   mkurban.F90 to set maxovr as an internal parameter.
+   Maxovr is now calculated in RtmMod.F90.
+4) Testing:
+   - ran test-model.pl comparing with clm2_deva_10 successfully on following
+     platforms: linux (apache- lf95), sgi(chinookfe) and ibm(blackforest)
+   - created a 3x3 surface dataset and verified that it was identical to
+     previous 3x3 surface dataset
+   - performed successful error growths tests at T42 using 
+     finidat = '/fs/cgd/csm/inputdata/lnd/clm2/inidata_2.1/cam/clmi_0000-09-01_64x128_T42_c021125.nc'
+     fsurdat = '/fs/cgd/csm/inputdata/lnd/clm2/srfdata/cam/clms_64x128_T42_c020514.nc'
+===============================================================
+	
+===============================================================
+clm2_deva_10
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Jan 16 16:57:29 MST 2003
+Model: CLM
+Version: CLM2.deva.10
+One-line Summary: RTM computation now done on all mpi tasks in preparation for cpl6
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no (RTM not enabled in CAM)
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) for all fields except for diagnostic fields
+    QCHANR and QCHOCNR which are different to roundoff
+Changes made:
+	
+1) reduced parameter maxovr to 10000 in areaMod.F90
+2) introduced interfaces for allgather routines in spmdMod.F90  
+   INTERFACE allgather_data
+      MODULE procedure allgather_1darray_int
+      MODULE procedure allgather_1darray_real
+      MODULE procedure allgather_2darray_int
+      MODULE procedure allgather_2darray_real
+   END INTERFACE
+3) made qchan2, qchocn2 grid level components instead of
+   column level components in clmpoint.F90, histFileMod.F90, 
+   clmtype.F90, clmtype_init.F90 and RtmMod.F90
+4) fixed bug in call go mpi_barrier (this is only invoked when cpp variable 
+   TIMING_BARRIERS is defined in driver.F90 and RtmMod.F90
+5) modified RtmMod.F90 so that all processors now do the entire RTM computation.
+   All mpi communication was buffered into one array before the communication. 
+   The new scheme elimates a scatter
+   The new scheme was implemented to to avoid performance degradation
+   when going to cpl6. The offline performance was slightly improved.
+6) Added the following variables to histVarConst.F90
+            c%p(pi)%pdf%flx_mss_vrt_dst(1) = 0.
+            c%p(pi)%pdf%flx_mss_vrt_dst(2) = 0.
+            c%p(pi)%pdf%flx_mss_vrt_dst(3) = 0.
+            c%p(pi)%pdf%flx_mss_vrt_dst(4) = 0.
+   Needed when dust will be coupled to cam
+6) testing: ran test-model.pl on ibm, sgi and linux (lf95) and 
+   compared with clm2_deva_09
+   only QCHANR and QCHOCNR were different and they were only different 
+   to roundoff (QCHANR was the same to about 15 digits and QCHOCNR was 
+   the same to 14 digits)
+	
+===============================================================
+===============================================================
+clm2_deva_09
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Jan 10 16:36:06 MST 2003
+Model: CLM
+Version: CLM2.deva.09
+One-line Summary: fixed non-spmd RTM bug
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+	
+1)Fixed bug in RtmMod.F90 that resulted in incorrect
+  results when code was run in pure threaded mode. This
+  only effects clm2.1 code. This was not picked up by the
+  SPMD was compared to pure openMp for 1 time step and
+  rtm output was zero at 1 time step. Tests are now
+  fixed so that the model is run for 4 time steps in
+  debug mode.
+2)Fixed bug in mkmxovr that computed novr incorrectly.
+  However, mkmxovr was only called by RtmMod and novr
+  was then overwritten with correct values from call
+  to areaini. The maximum number of overlapping cells
+  was returned correctly from mkmxovr.
+3)Fixed bug in mkgridMod for generated land fractions
+  in offline surface datasets. Land fractions and land mask now match.
+  New 3x3 surface dataset created:
+  /fs/cgd/csm/inputdata/lnd/clm2/offline/surface-data.120x060.010803.nc
+  Verified that results after 1 month were the same as when using
+  /fs/cgd/csm/inputdata/lnd/clm2/offline/surface-data.120x060.013002.nc
+4)Verified again that RTM gave consistent results with clm2_3_dev33
+  (after 25 timesteps qchocnr was same between clm2_deva_09 and clm2_3_dev33
+  to 9 decimal places and qchanr was same to 6 places except for very
+  small values of qchanr - do not expect results to be the same since
+  roundoff size changes occur between clm2_3_dev33 and clm2_deva_09).
+5)Modified test-model suite so that debug tests were run for 4 timesteps - 
+  (with rtm averging done every 2 time steps). Checking that 
+  spmd vs non-spmd is bit-for-bit now includes non-zero rtm output.
+===============================================================
+	
+===============================================================
+clm2_deva_08
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Dec 17 17:36:59 MST 2002
+Model: CLM
+Version: CLM2.deva.08
+One-line Summary: fixed ibm compiler bug (clm_mapping.F90) and auxiliary 
+	history file restart bug
+Requires change in build system: yes
+	updated Makefile to be almost identical to cam version
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: yes
+Machines tested: IBM, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+	
+1) Updated User's Guide to clm2.1
+2) Fixed clm_mapping.F90 so that both offline and cam mode
+   could compile on blackforest and bluesky (obtaining internal
+   compiler error message). This fix is very clumsy and
+   should be removed as soon as the blackforest and bluesky compilers
+   are updated. (Basically the use statement for clmtype must be within
+   the subroutines for offline mode and outside of the subroutines for
+   cam mode).
+3) Fixed restart bug for auxiliary history files (histFileMod.F90)
+4) Fixed dispose bug for auxiliary history files (do_close_dispose.F90)
+5) Enabled monthly history files for all auxiliary files consistently
+6) Set hist_nhtfrq(1) = cam_nhtfrq in controlMod.F90
+7) Updated Makefile and test-model.pl suite to operate with Makefile.
+   Included generation of auxiliary files for restart test.
+8) ran offline test-model.pl on blackforest and apache (linux)
+   verified that on both platforms results were bfb with clm2_deva_07
+   ran cam test-model.pl on blackforest 
+9) fixed restart bug in csm mode 
+   verifed that for case IibmT42_gx1v3 on blackforest at nstep = 3
+   differences between clm2_1 and clm2_0 for send2d buffer
+   only 76 differences appear that are greater than 1.e-11 (and they
+   are for small values of the buffer)	 
+   Run done on babyblue with following configuration
+   Note: output was also obtained for csm_sendalb
+   Only differences greater than 1.e-11 were that clm2.1 sends
+   0 for fields that were not to be filled in whereas
+   clm2.0 sends 1.e30
+===============================================================
+	
+===============================================================
+clm2_deva_07
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Dec  5 13:57:03 MST 2002
+Model: CLM
+Version: CLM2.deva.07
+One-line Summary: updated jobscript.csh
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+1) updated bld/offline/Makefile to cam2_0_1_dev10 Makefile
+   updated jobscript.csh to work with all platforms (see tests below)	
+2) driver.F90
+  - put in change to compile on sun with optimization 
+3) histFilMod.F90
+  - make single precision default for netCDF files 
+4) controlMod.F90
+  - fixed bug so that rtm_nsteps was initialized correctly if not
+    set in namelist 
+  - fixed bug so path name is fixed when runing in cam or ccsm mode
+  - defaults now set after reading namelist only for masterproc
+    (since only masterproc reads namelist)
+  - if PERGRO is defined in cam mode then
+    hist_empty_htapes = .true.
+    hist_fincl1 = 'TSA'
+5) tests
+  - ran test-model.pl -c ~/src/clm2_deva_06 successfully on ibm (blackforest)
+  - ran jobscript.csh on ibm(blackforest), sgi(chinookfe), linux(apache) with lf95 and pgf90,
+    sun(flagstaf), compaq(ornl-colt)
+  - tested that hist_fexcl, hist_fincl, hist_type1d_pertape, hist_avgflag_pertape worked
+    correctly using jobscipt.csh  
+===============================================================
+	
+===============================================================
+clm2_deva_06
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Nov 25 14:51:42 MST 2002
+Model: CLM
+Version: CLM2.deva.06
+One-line Summary: updated clm2.1 cam-clm interface to use all-to-all communication
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: yes (see below)
+Machines tested: IBM, SGI, Linux, Compaq
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+	
+1) Updated to Forrest cam-clm communication interface to clm2.1.
+   This involved deleting the file lnd_atmMod.F90 and adding the
+   files lnd_grid.F90 and lp_coupling.F90 (land-physics coupling).
+   In addition, clm_mapping.F90 had significant modifications.
+   Here is a brief summary of the communication modules:
+
+   - lnd_grid module now contains the following:
+
+   public surface_grid_init          ! initializes land surface decomposition
+   public get_nclumps                ! returns the number of clumps defined
+   public get_clump_cell_id_coord    ! returns clump/cell ids based on lon/lat
+   public get_clump_owner_id         ! returns clump owner based on clump id
+   public get_clump_ncells_proc      ! returns number of cells for process
+   public get_clump_ncells_id        ! returns number of cells in clump
+   public get_clump_coord_id         ! returns lon/lat coordinates based on id
+   public get_clump_info             ! returns clump info 
+   public get_clump_gcell_info       ! returns 1d gridcell index
+
+   surfage_grid_init() performs the land model domain decomposition into
+   clumps of grid cells (containing landunits, columns and pfts).
+   Clumps are private derived data types which may be accessed through 
+   a suite of functions and subroutines also contained in lnd_grid (see above).
+
+   - lp_coupling module contains the following:
+
+   public lp_coupling_init             ! initialize clump<-->chunk mapping
+   public lp_coupling_finalize         ! destroy clump<-->chunk mapping
+   public alltoall_clump_to_chunk_init ! communicate fluxes from lnd to atm
+   public alltoall_clump_to_chunk      ! communicate fluxes from lnd to atm
+   public alltoall_chunk_to_clump      ! communicate fluxes from atm to lnd
+
+   lp_coupling_init() initializes the mapping between atmosphere
+   physics chunks and land model clumps.  It also allocates buffers
+   for use by subroutines within the module which perform the alltoallv
+   communication/transposition of surface state and fluxes between the
+   atmosphere and the land.  This coupling is used when CAM and CLM are
+   run together as a single executable (when COUP_CAM is defined).
+
+   Modified clm_map subroutine to call surface_grid_init() (lnd_grid) for
+   domain decomposition and lp_coupling_init() (lp_coupling) to initialize
+   the atm<->lnd coupling.
+
+   Added npes=1 definition even for the case when SPMD is undefined so
+   that new domain decomposition works correctly when running SMP-only.
+
+   The clm2.1 lnd_grid.F90 is significantly different than the clm2.0
+   lnd_grid.F90 mainly because decomposition in clm2.1 can occur over
+   pfts OR landunits, depending on if the CPP variable COMPETE is
+   defined. In addition, the iteration scheme used in the clm2.0
+   lnd_grid.F90 for nodes with no pfts was modified to be similar to the
+   scheme already in place in clm2.1 (this scheme insures that the number
+   of pfts that "empty" nodes receive is always less then the number of
+   pfts of other nodes).
+
+2) test-model.pl was updated to permit using the resolutions
+   T42compete and amazon as command line arguments
+
+3) Made small modifications so that offline code now 
+   works on the Compaq
+	
+4) The following testing was done to verify the above changes:
+  -------------------------------------------------------------
+  OFFLINE:
+  -------------------------------------------------------------
+  ibm (blackforest)
+  test-model.pl -res T42        -compare ~/src/clm2_deva_05/src
+  test-model.pl -res T42compete -compare ~/src/clm2_deva_05/src
+  test-model.pl -res amazon     -compare ~/src/clm2_deva_05/src
+
+  sgi (chinkookfe)
+  test-model.pl -res T42        -compare ~/src/clm2_deva_05/src
+
+  linux lf95 (apache)
+  test-model.pl -res T42        -compare ~/src/clm2_deva_05/src
+
+  compaq (colt)
+  test-model.pl -res T42       
+  -------------------------------------------------------------
+  CAM:
+  -------------------------------------------------------------
+  ibm (blackforest)
+  test-model.pl -compare ~/src/cam2_0_dev10_clm2dev5
+
+  sgi (chinookfe)
+  test-model.pl -compare ~/src/cam2_0_dev10_clm2dev5
+
+  linux lf95 (apache)
+  test-model.pl -compare ~/src/cam2_0_dev10_clm2dev5 (eul,fv only)
+
+===============================================================
+	
+===============================================================
+clm2_deva_05
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Nov 13 10:22:16 MST 2002
+Model: CLM
+Version: CLM2.deva.05
+One-line Summary: inserted protex into all routines
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+1) Inserted protex into all code
+2) Put bug fix into inicFileMod.F90 so that DGVM could be tested
+   with initial file. Created a new DGVM initial file for testing.
+3) Put change in restDGVMMod.F90 so that weights read in and
+   written out would be relative to gridcell rather than landunit.
+   This is now consistent with initial file weights.
+   This makes the conversion tool, convert_inic,
+   able to work for DGVM initial files.	(The convertsion tool
+   must still be tested for DGVM initial files).
+4) Testing:
+   Ran test-model.pl successfully for T42 on IBM, SGI and 
+	Linux (pgf90 and lf95)
+        bfb with clm2_deva_04	
+   Ran test-model.pl successfully for amazon on IBM and Linux (lf95) 
+	bfb with clm2_deva_04
+	clm2_deva_05 used initial dataset clm2_1_amazon.i.1982-01-01-00000.c021112.nc
+	clm2_deva_04 used initial dataset clm2_1_amazon.i.1982-01-01-00000.nc
+===============================================================
+	
+===============================================================
+clm2_deva_04
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Nov  4 14:29:34 MST 2002
+Model: CLM
+Version: CLM2.deva.04
+One-line Summary: wrote clm2.0 to clm2.1 conversion tool and updated inicFileMod.F90
+	to have simpler interfaces
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+	
+1) added following components to clmtype 1d derived types:
+   land1d:	
+     integer, pointer :: itypwat(:)!water type (soil,lake, wetland, glackier)
+   cols1d:	
+     real(r8),pointer :: wtlnd(:)  !weight relative to landunit
+     integer, pointer :: itypwat(:)!water type (soil,lake, wetland, glackier)
+   pfts1d:	
+     real(r8),pointer :: wtlnd(:)  !weight relative to landunit
+     real(r8),pointer :: wtcol(:)  !weight relative to column
+     integer, pointer :: itypwat(:)!water type (soil,lake, wetland, glackier)
+     integer, pointer :: itypveg(:)!vegetation type
+   added the computations of the above in clm_mapping.F90. This required adding
+   the routine clm_map1d routine to clm_mapping - since clm_map1d now has
+   to be called after iniTimeConst.F90 to have values for water type available
+   (had to modify initializeMod.F90).
+
+2) HistFileMod.F90 - Added the following variables to the history file when 1d 
+   output is requested:
+   land1d%wtxy, land1d%itypwat
+   cols1d%wtxy, cols1d%wtlnd, cols1d%itypwat, 
+   pfts1d%wtxy, pfts1d%wtlnd, pfts1d%wtcol, pfts1d%itypwat, pfts1d%itypveg
+
+3) InicFileMod.F90 - Simplified interfaces. Also, output all information for
+   the pfts1d, cols1d, land1d and grid1d to the initial file. 
+   DGVM modification: now output weights relative to gridcell not relative to 
+   column. This was done to simplify the tool (convert_inic) that converts
+   clm2.0 initial datasets to clm2.0 initial datasets. ***This feature for
+   DGVM has not yet been tested***.
+   
+4) Testing: 
+   - convert_inic: 
+     used convert_inic to convert the initial clm2.0 dataset, 
+     clmi_0000-09-01_64x128_T42_c020514.nc (along with the information from
+     clms_64x128_c020514.nc) to clm2.1 form. Verified that data read
+     from clm2.1 initial dataset was bfb the same as the data from the clm2.0 
+     initial dataset (on the ibm). 
+     see README file in convert_inic directory 
+
+     ***NOTE: *** The testing was not done with DGVM.
+     ***NOTE: *** The testing was not done with RTM data. This must be done before 
+     clm2.1 release.
+	
+   - ran test-model.pl successfully (T42- BGC,RTM on) on 
+     IBM(blackforest), SGI (chinookfe) and linux (apache) and verified bfb with 
+     clm2_deva_03
+===============================================================
+	
+===============================================================
+clm2_deva_03
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Oct 24 10:22:39 MDT 2002
+Model: CLM
+Version: CLM2.deva.03
+One-line Summary: incorporated slevis dust and VOC changes
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, slevis
+Changes answers: (depends on if DGVM is defined)
+   DGVM OFF: no (bit-for-bit) (IBM and SGI),  yes(roundoff - with PERGRO on) (Linux)
+   DGVM ON: yes	
+1) Put in fix so that Biogeochemistry modules only compiled if CPP variable 
+BGC is defined.
+
+2) BVOC changes: final code review by Christine Wiedinmyer and Sam Levis. 
+Correction of units in calculation of variable "par".
+
+3) Dust changes: emissions code updated with changes from Charlie Zender 
+and Sam Levis 
+  a. gravimentric water content instead of volumetric water content affects 
+     emissions -- variable gwc_sfc instead of vwc_sfc; 
+  b. effect of frozen soil added with variable liqfrac; 
+  c. parameter value corrections). Dry deposition code of Charilie Zender 
+     added by Sam Levis. Minor changes throughout clm as a result 
+    (subroutines driver, BareGroundFluxes, Biogeophysics_Lake, CanopyFluxes
+     and Biogeochemistry).
+Renamed DustEmissionMod.F90 to DustMod.F90 - modified initializeMod.F90
+and driver.F90 to access appropriate dust routines.
+
+4) DGVM: Minor changes to code in driver, Establishment, Phenology, EcosystemDynini 
+included by Sam Levis.
+
+5) BGC:
+introduced sz_nbr = 200 (number of sub-grid bins in large bin of dust size 
+distribution BGC only) in clm_varpar.F90
+
+6) Made changes to clmpoint.F90 and histFileMod.F90 to put following new variables
+on history file: DPVLTRB1, DPVLTRB2, DPVLTRB3, DPVLTRB4, HTOP, HBOT, TLAI, TSAI    
+
+7) Tests: 
+a) ran T42 test-model.pl on SGI, IBM and Linux with and without BGC defined to verify bfb
+   - only changes on IBM and SGI were in VOCFLXT and DSTFLXT when BGC was defined 
+     but not DGVM	
+   - Linux showed roundoff level changes when PERGRO was turned on
+b) Sam verified that doing an offline 3 year 3x3 run with DGVM, BGC and ACCUM turned on
+(with the current changes) gave maximum temperatures differences of 10**-4 when compared
+to a similar offline clm2.0 run (with the same dust changes).
+===============================================================
+	
+===============================================================
+clm2_deva_02
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Oct 22 10:00:02 MDT 2002
+Model: CLM
+Version: CLM2.deva.02
+One-line Summary: updated coupled model interface to work with clm2.1 data structures
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (IBM,SGI)
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+Changes made:
+	
+1) Updated clm_csmMod.F90 to work with clm2.1 data sructures and new code in coupled mode.
+   For case I (active land, all other data components), showed that results
+   differed to roundoff (when compared to CLM2.0) on the SGI with PERGRO not defined
+   For case I (active land, all other data components), showed that results
+   differed to roundoff (when compared to CLM2.0) on the IBM with PERGRO defined
+   For case K (active land, active atm, data ocn, data ice), 
+   error growth is horrible, so used print statements at nstep = 3 
+   to examine send array (this cannot be verified for case I) and verified that
+   results did not differ by more than 11-12 places at nstep=3.
+
+2) Fixed bug in DustEmissionMod.F90 when the cpp variable COMPETE was defined
+   (no bug exists if COMPETE is not defined)
+
+3) Fixed bug in DGVMMod.F90 that appeared over non-vegetated pfts (previously
+   DGVM was tested only in amazon mode)
+
+4) Put in fixes to routine clm_map (in module clm_mapping.F90) 
+   that were put in clm2_3_dev33 in clm_map.F90. Verified that results were
+   bfb with clm2_deva_01 with SPMD enabled (IBM running test_model.pl) for 
+   both COMPETE defined and not defined.
+
+5) Added the following variables to clm_varcon
+     zlak(1:nlevlak), dzlak(1:nlevlak), zsoi(1:nlevsoi),
+     dzsoi(1:nlevsoi), zisoi(0:nlevsoi)    
+   and modified histFileMod.F90 so that zsoi now appears in the history file.
+
+6) Added 1d gridcell, landunit, column and pft mapping indices to initial data file.
+
+7) Tests performed in non-coupled mode:
+   ran test-model.pl (T42) successfully with and without COMPETE defined on 
+	IBM, SGI and Linux
+   compared bfb successfully with clm2_deva_01 on IBM and SGI
+===============================================================
+	
+===============================================================
+clm2_deva_01
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Oct 10 12:09:38 MDT 2002
+Model: CLM
+Version: CLM2.deva.01
+One-line Summary: brought clm2_1 code onto main development branch
+Requires change in build system: yes
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: yes
+Machines tested: IBM, SGI, Linux (lf95 and pgf90)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, erik
+Changes answers: Yes (roundoff)
+Changes made:
+	
+This tag involves massive changes to bring the new data structures
+(clm2_3_dev32_brnchT_clm3dev_1_13) onto the development branch as well
+as getting the code to now compile and run on linux under both pgf90
+and lf95 (with debugging as well as optimization invoked). Here is a
+basic summary of the changes to clm2_3_dev32_brnchT_clm3dev_1_13:
+
+1) all 'use precision' statemnts  changed to "use shr_kind_mod, only: r8 => shr_kind_r8"
+
+2) updated to changes in clm2_3_dev33
+
+3) clmtype initialization moved to clmtype_init (to satisfy pgf90) - initial values
+   now set to nan
+
+4) had to split pft_to_column into 2 routines to satisfy the new initialization of
+   clmtype components to signaling nan:
+     pft_to_col_glob  !averages over column pfts for soil/lake variables
+     pft_to_col_soil  !averages over column pfts for soil variables
+   both of these were placed in the module - pft2columnMod.F90	
+
+5) introduced new routine - histVarConst.F90 that initializes time constant history
+   variables (such as lake variables that need to have history variables set to 0 so
+   that infinities do not result when grid averages are performed). Currently, all
+   variables form driver.F90 or BiogeophysicsLake.F90 that were set to zero at each time step
+   have been moved to this routine. 
+
+6) all routines in biogeophys, biogeochem, ecosysdyndgvm and ecosysdyn were changed to
+   modules in order to satisfy lf95 checking flags. Some new modules contain logical groupings
+   of previously separate routines:
+
+   biogeophys/
+   BalanceCheckMod.F90      : BalanceCheck 
+   BareGroundFluxesMod.F90  : BareGroundFluxes
+   Biogeophysics1Mod.F90    : Biogeophysics1
+   Biogeophysics2Mod.F90    : Biogeophysics2
+   BiogeophysicsLakeMod.F90 : BiogeophysicsLake
+   CanopyFluxesMod.F90      : CanopyFluxes, Stomata  
+   FracWetMod.F90           : FracWet
+   FrictionVelocityMod.F90  : FrictionVelocity, MoninObukIni 
+   Hydrology1Mod.F90        : Hydrology1 
+   Hydrology2Mod.F90        : Hydrology2 
+   HydrologyLakeMod.F90     : HydrologyLake  
+   QSatMod.F90              : QSat
+   SnowHydrologyMod.F90     : SnowWater, SnowCompaction, CombineSnowLayers, DivideSnowLayers, Combo 
+   SoilHydrologyMod.F90     : SurfaceRunoff, Infiltration, SoilWater, Drainage
+   SoilTemperatureMod.F90   : SoilTemperature, SoilThermProp, PhaseChange
+   SurfaceAlbedoMod.F90     : SurfaceAlbedo, SnowAlbedo, SoilAlbedo, TwoStream, SnowAge 
+   SurfaceRadiationMod.F90  : SurfaceRadiation 
+   TridiagonalMod.F90       : Tridiagonal 
+   WetIceHydrologyMod.F90   : WetIceHydrology 
+
+   biogeochem/
+   BiogeochemistryMod.F90   : Biogeochemistry
+   DustEmissionMod.F90      : Dust, Dustini
+   VOCEmissionMod.F90       : VOCEmission
+
+   ecosysdyn/ 
+   EcosystemDynMod.F90      : EcosystemDyn
+
+   ecosysdyndgvm/
+   AllocationMod.F90        : Allocation 
+   DGVMMod.F90              : lpj, lpjreset1, lpjreset2, resetTimeConstDGVM
+   EcosystemDynDGVMMod.F90  : EcosystemDynini, EcosystemDyn, Phenology, FireSeason, LitterSOM 
+   EstablishmentMod.F90     : Establishment 
+   FireMod.F90              : Fire
+   KillMod.F90              : Kill 
+   LightMod.F90             : Light 
+   MortalityMod.F90         : Mortality 
+   ReproductionMod.F90      : Reproduction 
+   TurnoverMod.F90          : Turnover 
+   accumDGVMMod.F90         : accumDGVMini
+   histFileDGVMMod.F90      : histcrt_dgvm, histwrt_dgvm
+   restDGVMMod.F90          : restart_dgvm 
+   
+7) implemented fix in RTMMod.F90 so that obtain bfb restarts on linux
+   (this was never a problem on sgi or sun)
+
+8) moved/removed code from camclm_share
+
+   infnan => src/main/nanMod.F90
+   cfort.h => src/utils/timing/cfort.h 
+   datetime.F90 => src/main/getdatetime.F90
+   string_utils.F90 => added to src/main/time_manager.F90
+   linebuf_stdout.c => removed
+
+9) removed all references to mpishorthand.F90 and put in new file mpiinc.F90 
+   (simply includes mpif.h)
+
+10) OFFLINE tests:
+    ran test-model.pl with amazon and T42 options and 
+        verified bfb with clm2_3_dev32_brnchT_clm3dev_1_13 on ibm 
+    ran test-model.pl (1-5) successfully with amazon and T42 options on following platforms
+        ibm (babyblue), sgi (chinookfe), linux (apache - lf95 and pgf90) 
+    PROBLEM WITH SUN: test-model.pl @ T42 ran tests 1 and 2 successfully - 
+	exception on test3 with mpi
+    compaq not tested yet
+
+11) COUP_CAM tests:
+    verified that COUP_CAM was bfb with clm2_3_dev32_brnchT_clm3dev_1_1
+	
+12) COUP_CSM tests: 	
+    SGI: verified that configuration I gave roundoff vs ccsm2_0_1 
+	 verified that SPMDF_SMPT was bfb with SPMDT_SMPF
+    IBM: configuration I gave roundoff vs ccsm2_0_1 for most fields
+	 some fields had changes that were larger than roundoff
+	 for the worst case, althought the relative error was roundoff
+	 this needs to be examined further 
+===============================================================
+	
+===============================================================
+clm2_3_dev33
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Oct  1 12:21:13 MDT 2002
+Model: CLM
+Version: CLM2.3.dev33
+One-line Summary: fixed bug in clm_map and updated to ESMF_0_0_2p5
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI (successfully ran test-model.pl for 3x3 config)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+	
+1) updated esmf from ESMF_0_0_2p4 to ESMF_0_0_2p5
+
+2) modified main/clm_map.F90 to fix bug for large number MPI tasks (current
+   algorithm resulted in case where some processors had no patches)
+
+3) updated to clm changes in cam2_0_dev16 and cam2_0_dev24
+   - removed the is_lsm method in atm_lndMod.F90 methods. Always
+     assume that lsm will ONLY be run with phys366 and CLM will ONLY be
+     run with the new physics.
+   - Use a "C" wrapper to system call on SGI so that the return
+     code can be queried. (change to fileutils.F90 and added system_cmd.c.
+
+4) changed length of case name read in from restart to 32 (fixed potential
+   bug on branching) 
+
+5) changed histHandlerMod.F90 so that in COUP_CSM mode, restarts are written
+   ONLY when the coupler sets restart flag.
+
+===============================================================
+	
+===============================================================
+clm2_3_dev32
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Aug 19 11:15:03 MDT 2002
+Model: CLM
+Version: CLM2.3.dev32
+One-line Summary: modified history module so that per processor memory 
+	scales inversely with processor number in SPMD mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, erik
+Changes answers: no (bit-for-bit) 
+1) Modified history file module so that per-processor memory scales
+   inversely with total number of processors
+2) Modifed allocation of memory in surface data generation routines
+   so that T170 surface dataset could be generated
+3) Tests performed:
+   testing:
+   ran 3x3 with DGVM,ACCUM,BGC enabled and compared to clm2_3_dev31 
+	 bfb (ibm,sgi)
+   ran T42 with DGVM,ACCUM,BGC off and compared to clm2_3_dev31 
+	bfb (ibm,sgi)
+   compared that T42 surface file with clm2_3_dev31 
+	bfb (sgi)	
+===============================================================
+	
+===============================================================
+clm2_3_dev31
+Originator: mvertens ( Mariana Vertenstein)
+Date: Sat Jun 22 13:21:48 MDT 2002
+Model: CLM
+Version: CLM2.3.dev31
+One-line Summary: updated clm2_dev code to cam2_0_dev7
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+	
+Updated clm2_dev code to cam2_0_dev7 
+  (cvs udpate -kk -j clm2_3_dev30 -j cam2_0_dev7)
+	
+Specifically this included:
+	
+1) Removal of precision module and use csm_share shr_kind_mod module
+   to get precision types. Use the rename feature to get the names
+   that were used in the precision module.
+  
+2) Removed limit on length on string read in from restart pointer file, 
+   as this causes problem when casenames are long.
+  
+3) Fixed dispose bug for auxillary files (only applies to coupled mode)
+  
+4) Removed pilgrim/ for clm2_dev	
+===============================================================
+	
+===============================================================
+clm2_3_dev30
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Apr 29 16:44:56 MDT 2002
+Model: CLM
+Version: CLM2.3.dev30
+One-line Summary: made all arguments to generic min,max consistent
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM,
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Made all arguments to generic min and/or max consistent
+   This fixes many flint complaints, primarily for DGVM code
+2) Turned DGVM, BGC and ACCUM on by default for internal 
+   development testing scripts
+===============================================================
+	
+===============================================================
+clm2_3_dev29
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Apr 26 15:08:35 MDT 2002
+Model: CLM
+Version: CLM2.3.dev29
+One-line Summary: updated to ESMF_0_0_2p4
+Requires change in build system: no
+(Detailed description below)
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux (only lf95)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Updated to ESMF_0_0_2p4 (this fixes certain linux
+   compilation problems)
+===============================================================
+	
+===============================================================
+clm2_3_dev28
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Apr 23 09:34:18 MDT 2002
+Model: CLM
+Version: CLM2.3.dev28
+One-line Summary: removed unnecessary files from atmlnd_share directory 
+Requires change in build system: no
+(one-line description of changes: Makefile, include files, directories, etc.)
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM,
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+===============================================================
+	
+===============================================================
+clm2_3_dev27
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Apr 23 09:15:49 MDT 2002
+Model: CLM
+Version: CLM2.3.dev27
+One-line Summary: added FPSN to default histor output, updated cam 
+	          interface to cam1_8_dev1
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Added FPSN to default history output (no longer computed 
+   in Biogeochem.F90, now computed at end of Biogeophysics1.F90).
+2) Updated atm_lndMod.F90 to cam1_8_dev1 (fractional land version of cam)
+===============================================================
+	
+===============================================================
+clm2_3_dev26
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Apr 22 14:52:35 MDT 2002
+Model: CLM
+Version: CLM2.3.dev26
+One-line Summary: SPMD mod: made gather or scatter buffer different 
+	          between root and non-root processes
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: yes
+Machines tested: IBM (offline, cam, csm)
+	         SGI (offline only)
+	         Linux (pgf90, lf95, offline)
+	         Linux (pgf90, cam)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, erik
+Changes answers: no (bit-for-bit) 
+1) Previous version of having gatherv (or scatterv) buffers
+be the same for both root and non-root processes seems to
+violate the standard (even though no compiler to date has
+detected an error and the code has run without any problem).
+(See MPI-The Complete Reference, Volume 1, p.9).
+This change will now make the code standard compliant.
+===============================================================
+	
+===============================================================
+clm2_3_dev25
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Apr 15 14:16:19 MDT 2002
+Model: CLM
+Version: CLM2.3.dev25
+One-line Summary: got esmf changes to work with lahey compiler on apache
+Requires change in build system: no 
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, Linux
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Updated to ESMF_0_0_2p3 (changes only effect Linux platforms)
+   Put in changes so that offline code now works with lahey
+   compiler (on apache - CGD linux platform)	
+===============================================================
+	
+===============================================================
+clm2_3_dev24
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Apr 10 19:54:54 MDT 2002
+Model: CLM
+Version: CLM2.3.dev24
+One-line Summary: updated to ESMF_0_0_2p1
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: Linux (Longs)
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Updated to ESMF_0_0_2p1 (changes only effected Linux platforms)
+   Can no compile optimized ESMF on machine longs
+   (ran test-model.pl test3 on longs - same restart problem with
+   QCHANR and QCHOCNR as below)	
+===============================================================
+	
+===============================================================
+clm2_3_dev23
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Apr 10 13:33:34 MDT 2002
+Model: CLM
+Version: CLM2.3.dev23
+One-line Summary: fixed comments for CLm2.0 release
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, Linux
+Tested that restarts are bit-for-bit: yes (see below)
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+1) fixed all comments for CLM2.0 release
+2) histFileMod - removed requirement that following fields
+   had to be on primary history file:
+  'TV', 'TG','TSNOW','H2OCAN','H2OSNO','SNOWLIQ','SNOWICE','SNOWAGE','SNOWDP' 
+  'TSOI','TLAKE','SOILLIQ','SOILICE'
+3) updated scripts in test-model.pl and jobscript.csh for CLM2.0 release
+   (by default clm2_dev code will have BGC only turned on, not DGVM or ACCUM) 
+4) put in fix in mkgridMod.F90 so that landfrac will be read in if if are
+   reading in a grid file and if it is on initial grid file 5) added
+   first version of Code Reference document 6) Possible problem: when
+   testing on linux, restart is bfb except for QCHANR and QCHOCNR
+   (only roundoff changes for a few points). This needs to be looked into.   
+===============================================================
+	
+===============================================================
+
+clm2_3_dev22
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Apr  5 12:28:45 MST 2002
+Model: CLM
+Version: CLM2.3.dev22
+One-line Summary: brought code up to date with ESMF_0_0_2
+Requires change in build system: yes
+Put in appropriate modifications for ESMF build 
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes (ran test-model.pl)
+Tested that different domain decompositions match bit-for-bit: yes (ran test-model.pl)
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Brought code up to date with ESMF_0_0_2 
+   (cvs update -kk -d -P -j MF_LLU_O_O_12p1 -j ESMF_0_0_2)	
+   made following changes to timemanger.F90:	
+     Use MFM_TimeMgmt becomes Use ESMF_TimeMgmtMod
+     All function calls change from MFM_<call> to ESMF_<call>
+     e.g. (MFM_TimeMgrInit --> ESMFTimeMgrInit)
+     All type names change MF --> ESMF
+     e.g. (type(MF_Date) :: date --> type(ESMF_Date) :: date)
+   modified bld/offline/Makefile and bld/offline/tests/Makefile
+   to use the new esmf code
+===============================================================
+	
+===============================================================
+
+clm2_3_dev21
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Apr  2 21:50:55 MST 2002
+Model: CLM
+Version: CLM2.3.dev21
+One-line Summary: put in changes to decrease memory by 25%- 30% 
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) clm_varsur.F90, initialize.F90
+   made soic2d, sand3d and clay3d allocatable arrays
+   freed memory for these arrays at the end of initialize.F90	 
+   made pctgal, pctlak, pctwet and pcturb allocatable arrays
+   only freed memory for these arrays at the end of initialize.F90
+   if DGVM was not defined
+2) histFileMod.F90
+   allocated memory for slfld%value, slfld%count, mlsoifld%value,
+   and mlsoifld%count based on nhist (the actual number of history
+   files) not maxhist	
+3) tests - ran test-model.pl on ibm and sgi and compared
+   to bfb with clm2_3_dev19
+   also did branch run with 1 auxillary file for both 
+   clm2_3_dev21 and clm2_3_dev19 and showed bfb results for
+   both primary and auxillary history files.  	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev20
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Apr  1 16:14:12 MST 2002
+Model: CLM
+Version: CLM2.3.dev20
+One-line Summary: brought code up to date with cam1_7_dev28
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) brought code up to date with cam1_7_dev_28
+   - made caseid 32 characters
+   - go rid of redundant use of numpatch in "use" statements
+   - updated interface changes in atm_lndMod.F90
+2) fixed comments for release	
+3) made amax1 and amin1 generic functions in atmdrvMod.F90	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev19
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Mar  1 14:29:28 MST 2002
+Model: CLM
+Version: CLM2.3.dev19
+One-line Summary: put in fixed for VOC and BGC mode
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, slevis
+Changes answers: no (bit-for-bit) 
+1) Fixed by in DGVM history file for begenergy and begwater output to be correct
+2) Put in fix in mksrfdat for most files so that surface dataset could be 
+   could be created at 1 point without the model stoppint
+3) Fixed bug in biogeophys/FrictionVelocity.F90 (BGC mode) so that running
+   with more than 1 thread gave bfb results (bug fix resulted in introduction
+   of fm in clmtype)
+4) Added BGC history files in histUpdate.F90
+5) biogeochem/VOCEmission.F90: 
+   changed epsilon (empirical emission factors) values according to Alex Gunthers   
+   use of radiation divided between sunlit and shaded leaves
+   (nvoc parameter in clm_varpar.F90 changed from 4 to 5)
+6) DustEmission:  
+   fixed bug that resulted in different answers for different number of OpenMp threads
+   all initialization moved to Dustini
+7) Driver.F90 - Fixed dust and VOC initialization in Driver.F90
+8) Testing note: in doing testing on IBM (Babyblue) discovered that
+   comiling with qsmp=noauto removed from the Makefile gave
+   very different answers. When PERGRO was turned on, the
+   history files in most cases appeared	to differ to only roundoff.
+   All previous testing has been done with qsmp=noauto enabled.
+   Note that bounds checking cannot working will not compile for
+   some of the files unless qsmp=noauto does not appear as a compile flag.
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev18
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Feb 19 10:02:36 MST 2002
+Model: CLM
+Version: CLM2.3.dev18
+One-line Summary: added missing_value attribute for history file attributes
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI (ran test-model.pl)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: oleson, myself
+Changes answers: no (bit-for-bit) 
+ Added missing_value back in as history file field attributes 
+ since _FillValue is not recognized by the NCO operator suite
+ Keith Oleson made this modification and did the testing
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev17
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Feb 14 16:16:38 MST 2002
+Model: CLM
+Version: CLM2.3.dev17
+One-line Summary: introduced CPP variable ACCUM to fix CAM memory problem on IBM
+Requires change in build system: yes
+CPP variable ACCUM must be defined in preproc.h when running with DGVM and BGC defined 
+Tested to work coupled with CCSM: no
+Tested to work with CAM: yes
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes (CAM)
+Tested that different domain decompositions match bit-for-bit: yes (CAM)
+Code reviewed by: myself, erik
+Changes answers: no (bit-for-bit)
+ Introduced the CPP variable ACCUM in preproc.h to fix the 
+ following problem in COUP_CAM mode on the IBM
+ at T42L26, running test-model.pl -s eul:3 for cam1_7_dev27 
+ with nhtfrq(1)= 10 ( so that an abs/emis restart is written 
+ as well as restart files all history files) - the model aborted 
+ with an BPT error
+ at T21L26, the above test worked fine
+ when all clm2 accumulation routines were no longer invoked
+ as was the case for cam1_7_dev27 (with clm2_3_dev11), the
+ test at T42L26 now worked fine. Clearly there is some kind
+ of memory problem being encountered on the IBM that needs
+ to be investigated. This fix just provides a short term
+ solution.
+ Both test-model.pl and jobscript.csh were modified to 
+ put in this CPP variable, since both these scripts run
+ with DGVM turned on by default. Note that if DGVM and BGC are
+ defined, ACCUM must now also be defined.	
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev16
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Feb 11 15:33:54 MST 2002
+Model: CLM
+Version: CLM2.3.dev16
+One-line Summary: fixed private statement in driver.F90
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: None
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Fixed private statement in driver.F90
+   No testing
+===============================================================
+	
+===============================================================
+
+clm2_3_dev15
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Feb  7 18:12:59 MST 2002
+Model: CLM
+Version: CLM2.3.dev15
+One-line Summary: put in changes to that DGVM read in initial dataset successfully
+Requires change in build system: no
+(one-line description of changes: Makefile, include files, directories, etc.)
+Tested to work coupled with CCSM: yes
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Put in modifications so that initial dataset was read in and 
+   written out correctly in DGVM mode
+   In particular, the weight vectors have to be written out
+   differently than the other fields on the initial dataset.
+   Weights for land vector patches with zero weights cannot be 
+   set to those of the first patch with non-zero weight - as is
+   done for the other fields. Also, the call to iniTimeConstDGVM
+   must appear after the initial dataset is read in.	
+2) Added cell area and land fraction to history file.
+3) Tests
+   a) Ran an initial regional amazon simulation for 3 years (1979-182)
+      Started from an initial 1981 clm2 dataset and ran from 1981-1982.
+      Verified that the output at 1982 from the latter run was 
+      reasonable.   
+   b) Verified that restarts worked in both DGVM and non-DGVM mode
+      (offline) 
+   c) offline - ran test-model.pl on both SGI and IBM successfully.
+   c) CSM - verified bfb compatibility with ccsm2_0_beta35.
+      Verified that reading and writing initial datasets were
+      bfb with ccsm2_0_beta35. 
+      Verified that restarts and branching were bfb in ccsm2_0_beta35
+      with new clm2 code.	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev14
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Feb  5 14:38:42 MST 2002
+Model: CLM
+Version: CLM2.3.dev14
+One-line Summary: fixed minor compilation bugs on sgi
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (IBM only)
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+1) Fixed minor compilation bugs on utefe
+===============================================================
+	
+===============================================================
+
+clm2_3_dev13
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Feb  4 10:47:36 MST 2002
+Model: CLM
+Version: CLM2.3.dev13
+One-line Summary: introduced DGVM history file and added DGVM fields to initial dataset
+Requires change in build system: no
+(Detailed description below)
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, Erik Kluzek
+Changes answers: no (bit-for-bit) 
+	
+1) DGVM
+  a)added module histFileDGVM.F90 to create instantaneous 
+    DGVM history file at the beginning of each year (replaces
+    previous ascii files. This required also modifying lpjreset2.F90
+    and lpj.F90 to call netCDF output routines.
+  b)added module accumDGVM.F90 to begin the modularization of 
+    time accumalation for DGVM variables - moved initialization
+    calls in initializeMod.F90 to routine accumDGVMini in
+    accumDGVM.F90.	    
+  c)changed call to FireSeason and Littersom in EcosystemDyn to
+    occur for nstep> 1 (to be compatible with CAM and CSM)
+  d)removed setting of clm%wf=0 in LitterSom (not needed since
+    wf appears on restart file)
+	
+2) Accumulation
+   made accumulation initialization and restart output always
+   occur - to be compatible with CCSM2.0 release.
+   Removed all DGVM CPP directives from clm_map.
+	
+3) Restart
+   a)restart file id now changed to 4 
+     accumulations fields written/read from restart now 
+     subgrid weights written/read from restart now if CPP variable 
+     DGVM is defined
+   b)introduced new logical function, do_restwrite in histHandler.F90
+     to determine if restart files should be written for the current time
+     step
+	
+4) Initialization
+   a)modified inicFileMod.F90 to add DGVM fields to initial dataset 
+     if CPP variable DGVM is defined. Rewrote output/intput of initialization 
+     fields to be consistent with output of DGVM fields
+   b)introduced new logical function, do_inicwrite, in inicFileMod.F90 to 
+     determine if initial condition files should be written at the
+     current time step
+   c)modified Hydrology2.F90 to zero z(j) and zi(j) if there is now snow.
+        if (clm%snl > -nlevsno) then
+           clm%snowage = 0.
+           do j = -nlevsno+1, clm%snl
+              clm%h2osoi_ice(j) = 0.
+              clm%h2osoi_liq(j) = 0.
+              clm%t_soisno(j) = 0.
+              clm%dz(j) = 0.
+              clm%z(j) = 0.
+              clm%zi(j-1) = 0.
+           enddo
+         endif
+     this makes the initial dataset z and zi fields consistent with the snl field.
+     this modification does not effect the history dataset and is non-answer changing.
+	
+5) Testing
+   a)Ran test-model.pl on IBM (babyblue) and verified bfb results with clm2_3_dev12
+     verifed that initial files were bfb (without the new DGVM changes) 
+   b)Verified that new initial files (with and without the DGVM additions)
+     were read in and written out correctly on IBM (babyblue) 
+   c)ran non-global amazon simulation for 3 years
+     #define LSMLON  15, #define LSMLAT  11    
+     fsurdat = '$MODEL_DATADIR/srfdata/offline/surface-data.015x011.amazonnew.nc'
+     verified that restarts and branches worked correctly
+     verified that DGVM history file was valid
+     have not verified the validity yet of the new initial files with the DGVM additions
+     this will be done for next tag
+	
+===============================================================
+===============================================================
+
+clm2_3_dev12
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Jan 25 09:54:03 MST 2002
+Model: CLM
+Version: CLM2.3.dev12
+One-line Summary: implemented ccsm2.0 output filename requirements
+Requires change in build system: yes
+namelist was changed and CPP variable SHELL_MSS was removed
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI, LINUX
+  NOTE: ran test-model.pl successfully on babyblue(AIX) and utefe(SGI)
+  however, on longs(LINUX) the history output for QCHOCNR and QCHANR
+  was different when for the restart run when the number of processors
+  were changed - this was still the case even when all the PARALLEL
+  directives were removed from RtmMod.F90 - the differences
+  only appeared to roundoff. Since there are know problems with the
+  portland group compiler, this problem should be kept in mind, but
+  was not investigated further.	
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes (see note)
+Code reviewed by: myself, Erik Kluzek
+Changes answers: no (bit-for-bit) 
+Changes made:
+	
+1) Input/output and archiving
+  - implemented CCSM2.0 Ouput filename requirements
+      introduced new functions in histHandler.F90: set_hist_filename, set_init_filename
+      introduced new function in restFileMod.F90: set_rest_filename 
+  - put all I/O in new module fileutils.F90 - these now have the names:
+      public :: get_filename, set_filename, opnfil, getfil, putfil, getavu, relavu
+      private:: shell_cmd
+  - I/O routines from camclm_share/ioFileMod no longer used in any routine
+  - removed ioUnitMod.F90 (moved getavu and relavu no in fileutils)    	
+  - removed msvmn and mss comment from putfil routine
+  - removed CPP variable SHELL_MSS  (no longer needed) - all mss archiving
+    now involves system calls 
+  - removed msspni.F90 - mass store file paths now created at archive time
+      removed variables locpnh, locpnr, locfnr, msspnh and msspnr 
+      from clm_varctl    
+  - removed hist_nswrps and hist_irt as namelist input and introduced new
+    namelist input mss_wpass, mss_irt and archive_dir
+  - since mass store comments no longer used, removed histFileMod variables : 
+      mdcur_f, mscur_f, mcdate_f, mcsec_f, mdcur_e, mscur_e, mcdate_e,  mcsec_e, 
+      nmon, nyr, nfil
+
+3) Restarts
+
+    Introduced new routine, write_rest_pfile, to write restart pointer file
+    Added comments to restart pointer file to list history files needed for restart
+
+3) Misc
+
+  -  made get_filename a function call rather than a subroutine call to be
+     consistent with other new functions introduced in fileutils.F90
+  -  introduced log output for zsoi, zisoi and dzsoi  
+  -  made history output ZSOI and DZSOI only have valid values over soil
+
+4) Tests
+
+  comparison with clm2_3_dev11
+  using the following namelist:
+
+    nestep        = 100	
+    hist_nhtfrq   = 0,30,20
+    hist_mfilt    = 1,1,3
+    hist_fldaux1  = 'TV','TSOI'
+    hist_fldaux2  = 'TG','TSOI'
+
+   - verified that CCSM2.0 naming convention was followed
+   - verified that primary and auxillary files were bfb with clm2_3_dev11 for initial run
+   - verified that primary and auxillary files were bfb with clm2_3_dev11 for branch run
+   - verified that primary and auxillary files were bfb when restart was
+     done (i.e. nestep=27 for nsrest=0 followed by nestep=100 for nsrest=1)
+
+
+===============================================================
+===============================================================
+
+clm2_3_dev11
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Jan 11 14:45:32 MST 2002
+Model: CLM
+Version: CLM2.3.dev11
+One-line Summary: changed SHR_CONST_TKREF to SHR_CONST_TKFRZ
+Requires change in build system: yes
+changed Makefile to reflect update of esmf
+to version MF_LLU_O_O_12p1 
+now esmf library is build in executable directory under libesmf/	
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+ran test-model.pl on IBM and compared to clm2_3_dev10 output
+Name of tests cases on NCAR Mass-Store: (For changes that change answers)
+1) updated src/csm_share to share2_1_2_brnchT_const6
+2) updated src/utils/emsf to MF_LLU_O_O_12p1 
+   changed Makefile to reflect this update and move esmf library
+3) changed SHR_CONST_TKREF to SHR_CONST_TKFRZ
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev10
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Dec 10 11:57:23 MST 2001
+Model: CLM
+Version: CLM2.3.dev10
+One-line Summary: added use statements for needed share constants for cam and csm modes
+Requires change in build system: no
+(Detailed description below)
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: none
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+Name of tests cases on NCAR Mass-Store: (For changes that change answers)
+Changes made:
+1) added use statements for needed share constants for cam and csm modes
+   so that code would compile	
+
+===============================================================
+	
+===============================================================
+
+clm2_3_dev9
+Originator: slevis ( Samuel Levis)
+Date: Fri Dec  7 14:58:36 MST 2001
+Model: CLM
+Version: CLM2.3.dev9
+One-line Summary: correction in lpjreset2.F90 to work with SPMD defined
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+Changes made:
+1) corrected code in lpjreset2.F90 (related to dgvm only) to work
+with SPMD defined. NB: clm2_3_dev8 did not work with DGVM and SPMD defined
+
+Tested with test-model.pl script on IBM
+Tested with 2 year simulation (DGVM defined) on SGI
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev8
+Originator: slevis ( Samuel Levis)
+Date: Fri Dec  7 10:06:44 MST 2001
+Model: CLM
+Version: CLM2.3.dev8
+One-line Summary: put in new share constants, dgvm bug fix, and dgvm diagnostic
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: Yes (new-physics)
+Changes made:
+1) new shared constants module (ccsm2_0_beta24)
+   relevant changes in code
+2) bgc/dgvm bug fix in Biogeochemistry.F90
+3) added diagnostic in lpjreset2.F90
+tested with dgvm undefined and got small changes (reviewed by whole land group)
+tested with dgvm undefined and values of constants back to clm2 values except
+for PI: obtained roundoff changes (up to 1 year simulations)
+tested with dgvm defined and values of constants back to clm2 values except PI:
+obtained same answers (2 year simulations)
+tested with dgvm and rtm defined and constants back to clm2 values except PI:
+obtained same answers (1 day simulations)
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev7
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Dec  6 11:10:58 MST 2001
+Model: CLM
+Version: CLM2.3.dev7
+One-line Summary: fixed problems relating to incorporating esmf calendar manager in csm mode
+Requires change in build system: no
+Tested to work coupled with CCSM: YES
+Tested to work with CAM: no
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: sometimes bfb and sometimes roundoff (see below)
+Changes made:
+1) fixed minor problems relating to incorporating esmf calendar manager
+   in coupled mode
+
+testing:
+ran testing and validation scripts config K 
+ccsm model restart and branches are bfb (with respects to a 10 day run)
+clm2_3_dev7 results in either bfb or roundoff changes with respect to 
+cccsm2_0_beta27
+if coupled model is run from 00011215 for 10 days 
+  results are bfb
+if coupled model is run from 00010101 for 10 days 
+ results are bfb for first 27 land model time steps and then start
+ different to roundoff due to roundoff diffs in the calendar 
+ day computation between the old calendar day routine and the
+ esmf calendar day computation	
+
+===============================================================
+	
+===============================================================
+
+clm2_3_dev6
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Dec  3 11:41:39 MST 2001
+Model: CLM
+Version: CLM2.3.dev6
+One-line Summary: fixed problems for code to work in COUP_CCM mode
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (but not bfb comparisons)
+Tested to work with CAM: yes 
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit:yes
+Code reviewed by: myself, erik
+Changes answers: no (bit-for-bit)
+	
+Changes made:
+1) fixed problems for code to work in COUP_CCM mode
+2) updated src/utils/esmf to version MF_LLU_0_0_11p3
+   (this is consistent with cam1_7_dev12)
+	
+NOTE: discovered that incorporation of esmf calendar changes
+resulted in roundoff changes on the IBM (this appeared
+at time step 96 with 1200 sec time step when starting from
+19971231).  When both the code was compiled with the DEBUG
+flag (so that libg of esmf was used) the differences became bfb)
+However, for some initial dates the results were bfb.
+Changed documentation for clm2_3_dev5 to reflect this.
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev5
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Nov 27 13:47:04 MST 2001
+Model: CLM
+Version: CLM2.3.dev5
+One-line Summary: put in esmf time manager
+Requires change in build system: yes
+this is transparent to the user - Makefile and script have been updated
+Tested to work coupled with CCSM: yes 
+Tested to work with CAM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself, erik
+Changes answers: no (bit-for-bit - sgi) yes (roundoff - ibm)
+Changes made:
+1) put in esmf time manager into clm2 code
+ to see the explicit interface specifications, invoke make
+   in clm2/doc/Dev and examine the resulting postscript or
+   html files
+ tests: started on 19971201 with arbitrary initializion
+   and ran until several timsteps into 19981201. Compared
+   that the resulting output was bfb with clm2_3_dev4.
+   also ran test-model.pl on ibm and sgi and compared with clm2_3_dev4	
+   must modify write statemens to see output with
+   enough decimal places to compare	 
+2) added UsersGuide and updated it to the latest changes
+ to see the either the postscript or html version of the UsersGuide,
+   invoke make in clm2/doc/UsersGuide
+3) updated the Makefile in both bld/offline and bld/offline/tests
+   to work with the new esmf calendar manager interface
+===============================================================
+	
+===============================================================
+
+clm2_3_dev4
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Nov 16 09:46:39 MST 2001
+Model: CLM
+Version: CLM2.3.dev4
+One-line Summary: made clm work in csm and cam mode with spmd on
+Requires change in build system: no
+Tested to work coupled with CCSM: yes  (IBM only)
+  tested bfb with ccsm2_0_beta25 for 3 day run 
+  tested bfb resarts - atm, docn, dice for 5 day restart in 10 day run
+Tested to work with CAM: yes
+  ran test-model.pl on ibm
+  need to do this on all platforms before commiting to cam branch
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+  ran clm test-model.pl	on IBM and SGI
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) fixed mpi gatherv/scatterv bugs atm_lndMod.F90 and clm_csmMod.F90 
+   so that code now runs in cam and csm mode on ibm 
+2) introuced spmd_init_patch routine in spmdMod.F90 to initialize
+   arrays for number of per processor land/patch points 	
+3) removed rtm_doavg from namelist - rtm averaging is now done
+   if rtm_nsteps is set to greater than 1
+4) introduced call to spmd_init_patch in clm_map.F90
+5) fixed minor non answer changing bug in clm_map.F90 so that
+   patch points will still be distributed evenly across processors
+   even for very small land number or very large processor count
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev3
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Nov  9 13:35:18 MST 2001
+Model: CLM
+Version: CLM2.3.dev3
+One-line Summary: put in automated testing tools and CF1.0 conventions in history files
+Requires change in build system: no
+Tested to work coupled with CCSM: NO
+Tested to work with CAM: NO
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Introduced automated testing script test-model.pl
+   ran this on IBM and SGI and compared to clm2_3_dev2
+   to invoke this, go into bld/offline/tests and type
+    > test-model.pl 
+    (to do debug tests, restart tests)
+    or 
+    > test-model.pl -c control_src_dir 
+    (to do  debug tests, restart tests and to compare to control_src_dir)	
+   to get options to test-model.pl type
+   > test-model.pl -h
+2) Put in CF1.0 conventions into clm history file
+3) Put in consistency check with cam for restart
+4) Changed strings containing ccm to strings containing cam
+   NOTE: CPP variable COUP_CCM changed to COUP_CAM
+	
+===============================================================
+	
+===============================================================
+
+clm2_3_dev2
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Nov  8 10:26:16 MST 2001
+Model: CLM
+Version: CLM2.3.dev2
+One-line Summary: fixed bug to make results bfb with clm2_2_14 (DGVM and BGC on)
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: SGI (offline mode only)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+	(yes relative to clm2_3_dev1)
+	(no relative to clm2_2_14)
+Changes made:
+1) Fixed bug in Establishment.F90 - results are now bfb with clm2_2_14
+
+===============================================================
+===============================================================
+
+clm2_3_dev1
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Nov  6 14:35:10 MST 2001
+Model: CLM
+Version: CLM2.3.dev1
+One-line Summary: made DGVM work in SPMD mode
+Requires change in build system: no
+Tested to work coupled with CCSM: NO (this must be done)
+Tested to work with CAM: NO (this must be done)
+Machines tested: SGI (in SPMD and OpenMP)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: myself
+Changes answers: yes - due to a bug fixed in clm2_3_dev2
+	
+Changes made:
+1) changed the distribution of subgrid patches among processors
+   so that patches for a given land point must all be on the same processor
+2) changed all mpi gather/scatter calls to mpi gatherv/scatterv calls
+   and introduced subroutines to determine the asymmetric vector lengths
+	
+Tests (only ran in OFFLINE mode):
+1) Branched from Sam Levi's run clmr_19851231_81000 (after 
+   recreating the clmr file so that it could be read in) and
+   verified that bmfmg.out, bminc.out, fire.out, hm.out, lm.out, nind.out
+   pct.out, rm.out and sm.out were the same in SPMD and OpenMp mode.
+2) Verified that branching and restarts gave bfb the same answers
+   (OpenMp vs SPMD) - also that a branch from a given restart point gave
+   the same results as a restart from that same ponit
+3) Verified that clmi files were the same OpenMP vs SPMD
+4) Verified that clmh files were the same OpenMP vs SPMD
+5) Ran successfully with debugging turned on 
+	
+===============================================================
+	
+===============================================================
+
+clm2_2_14
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Nov  6 10:01:12 MST 2001
+Model: CLM
+Version: CLM2.2.14
+One-line Summary: Fixed two "problems" noticed in the b202.20.0 simulations
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (IBM only)
+Tested to work with CAM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself, Erik Kluzek
+Changes answers:  Yes (new-physics)
+Changes made:
+	
+1) Fixed bug in lake model (Biogeophysics_Lake.F90) where latent heat of
+fusion was being used (incorrect) instead of latent heat of sublimation
+(correct).
+Fixed two "problems" noticed in the b202.20.0 simulations: 
+2) Global water and ice contents in the top soil layer were increasing with time.
+(CombineSnowLayers.F90)  - Eliminated ponding in wetlands by assigning snow 
+melt to runoff.
+3) (SurfaceRunoff.F90) - Eliminated formation and growth of basal ice layer 
+beneath snow cover by assigning snow melt reaching impermeable ground 
+surface to surface runoff. 
+	
+These three fixes were tested by examining output from several single
+point and 21-year standalone simulations. No trends in surface soil
+water and ice were noted. Lake bug fix has small effects on surface
+fluxes from grid cells with lakes that have snow cover.
+
+4) Put in volr in initial dataset
+5) Put in restart id tag on restart file for consistency -
+if restart file is modified, the parameter rest_id in restFileMod.F90
+must be updated.
+6) Set maximum number of auxillary history files to 2 to be
+consistent with parameter settings.
+	
+===============================================================
+	
+===============================================================
+	
+clm2_2_13
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Oct 25 11:37:58 MDT 2001
+Model: CLM
+Version: CLM2.2.13
+One-line Summary: made roughness lenth and displacement height function of canopy top height
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: no
+Machines tested: SGI (only OPENMP mode)
+ keith oleson did offline 5 year runs on a global 3x3 (DGVM, BGC, RTM undefined)
+ sam levis did offline 3 year runs on a global 3x3 (DGVM, BGC, RTM defined)	
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes (for OPENMP only)
+Code reviewed by: myself, sam levis, keith oleson
+Changes answers: YES (new representation of data)
+	
+1)cleaned up pft physiology file and related code 
+  removed anything related to biogeochemistry when DGVM is off (not defined)
+2)used ratio of roughness length and displacement height to canopy top height
+  instead of actual values for roughness lenght and displacement height
+3)fixed openmp bug in RtmMod.F90
+4)fixed branch bug in AccumulMod.F90
+5)fixed DGVM bug in Fire.F90
+	
+===============================================================
+	
+===============================================================
+
+clm2_2_12
+Originator: erik ( Erik Kluzek)
+Date: Tue Oct 23 14:22:07 MDT 2001
+Model: CLM
+Version: CLM2.2.12
+One-line Summary: Update to clm2 changes in CCM3.12.62
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Tested to work with CAM: yes
+Machines tested: IBM
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: myself
+Changes answers: no (bit-for-bit)
+Changes made:
+
+Update to clm2 changes from CCM3.12.62, from Brian Eaton "Use public data 
+and methods from time_manager mod for initialization."
+
+===============================================================
+===============================================================
+
+clm2_2_11
+Originator: erik ( Erik Kluzek)
+Date: Tue Oct 16 11:45:09 MDT 2001
+Model: CLM
+Version: CLM2.2.11
+One-line Summary: Changes for SunOS/PC/Compaq, Don't use accumulMod if not DGVM,
+  New BGC token, Nix stop for "call endrun", check if masterproc on prints
+Requires change in build system: yes (BGC token needed to run bio-geochemistry)
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI, Compaq, some testing on SunOS, PC
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Code reviewed by: Mariana Vertenstein
+Changes answers: no (bit-for-bit)
+Changes made:
+
+SunOS fix:
+	Change data statements in EcosystemDynini.F90 so would compile.
+
+PC fix for PGF90 3.2-3 bug (FrictionVelocity.F90):
+	Check if DGVM set before defining variables only used for DGVM.
+	The Portland group compiler broke on a save statement used in this code.
+
+accumulMod.F90:
+	Make private and only use it if dynamic vegatation model is used (DGVM).
+	This was needed for machines with good subscript checking (Compaq, 
+	SunOS, and PC) since arrays were allocated and written with a 
+	dimension of zero.
+
+BGC token for biogeochemistry:
+	To run bio-geochemistry define this token.
+
+Replace "stop" with "call endrun":
+	Replace stop statements with "call endrun".
+
+Check if master-processor:
+	Make sure print statements check if they are master-processor before
+	printing, so that duplicated lines from every processor do not happen.
+
+===============================================================
+===============================================================
+
+clm2_2_10
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Oct 10 11:05:08 MDT 2001
+Model: CLM
+Version: CLM2.2.10
+One-line Summary: put  in DGVM changes (not turned on by default)
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (bfb and restart)
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes (both openmp and spmd - offline)
+Tested that different domain decompositions match bit-for-bit: yes (ccm)
+Code reviewed by: myself
+Changes answers: no (bit-for-bit) 
+1) Put in DGVM changes coded by Sam Levis. These are
+   turned off unless the CPP variable DGVM is defined.
+   The code currently does not work with DGVM on in SPMD mode.
+   Tested that code gave bfb the same results in both SPMD and 
+   openmp mode on SGI (with restarts)	
+	
+===============================================================
+	
+===============================================================
+
+clm2_2_9
+Originator: erik ( Erik Kluzek)
+Date: Tue Oct  9 13:17:39 MDT 2001
+Model: CLM
+Version: CLM2.2.9
+One-line Summary: Changes needed to work on SunOS
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI, Compaq, SunOS
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: yes
+Code reviewed by: Mariana Vertenstein
+Changes answers: no (bit-for-bit)
+Changes made:
+
+Changes needed to work on SunOS. Change one case of using array-syntax
+to a loop. Test that filenames aren't empty before printing. And 
+change so that writes to strings are done on a full string variable
+rather than a subscript range.
+        
+===============================================================
+===============================================================
+clm2_2_8
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Oct  8 08:54:37 MDT 2001
+Model: CLM
+Version: CLM2.2.8
+One-line Summary: cleaned up river routing code
+Requires change in build system: no
+Tested to work coupled with CCSM: yes 
+(tested that restarted with active atm and data ocn and ice)
+only tested this on IBM	
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+1) removed all references to irrigation
+2) removed all HYDRA code
+3) cleaned up RTM code to make it more modular	
+===============================================================
+	
+===============================================================
+clm2_2_7
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Sep 28 10:23:47 MDT 2001
+Model: CLM
+Version: CLM2.2.7
+One-line Summary: set irrigation term to zero
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: none
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: YES
+1) set irrigation term to zero 
+===============================================================
+	
+===============================================================
+clm2_2_6
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Sep 28 09:18:49 MDT 2001
+Model: CLM
+Version: CLM2.2.6
+One-line Summary: multiply total runoff by landfrac before doing RTM
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (in production mode)
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes (only in OFFLINE mode)
+Tested that different domain decompositions match bit-for-bit: no
+1) multiplied total runoff in each land model grid cell by the
+land fraction of that grid cell before the RTM calculation was done
+2) removed qextr from the RTM calculation when OFFLINE mode s
+not used
+These two changes significantly improved the water balance in
+COUP_CSM mode as calculated by the flux coupler
+===============================================================
+	
+===============================================================
+clm2_2_5
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Sep 25 14:52:27 MDT 2001
+Model: CLM
+Version: CLM2.2.5
+One-line Summary: fixed RTM spmd bug
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (in b202.18.1 run)
+Machines tested: IBM
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+1) fixed spmd bug in RTM code
+===============================================================
+	
+===============================================================
+clm2_2_4
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Sep 20 11:36:52 MDT 2001
+Model: CLM
+Version: CLM2.2.4
+One-line Summary: put in albedo shift in driver routine
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: YES
+1) shifted position of surface albedo calculation in driver.F90
+   and put in a corresponding shift in the time of the coupler
+   send
+2) Fixed bug in Hydrology1.F90 where snowpack on wetland was being
+   removed incorrectly for temperatures at freezing or above. Changed
+   if statement so that snowfall on unfrozen wetland does not accumulate.
+3  Fixed potential bug in CanopyFluxes.F90, BareGroundFluxes.F90, and
+   Biogeophysics_Lake.F90 where dthv and thvstar could be opposite in sign.
+   The root of a negative number could result. (Bug originally reported by
+4) Offline simulations were done for 5 years to validate these changes
+===============================================================
+	
+===============================================================
+clm2_2_3
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Sep 14 12:48:42 MDT 2001
+Model: CLM
+Version: CLM2.2.3
+One-line Summary: put in changes relating to history file updates that significantly sped up model
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (but not restarts)
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit) 
+1)Put in changes primarily to histFileMod.F90 (histslf and histmlf)
+  and histUpdate.F90 that significantly sped up model
+  Changed accumulMod and all calls to histslf and histmlf to
+  reflect these changes. Tested that history files were bfb
+  with previous code and for restarts in both OFFLINE mode
+  and COUP_CCM mode.  	
+===============================================================
+	
+===============================================================
+clm2_2_2
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Sep 11 11:00:50 MDT 2001
+Model: CLM
+Version: CLM2.2.2
+One-line Summary: changed surface dataset generation routines to use significantly less memory
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit) 
+1)changed surface dataset generation routines to use 
+significantly less memory - tested that new datasets were the
+same as previosly created (except for very minor roundoff differences)
+===============================================================
+	
+===============================================================
+clm2_2_1
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Sep  7 12:20:33 MDT 2001
+Model: CLM
+Version: CLM2.2.1
+One-line Summary: put in changes to fix flint complaints
+Requires change in build system: no
+(Detailed description below)
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit) 
+1) put in changes to fix flint complaints
+2) put in fixes for history file variables TSNOW,SNOWLIQ,SNOWICE,
+QVEGE,QCHOCNR	
+3) put in #ifdefs such that no memory allocation would occur
+if RTM or HYDRA were not defined as CPP variables 	
+===============================================================
+	
+===============================================================
+clm2_2_0
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Aug 24 10:18:15 MDT 2001
+Model: CLM
+Version: CLM2.2.0
+One-line Summary: restructured code to permit new coupler communication
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit) 
+Changes made:
+o PUT IN MAJOR CODE MODIFICATIONS (including renameing many routines)
+  to facilitate the new communciation mechanism with the flux coupler
+  as well as future changes to the clm model. 
+o the following all resulted in bfb results
+   directory main/
+    clm_drv => driver
+    clm_main => removed and put inside routine driver
+    clm_ctlMod => controlMod
+    clm_iniMod.F90 => initializeMod
+    clm_hist_update => histUpdate
+    clm_tci => iniTimeConst
+    clm_tvi => iniTimeVar
+    clm_iniMod => initializeMod
+  direcotory bioegeophy/
+    clm_hydro_canopy => Hydrology1
+    Fwet added and called in Hydrology1
+    clm_thermal => split into Biogeophysics1 and Biogeophysics2
+    clm_qsadv => QSat
+    clm_surfrad => SurfaceRadiation and moved inside Biogeophysics1
+    clm_thermal => BareGroundFluxes (bare ground/snow covered vegetation treatment)
+    clm_leaftem => CanopyFluxes
+    clm_obuini => MoninObukIni
+    clm_obult => FrictionVelocity- the following all resulted in bfb results
+    clm_psi => StabilityFunc
+    clm_stomata => Stomata
+    clm_condch => SensibleHCond
+    clm_condcq => LatentHCond
+    clm_lake => split into Biogeophysics_Lake and Hydrology_Lake
+    clm_tridia => Tridiagonal
+    clm_thermal => SoilTemperature (soil temperature treatment)
+    clm_thermalk => SoilThermProp
+    clm_meltfreeze => PhaseChange
+    clm_hydro_soil => Hydrology2
+    clm_hydro_snow => SnowWater
+    clm_hydro_soil => SurfaceRunoff (surface runoff treatment)
+    clm_hydro_soil => Infiltration (infiltration treament)
+    clm_soilwater => SoilWater
+    clm_hydro_soil => Drainage (drainage treatment)
+    clm_compact => SnowCompaction
+    clm_combin => CombineSnowLayers
+    clm_subdiv => DivideSnowLayers
+    clm_hydro_irrig => Irrigation
+    clm_hydro_wetice => WetIceHydrology
+    clm_snowage => SnowAge
+    clm_surfalb => SurfaceAlbedo
+    lsm_coszen => removed, calls to shr_orb_decl and shr_orb_cosz placed inside SurfaceAlbedo
+    clm_snowalb => SnowAlbedo
+    clm_soilalb => SoilAlbedo
+    clm_twostream => TwoStream
+    clm_balchk => BalanceCheck
+    clm_hist_update => histUpdate
+    clm_combo => Combo
+o history and restart files now have prefixes clmh and clmr (rather than lsmh and lsmr)
+o fixed bug in calculation of diagnostic river routing output (this does not effect
+  COUP_CCM mode in clm2)
+o endrun modified to handle aborts in a more robust fashion
+o fixed bug in caculation of reduced grid surface file
+o tested model in offline mode, coupled mode and ccm-clm stand alone mode.
+===============================================================
+	
+===============================================================
+clm2_1_28
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Aug  9 17:57:25 MDT 2001
+Model: CLM
+Version: CLM2.1.28
+One-line Summary: put in ability to read gaussian grid in offline mode
+Requires change in build system: yes
+In offline mode only:
+if want to read in gaussian grid:
+   set mksrf_offline_fgrid in namelist to dataset containing gaussian grid
+if want to create regular grid:
+   set	mksrf_offline_fnavyoro, mksrf_offline_edgen, mksrf_offline_edgee, 
+	mksrf_offline_edges, and mksrf_offline_edgew in namelist
+Tested to work coupled with CCSM: no
+Machines tested:  SGI (only shared memory mode)
+Tested that restarts are bit-for-bit: yes (only shared memory mode)
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) changed offline code so that could read in gaussian grid 
+   instead of creating regional (or global) regular grid
+2) tested the result by reading in T62 gaussian grid and comparing
+   TBOT in the clm history tape with TBOT from the atm driving file
+   (at i=18 and j=55 at 19800101 and 1200 sec both TBOT values
+   were equal to 288.024) - concluded that code worked 	 
+3) regular grid code was not effected	
+===============================================================
+	
+===============================================================
+clm2_1_27
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Aug  1 10:38:41 MDT 2001
+Model: CLM
+Version: CLM2.1.27
+One-line Summary: made irt in ccm mode dependent on ccm value
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) (not tested)
+Changes made:
+1) made hist_irt in COUP_CCM mode always equal to ccm value of irt
+2) made history file hist_nhtfrq equal to 2 days when running
+   in PERGRO mode
+3)set default value fo mksrf_fsoicol to
+  $data_dir/rawdata/mksrf_soicol_clm2.nc' in jan3x3.csh
+Did not do any tests of these minor changes	
+===============================================================
+	
+===============================================================
+clm2_1_26
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Jul 30 11:21:31 MDT 2001
+Model: CLM
+Version: CLM2.1.26
+One-line Summary: put in snow capping modifications
+Tested to work coupled with CCSM: yes
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes (Coupled with active atm)
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: No (new-physics)
+Changes made:
+1) put in snow capping modifications - if H2OSNO is greater than
+   1000 - then all precipation goes into runoff rather than snow
+2) put in minor fixes that will make code work when run with only
+   1 point and debugging flags set	
+Sanity tests done:	
+1)single point tests done by Keith Oleson 
+ - 2 patch point (soiland vegetation) 	
+ - glacier point
+ - lake point
+ - wetland point	
+initialized H2OSNO at 999mm and ran simulation for 1 year 	
+results	showed that capping was working as expected
+2) debugging tests done by Mariana Vertenstein	
+ran the stand alone model successfully for several time steps 
+on SGI with all debugging flags set 
+===============================================================
+	
+===============================================================
+clm2_1_25
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri Jul 27 14:56:49 MDT 2001
+Model: CLM
+Version: CLM2.1.25
+One-line Summary: fixed history file problem in v2xy routine
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: SGI (all debug flags on)
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) Fixed problem in v2xy - incorrect average was done for fields
+   (like TLAKE) that did not have global extent
+2) put in masterproc if logic for write statements
+
+Only examined effect of changes in offline code - 3x3 resolution.
+Now history files looked fine (both 2d and 1d). 
+Note - the new logic will make history file fields that have
+global extent (like TG) be different to roundff in places
+from clm2_1_24. Restarts and coupled model runs should 
+not be affected.
+===============================================================
+	
+===============================================================
+clm2_1_24
+Originator: erik ( Erik Kluzek)
+Date: Thu Jul 26 11:39:36 MDT 2001
+Model: CLM
+Version: CLM2.1.24
+One-line Summary: Changes to compile on Compaq and Lahey and check if 
+	masterproc for some prints
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (SGI,IBM) ccsm2_0_beta13
+Machines tested: IBM, SGI, Compaq
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit)
+Changes made:
+
+Changes so that will compile on Compaq and with Lahey compiler for
+Linux (checked in by Jim Rosinski).
+
+Also added checks to see if running on master-node so that runs with the CCM
+won't print the same output from each node. There are probably other checks
+like this that need to be added as well. Also the "slaveio" option probably
+should be taken out.
+===============================================================
+	
+===============================================================
+clm2_1_23
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Jul 24 15:51:25 MDT 2001
+Model: CLM
+Version: CLM2.1.23
+One-line Summary: added sending FSA to flux coupler
+Requires change in build system: no
+Tested to work coupled with CCSM: yes (IBM)
+Machines tested: IBM (only coupled mode)
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) added sending fsa to flux coupler
+2) fixed coupler restart problem by adding ocnrof_vec to restart file
+   when running in coupled mode 	
+===============================================================
+	
+===============================================================
+clm2_1_22
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Jun 21 12:08:39 MDT 2001
+Model: CLM
+Version: CLM2.1.22
+One-line Summary: added ability to start from history file
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: no (bit-for-bit) 
+	
+Tests Made:
+1) restart worked with finidat = ' '
+2) tested that diagnostic output was bfb with clm2_1_17 for 12 timesteps
+3) tested restart on auxillary history file as well as regular (openmp)
+4) tested that lsmi was the same except for t_soisno and t_lake (which is new)
+5) tested consistency of number of lake temperature values that were not 1.e36
+   vs t_soisno (for soil levels) (note: for 3x3 there are 148 lake points)
+6) tested restart with finidat = ' ' -  bfb spmd vs openmp
+7) tested restart on auxillary history file as well as regular - bfb spmd vs openmp
+8) tested auxillary tape and regular history tape writes - bfb spmd vs openmp
+9) tested reading in  lsmi  file when finidat is inic - bfb spmd vs openmp
+10)tested writing out lsmi  file when finidat is inic - bfb spmd vs openmp
+11)tested reading in  lsmha file when finidat is lsmh - bfb spmd vs openmp
+12)tested writing out lsmha file when finidat is lsmh - bfb spmd vs openmp
+
+Changes Made:
+1) put in functionality to start from either a lsm history or from an
+   instantaneous initial conditions dataset. If start from an lsm history file,
+   then 
+     o the initial snow profile is computed at startup from the SNOWDP field
+     o the average t_snow, snow_ice and snow_liq are put into the soil snow layers
+       WHERE THERE IS snow
+     o h2osno is REPLACED with sum of snowice and snowliq to
+       have consistency between h2osno and possibly averaged input values
+       field and the average t_snow
+   
+2) replaced the computation of snow fields on the history tape to only
+   the vertically averaged t_soisno and sum of h2osoi_liq and h2osoi_ice 
+   over all snow layers for the given patch - these will be written out
+   
+3) no longer have different types of 2d averaging - if a a patch is
+   not to be included in a 2d average, then its value is simply set to
+   1.e36.
+
+4) time increment counters now put in histFileMod rather than in histHandlerMod
+
+5) differences in 1d history file output:
+   NEW HISTORY FIELDS:
+      TSNOW, SNOWLIQ, SNOWICE, SOILLIQ, SOILICE, TLAKE
+
+   1d and 2d averages diffs:
+      WATSAT,SUCSAT,BSW (now 1.e36 over lake, wetlands and glaciers)
+      H2OSOI, TSOI, RSSUN, RSSHA, BTRAN (now 1.e36 over lakes)
+
+   2d diffs only (these are the same for 1d):
+      ZSOI, DZSOI
+      before ZSOI and DZSOI had 2d output only over soil, now 2d output is over
+      lakes and wetlands also
+===============================================================
+	
+===============================================================
+clm2_1_21
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Jun 19 21:16:23 MDT 2001
+Model: CLM
+Version: CLM2.1.21
+One-line Summary: fixed spmd bug for auxillary files
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+1) Fixed spmd bug in clm_ctlMod for auxillary files
+===============================================================
+	
+===============================================================
+clm2_1_20
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed Jun  6 10:30:33 MDT 2001
+Model: CLM
+Version: CLM2.1.20
+One-line Summary: fixed bug where fwet was not determined on initializaton
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+1) fixed bug where fwet was not determined on initialization
+did 12 time step initial run on SGI with debugging set to test 
+that modifications did not change answers (compared history files)
+===============================================================
+	
+===============================================================
+clm2_1_19
+Originator: erik ( Erik Kluzek)
+Date: Tue Jun  5 12:04:29 MDT 2001
+Model: CLM
+Version: CLM2.1.19
+One-line Summary: One-line bug-fix to allow code to run on Solaris 
+                  (give kind to float conversion)
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI, Compaq, Sun, Linux
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit)
+Changes made:
+
+clm_hist_update.F90 passed a subroutine a value converted to real,
+but it didn't give a kind (i.e. r8) to it, so the compiler on the Sun
+complained. Probably others gave warnings.
+===============================================================
+	
+===============================================================
+clm2_1_18
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu May 31 10:57:49 MDT 2001
+Model: CLM
+Version: CLM2.1.18
+One-line Summary: fixed two minor bugs - clm_tvi and ioFileMod
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: SGI (just tested that it compiled)
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) fixed ioFileMod so that it worked with ccm3_11_59
+2) fixed clm_tvi so that h2osoi_vol would be determined after
+   initial file was read in
+===============================================================
+	
+===============================================================
+clm2_1_17
+Originator: erik ( Erik Kluzek)
+Date: Fri May 25 11:01:33 MDT 2001
+Model: CLM
+Version: CLM2.1.17
+One-line Summary: Add use statement for shr_sys_mod routine used.
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit)
+Changes made:
+
+Add a use statement for shr_sys_mod in clm_csmMod.F90. This is 
+needed for the share2_0_6_brnchT_async_beta04 version of csm_share.
+===============================================================
+	
+===============================================================
+clm2_1_16
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu May 24 11:02:26 MDT 2001
+Model: CLM
+Version: CLM2.1.16
+One-line Summary: fixed two minor spmd bugs
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes 
+	(openmp, hybrid, spmd are all bfb)
+	tests were done for T42-gx3 and T42-gx1v2 for active
+	land and all other data components
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) fixed spmd bug introduced when runoff fluxes were averaged
+2) fixed minor bug in spmdMod that did not permit compilation
+   in openmp mode	
+===============================================================
+	
+===============================================================
+clm2_1_15
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue May 15 13:29:13 MDT 2001
+Model: CLM
+Version: CLM2.1.15
+One-line Summary: fixed problems with deleting auxillary files too early
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested:  SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) fixed bug in histHandler that removed auxillary files too early
+2) fixed global attribute bug in histFileMod
+3) fixed timers in program_csm - by default they are now on
+===============================================================
+	
+===============================================================
+clm2_1_14
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon May 14 21:04:19 MDT 2001
+Model: CLM
+Version: CLM2.1.14
+One-line Summary: fixed SPMD bugs
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: SGI (SPMD mode)
+Tested that restarts are bit-for-bit: yes (looked at lsmh files, SPMD mode)
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) fixed bugs related to running new rtm averaging scheme in coupled mode
+   with internal SPMD communication
+===============================================================
+	
+===============================================================
+clm2_1_13
+Originator: mvertens ( Mariana Vertenstein)
+Date: Wed May  9 13:10:02 MDT 2001
+Model: CLM
+Version: CLM2.1.13
+One-line Summary: added option to only call RTM on rtm_nsteps intervals
+Requires change in build system: yes
+must specify rtm_doavg and rtm_nsteps if want to call RTM less frequently
+than every time step
+default values are rtm_doavg = .false. for offline code and
+rtm_doavg = .true. with rtm_nsteps = 18 for coupled code
+also - utils/timings must be added to Filepath 
+Tested to work coupled with CCSM: no
+Machines tested: SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) (except for runoff values)
+Changes made:
+1) added option to only call RTM evey rtm_nsteps and every the input
+   to the RTM code between intervals
+2) utils/timing now has to be added to Filepath	
+3) modified Makefile loadflags for IRIX64 so that the inclusion of 
+   utils/timings would now work	
+===============================================================
+	
+===============================================================
+clm2_1_12
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri May  4 14:39:07 MDT 2001
+Model: CLM
+Version: CLM2.1.12
+One-line Summary: removed history fields DTV and DTG
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: none
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes made:
+1) removed DTV and DTG history fields - the DTV field sometimes
+   resulted in differences upon restart since d_tv was initialized
+   to 1.e36 and was only modified when clm_leaftem was invoked for
+   a given patch point. Once d_tv was modified from 1.e36, it could
+   stay at a new value for a long time if clm%frac_veg_nosno was
+   zero for those time steps (i.e. clm_leaftem would not be called).
+   However, upon restart, it would be reinitialized to 1.e36 resulting
+   in differences for those patch points between the initial and
+   restart history file output. Upon talking to Gordon, it seemed
+   easiest to just remove these two fields for now.	
+===============================================================
+	
+===============================================================
+clm2_1_11
+Originator: mvertens ( Mariana Vertenstein)
+Date: Fri May  4 11:48:58 MDT 2001
+Model: CLM
+Version: CLM2.11
+One-line Summary: fixed bug in mask_r sent to flux coupler
+Requires change in build system: no
+Machines tested:  SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Changes made:
+1) fixed bug in mask_r sent to flux coupler - now sending 1 over ocean
+   and 0 over land
+2) moved call to csm_sendalb from program_csm.F90 to clm_iniMod.F90
+   now all csm-clm initialization is in clm_iniMod
+3) tested that answers were bfb in csm mode using a data-ocn, 
+   data-atm and data-ice  models (looked at cpl and land history
+   files)	
+===============================================================
+	
+===============================================================
+clm2_1_10
+Originator: oleson ( Keith Oleson)
+Date: Wed May  2 14:02:48 MDT 2001
+Model: CLM
+Version: CLM2.1.10
+One-line Summary: Changed jan3x3.csh to point to new pft physiology file
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: Already tested in clm2_1_9
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: Yes (already tested in clm2_1_9)
+Changes made:
+
+Changed namelist parameter fpftcon in jan3x3.csh to point to
+pft-physiology-vegdyn (contains new vmax values associated with changes
+made in clm2_1_9)
+===============================================================
+	
+===============================================================
+clm2_1_9
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr 19 13:52:28 MDT 2001
+Model: CLM
+Version: CLM2.1.9
+One-line Summary: put in slevis photosynthesis changes
+Requires change in build system: no
+(Detailed description below)
+Tested to work coupled with CCSM: no
+Machines tested: SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: Yes (new-physics and initial conditions)
+Changes made:
+1) put in slevis photosynthese changes in clm_surfrad.F90
+2) put in new initial conditions in clm_tvi for h2osoi_vol, 
+   h2osoi_ice and h2osoi_liq (to be consistent with LANL amip366 runs)	
+===============================================================
+	
+===============================================================
+clm2_1_8
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr 19 12:52:28 MDT 2001
+Model: CLM
+Version: CLM2.1.8
+One-line Summary: put in new runoff interface to flux coupler
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: SGI
+Tested that restarts are bit-for-bit: yes (for flux coupled model only)
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) (did not test this - but expect it)
+Changes made:
+1) put in new river runoff interface to flux coupler - this
+   required breaking up the RTM initialization into two routines
+   so that RTM grid information could be sent to flux coupler earlier
+2) put in global flux calculations for coupled model (this is
+   only invoked when debug flag is set by coupler and HAS NOT BEEN
+   tested yet)
+3) put in new timer calls for coupled model (also NOT TESTED YET)
+4) fixed global attribute bug in history file handler
+===============================================================
+	
+===============================================================
+clm2_1_7
+Originator: mvertens ( Mariana Vertenstein)
+Date: Thu Apr  5 13:58:25 MDT 2001
+Model: CLM
+Version: CLM2.1.7
+One-line Summary: changed ccm interface module name to be consistent with lsm1 and lsm2
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: none
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: no (bit-for-bit) 
+Name of tests cases on NCAR Mass-Store: none
+Changes made:
+1) changed interace name from clm_ccmMod.F90 to lnd_ccmMod.F90 to be consistent
+   with lsm1 and lsm2
+2) changed interface names in areaMod.F90 from celledge_gaussian and cellarea_gaussian
+   to celledge_ccm and cellarea_ccm to account for non-gaussian ccm input grids 	
+3) No testing was done since these were such trivial changes	
+===============================================================
+	
+===============================================================
+clm2_1_6
+Originator: oleson ( Keith Oleson)
+Date: Thu Apr  5 13:37:07 MDT 2001
+Model: CLM
+Version: CLM2.1.6
+One-line Summary: incorporated effective root fraction
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: SGI
+Tested that restarts are bit-for-bit: no
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: Yes (more than roundoff)
+Name of tests cases on NCAR Mass-Store: /OLESON/clmv2/clm2n_ncep_rootr
+  Validated changes by looking at results of offline 800 day NCEP run. 
+Changes made:
+  1) Incorporated effective root fraction
+  2) Fixed bug in fwet-fdry in clm_hydro_canopy
+  3) Fixed bug in clm_leaftem (bug was there in original version
+     of clm code obtained from Goddard)
+  4) Fixed CPP bug in mksrfdat	
+===============================================================
+	
+===============================================================
+clm2_1_5
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Mar 13 10:16:19 MST 2001
+Model: CLM
+Version: CLM2.1.5
+One-line Summary: fixed error growth and bug in clm_qsadv
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested: IBM, SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: Yes 
+Changes made:
+1)put in fixes so that error growth now works (must set CPP variable PERGRO)
+2)fixed bounds on T in clm_qsadv (model blew up at LANL due to this problem)
+3)changed arbitrary initial conditions (snow water set to 1000. over land ice)
+4)fixed bugs in inicFileMod for generating initial conditions data
+  tested that data read and written matched internal data (i.e. compared
+  data read in and converted to kpatch grid with data in kpatch form before
+  it was written out)	
+5)fixed problems in interface to ccm and fixed problems in running through
+  spmd mode through ccm (tested that spmd and openmp mode gave bfb answers on SGI)
+6)put in fix so that when running in ccm or csm mode, model could create 
+  surface dataset on one platform and read it in on another 
+7)changed input namelist name to clmexp
+8)put in ability to handl lr grid when creating surface data
+===============================================================
+	
+===============================================================
+clm2_1_4
+Originator: mvertens ( Mariana Vertenstein)
+Date: Tue Feb 27 14:29:34 MST 2001
+Model: CLM
+Version: CLM2.1.4
+One-line Summary: fixed canopy energy balance and removed implicit soil evap term
+Requires change in build system: no
+Tested to work coupled with CCSM: no
+Machines tested:  SGI
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: no
+Changes answers: yes
+Name of tests cases on NCAR Mass-Store: clm21060H2Oamipc
+Changes made:
+1)fixed canopy energy balance
+2)removed implicit soil evap term- model now balances
+3)put in fixes (via CPP PERGRO) to make error growth work
+4) fixed branch run problem	
+===============================================================
+	
+===============================================================
+clm2_1_3
+Originator: mvertens ( Mariana Vertenstein)
+Date: Mon Feb 12 09:27:03 MST 2001
+Model: CLM
+Version: CLM2.1.3
+One-line Summary: removed soil color type 9 (used to brighten N. Africa)
+Requires change in build system: no
+Tested to work coupled with CCSM: yes
+Machines tested: SGI, IBM
+Tested that restarts are bit-for-bit: yes
+Tested that different domain decompositions match bit-for-bit: yes
+Changes answers: yes
+Name of tests cases on NCAR Mass-Store: None
+Changes made:
+1) changed MSS pathname (different for offline and coupled modes)
+2) fixed bugs in inicFileMod
+3) removed references to soil color type 9 (in clm_varcon and clm_soilalb)
+4) changed potential temperature calculation in clm_leaftem and clm_lake
+to used input potential temperature 
+5) fixed bug to update eflx_lh_grnd in clm_hydro_soil
+===============================================================
+===============================================================
+
+Originator: oleson ( Keith Oleson)
+Date: Mon Feb  5 11:05:34 MST 2001
+Model: CLM
+Version: CLM2.1.2
+One-line summary: fix clm_balchk bug
+Changes made:
+
+Fix clm_balchk bug
+===============================================================
+===============================================================
+
+Originator: mvertens ( VERTENSTEIN MARIANA 1349 ML CGD)
+Date: Fri Feb  2 14:09:52 MST 2001
+Model: CLM
+Version: CLM2.1.1
+One-line summary: added clm soil and snow albedo as default
+Changes made:
+1) Put in clm albedo calculation for soil and snow as the default case.
+   The lsm albedo calculation for soil can be invoked by setting the
+   CPP variable LSM_ALBEDOS.
+2) Added a field to the history file that gives the maximum over the
+   given history interval of the absolute error for the energy balance.
+3) Removed the ability to brighten north africa. (removed from namelist)
+4) Added <preproc.h> to includes for all biogeophyics routines.
+
+testing: tested on utefe. Did not test openmp or spmd.
+Tested that restart worked correctly. Had all debugging compile 
+options on.
+===============================================================
+===============================================================
+2/2/01: Commited Base Code
+===============================================================
+
+
+

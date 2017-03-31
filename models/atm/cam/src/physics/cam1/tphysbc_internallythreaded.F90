@@ -1,5 +1,7 @@
 #include <misc.h>
 #include <params.h>
+!#define CLOUDBRAIN
+
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -81,7 +83,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use runtime_opts, only: qrldampfac,qrldamp_equatoronly, qrl_dylat, qrl_critlat_deg, qrl_dailymean_interference,qrldamp_freetroponly,qrl_pbot,qrl_ptop,qrl_dp
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
-
+#ifdef CLOUDBRAIN
+    use nt_TypesModule
+    use nt_NetModule
+    use nt_FunctionsModule
+#endif
    implicit none
 
 #include <comctl.h>
@@ -92,7 +98,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Arguments
 !
 
-
+#ifdef CLOUDBRAIN
+    type(nt_Net) :: neural_net ! pritch smoke test, will neutran compile with CAM3?
+#endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
    real(r8), intent(inout) :: tpert(pcols,begchunk:endchunk)                ! Thermal temperature excess
@@ -500,6 +508,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 
+#ifdef CLOUDBRAIN
+
+    call nt_netInit(nt_Net, (/ 2, 4, 1/))
+#endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -644,7 +656,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call t_stopf ('dadadj')
    call physics_update (state(c), tend(c), ptend(c), ztodt)
 
-#ifdef CRM
+#if defined (CRM) || defined (CLOUDBRAIN)
+!#ifdef CRM
 ! Save the state and tend variables to overwrite conventional physics effects
 ! leter before calling the superparameterization. Conventional moist
 ! physics is allowed to compute tendencies due to conventional
@@ -654,7 +667,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     tend_save(c) = tend(c)
 
 #endif
-
 !
 !===================================================
 ! Moist convection
@@ -839,7 +851,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                in_srfflx_state2d(c)%ts,      in_srfflx_state2d(c)%sst, state(c)%pint(1,pverp),       zdu(:,:,c),  in_ocnfrac(:,c), &
                rhdfda(:,:,c),   rhu00(:,:,c) , state(c)%phis)
    call t_stopf('cldnrh')
-#ifdef CRM
+#if defined (CRM) || defined (CLOUDBRAIN)
+!#ifdef CRM
    call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
    call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
    call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
@@ -934,7 +947,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! send dynamical variables, and derived variables to history file
 !===================================================
 !
-#ifndef CRM
+!#ifndef CRM
+#if !defined(CRM) && !defined(CLOUDBRAIN)
    call diag_dynvar (lchnk, ncol, state(c))
 #endif
 !
@@ -965,6 +979,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                    qrs(:,:,c), qrl(:,:,c), flwds(:,c), rel(:,:,c), rei(:,:,c), &
                    sols(:,c), soll(:,c), solsd(:,c), solld(:,c),                  &
                    in_landfrac(:,c), state(c)%zm, state(c), fsds(:,c) &
+! pritch: Why does call to radiation have extra arguments under CRM?
+! One hypothesis is that it's for first-timestep-specific stuff.
 #ifdef CRM
                   ,fsntoa(:,c) ,fsntoac(:,c) ,fsdsc(:,c)   ,flwdsc(:,c)  ,fsntc(:,c) &
                   ,fsnsc(:,c)   , &
@@ -985,7 +1001,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 ! Dump cloud field information to history tape buffer (diagnostics)
 !
-#ifdef CRM
+#if defined (CRM) || defined (CLOUDBRAIN)
+!#ifdef CRM
       call outfld('_CLOUD  ',cld,  pcols,lchnk)
       call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
       call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)
@@ -1019,6 +1036,32 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
 
+#if defined(CRM) && defined(CLOUDBRAIN)
+  write (6,*) 'YO CRM and CLOUDBRAIN cant be defined simultaneously'
+  write (6,*) 'Either use superparameterization OR a neurel net, foo'
+  call endrun
+#endif
+
+#ifdef CLOUDBRAIN
+  ! As in SP, forget previous stuff:
+  call t_startf ('cloudbrain')
+  do c=begchunk,endchunk
+    state(c) = state_save(c)
+    tend(c) = tend_save(c)
+  end do
+  
+  ! Do we need to do anything special on timestep-1 (as in SP)?
+
+  ! INSERT gentine interface to neural network here.
+
+  ! Outputs needed:
+  ! profile of water vapor tendency
+  ! profile of dse tendency
+  ! precipitation rate at the surface
+  ! whatever radiation will need 
+  !   - liquid & ice mixing ratio profiles, cloud fraction profiles
+  !   (G may have more info about org / overlap)
+#endif
 
 #ifdef CRM
 !========================================================

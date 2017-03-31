@@ -22,9 +22,11 @@ module nt_FunctionsModule
             implicit none
             real, intent(in) :: args(:)
             real, intent(in) :: x
-            real :: fx
+            real :: fx,expmx,d
 
-            fx = 2 / (1 + exp(-2*x)) - 1
+            expmx = exp(-x)
+            d     = args2+expmx
+            fx    = args1*expmx/d/d
 
         end function logisticd
 
@@ -44,8 +46,50 @@ module nt_FunctionsModule
             real, intent(in) :: x
             real :: fx
 
-            fx=args(1) / 2
+            fx=0
 
         end function constd
+
+
+        function nt_logsig(x) result(fx)
+            real, intent(in) :: x
+            real :: fx
+
+            fx = 1. / (1. + exp(-x))
+
+        end function nt_logsig
+
+        function logsigd(x) result(fx)
+            implicit none
+            real, intent(in) :: x
+            real :: fx,expmx,d
+
+            expmx = exp(-x)
+            d     = 1.+expmx
+            fx    = expmx/d/d
+
+        end function logsigd
+
+        function nt_tansig(x) result(fx)
+            real, intent(in) :: x
+            real :: fx
+
+            fx = 2./(1.+exp(-2.*n))-1.
+
+        end function nt_tansig
+
+        function tansigd(x) result(fx)
+            implicit none
+            real, intent(in) :: x
+            real :: fx,expmx,d
+
+            expmx = exp(-2.*x)
+            d     = 1.+expmx
+            fx    = 4.*expmx/d/d
+
+        end function tansigd
+
+
+
 
 end module nt_FunctionsModule

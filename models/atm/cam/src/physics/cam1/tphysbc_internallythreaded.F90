@@ -39,7 +39,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Author: CCM1, CMS Contact: J. Truesdale
 ! 
 !-----------------------------------------------------------------------
-
+     
    use shr_kind_mod,    only: r8 => shr_kind_r8
    use ppgrid
    use pmgrid, only: masterproc

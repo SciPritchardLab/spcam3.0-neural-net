@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define CLOUDBRAIN
+#define CLOUDBRAIN
 
 #define PCWDETRAIN
 #define RADTIME 900.
@@ -510,7 +510,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 #ifdef CLOUDBRAIN
 
-    call nt_netInit(nt_Net, (/ 2, 4, 1/))
+!    call nt_netInit(nt_Net, (/ 2, 4, 1/))
+!    HEY this sanity check actually seems to fail to compile.
+!    The example in neutran is ill posed.
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
@@ -1050,18 +1052,95 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     tend(c) = tend_save(c)
   end do
   
-  ! Do we need to do anything special on timestep-1 (as in SP)?
+  ! HEY do we need to do anything special on timestep-1 (as in SP)?
 
-  ! INSERT gentine interface to neural network here.
+   do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
+      ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
 
-  ! Outputs needed:
-  ! profile of water vapor tendency
-  ! profile of dse tendency
-  ! precipitation rate at the surface
-  ! whatever radiation will need 
-  !   - liquid & ice mixing ratio profiles, cloud fraction profiles
-  !   (G may have more info about org / overlap)
-#endif
+      do i=1,ncol ! this is the loop over independent GCM columns.
+         ! ============ START CLOUDBRAIN INTERFACE ===========
+         ! INSERT gentine interface to single-column neural network here.
+
+         ! ------ INPUT
+         ! 1D PROFILES FOR INPUT: 
+         ! water vapor = state(c)%q(i,:,1) ! [kg/kg moist* air]
+                    !* Does ANN use moist mixing ratios too or do we need
+                    !conversion?
+         ! liquid water mixing ratio = state(c)%q(i,:,ixcldliq) ! [kg/kg moist]
+         ! ice water mixing ratio = state(c)%q(i,:,ixcldice) ! [kg/kg moist]
+         ! temperature = state(c)%t(i,:) (K)  
+         ! u wind: state(c)%u(i,:) ! m/s  likewise for "v"
+         ! mid-point of pressure levels: state(c)%pmid(i,:) ! [Pa]
+         ! thickness of pressure levels: state(c)%pdel(i,:) ! [Pa]
+
+         ! SCALARS FOR INPUT:
+         ! surface pressure: state(c)%ps(i) ! [Pa]
+         ! sensible heat flux:  shf(i,c) ! W/m2
+         ! latent heat flux:    lhf(i,c) ! W/m2
+      
+         ! HEY gentine, ARE OTHER INPUTS NEEDED?
+         ! ---------------------------
+
+         ! ----- OUTPUT 
+         ! 1D PROFILES FOR OUTPUT (for physics/dynamics coupling)
+         !ptend(c)%q(i,:,1) ! tendency of water vapor due to convection [kg/kg/s]
+         !ptend(c)%q(i,:,ixcldliq) ! likewise for cloud liquid water
+         !ptend(c)%q(i,:,ixcldice) ! and for cloud ice water
+         !ptend(c)%s(i,:) ! tendency of dry static energy (J/kg/s)         
+         ! ?? INSERT what will radiation scheme require ??
+         
+         ! SCALARS FOR OUTPUT
+         ! INSERT precip variable  (note for non-aqua will need multiple precip
+         ! variables required by land model surface state coupler,see 
+         ! in_surface_state2d(c)%prec*
+         ! But for aqua the precip will be purely diagnostic and for energy
+         ! checking.
+
+         ! ============ END CLOUDBRAIN INTERFACE ===========
+
+         ! INSERT interface to radiation
+         ! Based on downstream logic, key is just that qrs and qrl arrays populated
+         ! i.e. shortwave and longwave heating rates
+         ! They are separately wired to arterial ptend structures downstream.         
+
+      end do ! end column loop
+
+     ! Finish up: linkages from cloudbrain to arterial physics variables
+     ! And energy checking logic (mimicking what happens at end of SP)
+     ptend(c)%name  = 'cloudbrain'
+     ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+     ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+     ptend(c)%lq(ixcldliq) = .TRUE. ! allowed to update GCM liquid water
+     ptend(c)%lq(ixcldice) = .TRUE. ! allowed to update GCM ice water 
+
+     ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+     ptend(c)%lv    = .FALSE.
+   
+   ! Apply tendencies, check energy.
+     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy
+      ! and water integrals of input state.
+     call physics_update (state(c), tend(c), ptend(c), ztodt)
+! ----------
+!    check energy integrals
+!    INSERT update the water sink terms below once precip variables done.
+
+     !wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) +
+!prectend(:ncol,c)*1.e-3 ! include precip storage term
+     !icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) +
+!precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
+!     write(6,'(a,12e10.3)')'prect=',(prect(i),i=1,12)
+!     call check_energy_chng(state(c), tend(c), "crm", nstep, ztodt, zero,
+!wtricesink(:,c), icesink(:,c), zero)
+! -----------
+   call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
+   ! many things to history file tape.
+
+!    INSERT need to send precip, liquid water paths, other desired diags (mass
+!    fluxes?) to history file tapes at this stage, see SP outfld logic for inspiration. 
+  end do ! end chunk loop 
+#endif 
+! END OF CLOUDBRAIN
 
 #ifdef CRM
 !========================================================
@@ -1830,12 +1909,17 @@ end do
       state(c)%ps(:ncol) = exp( state(c)%ps(:ncol) )
       ps_local(:ncol,c) = ( state(c)%ps(:ncol) - ps_local(:ncol,c) )/ztodt
 
-  end if
 
      call outfld('VNTEND  ',ptend(c)%v       ,pcols   ,lchnk   )
       call outfld('UNTEND  ',ptend(c)%u       ,pcols   ,lchnk   )
       call outfld('QNTEND  ',ptend(c)%q(1,1,1),pcols   ,lchnk   )
       call outfld('LPSNTEN ',ps_local(:,c)      ,pcols   ,lchnk   )
+      call physics_update(state(c), tend(c), ptend(c), ztodt)
+! Pritch HEY very worriesome that above used to be outside the if (l_analyses)
+! statement.
+      s_tmp(:ncol,:pver,c) = (state(c)%s(:ncol,:pver) - s_tmp(:ncol,:pver,c))/ztodt
+      call outfld('SNTEND  ',s_tmp   ,pcols   ,lchnk   )
+  end if ! l_analyses for nudging.
 !
 ! pressure arrays
 !
@@ -1853,10 +1937,6 @@ end do
          end do
       end do
 
-      call physics_update(state(c), tend(c), ptend(c), ztodt)
-
-      s_tmp(:ncol,:pver,c) = (state(c)%s(:ncol,:pver) - s_tmp(:ncol,:pver,c))/ztodt
-      call outfld('SNTEND  ',s_tmp   ,pcols   ,lchnk   )
 
 !
 ! Compute net flux
@@ -1957,7 +2037,7 @@ end do
          qrl_crm(i,ii,jj,m,c) = qrl_crm(i,ii,jj,m,c) + dqrl(i,k,c)/cpair*state(c)%pdel(i,k)
        end do
      end do
-   end do 
+
 
 #endif
 

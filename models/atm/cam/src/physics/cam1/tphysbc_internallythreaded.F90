@@ -84,7 +84,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain
+    use cloudbrain_module
 #endif
    implicit none
 
@@ -99,7 +99,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #ifdef CLOUDBRAIN
    real(r8) :: pmid_neuralnet(inputlayerSize) ! Fixed vertical pressure grid of
 !the neural net
-   real(r8) :: in_net_s(pcols,pver), in_net_q(pcols,pver),in_net_w(pcols,pver) ! GCM s,q interpolated
+   real(r8) :: in_net_s(pcols,pver), in_net_qv(pcols,pver),in_net_w(pcols,pver) ! GCM s,q interpolated
 !to neural net vertical grid
    real(r8) :: out_net_dsdt(pcols,pver) ! dsdt on neural net vertical grid.
    real(r8) :: state_rho (pcols,pver), state_w (pcols,pver) ! intermediaries for
@@ -512,12 +512,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 
-#ifdef CLOUDBRAIN
-
-!    call nt_netInit(nt_Net, (/ 2, 4, 1/))
-!    HEY this sanity check actually seems to fail to compile.
-!    The example in neutran is ill posed.
-#endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -1066,7 +1060,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       ! ----- preprocessing of GCM input variables ------
       ! Vertically interpolate to NN-hardwired vertical grid (for all columns
       ! from 1 to ncol)
-      state_rho(:,:) = state(c)%pmid(:,:)/(rdair*state(c)%t(:,:))
+      state_rho(:,:) = state(c)%pmid(:,:)/(rair*state(c)%t(:,:))
       state_w(:,:) = -rga*state(c)%omega(:,:)/state_rho
       do k=1,inputlayerSize
         call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state(c)%s(:,:),in_net_s(:,k))
@@ -1080,7 +1074,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       end do 
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-         call cloudbrain(in_net_s(i,:),in_net_q(i,:),in_net_w(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:))
+         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:))
          
          ! INSERT precip variable  (note for non-aqua will need multiple precip
          ! variables required by land model surface state coupler,see 
@@ -1099,10 +1093,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
       ! INSERT vertically interpolate Neural Net produced tendencies back to GCM grid.
       do k=1,pver
-!        call vertinterp(ncol,pcols,inputlayerSize,pmid_neuralnet(:,:),state(c)%pmid(:,k),
-! HEY we have a problem. The vertinterp utility is not compatible with a target
-! pressure that is column-depenent. Not a problem for GCM-->NN interp but
-! becomes an obstacle to going back the other way. 
+        do i=1,ncol
+          call vertinterp_onecol(inputlayerSize,pmid_neuralnet(:),state(c)%pmid(i,k),out_net_dsdt(i,:),ptend(c)%s(i,k))
+          ! pritch had to hack a custom vertinterp that is not hardwired to
+          ! static target pressure across longitudes (icols). 
+        end do
       end do
 
      ! And energy checking logic (mimicking what happens at end of SP)
@@ -1115,7 +1110,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      ptend(c)%lv    = .FALSE.
    
    ! Apply tendencies, check energy.
-     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy
+     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
+!for later
       ! and water integrals of input state.
      call physics_update (state(c), tend(c), ptend(c), ztodt)
 ! ----------

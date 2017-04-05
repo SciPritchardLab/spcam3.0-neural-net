@@ -25,8 +25,8 @@ module nt_FunctionsModule
             real :: fx,expmx,d
 
             expmx = exp(-x)
-            d     = args2+expmx
-            fx    = args1*expmx/d/d
+            d     = args(2)+expmx
+            fx    = args(1)*expmx/d/d
 
         end function logisticd
 

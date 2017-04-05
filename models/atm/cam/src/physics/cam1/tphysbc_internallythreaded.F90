@@ -84,9 +84,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use nt_TypesModule
-    use nt_NetModule
-    use nt_FunctionsModule
+    use cloudbrain_module
 #endif
    implicit none
 
@@ -99,7 +97,13 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-    type(nt_Net) :: neural_net ! pritch smoke test, will neutran compile with CAM3?
+   real(r8) :: pmid_neuralnet(inputlayerSize) ! Fixed vertical pressure grid of
+!the neural net
+   real(r8) :: in_net_s(pcols,pver), in_net_qv(pcols,pver),in_net_w(pcols,pver) ! GCM s,q interpolated
+!to neural net vertical grid
+   real(r8) :: out_net_dsdt(pcols,pver) ! dsdt on neural net vertical grid.
+   real(r8) :: state_rho (pcols,pver), state_w (pcols,pver) ! intermediaries for
+!converting GCM omega to GCM vertical velocity for input to N-N.
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -508,12 +512,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 
-#ifdef CLOUDBRAIN
-
-!    call nt_netInit(nt_Net, (/ 2, 4, 1/))
-!    HEY this sanity check actually seems to fail to compile.
-!    The example in neutran is ill posed.
-#endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -1054,50 +1052,35 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
   
   ! HEY do we need to do anything special on timestep-1 (as in SP)?
 
+   call cloudbrainVerticalGrid(pmid_neuralnet)
    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
 
+      ! ----- preprocessing of GCM input variables ------
+      ! Vertically interpolate to NN-hardwired vertical grid (for all columns
+      ! from 1 to ncol)
+      state_rho(:,:) = state(c)%pmid(:,:)/(rair*state(c)%t(:,:))
+      state_w(:,:) = -rga*state(c)%omega(:,:)/state_rho
+      do k=1,inputlayerSize
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state(c)%s(:,:),in_net_s(:,k))
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state(c)%q(:,:,1),in_net_qv(:,k))
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state_w(:,:),in_net_w(:,k))
+   
+       ! Leverages vertinterp in control/ as called from diagnostics, eg:
+        !    call vertinterp(ncol, pcols, pver, state%pmid, 70000._r8, z3, p_surf)
+                                  !input # levels, input pressure vector, targer
+                                  !pressure, field, new field.
+      end do 
+
       do i=1,ncol ! this is the loop over independent GCM columns.
-         ! ============ START CLOUDBRAIN INTERFACE ===========
-         ! INSERT gentine interface to single-column neural network here.
-
-         ! ------ INPUT
-         ! 1D PROFILES FOR INPUT: 
-         ! water vapor = state(c)%q(i,:,1) ! [kg/kg moist* air]
-                    !* Does ANN use moist mixing ratios too or do we need
-                    !conversion?
-         ! liquid water mixing ratio = state(c)%q(i,:,ixcldliq) ! [kg/kg moist]
-         ! ice water mixing ratio = state(c)%q(i,:,ixcldice) ! [kg/kg moist]
-         ! temperature = state(c)%t(i,:) (K)  
-         ! u wind: state(c)%u(i,:) ! m/s  likewise for "v"
-         ! mid-point of pressure levels: state(c)%pmid(i,:) ! [Pa]
-         ! thickness of pressure levels: state(c)%pdel(i,:) ! [Pa]
-
-         ! SCALARS FOR INPUT:
-         ! surface pressure: state(c)%ps(i) ! [Pa]
-         ! sensible heat flux:  shf(i,c) ! W/m2
-         ! latent heat flux:    lhf(i,c) ! W/m2
-      
-         ! HEY gentine, ARE OTHER INPUTS NEEDED?
-         ! ---------------------------
-
-         ! ----- OUTPUT 
-         ! 1D PROFILES FOR OUTPUT (for physics/dynamics coupling)
-         !ptend(c)%q(i,:,1) ! tendency of water vapor due to convection [kg/kg/s]
-         !ptend(c)%q(i,:,ixcldliq) ! likewise for cloud liquid water
-         !ptend(c)%q(i,:,ixcldice) ! and for cloud ice water
-         !ptend(c)%s(i,:) ! tendency of dry static energy (J/kg/s)         
-         ! ?? INSERT what will radiation scheme require ??
+         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:))
          
-         ! SCALARS FOR OUTPUT
          ! INSERT precip variable  (note for non-aqua will need multiple precip
          ! variables required by land model surface state coupler,see 
          ! in_surface_state2d(c)%prec*
          ! But for aqua the precip will be purely diagnostic and for energy
          ! checking.
-
-         ! ============ END CLOUDBRAIN INTERFACE ===========
 
          ! INSERT interface to radiation
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
@@ -1107,18 +1090,28 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       end do ! end column loop
 
      ! Finish up: linkages from cloudbrain to arterial physics variables
+
+      ! INSERT vertically interpolate Neural Net produced tendencies back to GCM grid.
+      do k=1,pver
+        do i=1,ncol
+          call vertinterp_onecol(inputlayerSize,pmid_neuralnet(:),state(c)%pmid(i,k),out_net_dsdt(i,:),ptend(c)%s(i,k))
+          ! pritch had to hack a custom vertinterp that is not hardwired to
+          ! static target pressure across longitudes (icols). 
+        end do
+      end do
+
      ! And energy checking logic (mimicking what happens at end of SP)
      ptend(c)%name  = 'cloudbrain'
      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
      ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
      ptend(c)%lq(ixcldliq) = .TRUE. ! allowed to update GCM liquid water
      ptend(c)%lq(ixcldice) = .TRUE. ! allowed to update GCM ice water 
-
      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
      ptend(c)%lv    = .FALSE.
    
    ! Apply tendencies, check energy.
-     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy
+     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
+!for later
       ! and water integrals of input state.
      call physics_update (state(c), tend(c), ptend(c), ztodt)
 ! ----------

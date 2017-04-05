@@ -1061,7 +1061,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       do i=1,ncol ! this is the loop over independent GCM columns.
          ! ============ START CLOUDBRAIN INTERFACE ===========
          ! INSERT gentine interface to single-column neural network here.
-
+         call cloudbrain (state(c)%s(i,:),state(c)%pmid(i,:),state(c)%pint(i,:)
          ! ------ INPUT
          ! 1D PROFILES FOR INPUT: 
          ! water vapor = state(c)%q(i,:,1) ! [kg/kg moist* air]

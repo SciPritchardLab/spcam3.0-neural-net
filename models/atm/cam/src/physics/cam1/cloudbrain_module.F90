@@ -73,6 +73,7 @@ real (r8), intent(in) :: shf,lhf ! model shf,lhf
 real(r8), intent(in) :: ztodt         ! 2 delta t (model time increment)
 real (r8), intent(inout) :: dsdt(outputlayerSize-1) ! NN-predicted tendency of DSE
 real (r8), intent(inout) :: dqdt(outputlayerSize-1) ! NN-predicted tendency of qv
+!real (r8), intent(inout) :: rainrate ! under construction
 ! (will be interpolated downstream back to GCM vertical grid)
 
 ! Essence of neural net (will be defined in define_neuralnet)
@@ -82,12 +83,20 @@ real(r8) :: bias_input_wdse(hiddenlayerSize_wdse)
 real(r8) :: bias_output_wdse(outputlayerSize)
 real(r8) :: weights_input_wdse(hiddenlayerSize_wdse,inputlayerSize)
 real(r8) :: weights_output_wdse(outputlayerSize,hiddenlayerSize_wdse)
+
 real(r8) :: mu_in_wqv(inputlayerSize) ! normalization input mean
 real(r8) :: std_in_wqv(inputlayerSize)  ! normalization input standard deviation
 real(r8) :: bias_input_wqv(hiddenlayerSize_wqv)
 real(r8) :: bias_output_wqv(outputlayerSize)
 real(r8) :: weights_input_wqv(hiddenlayerSize_wqv,inputlayerSize)
 real(r8) :: weights_output_wqv(outputlayerSize,hiddenlayerSize_wqv)
+
+real(r8) :: mu_in_rainsurf(inputlayerSize)
+real(r8) :: std_in_rainsurf(inputlayerSize)
+real(r8) :: bias_input_rainsurf(hiddenlayerSize_rainsurf)
+real(r8) :: bias_output_rainsurf
+real(r8) :: weights_input_rainsurf(hiddenlayerSize_rainsurf,inputlayerSize)
+real(r8) :: weights_output_rainsurf(1,hiddenlayerSize_rainsurf)
 !-------
 
 real(r8) :: input(inputlayerSize) ! master array to contain all input fields from GCM
@@ -188,14 +197,18 @@ call define_neuralnet_wdse (mu_in_wdse, std_in_wdse, weights_input_wdse, bias_in
         dqdt(i) = 0.
     end do
     do i = 1,outputlayerSize-1
-     ! so we have the vertical flux of vapor in kg/kg*m/s on the NN pressure grid.
+     ! so we have the vertical flux of vapor in g/kg*m/s on the NN pressure grid.
         ! as for DSE we compute its vertical convergence between two NN pressure levels
         rhodz = (pmid_neuralnet(i) - pmid_neuralnet(i+1))/gravit ! kg/m2
         dz = rhodz/(0.5*(rho(i)+rho(i+1))) ! m, i.e. normalize by rho on staggered grid.
 
         ! dsdt = d[wq]/dz, i.e. in kg/kg/s 
-        dqdt(i) = (output(i)-output(i+1))/dz ! kg/kg/s , as expected by GCM's ptend
+        dqdt(i) = 1e-3*(output(i)-output(i+1))/dz ! kg/kg/s , as expected by GCM's ptend
     end do
+
+  ! ----------- rain rate ---------------
+  ! (under construction)
+
    return
 end subroutine cloudbrain
 
@@ -357,6 +370,7 @@ real(r8), intent(out) :: pnet(outputlayerSize)
 real(r8), intent(out) :: pnet_stagger(outputlayerSize-1)
 integer :: i
 pnet = (/ 72.0124505460262,87.8212302923203, 103.317126631737, 121.547240763903, 142.994038760662,168.225079774857, 197.908086702228, 232.828618958592, 273.910816758871,322.241902351379,379.100903868675,445.992574095726, 524.687174707651, 609.778694808483, 691.389430314302, 763.404481112957, 820.858368650079,859.53476652503, 887.020248919725, 912.644546944648, 936.198398470879, 957.485479535535, 976.325407391414, 992.556095123291 /)
+pnet = pnet*100. ! Convert to Pa!
 
 do i = 1,outputlayerSize-1
         pnet_stagger(i) = 0.5*(pnet(i) +pnet(i+1)) ! staggered grid

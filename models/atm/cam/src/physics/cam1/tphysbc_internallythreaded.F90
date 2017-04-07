@@ -97,13 +97,13 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: pmid_neuralnet(inputlayerSize) ! Fixed vertical pressure grid of
-!the neural net
-   real(r8) :: in_net_s(pcols,pver), in_net_qv(pcols,pver),in_net_w(pcols,pver) ! GCM s,q interpolated
+   real(r8) :: pmid_neuralnet_in(outputlayerSize) ! Fixed pressure grid of NN
+   real(r8) :: pmid_neuralnet_out(outputlayerSize-1) ! Staggered grid of its outputs to GCM
+   real(r8) :: in_net_s(pcols,outputlayerSize), in_net_qv(pcols,outputlayerSize),in_net_w(pcols,outputlayerSize), in_net_rho(pcols,outputlayerSize)! GCM s,q interpolated
 !to neural net vertical grid
-   real(r8) :: out_net_dsdt(pcols,pver) ! dsdt on neural net vertical grid.
-   real(r8) :: state_rho (pcols,pver), state_w (pcols,pver) ! intermediaries for
-!converting GCM omega to GCM vertical velocity for input to N-N.
+   real(r8) :: out_net_dsdt(pcols,outputlayerSize-1) ! dsdt on staggered neural net output vertical grid.
+   real(r8) :: out_net_dqdt(pcols,outputlayerSize-1) ! dqdt on staggered neural net output vertical grid.
+   real(r8) :: state_rho (pcols,pver), state_w (pcols,pver) ! intermediaries converting GCM omega to GCM vertical velocity prior to use as input to N-N.
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1052,29 +1052,26 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
   
   ! HEY do we need to do anything special on timestep-1 (as in SP)?
 
-   call cloudbrainVerticalGrid(pmid_neuralnet)
+   call cloudbrainVerticalGrid(pmid_neuralnet_in,pmid_neuralnet_out)
    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
 
       ! ----- preprocessing of GCM input variables ------
-      ! Vertically interpolate to NN-hardwired vertical grid (for all columns
-      ! from 1 to ncol)
+      ! Convert GCM omega to w
       state_rho(:,:) = state(c)%pmid(:,:)/(rair*state(c)%t(:,:))
       state_w(:,:) = -rga*state(c)%omega(:,:)/state_rho
-      do k=1,inputlayerSize
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state(c)%s(:,:),in_net_s(:,k))
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state(c)%q(:,:,1),in_net_qv(:,k))
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet(k),state_w(:,:),in_net_w(:,k))
-   
-       ! Leverages vertinterp in control/ as called from diagnostics, eg:
-        !    call vertinterp(ncol, pcols, pver, state%pmid, 70000._r8, z3, p_surf)
-                                  !input # levels, input pressure vector, targer
-                                  !pressure, field, new field.
+      ! Vertically interpolate to NN-hardwired vertical grid (for all columns
+      ! from 1 to ncol)
+      do k=1,outputlayerSize-1
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state(c)%s(:,:),in_net_s(:,k))
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state(c)%q(:,:,1),in_net_qv(:,k))
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state_w(:,:),in_net_w(:,k))
+        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state_rho(:,:),in_net_rho(:,k))  ! needed for flux convergence calc
       end do 
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:))
+         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),in_net_rho(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:),out_net_dqdt(i,:))
          
          ! INSERT precip variable  (note for non-aqua will need multiple precip
          ! variables required by land model surface state coupler,see 
@@ -1094,9 +1091,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       ! INSERT vertically interpolate Neural Net produced tendencies back to GCM grid.
       do k=1,pver
         do i=1,ncol
-          call vertinterp_onecol(inputlayerSize,pmid_neuralnet(:),state(c)%pmid(i,k),out_net_dsdt(i,:),ptend(c)%s(i,k))
-          ! pritch had to hack a custom vertinterp that is not hardwired to
-          ! static target pressure across longitudes (icols). 
+          ! from the staggered NN pressure grid to the GCM pressure grid.
+          call vertinterp_onecol(outputlayerSize-1,pmid_neuralnet_out(:),state(c)%pmid(i,k),out_net_dsdt(i,:),ptend(c)%s(i,k))
+          call vertinterp_onecol(outputlayerSize-1,pmid_neuralnet_out(:),state(c)%pmid(i,k),out_net_dqdt(i,:),ptend(c)%q(i,k,1))
+          ! nb re: _onecol: pritch had to hack a custom vertinterp that is not hardwired to
+          ! static target pressure across longitudes (i.e. i=1,ncol). 
         end do
       end do
 

@@ -1,6 +1,7 @@
 #include <misc.h>
 #include <params.h>
 #define CLOUDBRAIN
+#define BRAINDEBUG
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -62,6 +63,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use cloudsimulatorparms, only: doisccp
    use cloudsimulator, only: ccm_isccp
    use aerosol_intr, only: aerosol_wet_intr
+
 #ifdef CRM
    use history,         only: outfldcol
    use crmdims,       only: crm_nx, crm_ny, crm_nz
@@ -513,7 +515,13 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #ifdef QRLDAMP
    real (r8) :: newqrl (pcols,pver), dqrl(pcols,pver)
 #endif
-
+#ifdef BRAINDEBUG
+   real(r8) :: braindebug_x1,braindebug_x2,braindebug_y1,braindebug_y2
+   braindebug_x1 = 180.*3.14159/180.
+   braindebug_x2 = 182.*3.14159/180.
+   braindebug_y1 = 0.
+   braindebug_y2 = 2.*3.14159/180.
+#endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -730,6 +738,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call outfld('ZMDT    ',ftem(:,:,c),pcols   ,lchnk   )
    call outfld('ZMDQ    ',ptend(c)%q(1,1,1) ,pcols   ,lchnk   )
    call t_stopf('zm_convr')
+   call physics_update(state(c),tend(c),ptend(c),ztodt)
 
 !
 ! Determine the phase of the precipitation produced and add latent heat of fusion
@@ -783,7 +792,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call outfld('CMFDT   ',ftem(:,:,c)    ,pcols   ,lchnk   )
    call outfld('CMFDQ   ',ptend(c)%q(1,1,1),pcols   ,lchnk   )
    call t_stopf('cmfmca')
-
+   call physics_update (state(c), tend(c), ptend(c), ztodt)
 !
 ! Determine the phase of the precipitation produced and add latent heat of fusion
    call zm_conv_evap(state(c), ptend(c), cmfdqr2(:,:,c), cld, ztodt, prec_cmf(:,c), snow_cmf(:,c), .true.)
@@ -927,6 +936,23 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('DQCOND  ',dqcond(1,1,m,c),pcols   ,lchnk   )
    end do
 
+#ifdef BRAINDEBUG
+   call get_rlat_all_p(lchnk, ncol, clat(:,c))
+   call get_rlon_all_p(lchnk, ncol, clon(:,c))
+
+   do i=1,ncol
+     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
+         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
+         .le. braindebug_x2)  then
+       write (666,*) 'STATE AFTER DTCOND:i (P,s,T,Q)'
+       do k=1,pver
+         write (666,'(F10.3,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
+         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1)
+       end do
+     endif
+   end do  
+#endif
+
 ! Compute total convective and stratiform precipitation and snow rates
    do i=1,ncol
       precc (i,c) = prec_zmc(i,c) + prec_cmf(i,c)
@@ -1056,7 +1082,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
    call cloudbrainVerticalGrid(pmid_neuralnet_in,pmid_neuralnet_out)
    netpmin = minval(pmid_neuralnet_out)
-   write(6,*) 'HEY netpmin=',netpmin
    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
@@ -1091,7 +1116,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       end do ! end column loop
 
      ! Finish up: linkages from cloudbrain to arterial physics variables
-
       ! vertically interpolate Neural Net produced tendencies back to GCM grid.
       ptend(c)%s(:,:) = 0.
       ptend(c)%q(:,:,:) = 0.
@@ -1121,6 +1145,22 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      call outfld('BRAINDT',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk) 
      call outfld('BRAINDQ',ptend(c)%q(1,1,1),pcols,lchnk) 
 
+   call physics_update(state(c),tend(c),ptend(c),ztodt)
+
+#ifdef BRAINDEBUG
+   do i=1,ncol
+     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
+         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
+         .le. braindebug_x2)  then
+       write (555,*) 'STATE AFTER DTBRAIN: (P,s,T,Q)'
+       do k=1,pver
+         write (555,'(F10.3,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
+         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1)
+       end do
+     endif
+   end do  
+#endif
+
    ! Apply tendencies, check energy.
 !     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
 !for later
@@ -1129,9 +1169,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !    check energy integrals
 !    INSERT update the water sink terms below once precip variables done.
 
-     !wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) +
+!     wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) +
 !prectend(:ncol,c)*1.e-3 ! include precip storage term
-     !icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) +
+!     icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) +
 !precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
 !     write(6,'(a,12e10.3)')'prect=',(prect(i),i=1,12)
 !     call check_energy_chng(state(c), tend(c), "crm", nstep, ztodt, zero,

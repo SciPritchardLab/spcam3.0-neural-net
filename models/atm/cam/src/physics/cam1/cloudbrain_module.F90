@@ -203,7 +203,7 @@ call define_neuralnet_wdse (mu_in_wdse, std_in_wdse, weights_input_wdse, bias_in
         dz = rhodz/(0.5*(rho(i)+rho(i+1))) ! m, i.e. normalize by rho on staggered grid.
 
         ! dsdt = d[wq]/dz, i.e. in kg/kg/s 
-        dqdt(i) = 1e-3*(output(i)-output(i+1))/dz ! kg/kg/s , as expected by GCM's ptend
+        dqdt(i) = (output(i)-output(i+1))/dz/1000. ! kg/kg/s , as expected by GCM's ptend
     end do
 
   ! ----------- rain rate ---------------

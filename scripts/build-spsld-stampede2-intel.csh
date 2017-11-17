@@ -5,7 +5,8 @@ set rpath="/home1/00993/tg802402/cloudbrain_aquaplanet/spcam3.0-neural-net-maste
 setenv camroot $rpath/models/atm/cam
 setenv esmfroot $rpath/models/utils/esmf/build/linux_intel
 cp $camroot/bld/Makefile.stampede $camroot/bld/Makefile
-setenv INC_NETCDF   $HOME/include
+# Note I had to install my own version of netcdf3.6.3 to be old enough to play nice with spcam3.
+setenv INC_NETCDF   $HOME/include 
 setenv LIB_NETCDF   $HOME/lib
 
 setenv MPICH_DIR $MPICH_HOME # on stampede, this is env variable for impi home after module set right.

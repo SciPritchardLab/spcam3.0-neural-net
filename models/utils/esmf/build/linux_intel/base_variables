@@ -14,18 +14,18 @@ SH_LD		   = pgcc
 #
 #C_CC		   = cc 
 #C_FC		   = ftn
-C_CC		   = mpicc  -openmp -offload-attribute-target=mic 
-C_FC		   = mpif90 -openmp -offload-attribute-target=mic
+C_CC		   = mpicc  -openmp 
+C_FC		   = mpif90 -openmp 
 C_FC_MOD           = -I
 C_CLINKER_SLFLAG   = -Wl,-rpath,
 C_FLINKER_SLFLAG   = -Wl,-rpath,
 #C_CLINKER	   = cc
-C_CLINKER	   = mpicc -offload-attribute-target=mic
+C_CLINKER	   = mpicc 
 #C_FLINKER	   = ftn
-C_FLINKER	   = mpif90 -offload-attribute-target=mic
+C_FLINKER	   = mpif90 
 C_CCV		   = ${C_CC} --version
 #C_FCV              = ftn
-C_FCV              = mpif90 -offload-attribute-target=mic
+C_FCV              = mpif90 
 C_SYS_LIB	   = -ldl -lc -lg2c -lm
 #C_SYS_LIB	   = -ldl -lc -lf2c -lm
 #C_SYS_LIB	   = -ldl -lc /usr/lib/libf2c.a -lm  #Use /usr/lib/libf2c.a if that's what your f77 uses.
@@ -39,12 +39,12 @@ O_FOPTFLAGS	   = -O
 #
 #CXX_CC		   = CC 
 #CXX_FC		   = ftn
-CXX_CC		   = mpicc -offload-attribute-target=mic
-CXX_FC		   = mpif90 -offload-attribute-target=mic
+CXX_CC		   = mpicc 
+CXX_FC		   = mpif90 
 CXX_CLINKER_SLFLAG = -Wl,-rpath,
 CXX_FLINKER_SLFLAG = -Wl,-rpath,
-CXX_CLINKER	   = mpicc -offload-attribute-target=mic
-CXX_FLINKER	   = mpicc -offload-attribute-target=mic
+CXX_CLINKER	   = mpicc 
+CXX_FLINKER	   = mpicc 
 CXX_CCV		   = ${CXX_CC} --version
 #CXX_SYS_LIB	   = -ldl -lc -lf2c -lm
 CXX_SYS_LIB	   = -ldl -lc -lg2c -lm

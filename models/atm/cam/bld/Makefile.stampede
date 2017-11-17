@@ -308,7 +308,7 @@ FC := mpif90
 CC := mpicc
 CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS -xMIC-AVX512
 mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
-FFLAGS := $(cpp_path) -O1 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -openmp -xMIC-AVX512
+FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -openmp -xMIC-AVX512
 FREEFLAGS := -recursive
 LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -openmp -xMIC-AVX512
 

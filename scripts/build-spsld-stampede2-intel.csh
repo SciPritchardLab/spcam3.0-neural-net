@@ -1,7 +1,7 @@
 #! /usr/bin/csh -f
 module load netcdf
 # Use Intel MPI libraries
-set rpath="/home1/00993/tg802402/cloudbrain_aquaplanet/spcam3.0-neural-net-master-ecd41c89b4d8ea32c28c17fad5a3d60d0e22e536"
+set rpath="$HOME/github/spcam3.0-neural-net"
 setenv camroot $rpath/models/atm/cam
 setenv esmfroot $rpath/models/utils/esmf/build/linux_intel
 cp $camroot/bld/Makefile.stampede $camroot/bld/Makefile
@@ -12,9 +12,9 @@ setenv LIB_NETCDF   $HOME/lib
 setenv MPICH_DIR $MPICH_HOME # on stampede, this is env variable for impi home after module set right.
 
 # user override if desired. Expectation is you will use this scripts in a local dir, where obj created
-set wrkdir       = `pwd`/obj
+set wrkdir       = $HOME/convobuildtest/obj
 set blddir       = $wrkdir
-set rundir       = `pwd`/run
+set rundir       = $HOME/convobuildtest/run
 set cfgdir       = $camroot/bld
 
 ## Ensure that run and build directories exist

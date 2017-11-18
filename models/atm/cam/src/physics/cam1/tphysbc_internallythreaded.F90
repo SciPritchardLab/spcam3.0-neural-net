@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 #define CLOUDBRAIN
-#define BRAINDEBUG
+!#define BRAINDEBUG
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -85,7 +85,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_module
+    use cloudbrain_convo_module
 #endif
    implicit none
 
@@ -98,14 +98,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: pmid_neuralnet_in(outputlayerSize) ! Fixed pressure grid of NN
-   real(r8) :: pmid_neuralnet_out(outputlayerSize-1) ! Staggered grid of its outputs to GCM
-   real(r8) :: netpmin
-   real(r8) :: in_net_s(pcols,outputlayerSize), in_net_qv(pcols,outputlayerSize),in_net_w(pcols,outputlayerSize), in_net_rho(pcols,outputlayerSize)! GCM s,q interpolated
-!to neural net vertical grid
-   real(r8) :: out_net_dsdt(pcols,outputlayerSize-1) ! dsdt on staggered neural net output vertical grid.
-   real(r8) :: out_net_dqdt(pcols,outputlayerSize-1) ! dqdt on staggered neural net output vertical grid.
-   real(r8) :: state_rho (pcols,pver), state_w (pcols,pver) ! intermediaries converting GCM omega to GCM vertical velocity prior to use as input to N-N.
+   real(r8) :: dTdt_adiab(pver),dQdt_adiab(pver)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1080,59 +1073,27 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
   
   ! HEY do we need to do anything special on timestep-1 (as in SP)?
 
-   call cloudbrainVerticalGrid(pmid_neuralnet_in,pmid_neuralnet_out)
-   netpmin = minval(pmid_neuralnet_out)
    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
 
-      ! ----- preprocessing of GCM input variables ------
-      ! Convert GCM omega to w
-      state_rho(:,:) = state(c)%pmid(:,:)/(rair*state(c)%t(:,:))
-      state_w(:,:) = -rga*state(c)%omega(:,:)/state_rho
-      ! Vertically interpolate to NN-hardwired vertical grid (for all columns
-      ! from 1 to ncol)
-      do k=1,outputlayerSize-1
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state(c)%s(:,:),in_net_s(:,k))
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state(c)%q(:,:,1),in_net_qv(:,k))
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state_w(:,:),in_net_w(:,k))
-        call vertinterp(ncol,pcols,pver,state(c)%pmid(:,:),pmid_neuralnet_in(k),state_rho(:,:),in_net_rho(:,k))  ! needed for flux convergence calc
-      end do 
-
       do i=1,ncol ! this is the loop over independent GCM columns.
-         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),in_net_rho(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:),out_net_dqdt(i,:)) !,out_precip(i)) rain under construction
-         
-         ! INSERT precip variable  (note for non-aqua will need multiple precip
-         ! variables required by land model surface state coupler,see 
-         ! in_surface_state2d(c)%prec*
-         ! But for aqua the precip will be purely diagnostic and for energy
-         ! checking.
+!         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),in_net_rho(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:),out_net_dqdt(i,:)) !,out_precip(i)) rain under construction
+          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
+          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
+          call cloudbrain_convo (state(c)%tap(i,:),state(c)%qap(i,:,1),state(c)%omega(i,:),shf(i,c),lhf(i,c),dTdt_adiab,dQdt_adiab,ptend(c)%s(i,:),ptend(c)%q(i,:,1) )
+          ! INSERT need an estimate of adiabatic tendencies.
 
-         ! INSERT interface to radiation
+         ! INSERT (later) interface to radiation
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
 
       end do ! end column loop
 
-     ! Finish up: linkages from cloudbrain to arterial physics variables
-      ! vertically interpolate Neural Net produced tendencies back to GCM grid.
+      ! Finish up: linkages from cloudbrain to arterial physics variables
       ptend(c)%s(:,:) = 0.
       ptend(c)%q(:,:,:) = 0.
-      do k=1,pver
-        do i=1,ncol
-          ! from the staggered NN pressure grid to the GCM pressure grid.
-          call vertinterp_onecol(outputlayerSize-1,pmid_neuralnet_out(:),state(c)%pmid(i,k),out_net_dsdt(i,:),ptend(c)%s(i,k))
-          call vertinterp_onecol(outputlayerSize-1,pmid_neuralnet_out(:),state(c)%pmid(i,k),out_net_dqdt(i,:),ptend(c)%q(i,k,1)) 
-
-          ! nb re: _onecol: pritch had to hack a custom vertinterp that is not hardwired to
-          ! static target pressure across longitudes (i.e. i=1,ncol). 
-          if (state(c)%pmid(i,k) .le. netpmin) then
-            ptend(c)%s(i,k) = 0.
-            ptend(c)%q(i,k,1) = 0. 
-          endif
-        end do
-      end do
 
      ptend(c)%name  = 'cloudbrain'
      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
@@ -2110,6 +2071,11 @@ end do
   in_surface_state2d(c)%soll(:)   =  soll(:,c) 	 	
   in_surface_state2d(c)%solsd(:)  =  solsd(:,c)	 	
   in_surface_state2d(c)%solld(:)      =  solld(:,c) 		      
+
+#ifdef CLOUDBRAIN
+  state(c)%tap = state(c)%t
+  state(c)%qap = state(c)%q(:,:,1)
+#endif
 end do ! PRITCH FINAL CHUNK (should be no need to thread it).
 
    return

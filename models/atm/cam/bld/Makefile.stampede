@@ -302,15 +302,17 @@ ifeq ($(UNAMES),Linux)
 #  endif
 #endif
 
-# MSP hardwired values INTEL at stampede2
+# MSP hardwired values INTEL at stampede
 ESMF_ARCH = linux_intel
 FC := mpif90
 CC := mpicc
-CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS -xMIC-AVX512
+CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS #-xMIC-AVX512
+#CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -xMIC-AVX512
 mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
-FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -openmp -xMIC-AVX512
+#FFLAGS := $(cpp_path) -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -ftz -traceback -xHost -extend-source -openmp 
+FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -openmp #-xMIC-AVX512
 FREEFLAGS := -recursive
-LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -openmp -xMIC-AVX512
+LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -openmp #-xMIC-AVX512
 
 .SUFFIXES:
 .SUFFIXES: .F .F90 .c .o

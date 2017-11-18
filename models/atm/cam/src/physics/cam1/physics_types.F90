@@ -1,5 +1,5 @@
 #include <misc.h>
-
+#define CLOUDBRAIN
 !-------------------------------------------------------------------------------
 !physics data types module
 !-------------------------------------------------------------------------------
@@ -53,8 +53,10 @@ module physics_types
 #ifdef PVBUDGET
           pv,      &  ! Potential vorticity (added by Mike Pritchard)
 #endif
+#ifdef CLOUDBRAIN
+          tap, qap, & ! T,Q after physics.
+#endif
           zm      ! geopotential height above surface at midpoints (m)
-
      real(r8), dimension(pcols,pver,ppcnst) :: &
           q         ! constituent mixing ratio (kg/kg moist air)
 

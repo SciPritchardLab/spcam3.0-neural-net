@@ -85,7 +85,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_convo_module
+    use cloudbrain_keras_dense, only: init_keras_matrices,cloudbrain_dense4_stephan
 #endif
    implicit none
 
@@ -98,7 +98,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: dTdt_adiab(pver),dQdt_adiab(pver)
+   real(r8) :: dTdt_adiab(pver),dQdt_adiab(pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1087,6 +1087,9 @@ do c=begchunk,endchunk
 end do
 
    if(is_first_step() .and. .not. crminitread ) then
+#ifdef CLOUDBRAIN
+       call init_keras_matrices()
+#endif
 	  do c=begchunk,endchunk ! ---- PRITCH BEGIN CRM-CENTRIC CHUNK LOOP -----
 	   lchnk = state(c)%lchnk
 	   ncol  = state(c)%ncol 
@@ -1726,9 +1729,7 @@ end do
 ! Compute energy and water integrals of input state
 
      call check_energy_timestep_init(state(c), tend(c), pbuf)
-#ifndef CLOUDBRAIN
      call physics_update (state(c), tend(c), ptend(c), ztodt)
-#endif
 !    check energy integrals
      wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) + prectend(:ncol,c)*1.e-3 ! include precip storage term
      icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) + precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
@@ -1803,8 +1804,6 @@ end do
       lchnk = state(c)%lchnk
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-!         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),in_net_rho(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:),out_net_dqdt(i,:)) !,out_precip(i)) rain under construction
-
           if(is_first_step()) then
             dTdt_adiab(:) = 0. ! no "after physics" state exists, yet.
             dQdt_adiab(:) = 0. 
@@ -1822,14 +1821,13 @@ end do
             write(555,*) 'dQdt_adiab(:) =',dQdt_adiab(:)
           endif 
 #endif
-          call cloudbrain_convo (state(c)%tap(i,:),state(c)%qap(i,:),state(c)%omega(i,:),shf(i,c),lhf(i,c),dTdt_adiab,dQdt_adiab,ptend(c)%s(i,:),ptend(c)%q(i,:,1) )
-          ! INSERT need an estimate of adiabatic tendencies.
-
-         ! INSERT (later) interface to radiation
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
+         ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
+         ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
-
       end do ! end column loop
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
@@ -1845,8 +1843,9 @@ end do
      call outfld('BRAINDT',braindt,pcols,lchnk) 
      braindq = ptend(c)%q(:ncol,:pver,1)
      call outfld('BRAINDQ',braindq,pcols,lchnk) 
-
-   call physics_update(state(c),tend(c),ptend(c),ztodt)
+     call physics_update(state(c),tend(c),ptend(c),ztodt)
+     call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
+     call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)
 
 #ifdef BRAINDEBUG
    do i=1,ncol
@@ -1886,6 +1885,7 @@ end do
 #endif 
 endif ! not first step.
 ! END OF CLOUDBRAIN
+  call t_stopf ('cloudbrain')
 #endif ! CRM
  do c=begchunk,endchunk ! pritch new chunk loop
    lchnk = state(c)%lchnk

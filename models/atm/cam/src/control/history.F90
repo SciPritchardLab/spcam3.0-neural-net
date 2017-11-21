@@ -6038,6 +6038,9 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       'Large-scale (stable) precipitation rate (less than '//trim(string)// &
       'mm/hr is set to zero -- to get intensity divide by PRECLFRQ)',phys_decomp)
       call addfld ('PRECT   ','m/s     ',1,    'A','Total (convective and large-scale) precipitation rate',phys_decomp)
+      call addfld ('BRAINRAIN','mm/day',1,'A','Neural net estimated rain rate (mm/day, I think',phys_decomp) 
+      call addfld ('BRAINOLR','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+
       call addfld ('EVAPPCT ','percent ',1,    'A','Percentage of Zhang-McFarlane precipitation going into evaporation',phys_decomp)
       call addfld ('PRECTMX ','m/s     ',1,    'X','Maximum (convective and large-scale) precipitation rate',phys_decomp)
       call addfld ('PRECSL  ','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)

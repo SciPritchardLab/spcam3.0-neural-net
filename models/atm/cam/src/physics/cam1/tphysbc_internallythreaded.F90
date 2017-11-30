@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 #define CLOUDBRAIN
-#define BRAINDEBUG
+!#define BRAINDEBUG
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -504,13 +504,15 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #ifdef QRLDAMP
    real (r8) :: newqrl (pcols,pver), dqrl(pcols,pver)
 #endif
+#ifdef CLOUDBRAIN
+   real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
 #ifdef BRAINDEBUG
    real(r8) :: braindebug_x1,braindebug_x2,braindebug_y1,braindebug_y2
-   real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
    braindebug_x1 = 180.*3.14159/180.
    braindebug_x2 = 182.*3.14159/180.
    braindebug_y1 = 0.
    braindebug_y2 = 2.*3.14159/180.
+#endif
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 
@@ -1079,6 +1081,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 ! Initialize stuff:
+#ifndef CLOUDBRAIN ! save time
 
 call t_startf ('crm')
 do c=begchunk,endchunk
@@ -1087,9 +1090,6 @@ do c=begchunk,endchunk
 end do
 
    if(is_first_step() .and. .not. crminitread ) then
-#ifdef CLOUDBRAIN
-       call init_keras_matrices()
-#endif
 	  do c=begchunk,endchunk ! ---- PRITCH BEGIN CRM-CENTRIC CHUNK LOOP -----
 	   lchnk = state(c)%lchnk
 	   ncol  = state(c)%ncol 
@@ -1788,6 +1788,7 @@ end do
 ! End of superparameterization zone.
   end do ! end pritch new chunk loop
   call t_stopf('crm')
+#endif ! ndef CLOUDBRAIN
 #ifdef CLOUDBRAIN
   ! As in SP, forget previous stuff (we will retain SP's qrl,qrs)
   call t_startf ('cloudbrain')
@@ -1795,22 +1796,17 @@ end do
     state(c) = state_save(c)
     tend(c) = tend_save(c)
   end do
-  
-  ! HEY we cannot activte brain until step 2, for adiab tendencies to be
-  ! defined.
-  if ( .not. is_first_step()) then
-   do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
+   if ( is_first_step()) then
+      call init_keras_matrices()
+   else
+!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab)
+    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-          if(is_first_step()) then
-            dTdt_adiab(:) = 0. ! no "after physics" state exists, yet.
-            dQdt_adiab(:) = 0. 
-          else
-            dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
-            dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
-          endif
+          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
+          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
 #ifdef BRAINDEBUG
           if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
          .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &

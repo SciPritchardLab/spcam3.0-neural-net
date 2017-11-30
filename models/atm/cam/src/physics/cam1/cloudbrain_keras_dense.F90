@@ -35,6 +35,16 @@ use pmgrid, only: masterproc
   real :: weights5(outputlength,width4)
   real :: input_norm_mean(inputlength)
   real :: input_norm_std(inputlength)
+  real :: SPDT_99th_percentile(pver)
+  real :: SPDT_1st_percentile(pver)
+  real :: SPDQ_99th_percentile(pver)
+  real :: SPDQ_1st_percentile(pver)
+  real :: QRL_99th_percentile(pver)
+  real :: QRL_1st_percentile(pver)
+  real :: QRS_99th_percentile(pver)
+  real :: QRS_1st_percentile(pver)
+  real :: PRECT_99th_percentile, PRECT_1st_percentile
+  real :: FLUT_99th_percentile, FLUT_1st_percentile
 
   public init_keras_matrices,cloudbrain_dense4_stephan
 
@@ -146,6 +156,24 @@ use pmgrid, only: masterproc
    QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg, check w Rasp
    PRECT = 1.e2*output(4*nlev+1) ! mm/day? INSERT output normalization
    FLUT = 1.e4*output(4*nlev+2) ! W/m2?
+
+! ---- filter for outlier values ---
+   do j=1,nlev
+     k=j+k1-1
+     SPDT(k) = min(SPDT(k),SPDT_99th_percentile(k))
+     SPDT(k) = max(SPDT(k),SPDT_1st_percentile(k))
+     SPDQ(k) = min(SPDQ(k),SPDQ_99th_percentile(k))
+     SPDQ(k) = max(SPDQ(k),SPDQ_1st_percentile(k))
+     QRL(k) = min(QRL(k),QRL_99th_percentile(k))
+     QRL(k) = max(QRL(k),QRL_1st_percentile(k))
+     QRS(k) = min(QRS(k),QRS_99th_percentile(k))
+     QRS(k) = max(QRS(k),QRS_1st_percentile(k))
+   end do
+     
+   PRECT = min(PRECT,PRECT_99th_percentile)
+   PRECT = max(PRECT,PRECT_1st_percentile)
+   FLUT = min(FLUT,FLUT_99th_percentile)
+   FLUT = max(FLUT,FLUT_1st_percentile)
 
   end subroutine cloudbrain_dense4_stephan
 
@@ -302,6 +330,67 @@ use pmgrid, only: masterproc
   input_norm_std(4*n+2) = 8.038508e+01
   input_norm_mean(4*n+3) = 3.260061e+02 !SOLIN
   input_norm_std(4*n+3) = 4.229145e+02
+
+FLUT_1st_percentile = 1.050357e+02
+FLUT_99th_percentile = 3.006259e+02
+PRECT_1st_percentile = 0.000000e+00
+PRECT_99th_percentile = 5.468393e-07
+
+QRL_1st_percentile = (/ -6.216213e-05, -4.786214e-05 , -1.256669e-05 , &
+-3.463747e-05 , -2.075084e-05 , -1.487543e-05 , -1.190000e-05 , -1.010048e-05 ,&
+-8.858710e-06 , -9.239218e-06 , -3.533971e-05 , -5.625170e-05 , -6.792715e-05 ,&
+-7.292182e-05 , -6.816280e-05 , -6.093415e-05 , -5.520021e-05 , -5.255231e-05 ,&
+-4.910039e-05 , -4.995287e-05 , -5.905762e-05 , -8.697672e-05 , -1.440127e-04 ,&
+-2.254230e-04 , -1.765118e-04 , -1.305296e-04 , -9.227055e-05 , -6.312769e-05 ,&
+-4.791830e-05 , -4.394767e-05  /)
+QRL_99th_percentile = (/ -2.754649e-06, -3.494669e-06 , 6.443672e-06 ,&
+-3.217267e-06 , -1.438849e-06 , 4.984639e-06 , 5.586671e-06 , 8.278785e-06 ,&
+6.251957e-06 , 1.054514e-05 , 1.633342e-05 , 2.360345e-05 , 3.079865e-05 ,&
+3.016389e-05 , 2.756721e-05 , 1.868325e-05 , 1.010371e-05 , 8.113140e-06 ,&
+7.440296e-06 , 4.227221e-06 , 2.190772e-06 , 1.971648e-06 , 4.138415e-06 ,&
+1.364484e-05 , 2.147574e-05 , 1.927053e-05 , 1.717588e-05 , 1.542207e-05 ,&
+1.175662e-05 , 4.321834e-06  /)
+QRS_1st_percentile(:) = 0.
+QRS_99th_percentile = (/ 1.498364e-04, 1.111121e-04 , 7.985876e-05 ,&
+4.868936e-05 , 2.913275e-05 , 1.973089e-05 , 1.402391e-05 , 1.086071e-05 ,&
+8.813042e-06 , 1.012987e-05 , 2.464520e-05 , 3.939078e-05 , 4.780931e-05 ,&
+5.244340e-05 , 5.080475e-05 , 4.627056e-05 , 4.470625e-05 , 4.368851e-05 ,&
+4.233806e-05 , 4.243507e-05 , 4.617311e-05 , 5.793697e-05 , 7.428529e-05 ,&
+8.173476e-05 , 6.425010e-05 , 4.969213e-05 , 3.755981e-05 , 3.325900e-05 ,&
+3.117134e-05 , 3.105591e-05  /)  
+SPDQ_1st_percentile = (/ 0.000000e+00, 0.000000e+00 , -4.046073e-12 ,&
+-1.632948e-12 , -6.370369e-13 , -9.658690e-13 , -2.571320e-12 , -1.171232e-11 ,&
+-6.215761e-11 , -2.558772e-10 , -8.807576e-10 , -2.654580e-09 , -7.218700e-09 ,&
+-1.776687e-08 , -3.413185e-08 , -5.163957e-08 , -7.193884e-08 , -8.884352e-08 ,&
+-1.044166e-07 , -1.189258e-07 , -1.378456e-07 , -1.620004e-07 , -1.893262e-07 ,&
+-2.513909e-07 , -2.631886e-07 , -2.673291e-07 , -2.535809e-07 , -2.239956e-07 ,&
+-2.286600e-07 , -9.556879e-07  /)
+SPDQ_99th_percentile = (/ 0.000000e+00, 0.000000e+00 , 1.442080e-12 ,&
+3.227176e-12 , 6.178259e-13 , 7.964458e-13 , 2.072204e-12 , 1.019333e-11 ,&
+4.774195e-11 , 1.701812e-10 , 4.811421e-10 , 1.120881e-09 , 2.222386e-09 ,&
+3.699655e-09 , 5.659162e-09 , 8.834332e-09 , 1.435378e-08 , 2.283158e-08 ,&
+3.362205e-08 , 5.394483e-08 , 8.879985e-08 , 1.588675e-07 , 2.193465e-07 ,&
+2.513876e-07 , 2.469180e-07 , 2.417496e-07 , 2.229990e-07 , 1.955417e-07 ,&
+1.973605e-07 , 1.994683e-08  /) 
+SPDT_1st_percentile = (/ 0.000000e+00, 0.000000e+00 , -1.244579e-04 ,&
+1.359525e-07 , -2.295945e-06 , -4.367248e-06 , -1.714213e-05 , -2.709405e-05 ,&
+-2.526674e-05 , -2.578611e-05 , -2.522827e-05 , -2.596968e-05 , -2.799722e-05 ,&
+-2.654915e-05 , -2.700086e-05 , -2.669265e-05 , -3.055040e-05 , -3.652241e-05 ,&
+-4.535123e-05 , -6.417721e-05 , -8.799575e-05 , -1.309851e-04 , -1.510721e-04 ,&
+-1.442822e-04 , -1.326312e-04 , -1.191652e-04 , -1.073594e-04 , -1.076496e-04 ,&
+-1.308139e-04 , -5.065778e-04  /)
+SPDT_99th_percentile = (/ 0.000000e+00, 0.000000e+00 , -9.157017e-08 ,&
+8.838763e-05 , 8.283755e-07 , 1.059550e-06 , 2.006552e-06 , 1.477947e-05 ,&
+2.515600e-05 , 2.518402e-05 , 2.777238e-05 , 3.307331e-05 , 4.652006e-05 ,&
+7.865911e-05 , 1.217936e-04 , 1.731028e-04 , 2.333037e-04 , 2.831942e-04 ,&
+3.152643e-04 , 3.288059e-04 , 3.250533e-04 , 3.329234e-04 , 3.275821e-04 ,&
+3.292384e-04 , 2.779141e-04 , 2.323042e-04 , 1.875224e-04 , 1.584954e-04 ,&
+1.523564e-04 , 7.777996e-05  /)
+
+
+
+
+
 
   end subroutine init_keras_matrices
 

@@ -151,7 +151,7 @@ use pmgrid, only: masterproc
    SPDQ(:) = 0.
    SPDQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 !   QRL(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg, check w Rasp
+   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg already, I assume.
 !   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
    QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg, check w Rasp
    PRECT = 1.e2*output(4*nlev+1) ! mm/day? INSERT output normalization
@@ -160,14 +160,17 @@ use pmgrid, only: masterproc
 ! ---- filter for outlier values ---
    do j=1,nlev
      k=j+k1-1
-     SPDT(k) = min(SPDT(k),SPDT_99th_percentile(k))
-     SPDT(k) = max(SPDT(k),SPDT_1st_percentile(k))
-     SPDQ(k) = min(SPDQ(k),SPDQ_99th_percentile(k))
+     ! percentiles dfined from raw history file variables, so convert K/s -->
+     ! W/kg for SPDT, QRS, QRL to match the units predicted by the net.
+     SPDT(k) = min(SPDT(k),1.e3*SPDT_99th_percentile(k)) 
+     SPDT(k) = max(SPDT(k),1.e3*SPDT_1st_percentile(k))
+     SPDQ(k) = min(SPDQ(k),SPDQ_99th_percentile(k)) ! no unit conversion needed.
      SPDQ(k) = max(SPDQ(k),SPDQ_1st_percentile(k))
-     QRL(k) = min(QRL(k),QRL_99th_percentile(k))
-     QRL(k) = max(QRL(k),QRL_1st_percentile(k))
-     QRS(k) = min(QRS(k),QRS_99th_percentile(k))
-     QRS(k) = max(QRS(k),QRS_1st_percentile(k))
+     QRL(k) = min(QRL(k),1.e3*QRL_99th_percentile(k)) ! unit conversion since
+!history file was K/s but brain output is W/kg
+     QRL(k) = max(QRL(k),1.e3*QRL_1st_percentile(k))
+     QRS(k) = min(QRS(k),1.e3*QRS_99th_percentile(k))
+     QRS(k) = max(QRS(k),1.e3*QRS_1st_percentile(k))
    end do
      
    PRECT = min(PRECT,PRECT_99th_percentile)

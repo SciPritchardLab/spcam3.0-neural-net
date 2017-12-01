@@ -147,15 +147,15 @@ use pmgrid, only: masterproc
    end do
 
    SPDT(:) = 0.
-   SPDT(k1:k2) = output(1:nlev) ! W/kg, check w Rasp
+   SPDT(k1:k2) = output(1:nlev) ! W/kg, checked w Rasp
    SPDQ(:) = 0.
    SPDQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 !   QRL(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg already, I assume.
+   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
 !   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg, check w Rasp
-   PRECT = 1.e2*output(4*nlev+1) ! mm/day? INSERT output normalization
-   FLUT = 1.e4*output(4*nlev+2) ! W/m2?
+   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
+   PRECT = output(4*nlev+1)/24./3600. ! m/s
+   FLUT = 1.e5*output(4*nlev+2) ! W/m2
 
 ! ---- filter for outlier values ---
    do j=1,nlev
@@ -172,11 +172,12 @@ use pmgrid, only: masterproc
      QRS(k) = min(QRS(k),1.e3*QRS_99th_percentile(k))
      QRS(k) = max(QRS(k),1.e3*QRS_1st_percentile(k))
    end do
-     
-   PRECT = min(PRECT,PRECT_99th_percentile)
-   PRECT = max(PRECT,PRECT_1st_percentile)
-   FLUT = min(FLUT,FLUT_99th_percentile)
-   FLUT = max(FLUT,FLUT_1st_percentile)
+
+! avoid limiting these since jsut diagnostic anyways.
+!   PRECT = min(PRECT,PRECT_99th_percentile)
+!   PRECT = max(PRECT,PRECT_1st_percentile)
+!   FLUT = min(FLUT,FLUT_99th_percentile)
+!   FLUT = max(FLUT,FLUT_1st_percentile)
 
   end subroutine cloudbrain_dense4_stephan
 

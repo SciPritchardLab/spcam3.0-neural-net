@@ -57,7 +57,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use constituents,    only: dcconnam, cnst_get_ind
    use zm_conv,         only: zm_conv_evap, zm_convr
    use time_manager,    only: is_first_step, get_nstep, get_curr_calday
-   use moistconvection, only: cmfmca
+   use moistconvection, only: cmfmca,rgrav
    use check_energy,    only: check_energy_chng, check_energy_fix
    use dycore,          only: dycore_is
    use cloudsimulatorparms, only: doisccp
@@ -506,6 +506,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
    real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
+   real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
+   real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
 #ifdef BRAINDEBUG
    real(r8) :: braindebug_x1,braindebug_x2,braindebug_y1,braindebug_y2
    braindebug_x1 = 180.*3.14159/180.
@@ -1799,7 +1801,8 @@ end do
    if ( is_first_step()) then
       call init_keras_matrices()
    else
-!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab)
+!!!$XXXOMP PARALLEL DO PRIVATE
+!!!!(C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab,spdq_vint,spdq_abs_vint,vd01_vint,column_moistening_excess)
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
@@ -1825,6 +1828,67 @@ end do
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
       end do ! end column loop
+! ---- energy fixer attempt #1 ----
+      braindq = ptend(c)%q(:ncol,:pver,1)
+      call outfld('BRAINDQ',braindq,pcols,lchnk) 
+     braindt = ptend(c)%s(:ncol,:pver)/cpair 
+     call outfld('BRAINDT',braindt,pcols,lchnk) 
+      do i=1,ncol
+
+
+!  stage 1) apply the moisture budget constraint
+         spdq_vint = 0.
+         spdq_abs_vint = 0.
+         vd01_vint = 0.
+         do k=1,pver
+           spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)      
+           spdq_abs_vint = spdq_abs_vint + abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)      
+           vd01_vint = vd01_vint + latvap*rgrav*state(c)%vd01(i,k)*state(c)%pdel(i,k)
+         end do
+!         if (abs(spdq_vint) .gt. 1.e-2) then
+           ! W/m^2 excess moistening:
+           column_moistening_excess = spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
+           ! Spread it according to absolute value of tendency profile.
+           do k=1,pver
+             ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - (column_moistening_excess/rgrav/latvap/state(c)%pdel(i,k))* & ! W/m-> --> kg/kg/s
+                                                      abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)/spdq_abs_vint ! spread it
+           end do
+! stage 2) now use the corrected SPDQ with the MSE budget to predict the heating
+! rate that is self consistent.
+          spdq_vint = 0.
+          spdt_vint = 0.
+          spdt_abs_vint = 0.
+          dtv_vint = 0.
+          do k=1,pver
+            spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)
+            spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k)
+            spdt_abs_vint = spdt_abs_vint +abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)
+            dtv_vint = dtv_vint + cpair*rgrav*state(c)%dtv(i,k)*state(c)%pdel(i,k) ! checked assumption dtv in K/s
+          end do
+!         write (6,*) 'HEY excess before,after=',column_moistening_excess,spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
+!         (sanity check on stage 1, looks good). 
+          column_heating_excess = spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
+           ! Spread it according to absolute value of tendency profile.
+           do k=1,pver
+             ptend(c)%s(i,k) = ptend(c)%s(i,k) - (column_heating_excess/rgrav/state(c)%pdel(i,k))* & ! W/m-> -->
+                                                      abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)/spdt_abs_vint
+! spread it
+           end do
+          spdt_vint = 0.
+          do k=1,pver
+           spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k) 
+          end do
+!           write (6,*) 'HEY heat excess before,after=',column_heating_excess,spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
+!         end if 
+
+
+
+! ---- end energy fixer attempt
+      end do ! end column loop
+      braindq = ptend(c)%q(:ncol,:pver,1)
+      call outfld('BRAINDQ2',braindq,pcols,lchnk) 
+     braindt = ptend(c)%s(:ncol,:pver)/cpair 
+     call outfld('BRAINDT2',braindt,pcols,lchnk) 
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
      ptend(c)%name  = 'cloudbrain'
@@ -1835,10 +1899,6 @@ end do
      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
      ptend(c)%lv    = .FALSE.
  
-     braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('BRAINDT',braindt,pcols,lchnk) 
-     braindq = ptend(c)%q(:ncol,:pver,1)
-     call outfld('BRAINDQ',braindq,pcols,lchnk) 
      call physics_update(state(c),tend(c),ptend(c),ztodt)
      call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
      call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)

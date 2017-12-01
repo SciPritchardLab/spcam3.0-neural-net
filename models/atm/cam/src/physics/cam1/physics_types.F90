@@ -55,6 +55,7 @@ module physics_types
 #endif
 #ifdef CLOUDBRAIN
           tap, qap, & ! T,Q after physics.
+          dtv, vd01, & ! vertical diffusion of T, Q (for energy checker)
 #endif
           zm      ! geopotential height above surface at midpoints (m)
      real(r8), dimension(pcols,pver,ppcnst) :: &

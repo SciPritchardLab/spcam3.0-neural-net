@@ -174,8 +174,10 @@ use pmgrid, only: masterproc
    end do
 
 ! avoid limiting these since jsut diagnostic anyways.
-!   PRECT = min(PRECT,PRECT_99th_percentile)
-!   PRECT = max(PRECT,PRECT_1st_percentile)
+! actually precip is now used in the energy checker so needs to be suitably
+! valued.
+   PRECT = min(PRECT,PRECT_99th_percentile)
+   PRECT = max(PRECT,PRECT_1st_percentile)
 !   FLUT = min(FLUT,FLUT_99th_percentile)
 !   FLUT = max(FLUT,FLUT_1st_percentile)
 

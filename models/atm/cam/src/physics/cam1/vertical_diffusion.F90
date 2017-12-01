@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-
+#define CLOUDBRAIN
 module vertical_diffusion
 
 !---------------------------------------------------------------------------------
@@ -198,7 +198,11 @@ contains
     real(r8), intent(in) :: landfrac(pcols)        ! Land fraction
     real(r8), intent(in) :: sgh(pcols)             ! standard deviation of orography
 
+#ifdef CLOUDBRAIN
+    type(physics_state), intent(inout)  :: state      ! Physics state variables
+#else
     type(physics_state), intent(in)  :: state      ! Physics state variables
+#endif
     type(physics_ptend), intent(inout)  :: ptend   ! indivdual parameterization tendencies
 
     real(r8), intent(out) :: pblh(pcols)           ! planetary boundary layer height
@@ -285,6 +289,10 @@ contains
     call outfld ('DTVKE   ',dtk,pcols,lchnk)
     dtk(:ncol,:) = ptend%s(:ncol,:)/cpair            ! normalize heating for history using dtk
     call outfld ('DTV     ',dtk    ,pcols,lchnk)
+#ifdef CLOUDBRAIN
+    state%dtv(:,:) = dtk(:,:)
+    state%vd01(:,:) = ptend%q(:,:,1)
+#endif
     call outfld ('DUV     ',ptend%u,pcols,lchnk)
     call outfld ('DVV     ',ptend%v,pcols,lchnk)
     do m = 1, pcnst+pnats

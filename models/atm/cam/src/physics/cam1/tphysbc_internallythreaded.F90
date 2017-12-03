@@ -1835,6 +1835,7 @@ end do
      call outfld('BRAINDT',braindt,pcols,lchnk) 
      call outfld('QRL',qrl(i,:,c)/cpair
      call outfld('QRS',qrs(i,:,c)/cpair
+#ifdef BRAINENERGYFIX
       do i=1,ncol
 
 
@@ -1891,6 +1892,7 @@ end do
       call outfld('BRAINDQ2',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
      call outfld('BRAINDT2',braindt,pcols,lchnk) 
+#endif ! BRAINENERGYFIX
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
      ptend(c)%name  = 'cloudbrain'

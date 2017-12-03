@@ -1833,6 +1833,8 @@ end do
       call outfld('BRAINDQ',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
      call outfld('BRAINDT',braindt,pcols,lchnk) 
+     call outfld('QRL',qrl(i,:,c)/cpair
+     call outfld('QRS',qrs(i,:,c)/cpair
       do i=1,ncol
 
 

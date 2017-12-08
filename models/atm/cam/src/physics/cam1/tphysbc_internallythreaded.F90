@@ -1,6 +1,8 @@
 #include <misc.h>
 #include <params.h>
 #define CLOUDBRAIN
+#define BRAINCTRLFLUX
+!#define NOBRAINRAD
 !#define BRAINDEBUG
 #define PCWDETRAIN
 #define RADTIME 900.
@@ -158,6 +160,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 
+#ifdef NOBRAINRAD
+   real(r8) :: auxqrs(pcols,pver,begchunk:endchunk)            ! Shortwave heating rate
+   real(r8) :: auxqrl(pcols,pver,begchunk:endchunk)            ! Longwave  heating rate
+#endif
 
 
    real(r8) :: asdir(pcols,begchunk:endchunk)                  ! Albedo: shortwave, direct
@@ -193,7 +199,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8)    :: tauy(pcols,begchunk:endchunk)   ! surface stress (zonal) (N/m2)
    real(r8)    :: shf(pcols,begchunk:endchunk)   ! surface sensible heat flux (W/m2)
    real(r8)    :: lhf(pcols,begchunk:endchunk)   ! surface latent heat flux (W/m2) 
-
+#ifdef BRAINCTRLFLUX
+   real(r8)    :: ctrlSHFLX
+   real(r8)    :: ctrlLHFLX,sl
+#endif
 
 
 !
@@ -1801,13 +1810,22 @@ end do
    if ( is_first_step()) then
       call init_keras_matrices()
    else
-!!!$XXXOMP PARALLEL DO PRIVATE
-!!!!(C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab,spdq_vint,spdq_abs_vint,vd01_vint,column_moistening_excess)
+#ifndef BRAINENERGYFIX
+!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab)
+#endif
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
 
       do i=1,ncol ! this is the loop over independent GCM columns.
+#ifdef BRAINCTRLFLUX
+ ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes
+ ! from day 1, see dailymean_multicasecompare.m
+         sl = sin(clat(i,c))
+ctrlSHFLX = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -3.708686e+03*sl**9 + 2.521981e+03*sl**8 + 4.105127e+03*sl**7 + -1.442402e+03*sl**6 + -1.983412e+03*sl**5 + 2.087324e+02*sl**4 + 3.652624e+02*sl**3 + 4.211648e+01*sl**2 + -7.257877e+00*sl**1 + 7.512179e+00
+ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + 4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + 2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + 1.114391e+02*sl**0
+!     write (6,*) 'HEY SHFLX,LHFLX=',ctrlSHFLX,ctrlLHFLX
+#endif
           dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
           dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
 #ifdef BRAINDEBUG
@@ -1820,8 +1838,20 @@ end do
             write(555,*) 'dQdt_adiab(:) =',dQdt_adiab(:)
           endif 
 #endif
+#ifdef NOBRAINRAD
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrs(i,:,c),auxqrl(i,:,c),brainrain(i,c),brainolr(i,c))
+#endif
+#ifdef BRAINCTRLFLUX
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
+#endif
+#ifndef NOBRAINRAD
+#ifndef BRAINCTRLFLUX
           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,shf(i,c),lhf(i,c),solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
+#endif
+#endif
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
@@ -1833,8 +1863,8 @@ end do
       call outfld('BRAINDQ',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
      call outfld('BRAINDT',braindt,pcols,lchnk) 
-     call outfld('QRL',qrl(i,:,c)/cpair
-     call outfld('QRS',qrs(i,:,c)/cpair
+     call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
+     call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
 #ifdef BRAINENERGYFIX
       do i=1,ncol
 

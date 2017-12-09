@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 #define CLOUDBRAIN
-#define BRAINCTRLFLUX
+!#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
 #define PCWDETRAIN
@@ -100,7 +100,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: dTdt_adiab(pver),dQdt_adiab(pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
+   real(r8) :: dTdt_adiab(pcols,pver),dQdt_adiab(pcols,pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -526,7 +526,21 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
-
+! compute adiabatic tendencies that isolate dycore as was done in 'net training:
+#ifdef CLOUDBRAIN
+   do c=begchunk,endchunk
+     lchnk = state(c)%lchnk
+     ncol  = state(c)%ncol 
+     do i=1,ncol
+       do k=1,pver
+          dTdt_adiab(i,k) = (state(c)%t(i,k) - state(c)%tap(i,k))/ztodt
+          dQdt_adiab(i,k) = (state(c)%q(i,k,1) - state(c)%qap(i,k))/ztodt
+       end do 
+     end do
+     call outfld('dTdtadia',dTdt_adiab,pcols,lchnk)
+     call outfld('dQdtadia',dQdt_adiab,pcols,lchnk)
+   end do
+#endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -1826,8 +1840,8 @@ ctrlSHFLX = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -
 ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + 4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + 2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + 1.114391e+02*sl**0
 !     write (6,*) 'HEY SHFLX,LHFLX=',ctrlSHFLX,ctrlLHFLX
 #endif
-          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
-          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
+!          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
+!          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
 #ifdef BRAINDEBUG
           if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
          .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
@@ -1839,16 +1853,16 @@ ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -
           endif 
 #endif
 #ifdef NOBRAINRAD
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrs(i,:,c),auxqrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifdef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifndef NOBRAINRAD
 #ifndef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab,dQdt_adiab,shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #endif
@@ -2178,10 +2192,6 @@ endif ! not first step.
   in_surface_state2d(c)%solsd(:)  =  solsd(:,c)	 	
   in_surface_state2d(c)%solld(:)      =  solld(:,c) 		      
 
-#ifdef CLOUDBRAIN
-  state(c)%tap = state(c)%t
-  state(c)%qap = state(c)%q(:,:,1)
-#endif
 end do ! PRITCH FINAL CHUNK (should be no need to thread it).
 
    return

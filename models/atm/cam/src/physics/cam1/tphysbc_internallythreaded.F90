@@ -100,7 +100,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: dTdt_adiab(pcols,pver),dQdt_adiab(pcols,pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
+   real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),dQdt_adiab(begchunk:endchunk,pcols,pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -533,12 +533,12 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      ncol  = state(c)%ncol 
      do i=1,ncol
        do k=1,pver
-          dTdt_adiab(i,k) = (state(c)%t(i,k) - state(c)%tap(i,k))/ztodt
-          dQdt_adiab(i,k) = (state(c)%q(i,k,1) - state(c)%qap(i,k))/ztodt
+          dTdt_adiab(c,i,k) = (state(c)%t(i,k) - state(c)%tap(i,k))/ztodt
+          dQdt_adiab(c,i,k) = (state(c)%q(i,k,1) - state(c)%qap(i,k))/ztodt
        end do 
      end do
-     call outfld('dTdtadia',dTdt_adiab,pcols,lchnk)
-     call outfld('dQdtadia',dQdt_adiab,pcols,lchnk)
+     call outfld('dTdtadia',dTdt_adiab(c,:,:),pcols,lchnk)
+     call outfld('dQdtadia',dQdt_adiab(c,:,:),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -1853,16 +1853,16 @@ ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -
           endif 
 #endif
 #ifdef NOBRAINRAD
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrs(i,:,c),auxqrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifdef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifndef NOBRAINRAD
 #ifndef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(i,:),dQdt_adiab(i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #endif

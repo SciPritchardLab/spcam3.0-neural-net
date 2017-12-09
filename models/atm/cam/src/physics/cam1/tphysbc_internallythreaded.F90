@@ -1825,11 +1825,16 @@ end do
       call init_keras_matrices()
    else
 #ifndef BRAINENERGYFIX
-!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL,dTdt_adiab,dQdt_adiab)
+!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
 #endif
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
+      call outfld ('NNTAP',state(c)%tap(:ncol,:pver),pcols,lchnk)
+      call outfld ('NNQAP',state(c)%qap(:ncol,:pver),pcols,lchnk)
+      call outfld ('NNSHF',shf(:ncol,c),pcols,lchnk)
+      call outfld ('NNLHF',lhf(:ncol,c),pcols,lchnk)
+      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 #ifdef BRAINCTRLFLUX
@@ -1854,16 +1859,16 @@ ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -
 #endif
 #ifdef NOBRAINRAD
           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrs(i,:,c),auxqrl(i,:,c),brainrain(i,c),brainolr(i,c))
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrl(i,:,c),auxqrs(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifdef BRAINCTRLFLUX
           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #ifndef NOBRAINRAD
 #ifndef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrs(i,:,c),qrl(i,:,c),brainrain(i,c),brainolr(i,c))
+          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputsA
+                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
 #endif
 #endif
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver

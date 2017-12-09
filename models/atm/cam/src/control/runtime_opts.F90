@@ -2022,7 +2022,7 @@ subroutine preset
 ! Frequency in iterations of absorptivity/emissivity calc (negative
 ! values in model hours)
 !
-   iradae = -12
+   iradae = 1
 !
 ! Frequency of annual cycle sst update
 !
@@ -2031,8 +2031,8 @@ subroutine preset
 ! Default frequency of shortwave and longwave radiation computations: 
 ! once per hour (negative value implies model hours)
 !
-   iradsw = -1
-   iradlw = -1
+   iradsw = 1
+   iradlw = 1
 !
 ! Numerical scheme default values
 !

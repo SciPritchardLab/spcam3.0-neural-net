@@ -1,5 +1,5 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Sat Feb 10 12:26:10 CST 2018 on login3.stampede2.tacc.utexas.edu   \n\
+Libraries compiled on Sat Feb 10 12:46:16 CST 2018 on login3.stampede2.tacc.utexas.edu   \n\
 Machine characteristics: Linux login3.stampede2.tacc.utexas.edu 3.10.0-693.11.6.el7.x86_64 #1 SMP Thu Jan 4 01:06:37 UTC 2018 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc  -openmp  -O  -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
@@ -76,6 +76,6 @@ Using include paths: -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/mo
 Using ESMF directory: /home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/home1/05488/tg847872/densebuildtest/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpif90  -O -Wl,-rpath,/home1/05488/tg847872/densebuildtest/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/home1/05488/tg847872/densebuildtest/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/home1/05488/tg847872/spcam3-precip_output-build/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpif90  -O -Wl,-rpath,/home1/05488/tg847872/spcam3-precip_output-build/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/home1/05488/tg847872/spcam3-precip_output-build/obj/esmf/lib/libO/linux_intel "; 

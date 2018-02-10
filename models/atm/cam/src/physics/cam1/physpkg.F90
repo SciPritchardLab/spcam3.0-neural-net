@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 #define XEONPHI ! Pritch at TACC / Stampede
 
 subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)

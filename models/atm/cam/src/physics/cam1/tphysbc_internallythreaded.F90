@@ -2116,6 +2116,10 @@ endif ! not first step.
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
 
+! SR: Add storage terms to output.
+   call outfld('PRECTEND',prectend(:,c),pcols   ,lchnk       )
+   call outfld('PRECSTEND',precstend(:,c),pcols ,lchnk       )
+
 #if ( defined COUP_CSM )
    call outfld('PRECLav ',precl(:,c)   ,pcols   ,lchnk   )
    call outfld('PRECCav ',precc(:,c)   ,pcols   ,lchnk   )

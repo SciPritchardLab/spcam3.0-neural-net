@@ -6044,6 +6044,10 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNLHF','W/m2',1,'A','LHF into NN',phys_decomp)
       call addfld ('NNSOLIN','W/m2',1,'A','SOLIN into NN',phys_decomp)
 
+! SR: Add precipitation storage terms
+      call addfld ('PRECTEND   ','kg/kg/s     ',1,    'A','Tendency in precipitating water',phys_decomp)
+      call addfld ('PRECSTEND  ','kg/kg/s     ',1,    'A','Tendency in precipitating ice',phys_decomp)      
+
       call addfld ('EVAPPCT ','percent ',1,    'A','Percentage of Zhang-McFarlane precipitation going into evaporation',phys_decomp)
       call addfld ('PRECTMX ','m/s     ',1,    'X','Maximum (convective and large-scale) precipitation rate',phys_decomp)
       call addfld ('PRECSL  ','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)

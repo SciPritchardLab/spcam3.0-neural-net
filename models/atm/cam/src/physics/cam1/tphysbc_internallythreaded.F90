@@ -87,7 +87,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_keras_dense, only: init_keras_matrices,cloudbrain_dense4_stephan
+    use cloudbrain_keras_dense, only: init_keras_matrices, cloudbrain_purecrm_base
 #endif
    implicit none
 
@@ -100,7 +100,17 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #ifdef CLOUDBRAIN
-   real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),dQdt_adiab(begchunk:endchunk,pcols,pver),brainrain(pcols,begchunk:endchunk),brainolr(pcols,begchunk:endchunk)
+   real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
+               dQdt_adiab(begchunk:endchunk,pcols,pver),&
+               brainrain(pcols,begchunk:endchunk),&
+               brainolr(pcols,begchunk:endchunk), &
+               TC(begchunk:endchunk,pcols,pver), &
+               QC(begchunk:endchunk,pcols,pver), &
+               VC(begchunk:endchunk,pcols,pver), &
+               PS(begchunk:endchunk,pcols) &
+               TBP(begchunk:endchunk,pcols,pver), &
+               QBP(begchunk:endchunk,pcols,pver), &
+               VBP(begchunk:endchunk,pcols,pver)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -527,15 +537,32 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
+! SR: New fixed implementation of adiabatic tendencies, which also contain DTV, VD01
+! At this stage state%tap is TAP from the previous time step after coupling, right?
+! At this stage state%t is TBP from this time step (also called T_G in my notation)
+    ! real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
+    ! real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
+    ! real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
+    ! real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
+    ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
+    ! real(r8), intent(in) :: PS ! From t-1
+    ! real(r8), intent(in) :: SOLIN ! From t
 #ifdef CLOUDBRAIN
    do c=begchunk,endchunk
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
      do i=1,ncol
        do k=1,pver
-          dTdt_adiab(c,i,k) = (state(c)%t(i,k) - state(c)%tap(i,k))/ztodt
-          dQdt_adiab(c,i,k) = (state(c)%q(i,k,1) - state(c)%qap(i,k))/ztodt
+          TC(c,i,k) = state(c)%tap(i,k) - state(c)%dtv(i,k)*ztodt
+          QC(c,i,k) = state(c)%qap(i,k) - state(c)%vd01(i,k)*ztodt
+          VC(c,i,k) = state(c)%vap(i,k)
+          TBP(c,i,k) = state(c)%t(i,k)
+          QBP(c,i,k) = state(c)%q(i,k)
+          VBP(c,i,k) = state(c)%v(i,k)
+          dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+          dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
        end do 
+       PS(c, i) = state(c)%ps(i)
      end do
      call outfld('dTdtadia',dTdt_adiab(c,:,:),pcols,lchnk)
      call outfld('dQdtadia',dQdt_adiab(c,:,:),pcols,lchnk)
@@ -1814,7 +1841,9 @@ end do
   end do ! end pritch new chunk loop
   call t_stopf('crm')
 #endif ! ndef CLOUDBRAIN
+
 #ifdef CLOUDBRAIN
+  ! SR: I am commenting out a lot of things I think are unneccessary.
   ! As in SP, forget previous stuff (we will retain SP's qrl,qrs)
   call t_startf ('cloudbrain')
   do c=begchunk,endchunk
@@ -1837,14 +1866,14 @@ end do
       call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-#ifdef BRAINCTRLFLUX
- ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes
- ! from day 1, see dailymean_multicasecompare.m
-         sl = sin(clat(i,c))
-ctrlSHFLX = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -3.708686e+03*sl**9 + 2.521981e+03*sl**8 + 4.105127e+03*sl**7 + -1.442402e+03*sl**6 + -1.983412e+03*sl**5 + 2.087324e+02*sl**4 + 3.652624e+02*sl**3 + 4.211648e+01*sl**2 + -7.257877e+00*sl**1 + 7.512179e+00
-ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + 4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + 2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + 1.114391e+02*sl**0
-!     write (6,*) 'HEY SHFLX,LHFLX=',ctrlSHFLX,ctrlLHFLX
-#endif
+! #ifdef BRAINCTRLFLUX
+!  ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes
+!  ! from day 1, see dailymean_multicasecompare.m
+!          sl = sin(clat(i,c))
+! ctrlSHFLX = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -3.708686e+03*sl**9 + 2.521981e+03*sl**8 + 4.105127e+03*sl**7 + -1.442402e+03*sl**6 + -1.983412e+03*sl**5 + 2.087324e+02*sl**4 + 3.652624e+02*sl**3 + 4.211648e+01*sl**2 + -7.257877e+00*sl**1 + 7.512179e+00
+! ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + 4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + 2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + 1.114391e+02*sl**0
+! !     write (6,*) 'HEY SHFLX,LHFLX=',ctrlSHFLX,ctrlLHFLX
+! #endif
 !          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
 !          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
 #ifdef BRAINDEBUG
@@ -1857,20 +1886,32 @@ ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -
             write(555,*) 'dQdt_adiab(:) =',dQdt_adiab(:)
           endif 
 #endif
-#ifdef NOBRAINRAD
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrl(i,:,c),auxqrs(i,:,c),brainrain(i,c),brainolr(i,c))
-#endif
-#ifdef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
-#endif
-#ifndef NOBRAINRAD
-#ifndef BRAINCTRLFLUX
-          call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputsA
-                                          ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
-#endif
-#endif
+! #ifdef NOBRAINRAD
+!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
+!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrl(i,:,c),auxqrs(i,:,c),brainrain(i,c),brainolr(i,c))
+! #endif
+! #ifdef BRAINCTRLFLUX
+!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
+!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
+! #endif
+! #ifndef NOBRAINRAD
+! #ifndef BRAINCTRLFLUX
+!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputsA
+!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
+! #endif
+! #endif
+! SR: Here comes my call to the new cloudbrain function
+! subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS)
+    ! ! NN inputs
+    ! real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
+    ! real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
+    ! real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
+    ! real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
+    ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
+    ! real(r8), intent(in) :: PS ! From t-1
+    ! real(r8), intent(in) :: SOLIN ! From t
+  call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
+                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c))
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
@@ -1884,64 +1925,65 @@ ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -
      call outfld('BRAINDT',braindt,pcols,lchnk) 
      call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
      call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
-#ifdef BRAINENERGYFIX
-      do i=1,ncol
+! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway
+! #ifdef BRAINENERGYFIX
+!       do i=1,ncol
 
 
-!  stage 1) apply the moisture budget constraint
-         spdq_vint = 0.
-         spdq_abs_vint = 0.
-         vd01_vint = 0.
-         do k=1,pver
-           spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)      
-           spdq_abs_vint = spdq_abs_vint + abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)      
-           vd01_vint = vd01_vint + latvap*rgrav*state(c)%vd01(i,k)*state(c)%pdel(i,k)
-         end do
-!         if (abs(spdq_vint) .gt. 1.e-2) then
-           ! W/m^2 excess moistening:
-           column_moistening_excess = spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
-           ! Spread it according to absolute value of tendency profile.
-           do k=1,pver
-             ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - (column_moistening_excess/rgrav/latvap/state(c)%pdel(i,k))* & ! W/m-> --> kg/kg/s
-                                                      abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)/spdq_abs_vint ! spread it
-           end do
-! stage 2) now use the corrected SPDQ with the MSE budget to predict the heating
-! rate that is self consistent.
-          spdq_vint = 0.
-          spdt_vint = 0.
-          spdt_abs_vint = 0.
-          dtv_vint = 0.
-          do k=1,pver
-            spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)
-            spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k)
-            spdt_abs_vint = spdt_abs_vint +abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)
-            dtv_vint = dtv_vint + cpair*rgrav*state(c)%dtv(i,k)*state(c)%pdel(i,k) ! checked assumption dtv in K/s
-          end do
-!         write (6,*) 'HEY excess before,after=',column_moistening_excess,spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
-!         (sanity check on stage 1, looks good). 
-          column_heating_excess = spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
-           ! Spread it according to absolute value of tendency profile.
-           do k=1,pver
-             ptend(c)%s(i,k) = ptend(c)%s(i,k) - (column_heating_excess/rgrav/state(c)%pdel(i,k))* & ! W/m-> -->
-                                                      abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)/spdt_abs_vint
-! spread it
-           end do
-          spdt_vint = 0.
-          do k=1,pver
-           spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k) 
-          end do
-!           write (6,*) 'HEY heat excess before,after=',column_heating_excess,spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
-!         end if 
+! !  stage 1) apply the moisture budget constraint
+!          spdq_vint = 0.
+!          spdq_abs_vint = 0.
+!          vd01_vint = 0.
+!          do k=1,pver
+!            spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)      
+!            spdq_abs_vint = spdq_abs_vint + abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)      
+!            vd01_vint = vd01_vint + latvap*rgrav*state(c)%vd01(i,k)*state(c)%pdel(i,k)
+!          end do
+! !         if (abs(spdq_vint) .gt. 1.e-2) then
+!            ! W/m^2 excess moistening:
+!            column_moistening_excess = spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
+!            ! Spread it according to absolute value of tendency profile.
+!            do k=1,pver
+!              ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - (column_moistening_excess/rgrav/latvap/state(c)%pdel(i,k))* & ! W/m-> --> kg/kg/s
+!                                                       abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)/spdq_abs_vint ! spread it
+!            end do
+! ! stage 2) now use the corrected SPDQ with the MSE budget to predict the heating
+! ! rate that is self consistent.
+!           spdq_vint = 0.
+!           spdt_vint = 0.
+!           spdt_abs_vint = 0.
+!           dtv_vint = 0.
+!           do k=1,pver
+!             spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)
+!             spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k)
+!             spdt_abs_vint = spdt_abs_vint +abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)
+!             dtv_vint = dtv_vint + cpair*rgrav*state(c)%dtv(i,k)*state(c)%pdel(i,k) ! checked assumption dtv in K/s
+!           end do
+! !         write (6,*) 'HEY excess before,after=',column_moistening_excess,spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
+! !         (sanity check on stage 1, looks good). 
+!           column_heating_excess = spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
+!            ! Spread it according to absolute value of tendency profile.
+!            do k=1,pver
+!              ptend(c)%s(i,k) = ptend(c)%s(i,k) - (column_heating_excess/rgrav/state(c)%pdel(i,k))* & ! W/m-> -->
+!                                                       abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)/spdt_abs_vint
+! ! spread it
+!            end do
+!           spdt_vint = 0.
+!           do k=1,pver
+!            spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k) 
+!           end do
+! !           write (6,*) 'HEY heat excess before,after=',column_heating_excess,spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
+! !         end if 
 
 
 
-! ---- end energy fixer attempt
-      end do ! end column loop
-      braindq = ptend(c)%q(:ncol,:pver,1)
-      call outfld('BRAINDQ2',braindq,pcols,lchnk) 
-     braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('BRAINDT2',braindt,pcols,lchnk) 
-#endif ! BRAINENERGYFIX
+! ! ---- end energy fixer attempt
+!       end do ! end column loop
+!       braindq = ptend(c)%q(:ncol,:pver,1)
+!       call outfld('BRAINDQ2',braindq,pcols,lchnk) 
+!      braindt = ptend(c)%s(:ncol,:pver)/cpair 
+!      call outfld('BRAINDT2',braindt,pcols,lchnk) 
+! #endif ! BRAINENERGYFIX
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
      ptend(c)%name  = 'cloudbrain'

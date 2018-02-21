@@ -107,7 +107,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                TC(begchunk:endchunk,pcols,pver), &
                QC(begchunk:endchunk,pcols,pver), &
                VC(begchunk:endchunk,pcols,pver), &
-               PS(begchunk:endchunk,pcols) &
+               PS(begchunk:endchunk,pcols), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver)
@@ -557,7 +557,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
           QC(c,i,k) = state(c)%qap(i,k) - state(c)%vd01(i,k)*ztodt
           VC(c,i,k) = state(c)%vap(i,k)
           TBP(c,i,k) = state(c)%t(i,k)
-          QBP(c,i,k) = state(c)%q(i,k)
+          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
           VBP(c,i,k) = state(c)%v(i,k)
           dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
           dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt

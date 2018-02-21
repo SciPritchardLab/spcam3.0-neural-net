@@ -22,8 +22,8 @@ use pmgrid, only: masterproc
   integer, parameter :: nchunk = 64
   real :: bias1(width1)
   real :: weights1(width1,inputlength)
-  real :: bias2(width2)
-  real :: weights2(width2,width1)
+  real :: bias2(outputlength)
+  real :: weights2(outputlength,width1)
   real :: input_norm_mean(inputlength)
   real :: input_norm_std(inputlength)
   real :: SPDT_max_percentile(nlev)
@@ -39,7 +39,7 @@ use pmgrid, only: masterproc
 
   contains
 
-  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS)
+  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS)
     ! NN inputs
     real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
     real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
@@ -162,7 +162,7 @@ use pmgrid, only: masterproc
 !  write (6,*) weights1(55,44) !-- note this matches kernel (55,44) from the h5
 ! ----- layer 2:
   open (unit=555,file='./keras_matrices/layer2_bias.txt',status='old',action='read')
-  nline=width2/nchunk
+  nline=outputlength/nchunk
   do k=1,nline
     ipt1=(k-1)*nchunk+1
     ipt2 = (k-1)*nchunk+nchunk
@@ -171,7 +171,7 @@ use pmgrid, only: masterproc
 !  write (6,*) bias2(1000)
   open (unit=555,file='./keras_matrices/layer2_kernel.txt',status='old',action='read')
   nline = width1/nchunk
-  do k=1,width2
+  do k=1,outputlength
     do j=1,nline
       ipt1 = (j-1)*nchunk+1
       ipt2 = (j-1)*nchunk+nchunk

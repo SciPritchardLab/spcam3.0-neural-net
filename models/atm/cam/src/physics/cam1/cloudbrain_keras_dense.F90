@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -39,7 +39,7 @@ use pmgrid, only: masterproc
 
   contains
 
-  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS)
+  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
     ! NN inputs
     real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
     real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
@@ -57,8 +57,10 @@ use pmgrid, only: masterproc
     real(r8) :: input(inputlength),x1(width1)
     real(r8) :: output (outputlength)
     integer :: k,j,k1,k2
+    integer, intent(in) :: icol
 
 !    call init_keras_matrices
+
 
     ! Stack the input variables
     k1=pver-nlev+1
@@ -72,20 +74,27 @@ use pmgrid, only: masterproc
     input(5*nlev+2) = SOLIN
 
 #ifdef BRAINDEBUG
-    if (masterproc) then
-      write (6,*) 'HEY input=',input
+    if (masterproc .and. icol .eq. 1) then
+      write (6,*) 'HEY input pre norm=',input
     endif
 #endif
     ! normalize input:
     do k=1,inputlength
       input(k) = (input(k) - input_norm_mean(k))/input_norm_std(k)
     end do
-! #ifdef BRAINDEBUG
-!    if (masterproc) then
-!     write (6,*) 'HEY normalized = ',input
-!     stop
-!    endif
-!#endif
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY normalized = ',input
+    endif
+#endif
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY weights1 = ',weights1
+     write (6,*) 'HEY bias1 = ',bias1
+     write (6,*) 'HEY weights2 = ',weights2
+     write (6,*) 'HEY bias2 = ',bias2
+    endif
+#endif
 ! 1st layer: input length-->512.
     x1(1:width1) = 0.
     do k=1,width1
@@ -106,9 +115,8 @@ use pmgrid, only: masterproc
    end do
 
 #ifdef BRAINDEBUG
-   if (masterproc) then
+   if (masterproc .and. icol .eq. 1) then
     write (6,*) 'HEY output = ',output
-    stop
    endif
 #endif
 

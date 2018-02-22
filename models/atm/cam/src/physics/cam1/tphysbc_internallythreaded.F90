@@ -564,8 +564,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
-     call outfld('dTdtadia',dTdt_adiab(c,:,:),pcols,lchnk)
-     call outfld('dQdtadia',dQdt_adiab(c,:,:),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -1859,11 +1857,13 @@ end do
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
-      call outfld ('NNTAP',state(c)%tap(:ncol,:pver),pcols,lchnk)
-      call outfld ('NNQAP',state(c)%qap(:ncol,:pver),pcols,lchnk)
-      call outfld ('NNSHF',shf(:ncol,c),pcols,lchnk)
-      call outfld ('NNLHF',lhf(:ncol,c),pcols,lchnk)
+      call outfld('NNTC',TC(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQC',QC(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVC',VC(c,:ncol,:),pcols,lchnk)
+      call outfld('dTdtadia',dTdt_adiab(c,:ncol,:),pcols,lchnk)
+      call outfld('dQdtadia',dQdt_adiab(c,:ncol,:),pcols,lchnk)
       call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX
@@ -1911,7 +1911,7 @@ end do
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
   call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c))
+                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated

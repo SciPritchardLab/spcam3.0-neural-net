@@ -1,6 +1,8 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
+#define ADIABHACK
+#define INPLIMITER
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -28,6 +30,8 @@ use pmgrid, only: masterproc
   real :: input_norm_std(inputlength)
   real :: output_norm_min(outputlength)
   real :: output_norm_max(outputlength)
+  real :: input_norm_min(inputlength)
+  real :: input_norm_max(inputlength)
 
   public init_keras_matrices, cloudbrain_purecrm_base
 
@@ -72,6 +76,15 @@ use pmgrid, only: masterproc
       write (6,*) 'HEY input pre norm=',input
     endif
 #endif
+
+! Limit inputs to their min max values
+#ifdef INPLIMITER
+do k=1,inputlength
+  input(k) = min(input(k), input_norm_max(k))
+  input(k) = max(input(k), input_norm_min(k))
+end do
+#endif
+
     ! normalize input:
     do k=1,inputlength
       input(k) = (input(k) - input_norm_mean(k))/input_norm_std(k)
@@ -119,6 +132,16 @@ use pmgrid, only: masterproc
      output(k) = min(output(k), output_norm_max(k))
      output(k) = max(output(k), output_norm_min(k))
    end do
+! Set top 9 levels to zero for moisture
+! Do the same for the top 9 levels of SPDT
+#ifdef ADIABHACK
+do k=1,9
+  output(k) = 0. 
+end do
+do k=30,39
+  output(k) = 0. 
+end do
+#endif
 
 #ifdef BRAINDEBUG
    if (masterproc .and. icol .eq. 1) then
@@ -191,6 +214,7 @@ if (masterproc) then
 endif
 
 ! SR: Additionally, read min and max arrays
+! OUTPUT
  write (6,*) 'SR: reading mins'
   open (unit=555,file='./keras_matrices/outp_mins.txt',status='old',action='read')
   read(555,*) output_norm_min(1:outputlength)
@@ -202,8 +226,24 @@ write (6,*) 'SR: reading maxs'
   close (555)
  write (6,*) 'SR: finished reading maxs'
 if (masterproc) then
-    write (6,*) 'SR: mins = ',output_norm_min
-    write (6,*) 'SR: maxs = ',output_norm_max
+    write (6,*) 'SR: output mins = ',output_norm_min
+    write (6,*) 'SR: output maxs = ',output_norm_max
+endif
+
+! INPUT
+ write (6,*) 'SR: reading mins'
+  open (unit=555,file='./keras_matrices/inp_mins.txt',status='old',action='read')
+  read(555,*) input_norm_min(1:inputlength)
+  close (555)
+ write (6,*) 'SR: finished reading mins'
+write (6,*) 'SR: reading maxs'
+  open (unit=555,file='./keras_matrices/inp_maxs.txt',status='old',action='read')
+  read(555,*) input_norm_max(1:inputlength)
+  close (555)
+ write (6,*) 'SR: finished reading maxs'
+if (masterproc) then
+    write (6,*) 'SR: input mins = ',input_norm_min
+    write (6,*) 'SR: input maxs = ',input_norm_max
 endif
 
   end subroutine init_keras_matrices

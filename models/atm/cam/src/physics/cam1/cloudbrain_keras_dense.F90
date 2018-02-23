@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define BRAINDEBUG
+!#define BRAINDEBUG
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -26,14 +26,8 @@ use pmgrid, only: masterproc
   real :: weights2(outputlength,width1)
   real :: input_norm_mean(inputlength)
   real :: input_norm_std(inputlength)
-  real :: SPDT_max_percentile(nlev)
-  real :: SPDT_min_percentile(nlev)
-  real :: SPDQ_max_percentile(nlev)
-  real :: SPDQ_min_percentile(nlev)
-  real :: QRL_max_percentile(nlev)
-  real :: QRL_min_percentile(nlev)
-  real :: QRS_max_percentile(nlev)
-  real :: QRS_min_percentile(nlev)
+  real :: output_norm_min(outputlength)
+  real :: output_norm_max(outputlength)
 
   public init_keras_matrices, cloudbrain_purecrm_base
 
@@ -120,6 +114,18 @@ use pmgrid, only: masterproc
    endif
 #endif
 
+! SR: Limit outputs to external mins and maxs
+   do k=1,outputlength
+     output(k) = min(output(k), output_norm_max(k))
+     output(k) = max(output(k), output_norm_min(k))
+   end do
+
+#ifdef BRAINDEBUG
+   if (masterproc .and. icol .eq. 1) then
+    write (6,*) 'HEY output limit = ',output
+   endif
+#endif
+
 ! Unstack the output variables and unit convert them back
 ! ATTENTION: I confusingly, placed SPDQ before SPDT
    SPDQ(:) = 0.   ! If we are predicting all 30 levels, this should be irrelevant, right?
@@ -130,24 +136,6 @@ use pmgrid, only: masterproc
    QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
 !   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
    QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
-
-! SR, I will comment this out for now. Except for QRS which must be strictly positive.
-! ---- filter for outlier values ---
-   do j=1,nlev
-     k=j+k1-1
-!      ! percentiles dfined from raw history file variables, so convert K/s -->
-!      ! W/kg for SPDT, QRS, QRL to match the units predicted by the net.
-!      SPDT(k) = min(SPDT(k),1.e3*SPDT_max_percentile(j)) 
-!      SPDT(k) = max(SPDT(k),1.e3*SPDT_min_percentile(j))
-!      SPDQ(k) = min(SPDQ(k),SPDQ_max_percentile(j)) ! no unit conversion needed.
-!      SPDQ(k) = max(SPDQ(k),SPDQ_min_percentile(j))
-!      QRL(k) = min(QRL(k),1.e3*QRL_max_percentile(j)) ! unit conversion since
-! !history file was K/s but brain output is W/kg
-!      QRL(k) = max(QRL(k),1.e3*QRL_min_percentile(j))
-    !  QRS(k) = min(QRS(k),1.e3*QRS_max_percentile(j))
-    !  QRS(k) = max(QRS(k),1.e3*QRS_min_percentile(j))
-     QRS(k) = max(QRS(k),0.)
-   end do
 
   end subroutine cloudbrain_purecrm_base
 
@@ -188,18 +176,34 @@ use pmgrid, only: masterproc
 
 ! SR: Also read mean and std 
  write (6,*) 'SR: reading means'
-  open (unit=555,file='./keras_matrices/means.txt',status='old',action='read')
+  open (unit=555,file='./keras_matrices/inp_means.txt',status='old',action='read')
   read(555,*) input_norm_mean(1:inputlength)
   close (555)
  write (6,*) 'SR: finished reading means'
 write (6,*) 'SR: reading stds'
-  open (unit=555,file='./keras_matrices/stds.txt',status='old',action='read')
+  open (unit=555,file='./keras_matrices/inp_stds.txt',status='old',action='read')
   read(555,*) input_norm_std(1:inputlength)
   close (555)
  write (6,*) 'SR: finished reading means'
 if (masterproc) then
     write (6,*) 'SR: means = ',input_norm_mean
     write (6,*) 'SR: stds = ',input_norm_std
+endif
+
+! SR: Additionally, read min and max arrays
+ write (6,*) 'SR: reading mins'
+  open (unit=555,file='./keras_matrices/outp_mins.txt',status='old',action='read')
+  read(555,*) output_norm_min(1:outputlength)
+  close (555)
+ write (6,*) 'SR: finished reading mins'
+write (6,*) 'SR: reading maxs'
+  open (unit=555,file='./keras_matrices/outp_maxs.txt',status='old',action='read')
+  read(555,*) output_norm_max(1:outputlength)
+  close (555)
+ write (6,*) 'SR: finished reading maxs'
+if (masterproc) then
+    write (6,*) 'SR: mins = ',output_norm_min
+    write (6,*) 'SR: maxs = ',output_norm_max
 endif
 
   end subroutine init_keras_matrices

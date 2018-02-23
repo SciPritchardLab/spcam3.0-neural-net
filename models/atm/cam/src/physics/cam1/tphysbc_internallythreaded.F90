@@ -1851,9 +1851,7 @@ end do
    if ( is_first_step()) then
       call init_keras_matrices()
    else
-#ifndef BRAINENERGYFIX
-!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
-#endif
+  ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk

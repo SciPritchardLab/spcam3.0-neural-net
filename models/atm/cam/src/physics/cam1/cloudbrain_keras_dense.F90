@@ -1,8 +1,7 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
-#define ADIABHACK
-#define INPLIMITER
+#define LIMITOUTP
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -128,19 +127,11 @@ end do
 #endif
 
 ! SR: Limit outputs to external mins and maxs
+#ifdef LIMITOUTP
    do k=1,outputlength
      output(k) = min(output(k), output_norm_max(k))
      output(k) = max(output(k), output_norm_min(k))
    end do
-! Set top 9 levels to zero for moisture
-! Do the same for the top 9 levels of SPDT
-#ifdef ADIABHACK
-do k=1,9
-  output(k) = 0. 
-end do
-do k=30,39
-  output(k) = 0. 
-end do
 #endif
 
 #ifdef BRAINDEBUG
@@ -204,7 +195,7 @@ end do
   close (555)
  write (6,*) 'SR: finished reading means'
 write (6,*) 'SR: reading stds'
-  open (unit=555,file='./keras_matrices/inp_stds.txt',status='old',action='read')
+  open (unit=555,file='./keras_matrices/inp_stds_by_var.txt',status='old',action='read')
   read(555,*) input_norm_std(1:inputlength)
   close (555)
  write (6,*) 'SR: finished reading means'

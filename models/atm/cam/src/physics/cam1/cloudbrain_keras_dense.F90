@@ -1,7 +1,10 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
-#define LIMITOUTP
+! Limit output to min-max
+!#define LIMITOUTP
+! Limit input to min-max
+!#define INPLIMITER  
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -31,6 +34,7 @@ use pmgrid, only: masterproc
   real :: output_norm_max(outputlength)
   real :: input_norm_min(inputlength)
   real :: input_norm_max(inputlength)
+  real :: input_norm_max_rs(inputlength)
 
   public init_keras_matrices, cloudbrain_purecrm_base
 
@@ -86,7 +90,7 @@ end do
 
     ! normalize input:
     do k=1,inputlength
-      input(k) = (input(k) - input_norm_mean(k))/input_norm_std(k)
+      input(k) = (input(k) - input_norm_mean(k))/input_norm_max_rs(k)
     end do
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -108,7 +112,8 @@ end do
         x1(k) = x1(k) + weights1(k,j)*input(j)
       end do
       x1(k) = x1(k) + bias1(k)
-      x1(k) = max(0.,x1(k)) ! relu activation.
+      !x1(k) = max(0.,x1(k)) ! relu activation.
+      x1(k) = max(0.3 * x1(k), x1(k))  ! Leaky ReLU
     end do
 ! output layer: 512->output length
    output(1:outputlength) = 0.
@@ -232,9 +237,15 @@ write (6,*) 'SR: reading maxs'
   read(555,*) input_norm_max(1:inputlength)
   close (555)
  write (6,*) 'SR: finished reading maxs'
+write (6,*) 'SR: reading max_rs'
+  open (unit=555,file='./keras_matrices/inp_max_rs.txt',status='old',action='read')
+  read(555,*) input_norm_max_rs(1:inputlength)
+  close (555)
+ write (6,*) 'SR: finished reading max_rs'
 if (masterproc) then
     write (6,*) 'SR: input mins = ',input_norm_min
     write (6,*) 'SR: input maxs = ',input_norm_max
+    write (6,*) 'SR: input max_rs = ',input_norm_max_rs
 endif
 
   end subroutine init_keras_matrices

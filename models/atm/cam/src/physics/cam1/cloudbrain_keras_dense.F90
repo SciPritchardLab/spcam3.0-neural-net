@@ -20,7 +20,7 @@ use pmgrid, only: masterproc
   private
   ! Define the network architecture. For now just one hidden layer.
   integer, parameter :: nlev = 30
-  integer, parameter :: inputlength = 152
+  integer, parameter :: inputlength = 94  ! For no adiab option. 152 for original purecrm
   integer, parameter :: width1 = 512
   integer, parameter :: outputlength = 120
   integer, parameter :: nchunk = 64
@@ -40,13 +40,15 @@ use pmgrid, only: masterproc
 
   contains
 
-  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
+  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SHFLX, LHFLX, SPDT, SPDQ, QRL, QRS, icol)
     ! NN inputs
     real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
     real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
     real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
     real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
     real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
+    real(r8), intent(in) :: SHFLX ! Sensible heat flux from previous time step
+    real(r8), intent(in) :: LHFLX ! Latent heat flux
     real(r8), intent(in) :: PS ! From t-1
     real(r8), intent(in) :: SOLIN ! From t
     ! NN outputs
@@ -64,15 +66,26 @@ use pmgrid, only: masterproc
 
 
     ! Stack the input variables
+    ! k1=pver-nlev+1
+    ! k2=pver
+    ! input(1:nlev)=TC(k1:k2) 
+    ! input((nlev+1):2*nlev)=QC(k1:k2)
+    ! input((2*nlev+1):3*nlev)=VC(k1:k2)
+    ! input((3*nlev+1):4*nlev) = dTdt_adiabatic(k1:k2)
+    ! input((4*nlev+1):5*nlev) = dQdt_adiabatic(k1:k2)
+    ! input(5*nlev+1) = PS
+    ! input(5*nlev+2) = SOLIN
+
+    ! Stacking for noadiab option
     k1=pver-nlev+1
     k2=pver
     input(1:nlev)=TC(k1:k2) 
     input((nlev+1):2*nlev)=QC(k1:k2)
     input((2*nlev+1):3*nlev)=VC(k1:k2)
-    input((3*nlev+1):4*nlev) = dTdt_adiabatic(k1:k2)
-    input((4*nlev+1):5*nlev) = dQdt_adiabatic(k1:k2)
-    input(5*nlev+1) = PS
-    input(5*nlev+2) = SOLIN
+    input(3*nlev+1) = SHFLX
+    input(3*nlev+2) = LHFLX
+    input(3*nlev+3) = PS
+    input(3*nlev+4) = SOLIN
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then

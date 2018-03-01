@@ -1909,7 +1909,7 @@ end do
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
   call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
+                               solin(i,c), shf(i,c), lhf(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated

@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 module vertical_diffusion
 
 !---------------------------------------------------------------------------------

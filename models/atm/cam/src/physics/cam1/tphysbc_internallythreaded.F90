@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
@@ -2060,8 +2060,8 @@ end do
 !    INSERT need to send precip, liquid water paths, other desired diags (mass
 !    fluxes?) to history file tapes at this stage, see SP outfld logic for inspiration. 
   end do ! end chunk loop 
-#endif 
 endif ! not first step.
+#endif 
 ! END OF CLOUDBRAIN
   call t_stopf ('cloudbrain')
 #endif ! CRM

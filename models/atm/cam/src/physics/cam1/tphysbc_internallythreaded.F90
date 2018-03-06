@@ -677,6 +677,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    !*** BAB's FV heating kludge *** save the initial temperature
    tini(:ncol,:pver) = state(c)%t(:ncol,:pver)
    if (dycore_is('LR')) then
+      write (6,*) 'SR: This is happening = ',output
       call check_energy_fix(state(c), ptend(c), nstep, flx_heat(:,c))
       call physics_update(state(c), tend(c), ptend(c), ztodt)
       call check_energy_chng(state(c), tend(c), "chkengyfix", nstep, ztodt, zero, zero, zero, flx_heat(:,c))

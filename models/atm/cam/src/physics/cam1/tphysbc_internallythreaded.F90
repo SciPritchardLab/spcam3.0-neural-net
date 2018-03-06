@@ -710,8 +710,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call t_stopf ('dadadj')
    call physics_update (state(c), tend(c), ptend(c), ztodt)
 
-#if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
+!#if defined (CRM) || defined (CLOUDBRAIN)
+#ifdef CRM
 ! Save the state and tend variables to overwrite conventional physics effects
 ! leter before calling the superparameterization. Conventional moist
 ! physics is allowed to compute tendencies due to conventional
@@ -720,6 +720,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     state_save(c) = state(c)
     tend_save(c) = tend(c)
 
+#endif
+! SR: debug09 changes to make sure || statement was working
+#ifdef CLOUDBRAIN
+    state_save(c) = state(c)
+    tend_save(c) = tend(c)
 #endif
 !
 !===================================================
@@ -904,8 +909,18 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                in_srfflx_state2d(c)%ts,      in_srfflx_state2d(c)%sst, state(c)%pint(1,pverp),       zdu(:,:,c),  in_ocnfrac(:,c), &
                rhdfda(:,:,c),   rhu00(:,:,c) , state(c)%phis)
    call t_stopf('cldnrh')
-#if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
+!#if defined (CRM) || defined (CLOUDBRAIN)
+#ifdef CRM
+   call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
+   call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
+   call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
+#else
+   call outfld('CONCLD  ',concld(:,:,c), pcols,lchnk)
+   call outfld('CLDST   ',cldst(:,:,c),  pcols,lchnk)
+   call outfld('CNVCLD  ',clc(:,c),    pcols,lchnk)
+#endif
+!SR: Make sure
+#ifdef CLOUDBRAIN 
    call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
    call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
    call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
@@ -1071,8 +1086,22 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 ! Dump cloud field information to history tape buffer (diagnostics)
 !
-#if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
+!#if defined (CRM) || defined (CLOUDBRAIN)
+#ifdef CRM
+      call outfld('_CLOUD  ',cld,  pcols,lchnk)
+      call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
+      call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)
+      call outfld('_CLDMED ',clmed(:,c)  ,pcols,lchnk)
+      call outfld('_CLDHGH ',clhgh(:,c)  ,pcols,lchnk)
+#else
+      call outfld('CLDTOT  ',cltot(:,c)  ,pcols,lchnk)
+      call outfld('CLDLOW  ',cllow(:,c)  ,pcols,lchnk)
+      call outfld('CLDMED  ',clmed(:,c)  ,pcols,lchnk)
+      call outfld('CLDHGH  ',clhgh(:,c)  ,pcols,lchnk)
+      call outfld('CLOUD   ',cld    ,pcols,lchnk)
+#endif
+!SR: Make sure
+#ifdef CLOUDBRAIN
       call outfld('_CLOUD  ',cld,  pcols,lchnk)
       call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
       call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)

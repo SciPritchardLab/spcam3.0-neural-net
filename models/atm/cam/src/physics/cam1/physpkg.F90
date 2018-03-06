@@ -270,6 +270,8 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
       uphystend(:ncol,:,c) = phys_state(c)%u(:ncol,:)
       vphystend(:ncol,:,c) = phys_state(c)%v(:ncol,:)
       qphystend(:ncol,:,:,c) = phys_state(c)%q(:ncol,:,:)
+      ! SR: Debug output T 1
+      call outfld ('DBGT1',phys_state(c)%t(:ncol,:),pcols,c)
    end do
 
    call tphysbc_internallythreaded (ztodt, pblht(:,begchunk:endchunk), tpert(:,begchunk:endchunk),             &
@@ -289,7 +291,12 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
                    ,flwds_crm,flns_crm,flut_crm   &
                    ,fsdsc_crm,fsntoac_crm,flnsc_crm, flutc_crm & 
 #endif
-)                      
+)
+do c=begchunk, endchunk
+      ncol = get_ncols_p(c)
+      ! SR: Debug output T 2
+      call outfld ('DBGT2',phys_state(c)%t(:ncol,:),pcols,c)
+end do                      
       call t_stopf ('tphysbc_internallythreaded')
       do c=begchunk,endchunk 
         if (dosw .or. dolw) then
@@ -637,6 +644,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 !
 ! surface diagnostics for history files
 !
+      call outfld ('DBGT3',phys_state(c)%t(:ncol,:pver),pcols,c) ! SR: Debug T 3
       call diag_surf (c, ncol, srfflx_state2d(c)%shf, srfflx_state2d(c)%lhf, srfflx_state2d(c)%cflx, &
                       srfflx_state2d(c)%tref, trefmxav(1,c), trefmnav(1,c), srfflx_state2d(c)%qref, &
                       srfflx_state2d(c)%wsx, srfflx_state2d(c)%wsy, &

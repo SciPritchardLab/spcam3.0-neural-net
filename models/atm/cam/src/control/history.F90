@@ -6160,6 +6160,10 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNTC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNQC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVC','K     ',pver, 'A','TC into NN',phys_decomp)
+! SR: Additional debug outputs to check T at several stages
+      call addfld ('DBGT1','K     ',pver, 'A','Debug T 1',phys_decomp)
+      call addfld ('DBGT2','K     ',pver, 'A','Debug T 2',phys_decomp)
+      call addfld ('DBGT3','K     ',pver, 'A','Debug T 3',phys_decomp)
 
       call addfld ('BRAINDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
       call addfld ('BRAINDT2','K/s     ',pver, 'A','T tendency - neural net (after energy fix)',phys_decomp)

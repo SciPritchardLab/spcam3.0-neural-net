@@ -677,7 +677,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    !*** BAB's FV heating kludge *** save the initial temperature
    tini(:ncol,:pver) = state(c)%t(:ncol,:pver)
    if (dycore_is('LR')) then
-      write (6,*) 'SR: This is happening = ',output
+      write (6,*) 'SR: energy fix is happening'
       call check_energy_fix(state(c), ptend(c), nstep, flx_heat(:,c))
       call physics_update(state(c), tend(c), ptend(c), ztodt)
       call check_energy_chng(state(c), tend(c), "chkengyfix", nstep, ztodt, zero, zero, zero, flx_heat(:,c))
@@ -2226,6 +2226,10 @@ endif ! not first step.
    call outfld('DQRL    ',dqrl(:,:,c)/cpair ,pcols,lchnk)
 ! Also apply artificial interference to the radiative heating driving the CRM
 ! on subsequent call to crm, identically in each of the CRM sub-columns...
+
+!SR: More debug
+call outfld('DBGT5',tend(c)%dtdt ,pcols,lchnk)
+call outfld('DBGT6',ptend(c)%s ,pcols,lchnk)
 
  ! Now it appears to me that qrl_crm has units of qrl_tmp / cpair * pdel
  ! at this scope in the code whereas qrl has units of qrl_tmp

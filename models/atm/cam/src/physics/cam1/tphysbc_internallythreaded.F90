@@ -2022,13 +2022,18 @@ end do
      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
      ptend(c)%lv    = .FALSE.
  
-     call physics_update(state(c),tend(c),ptend(c),ztodt)
      ! SR: New energy computation here
      call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
      call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+
+     call physics_update(state(c),tend(c),ptend(c),ztodt)
+     
      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+     
      call outfld('TEPOST',state(c)%te_cur(:ncol),pcols,lchnk)
      call outfld('TWPOST',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPOST',state(c)%s(:ncol, :pver),pcols,lchnk)
      call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
      call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)
 

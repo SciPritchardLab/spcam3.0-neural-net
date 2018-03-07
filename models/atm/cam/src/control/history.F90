@@ -6167,6 +6167,11 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('DBGT4','K     ',pver, 'A','Debug T 4',phys_decomp)
       call addfld ('DBGT5','K     ',pver, 'A','Debug T 5',phys_decomp)
       call addfld ('DBGT6','K     ',pver, 'A','Debug T 6',phys_decomp)
+      ! Variables for energy check
+      call addfld ('TEPRE','K     ',1, 'A','Pre BRAIN TE',phys_decomp)
+      call addfld ('TWPRE','K     ',1, 'A','Pre BRAIN TW',phys_decomp)
+      call addfld ('TEPOST','K     ',1, 'A','Post BRAIN TE',phys_decomp)
+      call addfld ('TWPOST','K     ',1, 'A','Post BRAIN TW',phys_decomp)
 
       call addfld ('BRAINDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
       call addfld ('BRAINDT2','K/s     ',pver, 'A','T tendency - neural net (after energy fix)',phys_decomp)

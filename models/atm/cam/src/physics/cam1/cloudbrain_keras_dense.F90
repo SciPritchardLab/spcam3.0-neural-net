@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 ! Limit output to min-max
 !#define LIMITOUTP
 ! Limit input to min-max
@@ -152,10 +152,10 @@ end do
    SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
    SPDT(:) = 0.
    SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
-   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
-   !QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
-   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
-   !QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
+!   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
+   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
+!   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
+   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
 
   end subroutine cloudbrain_purecrm_base
 

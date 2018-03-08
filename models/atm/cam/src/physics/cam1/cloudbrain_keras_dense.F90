@@ -148,9 +148,9 @@ end do
 ! Unstack the output variables and unit convert them back
 ! ATTENTION: I confusingly, placed SPDQ before SPDT
    SPDQ(:) = 0.   ! If we are predicting all 30 levels, this should be irrelevant, right?
-   SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
+   !SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
    SPDT(:) = 0.
-   SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
+   !SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
 !   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
    QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
 !   QRS(:) = 0. ! retain SP or upstream solution above neural net top.

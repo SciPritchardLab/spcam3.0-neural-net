@@ -126,6 +126,10 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
 ! Output Energy correction term
 !
   call outfld('ENGYCORR',engycorr ,plond   ,lat     )
+
+!SR Add output here to check whether this is happening.
+ ! call outfld('BETA', ,plond   ,lat     )  
+ write (6,*) 'SR: BETA = ', beta
 !
 ! Compute q tendency due to mass adjustment
 ! If LFIXLIM = .T., then:

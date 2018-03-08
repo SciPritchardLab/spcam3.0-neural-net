@@ -6182,6 +6182,10 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('SPRE_R','K     ',pver, 'A','Pre RAD S',phys_decomp)
       call addfld ('SPOST_R','K     ',pver, 'A','Post RAD S',phys_decomp)
 
+      call addfld ('BETA','K',1,'A','beta',dyn_decomp,flag_xyfill=.true.)
+      call addfld ('DIFFT','K   ',plev, 'A','difft',dyn_decomp)
+      call addfld ('RESIDUAL','K   ',plev, 'A','residual',dyn_decomp)
+
       call addfld ('BRAINDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
       call addfld ('BRAINDT2','K/s     ',pver, 'A','T tendency - neural net (after energy fix)',phys_decomp)
       call addfld ('BRAINDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)

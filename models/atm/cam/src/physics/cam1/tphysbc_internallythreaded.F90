@@ -1939,7 +1939,9 @@ end do
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
   call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
+                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+                               !qrl(i,:,c), qrs(i,:,c), &
+                               i)
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
@@ -2161,6 +2163,10 @@ endif ! not first step.
 ! Compute net radiative heating
 !
    call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
+
+     call outfld('TEPRE_R',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE_R',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE_R',state(c)%s(:ncol, :pver),pcols,lchnk)
 !
 ! Add radiation tendencies to cummulative model tendencies and update profiles
 !
@@ -2169,6 +2175,10 @@ endif ! not first step.
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)
 !
+     call outfld('TEPOST_R',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPOST_R',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPOST_R',state(c)%s(:ncol, :pver),pcols,lchnk)
+
 ! Compute net surface radiative flux for use by surface temperature code.
 ! Note that units have already been converted to mks in RADCTL.  Since
 ! fsns and flwds are in the buffer, array values will be carried across

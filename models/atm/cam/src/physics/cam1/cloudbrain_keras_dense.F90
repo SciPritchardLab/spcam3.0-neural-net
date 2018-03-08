@@ -40,7 +40,8 @@ use pmgrid, only: masterproc
 
   contains
 
-  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
+  !subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
+  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, icol)
     ! NN inputs
     real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
     real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
@@ -52,8 +53,8 @@ use pmgrid, only: masterproc
     ! NN outputs
     real(r8), intent(out) :: SPDT(pver) ! W/kg
     real(r8), intent(out) :: SPDQ(pver) ! W/kg
-    real(r8), intent(inout) :: QRL(pver) ! W/kg
-    real(r8), intent(inout) :: QRS(pver) ! W/kg
+    !real(r8), intent(inout) :: QRL(pver) ! W/kg
+    !real(r8), intent(inout) :: QRS(pver) ! W/kg
 
     real(r8) :: input(inputlength),x1(width1)
     real(r8) :: output (outputlength)
@@ -148,13 +149,13 @@ end do
 ! Unstack the output variables and unit convert them back
 ! ATTENTION: I confusingly, placed SPDQ before SPDT
    SPDQ(:) = 0.   ! If we are predicting all 30 levels, this should be irrelevant, right?
-   !SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
+   SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
    SPDT(:) = 0.
-   !SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
+   SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
 !   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
-   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
+   !QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
 !   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
+   !QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
 
   end subroutine cloudbrain_purecrm_base
 

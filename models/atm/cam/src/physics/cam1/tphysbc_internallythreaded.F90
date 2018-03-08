@@ -1135,11 +1135,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    end if
 
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
-
-     ! SR: TE, TW and S before BRAIN or SP
-     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
-     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
-     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+     
 
 
 #ifdef CLOUDBRAIN
@@ -1173,6 +1169,12 @@ call t_startf ('crm')
 do c=begchunk,endchunk
   state(c) = state_save(c)
   tend(c) = tend_save(c)
+     lchnk = state(c)%lchnk
+	   ncol  = state(c)%ncol
+! SR: TE, TW and S before BRAIN or SP
+     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
 end do
 
    if(is_first_step() .and. .not. crminitread ) then
@@ -1883,6 +1885,12 @@ end do
   do c=begchunk,endchunk
     state(c) = state_save(c)
     tend(c) = tend_save(c)
+     lchnk = state(c)%lchnk
+	   ncol  = state(c)%ncol
+! SR: TE, TW and S before BRAIN or SP
+     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
   end do
    if ( is_first_step()) then
       call init_keras_matrices()

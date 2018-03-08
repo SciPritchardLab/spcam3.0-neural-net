@@ -441,6 +441,17 @@ grqla(:,:,:) = inf
    else
      beta = 0.
    endif
+!SR Add output here to check whether this is happening.
+ ! call outfld('BETA', ,plond   ,lat     )  
+ write (6,*) 'SR: BETA = ', beta
+ write (6,*) 'SR: BETA = ', residual
+ write (6,*) 'SR: BETA = ', fixmas
+ write (6,*) 'SR: BETA = ', engy1
+ write (6,*) 'SR: BETA = ', engy2
+ write (6,*) 'SR: BETA = ', difft
+
+
+  
 !!   write(6,125) residual,beta
 !!125 format('      resid, beta      = ',25x,2f25.15)
 !

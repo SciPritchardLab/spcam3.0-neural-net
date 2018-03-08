@@ -1136,6 +1136,12 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
 
+     ! SR: TE, TW and S before BRAIN or SP
+     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+
+
 #ifdef CLOUDBRAIN
 #ifndef CRM
   write (6,*) 'YO  CLOUDBRAIN currently cant be defined without #define CRM'
@@ -1940,7 +1946,7 @@ end do
     ! real(r8), intent(in) :: SOLIN ! From t
   call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
                                solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               !qrl(i,:,c), qrs(i,:,c), &
+                               qrl(i,:,c), qrs(i,:,c), &
                                i)
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
@@ -2025,17 +2031,11 @@ end do
      ptend(c)%lv    = .FALSE.
  
      ! SR: New energy computation here
-     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
-     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
-     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
 
      call physics_update(state(c),tend(c),ptend(c),ztodt)
      
      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
      
-     call outfld('TEPOST',state(c)%te_cur(:ncol),pcols,lchnk)
-     call outfld('TWPOST',state(c)%tw_cur(:ncol),pcols,lchnk)
-     call outfld('SPOST',state(c)%s(:ncol, :pver),pcols,lchnk)
      call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
      call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)
 
@@ -2079,7 +2079,15 @@ endif ! not first step.
 ! END OF CLOUDBRAIN
   call t_stopf ('cloudbrain')
 #endif ! CRM
+
  do c=begchunk,endchunk ! pritch new chunk loop
+
+     ! SR: TE, TW and S after BRAIN or SP, with SPs update
+     call outfld('TEPOST',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPOST',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPOST',state(c)%s(:ncol, :pver),pcols,lchnk)
+
+
    lchnk = state(c)%lchnk
    ncol  = state(c)%ncol 
    ifld = pbuf_get_fld_idx('CLD')

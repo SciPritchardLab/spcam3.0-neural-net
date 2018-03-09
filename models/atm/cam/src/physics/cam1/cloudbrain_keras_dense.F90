@@ -24,12 +24,12 @@ use pmgrid, only: masterproc
   integer, parameter :: outputlength = 120
   integer, parameter :: nchunk = 64
   ! 1st: BASE
-  integer, parameter :: width = 512
+  ! integer, parameter :: width = 512
   ! Weight and bias matrices
-  real :: bias1(width)
-  real :: weights1(width,inputlength)
-  real :: bias2(outputlength)
-  real :: weights2(outputlength,width)
+  ! real :: bias1(width)
+  ! real :: weights1(width,inputlength)
+  ! real :: bias2(outputlength)
+  ! real :: weights2(outputlength,width)
 
   ! 2nd: Deep
   integer, parameter :: width = 256
@@ -62,7 +62,7 @@ use pmgrid, only: masterproc
   real :: input_norm_max(inputlength)
   real :: input_norm_max_rs(inputlength)
 
-  public init_keras_matrices, cloudbrain_purecrm_base
+  public init_keras_norm, init_keras_matrices_base, init_keras_matrices_deep, cloudbrain_purecrm_base, cloudbrain_purecrm_deep
 
   contains
 
@@ -564,7 +564,7 @@ end do
   close (555)
  write (6,*) 'SR: finished reading layer2_kernel'
 
-end subroutine init_keras_matrices_base
+end subroutine init_keras_matrices_deep
 
 
 

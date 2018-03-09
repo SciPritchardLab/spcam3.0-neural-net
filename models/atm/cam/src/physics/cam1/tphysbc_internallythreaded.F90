@@ -87,7 +87,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_keras_dense, only: init_keras_matrices, cloudbrain_purecrm_base
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, init_keras_matrices_deep, &
+                                      cloudbrain_purecrm_base, cloudbrain_purecrm_deep
 #endif
    implicit none
 
@@ -1893,7 +1894,9 @@ end do
      call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
   end do
    if ( is_first_step()) then
-      call init_keras_matrices()
+      call init_keras_norm()
+      !call init_keras_matrices_base()
+      call init_keras_matrices_deep()
    else
   ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
@@ -1952,7 +1955,11 @@ end do
     ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
-  call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
+  ! call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
+  !                              solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+  !                              qrl(i,:,c), qrs(i,:,c), &
+  !                              i)
+  call cloudbrain_purecrm_deep(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
                                solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                qrl(i,:,c), qrs(i,:,c), &
                                i)

@@ -247,30 +247,7 @@ end do
      write (6,*) 'HEY normalized = ',input
     endif
 #endif
-#ifdef BRAINDEBUG
-    if (masterproc .and. icol .eq. 1) then
-     write (6,*) 'HEY weights1 = ',weights1
-     write (6,*) 'HEY bias1 = ',bias1
-     write (6,*) 'HEY weights2 = ',weights2
-     write (6,*) 'HEY bias2 = ',bias2
-     write (6,*) 'HEY weights2 = ',weights3
-     write (6,*) 'HEY bias2 = ',bias3
-     write (6,*) 'HEY weights2 = ',weights4
-     write (6,*) 'HEY bias2 = ',bias4
-     write (6,*) 'HEY weights2 = ',weights5
-     write (6,*) 'HEY bias2 = ',bias5
-     write (6,*) 'HEY weights2 = ',weights6
-     write (6,*) 'HEY bias2 = ',bias6
-     write (6,*) 'HEY weights2 = ',weights7
-     write (6,*) 'HEY bias2 = ',bias7
-     write (6,*) 'HEY weights2 = ',weights8
-     write (6,*) 'HEY bias2 = ',bias8
-     write (6,*) 'HEY weights2 = ',weights9
-     write (6,*) 'HEY bias2 = ',bias9
-     write (6,*) 'HEY weights2 = ',weights10
-     write (6,*) 'HEY bias2 = ',bias10
-    endif
-#endif
+
 
 ! 1st layer: input length-->256.
     x1(1:width) = 0.
@@ -282,6 +259,12 @@ end do
       x1(k) = max(0.3 * x1(k), x1(k))  ! Leaky ReLU
     end do
 
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 1 = ',x1
+    endif
+#endif
+
 ! 2nd layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
@@ -291,6 +274,12 @@ end do
       x2(k) = x2(k) + bias2(k)
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 2 = ',x1
+    endif
+#endif
 
 ! 3rd layer: 256-->256.
     x2(1:width) = 0.
@@ -302,6 +291,12 @@ end do
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
 
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 3 = ',x1
+    endif
+#endif
+
 ! 4th layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
@@ -311,6 +306,12 @@ end do
       x2(k) = x2(k) + bias4(k)
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 4 = ',x1
+    endif
+#endif
 
 ! 5th layer: 256-->256.
     x2(1:width) = 0.
@@ -322,6 +323,12 @@ end do
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
 
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 5 = ',x1
+    endif
+#endif
+
 ! 6th layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
@@ -331,6 +338,12 @@ end do
       x2(k) = x2(k) + bias6(k)
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 6 = ',x1
+    endif
+#endif
 
 ! 7th layer: 256-->256.
     x2(1:width) = 0.
@@ -342,6 +355,12 @@ end do
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
 
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 7 = ',x1
+    endif
+#endif
+
 ! 8th layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
@@ -352,6 +371,12 @@ end do
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
 
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 8 = ',x1
+    endif
+#endif
+
 ! 9th layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
@@ -361,6 +386,12 @@ end do
       x2(k) = x2(k) + bias9(k)
       x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+
+#ifdef BRAINDEBUG
+    if (masterproc .and. icol .eq. 1) then
+     write (6,*) 'HEY Activations 9 = ',x1
+    endif
+#endif
 
 ! output layer: 256->output length
    output(1:outputlength) = 0.
@@ -550,19 +581,47 @@ end do
  write (6,*) 'SR: finished reading layer9_kernel'
 
 ! ----- layer 10:
- write (6,*) 'SR: reading layer2_bias'
+ write (6,*) 'SR: reading layer10_bias'
   open (unit=555,file='./keras_matrices/layer10_bias.txt',status='old',action='read')
   read(555,*) bias10(1:outputlength)
   close (555)
- write (6,*) 'SR: finished reading layer2_bias'
+ write (6,*) 'SR: finished reading layer10_bias'
 
- write (6,*) 'SR: reading layer2_kernel'
+ write (6,*) 'SR: reading layer10_kernel'
   open (unit=555,file='./keras_matrices/layer10_kernel.txt',status='old',action='read') 
   do k=1,outputlength
     read(555,*) weights10(k,1:width)
   end do
   close (555)
- write (6,*) 'SR: finished reading layer2_kernel'
+ write (6,*) 'SR: finished reading layer10_kernel'
+
+#ifdef BRAINDEBUG
+    if (masterproc) then
+     write (6,*) 'HEY weights1 = ',weights1
+     write (6,*) 'HEY bias1 = ',bias1
+     write (6,*) 'HEY weights2 = ',weights2
+     write (6,*) 'HEY bias2 = ',bias2
+     write (6,*) 'HEY weights3 = ',weights3
+     write (6,*) 'HEY bias3 = ',bias3
+     write (6,*) 'HEY weights4 = ',weights4
+     write (6,*) 'HEY bias4 = ',bias4
+     write (6,*) 'HEY weights5 = ',weights5
+     write (6,*) 'HEY bias5 = ',bias5
+     write (6,*) 'HEY weights6 = ',weights6
+     write (6,*) 'HEY bias6 = ',bias6
+     write (6,*) 'HEY weights7 = ',weights7
+     write (6,*) 'HEY bias7 = ',bias7
+     write (6,*) 'HEY weights8 = ',weights8
+     write (6,*) 'HEY bias8 = ',bias8
+     write (6,*) 'HEY weights9 = ',weights9
+     write (6,*) 'HEY bias9 = ',bias9
+     write (6,*) 'HEY weights10 = ',weights10
+     write (6,*) 'HEY bias10 = ',bias10
+
+     write (6,*) 'HEY weights1(5, 10) = ',weights1(5, 10)
+     write (6,*) 'HEY weights2(5, 10) = ',weights2(5, 10)
+    endif
+#endif
 
 end subroutine init_keras_matrices_deep
 

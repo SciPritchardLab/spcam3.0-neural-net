@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
@@ -100,7 +100,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Arguments
 !
 
-#ifdef CLOUDBRAIN
+#if defined (CRM) || defined (CLOUDBRAIN)
    real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
                dQdt_adiab(begchunk:endchunk,pcols,pver),&
                brainrain(pcols,begchunk:endchunk),&
@@ -548,7 +548,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
-#ifdef CLOUDBRAIN
+#if defined (CRM) || defined (CLOUDBRAIN)
    do c=begchunk,endchunk
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
@@ -565,6 +565,17 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
+   end do
+   do c=begchunk,endchunk
+    ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
+      call outfld('NNTC',TC(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQC',QC(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVC',VC(c,:ncol,:),pcols,lchnk)
+      call outfld('dTdtadia',dTdt_adiab(c,:ncol,:),pcols,lchnk)
+      call outfld('dQdtadia',dQdt_adiab(c,:ncol,:),pcols,lchnk)
+      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -1900,15 +1911,6 @@ end do
    else
   ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
-      ncol  = state(c)%ncol
-      lchnk = state(c)%lchnk
-      call outfld('NNTC',TC(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQC',QC(c,:ncol,:),pcols,lchnk)
-      call outfld('NNVC',VC(c,:ncol,:),pcols,lchnk)
-      call outfld('dTdtadia',dTdt_adiab(c,:ncol,:),pcols,lchnk)
-      call outfld('dQdtadia',dQdt_adiab(c,:ncol,:),pcols,lchnk)
-      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
-      call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX

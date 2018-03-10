@@ -272,8 +272,9 @@ end do
         x2(k) = x2(k) + weights2(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias2(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -288,8 +289,9 @@ end do
         x2(k) = x2(k) + weights3(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias3(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -304,8 +306,9 @@ end do
         x2(k) = x2(k) + weights4(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias4(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -320,8 +323,9 @@ end do
         x2(k) = x2(k) + weights5(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias5(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -336,8 +340,9 @@ end do
         x2(k) = x2(k) + weights6(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias6(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -352,8 +357,9 @@ end do
         x2(k) = x2(k) + weights7(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias7(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -368,8 +374,9 @@ end do
         x2(k) = x2(k) + weights8(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias8(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -384,8 +391,9 @@ end do
         x2(k) = x2(k) + weights9(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias9(k)
-      x1(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
     end do
+    x1(1:width) = x2(1:width)
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then

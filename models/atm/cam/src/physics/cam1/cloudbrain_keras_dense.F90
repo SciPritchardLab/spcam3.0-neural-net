@@ -370,7 +370,7 @@ end do
 ! 8th layer: 256-->256.
     x2(1:width) = 0.
     do k=1,width
-      do j=1,inputlength
+      do j=1,width
         x2(k) = x2(k) + weights8(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias8(k)

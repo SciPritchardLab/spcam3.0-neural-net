@@ -1919,7 +1919,8 @@ end do
    else
   ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
-
+      lchnk = state(c)%lchnk
+	    ncol  = state(c)%ncol
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX
 !  ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes

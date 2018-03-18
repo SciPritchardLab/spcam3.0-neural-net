@@ -4,8 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
-#define NOADIAB
-!define DEEP
+!#define NOADIAB
+#define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -1919,7 +1919,7 @@ end do
    else
   ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
-      lchnk = state(c)%lchnk
+      lchnk = state(c)%lchnk   ! This was missing for some reason...
 	    ncol  = state(c)%ncol
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX

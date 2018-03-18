@@ -5,8 +5,8 @@
 !#define LIMITOUTP
 ! Limit input to min-max
 !#define INPLIMITER  
-#define NOADIAB
-!#define DEEP
+!#define NOADIAB
+#define DEEP
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8

@@ -4,8 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
-!#define NOADIAB
-#define DEEP
+#define NOADIAB
+!#define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -1921,6 +1921,12 @@ end do
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
       lchnk = state(c)%lchnk   ! This was missing for some reason...
 	    ncol  = state(c)%ncol
+
+#ifdef NOADIAB
+   shf(1:pcols,c) 	= in_srfflx_state2d(c)%shf  ! surface sensible heat flux (W/m2)
+   lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
+#endif
+
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX
 !  ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes

@@ -119,13 +119,14 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   do k=1,plev
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
-      t3m1    (i,k) = t3m1(i,k) + beta
+      t3m1    (i,k) = t3m1(i,k)! + beta  ! SR: Comment out beta correction
     end do
   end do
 !
 ! Output Energy correction term
 !
   call outfld('ENGYCORR',engycorr ,plond   ,lat     )
+
 !
 ! Compute q tendency due to mass adjustment
 ! If LFIXLIM = .T., then:

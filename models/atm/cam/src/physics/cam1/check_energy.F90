@@ -227,7 +227,7 @@ contains
     ke = 0.
     se = 0.
     wv = 0.
-    wl = 0.
+    wl = 0. 
     wi = 0.
     do k = 1, pver
        do i = 1, ncol

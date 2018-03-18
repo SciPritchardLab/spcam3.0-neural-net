@@ -72,6 +72,7 @@ CONTAINS
         real(r8) :: ztodt
     real(r8) :: ttend(pcols,pver),qtend (pcols,pver),qitend(pcols,pver),qctend(pcols,pver)
     real (r8) :: stend(pcols,pver),utend (pcols,pver),vtend(pcols,pver),omgatend(pcols,pver)
+    real (r8) :: t_debug(pcols,pver) !SR: debug output to check what t3 is
     integer :: nstep
 #ifdef PVBUDGET
   real(r8):: pv1(pcols,pver,begchunk:endchunk)
@@ -126,6 +127,7 @@ CONTAINS
                u3auxloc(i,k) = u3aux (lons(i),k,lats(i))
                auxdqfcst(i,k) = dqfcst(lons(i),k,lats(i))/ztodt
 #endif
+               t_debug(i,k) = t3 (lons(i),k,lats(i))
                ttend(i,k) = (t3 (lons(i),k,lats(i)) - phys_state(lchnk)%t(i,k))/ztodt
                utend(i,k) = (u3  (lons(i),k,lats(i)) - phys_state(lchnk)%u    (i,k))/ztodt
                vtend(i,k) = (v3  (lons(i),k,lats(i)) - phys_state(lchnk)%v    (i,k) )/ztodt
@@ -160,6 +162,7 @@ CONTAINS
                qitend(i,k) = -(qitend(i,k) - phys_state(lchnk)%q(i,k,3))/ztodt
              end do
            end do
+           call outfld('DBGT4',t_debug,pcols,lchnk)
            call outfld('TTEND',ttend,pcols,lchnk)
            call outfld('UTEND',utend,pcols,lchnk)
            call outfld('VTEND',vtend,pcols,lchnk)

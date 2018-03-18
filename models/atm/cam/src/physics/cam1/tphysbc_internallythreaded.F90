@@ -5,6 +5,7 @@
 !#define NOBRAINRAD
 !#define BRAINDEBUG
 #define NOADIAB
+!define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -88,8 +89,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, init_keras_matrices_deep, &
-                                      cloudbrain_purecrm_base, cloudbrain_purecrm_deep
+#ifdef DEEP
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_purecrm_deep
+#else
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_purecrm_base
+#endif
 #endif
    implicit none
 
@@ -1962,14 +1966,17 @@ end do
   call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
 #else
-  ! call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-  !                              solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-  !                              qrl(i,:,c), qrs(i,:,c), &
-  !                              i)
+#ifndef DEEP
+  call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
+                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+                               qrl(i,:,c), qrs(i,:,c), &
+                               i)
+#else
   call cloudbrain_purecrm_deep(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
                                solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                qrl(i,:,c), qrs(i,:,c), &
                                i)
+#endif 
 #endif
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 

@@ -33,7 +33,7 @@ use pmgrid, only: masterproc
   ! 1st: BASE
 #ifndef DEEP
   integer, parameter :: width = 512
-  Weight and bias matrices
+  !Weight and bias matrices
   real :: bias1(width)
   real :: weights1(width,inputlength)
   real :: bias2(outputlength)
@@ -70,14 +70,20 @@ use pmgrid, only: masterproc
   real :: input_norm_max(inputlength)
   real :: input_norm_max_rs(inputlength)
 
-  public init_keras_norm, init_keras_matrices_base, init_keras_matrices_deep, cloudbrain_purecrm_base, cloudbrain_purecrm_deep
+  public init_keras_norm
+#ifdef DEEP
+  public init_keras_matrices_deep, cloudbrain_purecrm_deep
+#else
+  public init_keras_matrices_base, cloudbrain_purecrm_base
+#endif
 
   contains
 
+#ifndef DEEP
   subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, &
 #ifdef NOADIAB
                                       SHFLX, LHFLX, &
-#else
+#endif
                                       SPDT, SPDQ, QRL, QRS, icol)
     ! NN inputs
     real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
@@ -214,7 +220,7 @@ end do
   end subroutine cloudbrain_purecrm_base
 
 
-
+#else
 
 
   subroutine cloudbrain_purecrm_deep (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
@@ -472,11 +478,11 @@ end do
 
   end subroutine cloudbrain_purecrm_deep
 
+#endif
 
 
 
-
-
+#ifdef DEEP
   subroutine init_keras_matrices_deep()
 
   integer :: nline,k,ipt1,ipt2,j,n,ios
@@ -662,7 +668,7 @@ end do
 end subroutine init_keras_matrices_deep
 
 
-
+#else
 
 
 
@@ -701,7 +707,7 @@ end subroutine init_keras_matrices_deep
  write (6,*) 'SR: finished reading layer2_kernel'
 
 end subroutine init_keras_matrices_base
-
+#endif
 
 
 subroutine init_keras_norm()

@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define CLOUDBRAIN
+#define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
@@ -1911,8 +1911,11 @@ end do
   end do
    if ( is_first_step()) then
       call init_keras_norm()
-      !call init_keras_matrices_base()
+#ifndef DEEP
+      call init_keras_matrices_base()
+#else
       call init_keras_matrices_deep()
+#endif
    else
   ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
     do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.

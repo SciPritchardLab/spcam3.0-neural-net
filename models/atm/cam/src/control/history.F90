@@ -6160,8 +6160,6 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNTC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNQC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVC','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNSHF','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNLHF','K     ',pver, 'A','TC into NN',phys_decomp)
 ! SR: Additional debug outputs to check T at several stages
       call addfld ('DBGT1','K     ',pver, 'A','Debug T 1',phys_decomp)
       call addfld ('DBGT2','K     ',pver, 'A','Debug T 2',phys_decomp)

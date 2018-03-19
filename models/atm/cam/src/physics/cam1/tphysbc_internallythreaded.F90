@@ -4,7 +4,7 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
-#define NOADIAB
+!#define NOADIAB
 !#define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
@@ -1926,7 +1926,7 @@ end do
    shf(1:pcols,c) 	= in_srfflx_state2d(c)%shf  ! surface sensible heat flux (W/m2)
    lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
    call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
-   call outfld('NNLHF',shf(1:pcols,c),pcols,lchnk)
+   call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
 #endif
 
       do i=1,ncol ! this is the loop over independent GCM columns.

@@ -5,7 +5,7 @@
 !#define LIMITOUTP
 ! Limit input to min-max
 !#define INPLIMITER  
-#define NOADIAB
+!#define NOADIAB
 !#define DEEP
 
 module cloudbrain_keras_dense

@@ -188,10 +188,13 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
 ! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
 #ifndef CLOUDBRAIN
+  ptend%s = 0.
+  ptend%q = 0.
+#endif
    call physics_update (state, tend, ptend, ztodt)
 ! Check energy integrals
    call check_energy_chng(state, tend, "vdiff", nstep, ztodt, cflx(:,1), zero, zero, shf)
-#endif
+
 
 !  aerosol dry deposition processes
    call aerosol_drydep_intr (state, ptend, cflx(:,1), ztodt, &

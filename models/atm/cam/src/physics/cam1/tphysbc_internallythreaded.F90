@@ -2207,11 +2207,16 @@ endif ! not first step.
 !
 ! Add radiation tendencies to cummulative model tendencies and update profiles
 !
+! No radiation if full physics cloudbrain
+#ifndef CLOUDBRAIN
+  ptend%s = 0.
+#endif
    call physics_update(state(c), tend(c), ptend(c), ztodt)
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)
 !
+
      call outfld('TEPOST_R',state(c)%te_cur(:ncol),pcols,lchnk)
      call outfld('TWPOST_R',state(c)%tw_cur(:ncol),pcols,lchnk)
      call outfld('SPOST_R',state(c)%s(:ncol, :pver),pcols,lchnk)

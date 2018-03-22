@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define BRAINDEBUG
+!#define BRAINDEBUG
 ! Limit output to min-max
 !#define LIMITOUTP
 ! Limit input to min-max

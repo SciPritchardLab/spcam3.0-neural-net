@@ -579,7 +579,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNVC',VC(c,:ncol,:),pcols,lchnk)
       call outfld('dTdtadia',dTdt_adiab(c,:ncol,:),pcols,lchnk)
       call outfld('dQdtadia',dQdt_adiab(c,:ncol,:),pcols,lchnk)
-      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
       call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
 #endif
@@ -1927,6 +1926,7 @@ end do
    lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
    call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
    call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
+   call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
 #endif
 
       do i=1,ncol ! this is the loop over independent GCM columns.

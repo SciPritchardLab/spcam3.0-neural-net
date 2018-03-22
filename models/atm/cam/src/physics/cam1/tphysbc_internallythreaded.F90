@@ -5,7 +5,7 @@
 !#define NOBRAINRAD
 !#define BRAINDEBUG
 !#define NOADIAB
-!#define DEEP
+#define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS

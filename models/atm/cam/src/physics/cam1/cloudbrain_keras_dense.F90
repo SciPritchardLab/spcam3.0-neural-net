@@ -1,12 +1,13 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 ! Limit output to min-max
 !#define LIMITOUTP
 ! Limit input to min-max
 !#define INPLIMITER  
 !#define NOADIAB
-!#define DEEP
+#define DEEP
+#define TANH
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -290,7 +291,11 @@ end do
         x1(k) = x1(k) + weights1(k,j)*input(j)
       end do
       x1(k) = x1(k) + bias1(k)
+#ifdef TANH
+      x1(k) = (exp(x1(k)) - exp(-1. * x1(k))) / (exp(x1(k)) + exp(-1. * x1(k)))  ! Tanh
+#else
       x1(k) = max(0.3 * x1(k), x1(k))  ! Leaky ReLU
+#endif
     end do
 
 #ifdef BRAINDEBUG
@@ -306,7 +311,11 @@ end do
         x2(k) = x2(k) + weights2(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias2(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -323,7 +332,11 @@ end do
         x2(k) = x2(k) + weights3(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias3(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -340,7 +353,11 @@ end do
         x2(k) = x2(k) + weights4(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias4(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -357,7 +374,11 @@ end do
         x2(k) = x2(k) + weights5(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias5(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -374,7 +395,11 @@ end do
         x2(k) = x2(k) + weights6(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias6(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -391,7 +416,11 @@ end do
         x2(k) = x2(k) + weights7(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias7(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -408,7 +437,11 @@ end do
         x2(k) = x2(k) + weights8(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias8(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 
@@ -425,7 +458,11 @@ end do
         x2(k) = x2(k) + weights9(k,j)*x1(j)
       end do
       x2(k) = x2(k) + bias9(k)
-      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU
+#ifdef TANH
+      x2(k) = (exp(x2(k)) - exp(-1. * x2(k))) / (exp(x2(k)) + exp(-1. * x2(k)))  ! Tanh
+#else
+      x2(k) = max(0.3 * x2(k), x2(k))  ! Leaky ReLU     
+#endif
     end do
     x1(1:width) = x2(1:width)
 

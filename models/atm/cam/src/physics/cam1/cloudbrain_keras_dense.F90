@@ -32,7 +32,7 @@ use pmgrid, only: masterproc
   integer, parameter :: nchunk = 64
   ! 1st: BASE
 #ifndef DEEP
-  integer, parameter :: width = 128
+  integer, parameter :: width = 512
   !Weight and bias matrices
   real :: bias1(width)
   real :: weights1(width,inputlength)

@@ -1,13 +1,13 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 ! Limit output to min-max
 !#define LIMITOUTP
 ! Limit input to min-max
 !#define INPLIMITER  
 !#define NOADIAB
-#define DEEP
-#define TANH
+!#define DEEP
+!#define TANH
 
 module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -23,13 +23,8 @@ use pmgrid, only: masterproc
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
-  integer, parameter :: width1 = 512
-#ifdef NOADIAB
-  integer, parameter :: inputlength = 94  ! For no adiab option. 152 for original purecrm
-#else
-  integer, parameter :: inputlength = 152
-#endif
-  integer, parameter :: outputlength = 120
+  integer, parameter :: inputlength = 93
+  integer, parameter :: outputlength = 60
   integer, parameter :: nchunk = 64
   ! 1st: BASE
 #ifndef DEEP
@@ -73,66 +68,41 @@ use pmgrid, only: masterproc
 
   public init_keras_norm
 #ifdef DEEP
-  public init_keras_matrices_deep, cloudbrain_purecrm_deep
+  public init_keras_matrices_deep, cloudbrain_fullphy_deep
 #else
-  public init_keras_matrices_base, cloudbrain_purecrm_base
+  public init_keras_matrices_base, cloudbrain_fullphy_base
 #endif
 
   contains
 
 #ifndef DEEP
-  subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, &
-#ifdef NOADIAB
-                                      SHFLX, LHFLX, &
-#endif
-                                      SPDT, SPDQ, QRL, QRS, icol)
+  subroutine cloudbrain_fullphy_base (TBP, QBP, VBP, PS, TS, SOLIN, &
+                                      TPHYSTND, PHQ, icol)
     ! NN inputs
-    real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
-    real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
-    real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
-    real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
-    real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
-#ifdef NOADIAB
-    real(r8), intent(in) :: SHFLX ! Sensible heat flux from previous time step
-    real(r8), intent(in) :: LHFLX ! Latent heat flux
-#endif
+    real(r8), intent(in) :: TBP(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
+    real(r8), intent(in) :: QBP(pver)   ! QAP[t-1] - VD01[t-1]*dt
+    real(r8), intent(in) :: VBP(pver)   ! VAP[t-1]
     real(r8), intent(in) :: PS ! From t-1
+    real(r8), intent(in) :: TS ! From t-1
     real(r8), intent(in) :: SOLIN ! From t
     ! NN outputs
-    real(r8), intent(out) :: SPDT(pver) ! W/kg
-    real(r8), intent(out) :: SPDQ(pver) ! W/kg
-    real(r8), intent(inout) :: QRL(pver) ! W/kg
-    real(r8), intent(inout) :: QRS(pver) ! W/kg
+    real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
+    real(r8), intent(out) :: PHQ(pver) ! W/kg
 
     real(r8) :: input(inputlength),x1(width)
     real(r8) :: output (outputlength)
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
-!    call init_keras_matrices
-#ifdef NOADIAB
-    ! Stacking for noadiab option
-    k1=pver-nlev+1
-    k2=pver
-    input(1:nlev)=TC(k1:k2) 
-    input((nlev+1):2*nlev)=QC(k1:k2)
-    input((2*nlev+1):3*nlev)=VC(k1:k2)
-    input(3*nlev+1) = SHFLX
-    input(3*nlev+2) = LHFLX
-    input(3*nlev+3) = PS
-    input(3*nlev+4) = SOLIN
-#else
     ! Stack the input variables
     k1=pver-nlev+1
     k2=pver
-    input(1:nlev)=TC(k1:k2) 
-    input((nlev+1):2*nlev)=QC(k1:k2)
-    input((2*nlev+1):3*nlev)=VC(k1:k2)
-    input((3*nlev+1):4*nlev) = dTdt_adiabatic(k1:k2)
-    input((4*nlev+1):5*nlev) = dQdt_adiabatic(k1:k2)
-    input(5*nlev+1) = PS
-    input(5*nlev+2) = SOLIN
-#endif
+    input(1:nlev)=TBP(k1:k2) 
+    input((nlev+1):2*nlev)=QBP(k1:k2)
+    input((2*nlev+1):3*nlev)=VBP(k1:k2)
+    input(3*nlev+1) = PS
+    input(3*nlev+2) = TS
+    input(3*nlev+3) = SOLIN
 
 
 
@@ -208,56 +178,43 @@ end do
 #endif
 
 ! Unstack the output variables and unit convert them back
-! ATTENTION: I confusingly, placed SPDQ before SPDT
-   SPDQ(:) = 0.   ! If we are predicting all 30 levels, this should be irrelevant, right?
-   SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
-   SPDT(:) = 0.
-   SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
-!   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
-   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
-!   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
+! [TPHYSTND, PHQ]
+   TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
+   PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 
-  end subroutine cloudbrain_purecrm_base
+  end subroutine cloudbrain_fullphy_base
 
 
 #else
 
 
-  subroutine cloudbrain_purecrm_deep (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS, icol)
-  !subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, icol)
+  subroutine cloudbrain_fullphy_deep (TBP, QBP, VBP, PS, TS, SOLIN, &
+                                      TPHYSTND, PHQ, icol)
     ! NN inputs
-    real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
-    real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
-    real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
-    real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
-    real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
+    real(r8), intent(in) :: TBP(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
+    real(r8), intent(in) :: QBP(pver)   ! QAP[t-1] - VD01[t-1]*dt
+    real(r8), intent(in) :: VBP(pver)   ! VAP[t-1]
     real(r8), intent(in) :: PS ! From t-1
+    real(r8), intent(in) :: TS ! From t-1
     real(r8), intent(in) :: SOLIN ! From t
     ! NN outputs
-    real(r8), intent(out) :: SPDT(pver) ! W/kg
-    real(r8), intent(out) :: SPDQ(pver) ! W/kg
-    real(r8), intent(inout) :: QRL(pver) ! W/kg
-    real(r8), intent(inout) :: QRS(pver) ! W/kg
+    real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
+    real(r8), intent(out) :: PHQ(pver) ! W/kg
 
-    real(r8) :: input(inputlength),x1(width), x2(width)
+    real(r8) :: input(inputlength),x1(width)
     real(r8) :: output (outputlength)
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
-!    call init_keras_matrices
-
-
     ! Stack the input variables
     k1=pver-nlev+1
     k2=pver
-    input(1:nlev)=TC(k1:k2) 
-    input((nlev+1):2*nlev)=QC(k1:k2)
-    input((2*nlev+1):3*nlev)=VC(k1:k2)
-    input((3*nlev+1):4*nlev) = dTdt_adiabatic(k1:k2)
-    input((4*nlev+1):5*nlev) = dQdt_adiabatic(k1:k2)
-    input(5*nlev+1) = PS
-    input(5*nlev+2) = SOLIN
+    input(1:nlev)=TBP(k1:k2) 
+    input((nlev+1):2*nlev)=QBP(k1:k2)
+    input((2*nlev+1):3*nlev)=VBP(k1:k2)
+    input(3*nlev+1) = PS
+    input(3*nlev+2) = TS
+    input(3*nlev+3) = SOLIN
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -503,17 +460,11 @@ end do
 #endif
 
 ! Unstack the output variables and unit convert them back
-! ATTENTION: I confusingly, placed SPDQ before SPDT
-   SPDQ(:) = 0.   ! If we are predicting all 30 levels, this should be irrelevant, right?
-   SPDQ(k1:k2) = output(1:nlev)/2.5e6 ! W/kg --> kg/kg/s
-   SPDT(:) = 0.
-   SPDT(k1:k2) = output((nlev+1):2*nlev) ! W/kg, is this what CAM wants?
-!   QRL(:) = 0. ! retain SP or upstream solution above neural net top. SR: Again, this should be irrelevant now...
-   QRL(k1:k2) = output ((2*nlev+1):3*nlev) ! W/kg 
-!   QRS(:) = 0. ! retain SP or upstream solution above neural net top.
-   QRS(k1:k2) = output ((3*nlev+1):4*nlev) ! W/kg
+! [TPHYSTND, PHQ]
+   TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
+   PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 
-  end subroutine cloudbrain_purecrm_deep
+  end subroutine cloudbrain_fullphy_deep
 
 #endif
 

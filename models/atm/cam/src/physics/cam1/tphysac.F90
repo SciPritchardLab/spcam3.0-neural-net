@@ -1,6 +1,7 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINCTRLFLUX
+#define CLOUDBRAIN
 subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                     taux,    tauy,    cflx,    sgh,    lhf,  &
                     landfrac,snowh,   tref,    precc,  precl,&
@@ -185,10 +186,12 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
    call vd_intr (ztodt    ,state    ,taux     ,tauy     , shf    ,&
                  cflx     ,pblh     ,tpert    ,qpert    , surfric  ,&
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
-
+! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
+#ifndef CLOUDBRAIN
    call physics_update (state, tend, ptend, ztodt)
 ! Check energy integrals
    call check_energy_chng(state, tend, "vdiff", nstep, ztodt, cflx(:,1), zero, zero, shf)
+#endif
 
 !  aerosol dry deposition processes
    call aerosol_drydep_intr (state, ptend, cflx(:,1), ztodt, &

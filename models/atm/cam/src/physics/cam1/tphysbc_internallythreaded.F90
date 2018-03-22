@@ -5,7 +5,7 @@
 !#define NOBRAINRAD
 !#define BRAINDEBUG
 !#define NOADIAB
-#define DEEP
+!#define DEEP
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -90,9 +90,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
 #ifdef DEEP
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_purecrm_deep
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_fullphy_deep
 #else
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_purecrm_base
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_fullphy_base
 #endif
 #endif
    implicit none
@@ -554,14 +554,14 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
 #if defined (CRM) || defined (CLOUDBRAIN)
+! Full phy implementation
+! [TBP, QBP, VBP, PS, SOLIN, TS]
+! BP is defined as T at the beginning of time step before any physics updates
    do c=begchunk,endchunk
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
      do i=1,ncol
        do k=1,pver
-          TC(c,i,k) = state(c)%tap(i,k) - state(c)%dtv(i,k)*ztodt
-          QC(c,i,k) = state(c)%qap(i,k) - state(c)%vd01(i,k)*ztodt
-          VC(c,i,k) = state(c)%vap(i,k)
           TBP(c,i,k) = state(c)%t(i,k)
           QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
           VBP(c,i,k) = state(c)%v(i,k)
@@ -574,11 +574,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    do c=begchunk,endchunk
     ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
-      call outfld('NNTC',TC(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQC',QC(c,:ncol,:),pcols,lchnk)
-      call outfld('NNVC',VC(c,:ncol,:),pcols,lchnk)
-      call outfld('dTdtadia',dTdt_adiab(c,:ncol,:),pcols,lchnk)
-      call outfld('dQdtadia',dQdt_adiab(c,:ncol,:),pcols,lchnk)
+      call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
 #endif
@@ -1928,6 +1926,7 @@ end do
    call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
 #endif
    call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+   call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX
@@ -1964,32 +1963,18 @@ end do
 !                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
 ! #endif
 ! #endif
-! SR: Here comes my call to the new cloudbrain function
-! subroutine cloudbrain_purecrm_base (TC, QC, VC, dTdt_adiabatic, dQdt_adiabatic, PS, SOLIN, SPDT, SPDQ, QRL, QRS)
-    ! ! NN inputs
-    ! real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
-    ! real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
-    ! real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
-    ! real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
-    ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
-    ! real(r8), intent(in) :: PS ! From t-1
-    ! real(r8), intent(in) :: SOLIN ! From t
-#ifdef NOADIAB
-  call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), shf(i,c), lhf(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), qrl(i,:,c), qrs(i,:,c), i)
-#else
+! SR: Full physics implementation
+! [TBP, QBP, VBP, PS, SOLIN, TS]
+! [TPHYSTND, PHQ]
 #ifndef DEEP
-  call cloudbrain_purecrm_base(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               qrl(i,:,c), qrs(i,:,c), &
-                               i)
+  call cloudbrain_fullphy_base(&
 #else
-  call cloudbrain_purecrm_deep(TC(c,i,:), QC(c,i,:), VC(c,i,:), dTdt_adiab(c,i,:), dQdt_adiab(c,i,:), PS(c,i), &
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               qrl(i,:,c), qrs(i,:,c), &
+  call cloudbrain_fullphy_deep(&
+#endif                    
+                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+                               solin(i,c), ts(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                i)
-#endif 
-#endif
+
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
          ! Based on downstream logic, key is just that qrs and qrl arrays populated
@@ -2001,8 +1986,8 @@ end do
       call outfld('BRAINDQ',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
      call outfld('BRAINDT',braindt,pcols,lchnk) 
-     call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
-     call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
+     !call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
+     !call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
 ! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway
 ! #ifdef BRAINENERGYFIX
 !       do i=1,ncol

@@ -1966,13 +1966,15 @@ end do
 ! SR: Full physics implementation
 ! [TBP, QBP, VBP, PS, SOLIN, TS]
 ! [TPHYSTND, PHQ]
+!subroutine cloudbrain_fullphy_base (TBP, QBP, VBP, PS, TS, SOLIN, &
+                                      !TPHYSTND, PHQ, icol)
 #ifndef DEEP
   call cloudbrain_fullphy_base(&
 #else
   call cloudbrain_fullphy_deep(&
 #endif                    
-                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
-                               solin(i,c), ts(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), ts(i,c),&
+                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver

@@ -2208,8 +2208,8 @@ endif ! not first step.
 ! Add radiation tendencies to cummulative model tendencies and update profiles
 !
 ! No radiation if full physics cloudbrain
-#ifndef CLOUDBRAIN
-  ptend%s = 0.
+#ifdef CLOUDBRAIN
+  ptend(c)%s = 0.
 #endif
    call physics_update(state(c), tend(c), ptend(c), ztodt)
 

@@ -187,7 +187,7 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                  cflx     ,pblh     ,tpert    ,qpert    , surfric  ,&
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
 ! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
-#ifndef CLOUDBRAIN
+#ifdef CLOUDBRAIN
   ptend%s = 0.
   ptend%q = 0.
 #endif

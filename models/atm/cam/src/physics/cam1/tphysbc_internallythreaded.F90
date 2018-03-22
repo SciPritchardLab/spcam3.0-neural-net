@@ -1926,8 +1926,8 @@ end do
    lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
    call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
    call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-   call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
 #endif
+   call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! #ifdef BRAINCTRLFLUX

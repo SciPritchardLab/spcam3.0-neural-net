@@ -6,7 +6,7 @@
 ! Limit input to min-max
 !#define INPLIMITER  
 !#define NOADIAB
-!#define DEEP
+#define DEEP
 !#define TANH
 
 module cloudbrain_keras_dense
@@ -201,7 +201,7 @@ end do
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
 
-    real(r8) :: input(inputlength),x1(width)
+    real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
     integer :: k,j,k1,k2
     integer, intent(in) :: icol

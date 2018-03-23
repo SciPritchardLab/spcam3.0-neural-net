@@ -213,8 +213,8 @@ end do
     input((nlev+1):2*nlev)=QBP(k1:k2)
     input((2*nlev+1):3*nlev)=VBP(k1:k2)
     input(3*nlev+1) = PS
-    input(3*nlev+2) = TS
-    input(3*nlev+3) = SOLIN
+    input(3*nlev+2) = SOLIN
+    input(3*nlev+3) = TS
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then

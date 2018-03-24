@@ -1,8 +1,6 @@
 #include <misc.h>
 #include <params.h>
-! CLOUDBRAIN only writes out some output here
-#define CLOUDBRAIN
-#define SPFLUXBYPASS
+
 module vertical_diffusion
 
 !---------------------------------------------------------------------------------
@@ -200,11 +198,7 @@ contains
     real(r8), intent(in) :: landfrac(pcols)        ! Land fraction
     real(r8), intent(in) :: sgh(pcols)             ! standard deviation of orography
 
-#ifdef CLOUDBRAIN
-    type(physics_state), intent(inout)  :: state      ! Physics state variables
-#else
     type(physics_state), intent(in)  :: state      ! Physics state variables
-#endif
     type(physics_ptend), intent(inout)  :: ptend   ! indivdual parameterization tendencies
 
     real(r8), intent(out) :: pblh(pcols)           ! planetary boundary layer height
@@ -291,10 +285,6 @@ contains
     call outfld ('DTVKE   ',dtk,pcols,lchnk)
     dtk(:ncol,:) = ptend%s(:ncol,:)/cpair            ! normalize heating for history using dtk
     call outfld ('DTV     ',dtk    ,pcols,lchnk)
-#ifdef CLOUDBRAIN
-    state%dtv(:,:) = dtk(:,:)
-    state%vd01(:,:) = ptend%q(:,:,1)
-#endif
     call outfld ('DUV     ',ptend%u,pcols,lchnk)
     call outfld ('DVV     ',ptend%v,pcols,lchnk)
     do m = 1, pcnst+pnats
@@ -477,14 +467,14 @@ contains
 ! other constituents in the boundary layer.
 
 ! don't apply countergradient transport if suprparameterization is used - Marat K.
-#ifndef CRM
+!#ifndef CRM ! pritch removed this.
 
     call vd_add_cg(                                                   &
          lchnk      ,ncol       ,                                     &
          ktopblmn   ,q          ,dse        ,tmpi2      ,kvh        , &
          tmpi1      ,cgs        ,kqfs       ,rpdel      ,ztodt      )
 
-#endif
+!#endif
 
 ! Add the explicit surface fluxes to the lowest layer (do not include moutain stress)
 
@@ -497,7 +487,6 @@ contains
 !!$       print *, "dampx, dampy", lchnk,i, dampx, dampy
 !!$       u(i,pver) = u(i,pver) / (1. + ztodt*dampx)
 !!$       v(i,pver) = v(i,pver) / (1. + ztodt*dampx)
-       dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
 #ifndef SPFLUXBYPASS
 ! pritch, option to move when sfc fluxes added to right before SP.
        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
@@ -505,7 +494,9 @@ contains
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
+#ifndef SPFLUXBPASS
           q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+#endif
        end do
     end do
 
@@ -518,14 +509,8 @@ contains
 
 ! Diffuse momentum
 ! (pritch: following what Marat does below for DSE ifdef CRM, disable vertical diffusion of momentum ifdef SPMOMTRANS. Nonetheless, allow surface stress to enter the model lowest layer just as surface sensible heat fluxes are allowed above.
-#ifdef SPMOMTRANS
-#ifndef CRM
-write (6,*) 'UNEXPECTED EXCEPTION: SPMOMTRANS defined, but CRM not. Abort.'
-stop
-#endif
-#endif
 
-#ifndef SPMOMTRANS
+!#ifndef SPMOMTRANS
     call vd_lu_decomp(                                        &
          lchnk    ,ncol     ,                                 &
          ksrftms  ,kvm      ,tmpi2    ,rpdel    ,ztodt    ,   &
@@ -569,11 +554,11 @@ stop
           dse(i,k) = dse(i,k) + dtk(i,k)
        end do
     end do
-#endif 
+!#endif 
 ! (#endif <-- ifndef SPMOMTRANS)
 
 ! don't diffuse DSE if superparameterization is used - Marat K.
-#ifndef CRM
+!#ifndef CRM ! pritch removed this.
 
 ! Diffuse dry static energy
     call vd_lu_decomp(                                      &
@@ -604,7 +589,7 @@ stop
             q(1,1,m),ca       ,tmpm     ,dnom     ,ntop    ,nbot     )
     end do
 
-#endif
+!#endif
 
     return
   end subroutine vdiff

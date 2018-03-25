@@ -505,7 +505,9 @@ contains
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
+#ifndef SPFLUXBPASS
           q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+#endif
        end do
     end do
 

@@ -2091,9 +2091,10 @@ end do
 !    fluxes?) to history file tapes at this stage, see SP outfld logic for inspiration. 
   end do ! end chunk loop 
 endif ! not first step.
+  call t_stopf ('cloudbrain')
 #endif 
 ! END OF CLOUDBRAIN
-  call t_stopf ('cloudbrain')
+  
 #endif ! CRM
  do c=begchunk,endchunk ! pritch new chunk loop
    lchnk = state(c)%lchnk

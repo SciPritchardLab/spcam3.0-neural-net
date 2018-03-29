@@ -497,7 +497,6 @@ contains
 !!$       print *, "dampx, dampy", lchnk,i, dampx, dampy
 !!$       u(i,pver) = u(i,pver) / (1. + ztodt*dampx)
 !!$       v(i,pver) = v(i,pver) / (1. + ztodt*dampx)
-       dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
 #ifndef SPFLUXBYPASS
 ! pritch, option to move when sfc fluxes added to right before SP.
        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)

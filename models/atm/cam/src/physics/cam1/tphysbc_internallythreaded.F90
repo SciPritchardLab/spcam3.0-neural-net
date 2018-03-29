@@ -2211,6 +2211,10 @@ endif ! not first step.
    call outfld('PRECC   ',precc(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECSL  ',precsl(:,c)  ,pcols   ,lchnk       )
    call outfld('PRECSC  ',precsc(:,c)  ,pcols   ,lchnk       )
+#ifdef CRM
+   call outfld('PRECTEND',prectend(:,c)  ,pcols   ,lchnk       )
+   call outfld('PRECSTEND',precstend(:,c)  ,pcols   ,lchnk       )
+#endif
    
    prect(:ncol,c) = precc(:ncol,c) + precl(:ncol,c)
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )

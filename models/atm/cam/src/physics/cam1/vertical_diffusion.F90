@@ -487,7 +487,10 @@ contains
 #endif
 
 ! Add the explicit surface fluxes to the lowest layer (do not include moutain stress)
-
+! #ifdef SPFLUXBYPASS
+!  call get_rlat_all_p(lchnk, ncol, clat(:,c))
+!  call get_rlon_all_p(lchnk, ncol, clon(:,c))
+! #endif
     do i = 1, ncol
        tmp1(i)  = ztodt*gravit*rpdel(i,pver)
        u(i,pver) = u(i,pver) + tmp1(i) * taux(i)
@@ -504,7 +507,7 @@ contains
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
-#ifndef SPFLUXBPASS
+#ifndef SPFLUXBYPASS
           q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
 #endif
        end do

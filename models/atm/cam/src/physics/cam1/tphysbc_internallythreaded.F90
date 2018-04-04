@@ -999,6 +999,19 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('DQCOND  ',dqcond(1,1,m,c),pcols   ,lchnk   )
    end do
 
+! TEST
+  !  call get_rlat_all_p(lchnk, ncol, clat(:,c))
+  !  call get_rlon_all_p(lchnk, ncol, clon(:,c))
+  !  !write (6,*) 'SR: c = ', c
+  !  !write (6,*) 'SR: clat(:, c) = ', clat(:, c)
+  !  do i=1,ncol
+  !    if (clat(i,c) .le. -1.5) then
+  !     write (6,*) 'SR: c = ', c
+  !     write (6,*) 'SR: i', i
+  !     write (6,*) 'SR: clat(i, c)', clat(i,c)
+  !    endif
+  !  end do
+
 #ifdef BRAINDEBUG
    call get_rlat_all_p(lchnk, ncol, clat(:,c))
    call get_rlon_all_p(lchnk, ncol, clon(:,c))
@@ -1052,6 +1065,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call get_rlat_all_p(lchnk, ncol, clat(:,c))
    call get_rlon_all_p(lchnk, ncol, clon(:,c))
    call zenith (calday, clat(:,c), clon(:,c), coszrs(:,c), ncol)
+
 
    if (dosw .or. dolw) then
 
@@ -1322,6 +1336,8 @@ end do
  ! bottom-centric physics tendency profile component, and to allow SP to do
  ! the job of diffusing the flux infusion.
   do c=begchunk,endchunk
+    call get_rlat_all_p(lchnk, ncol, clat(:,c))
+    call get_rlon_all_p(lchnk, ncol, clon(:,c))
     ncol  = state(c)%ncol
     ptend(c)%lu = .false.
     ptend(c)%lv = .false.
@@ -1329,11 +1345,15 @@ end do
     ptend(c)%lq = .false.
     ptend(c)%lq(1) = .true.
     do i=1,ncol
-      tmp1 = gravit*state(c)%rpdel(i,pver)
-      ptend(c)%s(i,:) = 0.
-      ptend(c)%s(i,pver) = tmp1*shf(i,c) 
-      ptend(c)%q(i,:,1) = 0.
-      ptend(c)%q(i,pver,1) = tmp1*cflx(i,1,c)
+      ! SR: Ugly hack to bypass the fluxbypass for the lowest latitude
+      ! Only do it for points greater than -85.9 degrees
+      !if (clat(i,c) .ge. -1.5) then
+        tmp1 = gravit*state(c)%rpdel(i,pver)
+        ptend(c)%s(i,:) = 0.
+        ptend(c)%s(i,pver) = tmp1*shf(i,c) 
+        ptend(c)%q(i,:,1) = 0.
+        ptend(c)%q(i,pver,1) = tmp1*cflx(i,1,c)
+      !endif
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do

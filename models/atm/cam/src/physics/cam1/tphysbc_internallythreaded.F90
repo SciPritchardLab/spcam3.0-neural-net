@@ -602,9 +602,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      taux(1:pcols,c) 	= in_srfflx_state2d(c)%wsx
      tauy(1:pcols,c) 	= in_srfflx_state2d(c)%wsy  
      shf(1:pcols,c) 	= in_srfflx_state2d(c)%shf  ! surface sensible heat flux (W/m2)
-     lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
-
-     
+     lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2)      
      
    ! this next code was originally in tphysbc.F90:... (MS)     
    ! Just updating to generality of column,chunk arrays. 
@@ -1333,16 +1331,22 @@ end do
     ptend(c)%lq = .false.
     ptend(c)%lq(1) = .true.
     do i=1,ncol
+#ifdef FBPHACK
       ! SR: Ugly hack to bypass the fluxbypass for the lowest latitude
       ! Only do it for points greater than -85.9 degrees
       if (clat(i,c) .ge. -1.5) then
         write (6,*) 'SR: tphy --> c, i, clat(i, c)', c, i, clat(i, c)
+#endif
         tmp1 = gravit*state(c)%rpdel(i,pver)
         ptend(c)%s(i,:) = 0.
         ptend(c)%s(i,pver) = tmp1*shf(i,c) 
         ptend(c)%q(i,:,1) = 0.
-        ptend(c)%q(i,pver,1) = tmp1*cflx(i,1,c)
+        ptend(c)%q(i,pver,1) = tmp1*lhf(i,c)/latvap
+        !write (6,*) 'SR: c, i, cflx = ', c, i, tmp1*cflx(i, 1, c)
+        !write (6,*) 'SR: c, i, lhf = ', c, i, tmp1*lhf(i,c)/latvap
+#ifdef FBPHACK
       endif
+#endif
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do

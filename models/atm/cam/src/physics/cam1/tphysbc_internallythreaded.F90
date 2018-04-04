@@ -999,18 +999,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('DQCOND  ',dqcond(1,1,m,c),pcols   ,lchnk   )
    end do
 
-! TEST
-  !  call get_rlat_all_p(lchnk, ncol, clat(:,c))
-  !  call get_rlon_all_p(lchnk, ncol, clon(:,c))
-  !  !write (6,*) 'SR: c = ', c
-  !  !write (6,*) 'SR: clat(:, c) = ', clat(:, c)
-  !  do i=1,ncol
-  !    if (clat(i,c) .le. -1.5) then
-  !     write (6,*) 'SR: c = ', c
-  !     write (6,*) 'SR: i', i
-  !     write (6,*) 'SR: clat(i, c)', clat(i,c)
-  !    endif
-  !  end do
 
 #ifdef BRAINDEBUG
    call get_rlat_all_p(lchnk, ncol, clat(:,c))
@@ -1347,13 +1335,14 @@ end do
     do i=1,ncol
       ! SR: Ugly hack to bypass the fluxbypass for the lowest latitude
       ! Only do it for points greater than -85.9 degrees
-      !if (clat(i,c) .ge. -1.5) then
+      if (clat(i,c) .ge. -1.5) then
+        write (6,*) 'SR: tphy --> c, i, clat(i, c)', c, i, clat(i, c)
         tmp1 = gravit*state(c)%rpdel(i,pver)
         ptend(c)%s(i,:) = 0.
         ptend(c)%s(i,pver) = tmp1*shf(i,c) 
         ptend(c)%q(i,:,1) = 0.
         ptend(c)%q(i,pver,1) = tmp1*cflx(i,1,c)
-      !endif
+      endif
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do

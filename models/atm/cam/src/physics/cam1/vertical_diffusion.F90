@@ -39,6 +39,9 @@ module vertical_diffusion
   use constituents, only: pcnst, pnats, cnst_name, cnst_add, qmincg, cnst_get_ind
   use pmgrid,       only: masterproc
   use physconst,    only: karman
+#ifdef SPFLUXBYPASS
+  use phys_grid,    only: get_rlat_all_p, get_rlon_all_p, get_lon_all_p, get_lat_all_p
+#endif
 
   implicit none
 
@@ -396,6 +399,11 @@ contains
     integer :: ktopbl(pcols)                       ! index of first midpoint inside pbl
     integer :: ktopblmn                            ! min value of ktopbl
 
+#ifdef SPFLUXBYPASS
+   real(r8) :: clat(pcols)                   ! current latitudes(radians)
+   real(r8) :: clon(pcols)                   ! current longitudes(radians)
+#endif
+
 !-----------------------------------------------------------------------
     zero(:) = 0.
 
@@ -487,10 +495,10 @@ contains
 #endif
 
 ! Add the explicit surface fluxes to the lowest layer (do not include moutain stress)
-! #ifdef SPFLUXBYPASS
-!  call get_rlat_all_p(lchnk, ncol, clat(:,c))
-!  call get_rlon_all_p(lchnk, ncol, clon(:,c))
-! #endif
+#ifdef SPFLUXBYPASS
+  call get_rlat_all_p(lchnk, ncol, clat)
+  call get_rlon_all_p(lchnk, ncol, clon)
+#endif
     do i = 1, ncol
        tmp1(i)  = ztodt*gravit*rpdel(i,pver)
        u(i,pver) = u(i,pver) + tmp1(i) * taux(i)
@@ -500,15 +508,25 @@ contains
 !!$       print *, "dampx, dampy", lchnk,i, dampx, dampy
 !!$       u(i,pver) = u(i,pver) / (1. + ztodt*dampx)
 !!$       v(i,pver) = v(i,pver) / (1. + ztodt*dampx)
-#ifndef SPFLUXBYPASS
+#ifdef SPFLUXBYPASS
 ! pritch, option to move when sfc fluxes added to right before SP.
-       dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
+      if (clat(i) .le. -1.5) then
+        write (6,*) 'SR: vd --> lchnk, i, clat(i)', lchnk, i, clat(i)
+        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
+      endif
+#else
+        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
 #endif
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
-#ifndef SPFLUXBYPASS
-          q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+#ifdef SPFLUXBYPASS
+! pritch, option to move when sfc fluxes added to right before SP.
+      if (clat(i) .le. -1.5) then
+        q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+      endif
+#else
+        q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
 #endif
        end do
     end do

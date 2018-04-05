@@ -508,28 +508,13 @@ contains
 !!$       print *, "dampx, dampy", lchnk,i, dampx, dampy
 !!$       u(i,pver) = u(i,pver) / (1. + ztodt*dampx)
 !!$       v(i,pver) = v(i,pver) / (1. + ztodt*dampx)
-#ifdef SPFLUXBYPASS
-#ifdef FBPHACK
-! pritch, option to move when sfc fluxes added to right before SP.
-      if (clat(i) .le. -1.5) then
-        write (6,*) 'SR: vd --> lchnk, i, clat(i)', lchnk, i, clat(i)
-        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
-      endif
-#endif
-#else
+#ifndef SPFLUXBYPASS
         dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
 #endif
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
-#ifdef SPFLUXBYPASS
-#ifdef FBPHACK
-! pritch, option to move when sfc fluxes added to right before SP.
-      if (clat(i) .le. -1.5) then
-        q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
-      endif
-#endif
-#else
+#ifndef SPFLUXBYPASS
         q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
 #endif
        end do

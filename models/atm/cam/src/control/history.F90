@@ -6050,6 +6050,10 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('PRECTMX ','m/s     ',1,    'X','Maximum (convective and large-scale) precipitation rate',phys_decomp)
       call addfld ('PRECSL  ','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
       call addfld ('PRECSC  ','m/s     ',1,    'A','Convective snow rate (water equivalent)',phys_decomp)
+#ifdef CRM
+      call addfld ('PRECTEND','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
+      call addfld ('PRECSTEND','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
+#endif
       call addfld ('SHFLX   ','W/m2    ',1,    'A','Surface sensible heat flux',phys_decomp)
       call addfld ('LHFLX   ','W/m2    ',1,    'A','Surface latent heat flux',phys_decomp)
       call addfld ('QFLX    ','kg/m2/s ',1,    'A','Surface water flux',phys_decomp)

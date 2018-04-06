@@ -39,9 +39,6 @@ module vertical_diffusion
   use constituents, only: pcnst, pnats, cnst_name, cnst_add, qmincg, cnst_get_ind
   use pmgrid,       only: masterproc
   use physconst,    only: karman
-#ifdef SPFLUXBYPASS
-  use phys_grid,    only: get_rlat_all_p, get_rlon_all_p, get_lon_all_p, get_lat_all_p
-#endif
 
   implicit none
 
@@ -399,10 +396,6 @@ contains
     integer :: ktopbl(pcols)                       ! index of first midpoint inside pbl
     integer :: ktopblmn                            ! min value of ktopbl
 
-#ifdef SPFLUXBYPASS
-   real(r8) :: clat(pcols)                   ! current latitudes(radians)
-   real(r8) :: clon(pcols)                   ! current longitudes(radians)
-#endif
 
 !-----------------------------------------------------------------------
     zero(:) = 0.
@@ -495,10 +488,7 @@ contains
 #endif
 
 ! Add the explicit surface fluxes to the lowest layer (do not include moutain stress)
-#ifdef SPFLUXBYPASS
-  call get_rlat_all_p(lchnk, ncol, clat)
-  call get_rlon_all_p(lchnk, ncol, clon)
-#endif
+
     do i = 1, ncol
        tmp1(i)  = ztodt*gravit*rpdel(i,pver)
        u(i,pver) = u(i,pver) + tmp1(i) * taux(i)

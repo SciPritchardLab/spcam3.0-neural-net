@@ -3,7 +3,7 @@
 #define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
-#define BRAINDEBUG
+!#define BRAINDEBUG
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -91,9 +91,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
 #ifdef DEEP
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_fullphy_deep
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_deep
 #else
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_fullphy_base
+    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_base
 #endif
 #endif
    implicit none
@@ -1337,6 +1337,7 @@ end do
    else
 
 #ifdef SPFLUXBYPASS
+#ifndef CLOUDBRAIN
  ! pritch -- apply surface flux perturbations to lowest level DSE,
  ! constituents here, right before superparameterization, insated of
  ! instead of in vertical diffusion routine. To avoid exposiing dycore to a
@@ -1362,6 +1363,7 @@ end do
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do
+#endif
 #endif
 
 ! ================= BEGIN THREADED ZONE OF MOST WORK ===================
@@ -1951,62 +1953,24 @@ end do
       lchnk = state(c)%lchnk   ! This was missing for some reason...
 	    ncol  = state(c)%ncol
 
-#ifdef NOADIAB
-   shf(1:pcols,c) 	= in_srfflx_state2d(c)%shf  ! surface sensible heat flux (W/m2)
-   lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
+ 
    call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
    call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-#endif
    call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
    call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-! #ifdef BRAINCTRLFLUX
-!  ! implement 12th order polynomial fit to CTRL's zonal mean latent heat fluxes
-!  ! from day 1, see dailymean_multicasecompare.m
-!          sl = sin(clat(i,c))
-! ctrlSHFLX = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -3.708686e+03*sl**9 + 2.521981e+03*sl**8 + 4.105127e+03*sl**7 + -1.442402e+03*sl**6 + -1.983412e+03*sl**5 + 2.087324e+02*sl**4 + 3.652624e+02*sl**3 + 4.211648e+01*sl**2 + -7.257877e+00*sl**1 + 7.512179e+00
-! ctrlLHFLX = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + -3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + 4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + 2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + 1.114391e+02*sl**0
-! !     write (6,*) 'HEY SHFLX,LHFLX=',ctrlSHFLX,ctrlLHFLX
-! #endif
-!          dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
-!          dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
-#ifdef BRAINDEBUG
-          if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-            write (555,*) 'tap=',state(c)%tap(i,:)
-            write (555,*) 'qap=',state(c)%qap(i,:)
-            write (555,*) 'dTdt_adiab(:)=',dTdt_adiab(:)
-            write(555,*) 'dQdt_adiab(:) =',dQdt_adiab(:)
-          endif 
-#endif
-! #ifdef NOBRAINRAD
-!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputs
-!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),auxqrl(i,:,c),auxqrs(i,:,c),brainrain(i,c),brainolr(i,c))
-! #endif
-! #ifdef BRAINCTRLFLUX
-!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),ctrlSHFLX,ctrlLHFLX,solin(i,c),& ! inputs
-!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
-! #endif
-! #ifndef NOBRAINRAD
-! #ifndef BRAINCTRLFLUX
-!           call cloudbrain_dense4_stephan (state(c)%tap(i,:),state(c)%qap(i,:),dTdt_adiab(c,i,:),dQdt_adiab(c,i,:),shf(i,c),lhf(i,c),solin(i,c),& ! inputsA
-!                                           ptend(c)%s(i,:),ptend(c)%q(i,:,1),qrl(i,:,c),qrs(i,:,c),brainrain(i,c),brainolr(i,c))
-! #endif
-! #endif
-! SR: Full physics implementation
-! [TBP, QBP, VBP, PS, SOLIN, TS]
-! [TPHYSTND, PHQ]
-!subroutine cloudbrain_fullphy_base (TBP, QBP, VBP, PS, TS, SOLIN, &
-                                      !TPHYSTND, PHQ, icol)
+
+! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
+!                                       TPHYSTND, PHQ, icol)
 #ifndef DEEP
-  call cloudbrain_fullphy_base(&
+  call cloudbrain_base(&
 #else
-  call cloudbrain_fullphy_deep(&
+  call cloudbrain_deep(&
 #endif                    
-                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), ts(i,c),&
-                               solin(i,c), ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+                               solin(i,c), shf(i,c), lhf(i,c), &
+                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver

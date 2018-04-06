@@ -23,7 +23,7 @@ use pmgrid, only: masterproc
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
-  integer, parameter :: inputlength = 93
+  integer, parameter :: inputlength = 64
   integer, parameter :: outputlength = 60
   integer, parameter :: nchunk = 64
   ! 1st: BASE
@@ -68,23 +68,25 @@ use pmgrid, only: masterproc
 
   public init_keras_norm
 #ifdef DEEP
-  public init_keras_matrices_deep, cloudbrain_fullphy_deep
+  public init_keras_matrices_deep, cloudbrain_deep
 #else
-  public init_keras_matrices_base, cloudbrain_fullphy_base
+  public init_keras_matrices_base, cloudbrain_base
 #endif
 
   contains
 
 #ifndef DEEP
-  subroutine cloudbrain_fullphy_base (TBP, QBP, VBP, PS, TS, SOLIN, &
+  subroutine cloudbrain_base (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                                       TPHYSTND, PHQ, icol)
     ! NN inputs
-    real(r8), intent(in) :: TBP(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
-    real(r8), intent(in) :: QBP(pver)   ! QAP[t-1] - VD01[t-1]*dt
-    real(r8), intent(in) :: VBP(pver)   ! VAP[t-1]
-    real(r8), intent(in) :: PS ! From t-1
-    real(r8), intent(in) :: TS ! From t-1
+    ! I will leave VBP as an input right now even though it is not used in the current NN
+    real(r8), intent(in) :: TBP(pver)   
+    real(r8), intent(in) :: QBP(pver)
+    real(r8), intent(in) :: VBP(pver)
+    real(r8), intent(in) :: PS ! From t
     real(r8), intent(in) :: SOLIN ! From t
+    real(r8), intent(in) :: SHFLX ! From t
+    real(r8), intent(in) :: LHFLX ! From t
     ! NN outputs
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
@@ -94,15 +96,16 @@ use pmgrid, only: masterproc
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
+    ! inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
     ! Stack the input variables
     k1=pver-nlev+1
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=VBP(k1:k2)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = TS
+    input(2*nlev+1) = PS
+    input(2*nlev+2) = SOLIN
+    input(2*nlev+3) = SHFLX
+    input(2*nlev+4) = LHFLX
 
 
 
@@ -182,21 +185,23 @@ end do
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
    PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 
-  end subroutine cloudbrain_fullphy_base
+  end subroutine cloudbrain_base
 
 
 #else
 
 
-  subroutine cloudbrain_fullphy_deep (TBP, QBP, VBP, PS, TS, SOLIN, &
+  subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                                       TPHYSTND, PHQ, icol)
     ! NN inputs
-    real(r8), intent(in) :: TBP(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
-    real(r8), intent(in) :: QBP(pver)   ! QAP[t-1] - VD01[t-1]*dt
-    real(r8), intent(in) :: VBP(pver)   ! VAP[t-1]
-    real(r8), intent(in) :: PS ! From t-1
-    real(r8), intent(in) :: TS ! From t-1
+    ! I will leave VBP as an input right now even though it is not used in the current NN
+    real(r8), intent(in) :: TBP(pver)   
+    real(r8), intent(in) :: QBP(pver)
+    real(r8), intent(in) :: VBP(pver)
+    real(r8), intent(in) :: PS ! From t
     real(r8), intent(in) :: SOLIN ! From t
+    real(r8), intent(in) :: SHFLX ! From t
+    real(r8), intent(in) :: LHFLX ! From t
     ! NN outputs
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
@@ -206,15 +211,16 @@ end do
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
+    ! inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
     ! Stack the input variables
     k1=pver-nlev+1
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=VBP(k1:k2)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = TS
+    input(2*nlev+1) = PS
+    input(2*nlev+2) = SOLIN
+    input(2*nlev+3) = SHFLX
+    input(2*nlev+4) = LHFLX
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -464,7 +470,7 @@ end do
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
    PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
 
-  end subroutine cloudbrain_fullphy_deep
+  end subroutine cloudbrain_deep
 
 #endif
 

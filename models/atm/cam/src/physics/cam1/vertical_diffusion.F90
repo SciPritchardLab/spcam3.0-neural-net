@@ -560,6 +560,7 @@ stop
     do k = 1, pver
        do i = 1, ncol
           dtk(i,k) = (tmpi1(i,k+1) + tmpi1(i,k)) * rpdel(i,k)
+!SR dse is ptend%s which we are setting to zero later --> No DTK application!
           dse(i,k) = dse(i,k) + dtk(i,k)
        end do
     end do

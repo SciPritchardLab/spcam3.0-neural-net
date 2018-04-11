@@ -115,8 +115,12 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                QC(begchunk:endchunk,pcols,pver), &
                VC(begchunk:endchunk,pcols,pver), &
                PS(begchunk:endchunk,pcols), &
+               TOT_PRECL(pcols,begchunk:endchunk), &
+               TOT_PRECS(pcols,begchunk:endchunk), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
+               QCBP(begchunk:endchunk,pcols,pver), &
+               QIBP(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
@@ -545,6 +549,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    braindebug_y2 = 2.*3.14159/180.
 #endif
 #endif
+
+call cnst_get_ind('CLDLIQ', ixcldliq)
+call cnst_get_ind('CLDICE', ixcldice)
+
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
 ! SR: New fixed implementation of adiabatic tendencies, which also contain DTV, VD01
@@ -568,9 +576,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
        do k=1,pver
           TBP(c,i,k) = state(c)%t(i,k)
           QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+          QCBP(c,i,k) = state(c)%q(i,k,ixcldliq)   ! index 1 is vapor
+          QIBP(c,i,k) = state(c)%q(i,k,ixcldice)   ! index 1 is vapor
           VBP(c,i,k) = state(c)%v(i,k)
-          dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
-          dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
@@ -580,6 +588,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       lchnk = state(c)%lchnk
       call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQCBP',QCBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQIBP',QIBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
@@ -816,8 +826,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 ! Transport cloud water and ice only
 !
-   call cnst_get_ind('CLDLIQ', ixcldliq)
-   call cnst_get_ind('CLDICE', ixcldice)
+
    ptend(c)%name = 'convtran1'
    ptend(c)%lq(ixcldice) = .true.
    ptend(c)%lq(ixcldliq) = .true.
@@ -1961,16 +1970,16 @@ end do
 
       do i=1,ncol ! this is the loop over independent GCM columns.
 
+! inputs : [TBP, QBP, QCBP, QIBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+! outputs : [TPHY_NOKE, PHQ, PHCLDLIQ, PHCLDICE, TOT_PRECL, TOT_PRECS, FSNT, FSNS, FLNT, FLNS]
+
 ! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 !                                       TPHYSTND, PHQ, icol)
-#ifndef DEEP
-  call cloudbrain_base(&
-#else
-  call cloudbrain_deep(&
-#endif                    
-                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+
+  call cloudbrain_deep(        TBP(c,i,:), QBP(c,i,:), QCBP(c,i,:), QIBP(c,i,:), VBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
-                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
+                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), ptend(c)%q(i,:,ixcldliq), ptend(c)%q(i,:,ixcldice), &
+                               TOT_PRECL(i,c), TOT_PRECS(i,c), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
                                i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
@@ -1980,10 +1989,20 @@ end do
          ! They are separately wired to arterial ptend structures downstream.         
       end do ! end column loop
 ! ---- energy fixer attempt #1 ----
-      braindq = ptend(c)%q(:ncol,:pver,1)
-      call outfld('BRAINDQ',braindq,pcols,lchnk) 
-     braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('BRAINDT',braindt,pcols,lchnk) 
+    braindq = ptend(c)%q(:ncol,:pver,1)
+    call outfld('NNDQ',braindq,pcols,lchnk) 
+    braindq = ptend(c)%q(:ncol,:pver,ixcldliq)
+    call outfld('NNDQC',braindq,pcols,lchnk)
+    braindq = ptend(c)%q(:ncol,:pver,ixcldice)
+    call outfld('NNDQI',braindq,pcols,lchnk)
+    braindt = ptend(c)%s(:ncol,:pver)/cpair 
+    call outfld('NNDT',braindt,pcols,lchnk) 
+    call outfld('NNPRECL',TOT_PRECL(:ncol,c),pcols,lchnk)
+    call outfld('NNPRECS',TOT_PRECS(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
      !call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
      !call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
 ! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway
@@ -2050,8 +2069,8 @@ end do
      ptend(c)%name  = 'cloudbrain'
      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
      ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-     ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-     ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+     ptend(c)%lq(ixcldliq) = .TRUE. ! allowed to update GCM liquid water
+     ptend(c)%lq(ixcldice) = .TRUE. ! allowed to update GCM ice water 
      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
      ptend(c)%lv    = .FALSE.
  
@@ -2061,8 +2080,6 @@ end do
      
      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
      
-     call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
-     call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)
 
 #ifdef BRAINDEBUG
    do i=1,ncol

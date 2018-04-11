@@ -39,7 +39,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 #endif
    use analyses, only: analyses_int
    use runtime_opts,  only: l_analyses
-   use runtime_opts, only: aqua_AndKua, aqua_uniform, aqua_uniform_sst_degC
+   use runtime_opts, only: aqua_AndKua, aqua_3KW1, aqua_uniform, aqua_uniform_sst_degC
 
 
    use check_energy, only: check_energy_gmean
@@ -478,7 +478,7 @@ end do
    if (ifluxcalc .eq. 1) then
 #endif
    call t_startf ('sstint')
-   call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_uniform_sst_degC)
+   call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_uniform_sst_degC)
    call t_stopf ('sstint')
 !
 ! iceint may change ocean fraction, so call it before camoce

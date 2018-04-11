@@ -2236,6 +2236,11 @@ endif ! not first step.
                     state(c)%pmid,      &
                  state(c)%rpdel(1,pver))
 
+
+! At this stage save column integral energy and water
+   call outfld('TE', state(c)%te_cur, pcols, lchnk   )
+   call outfld('TW', state(c)%tw_cur, pcols, lchnk   )
+
 !---------------------------------------------------------------------------------------
 ! Save history variables. These should move to the appropriate parameterization interface
 !---------------------------------------------------------------------------------------

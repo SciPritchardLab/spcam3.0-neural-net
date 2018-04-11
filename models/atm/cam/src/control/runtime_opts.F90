@@ -536,7 +536,7 @@ module runtime_opts
   real (r8), public :: fluxdampfac,flux_dylat,flux_critlat_deg
   logical, public :: fluxdamp_equatoronly
 #endif
-  logical, public :: aqua_uniform, aqua_AndKua
+  logical, public :: aqua_uniform, aqua_AndKua, aqua_3KW1
   real(r8), public :: aqua_uniform_sst_degC
 
   real(r8), public :: tau_t            ! time scale for nudging T  with analyses (seconds)
@@ -748,7 +748,7 @@ subroutine read_namelist
   fluxdampfac,fluxdamp_equatoronly,flux_dylat,flux_critlat_deg, &
 #endif
                     analyses_time_interp, less_surface_nudging, nudge_dse_not_T, &
-                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua
+                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1
 
 
 #endif
@@ -1559,6 +1559,10 @@ subroutine read_namelist
     write (6,*) 'Pritch Andersen & Kuang 2012 aquaplanet SSTs activated'
     aqua_planet = .true.
   end if
+  if (aqua_3KW1) then
+    write (6,*) 'SR Zonally assymetric'
+    aqua_planet = .true.
+  end if
 #ifdef FLUXDAMP
   if (masterproc) then
    write (6,*) 'fluxdampfac=',fluxdampfac
@@ -1818,6 +1822,7 @@ subroutine distnl
   call mpibcast (aqua_uniform  ,1,mpilog,0,mpicom)
   call mpibcast (aqua_uniform_sst_degC, 1, mpir8, 0, mpicom) ! pritch
   call mpibcast (aqua_AndKua, 1,mpilog,0,mpicom)
+  call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'
 ! ASK   call flush(idjb_out)
@@ -2097,8 +2102,9 @@ subroutine preset
    flux_critlat_deg = -999.
 #endif
    aqua_uniform = .false.
-   aqua_uniform_sst_degC = -999.
+   aqua_uniform_sst_degC = 0.
    aqua_AndKua = .false.
+   aqua_3KW1 = .false.
 #if ( defined COUP_CSM )
 !
 ! Communications with the flux coupler

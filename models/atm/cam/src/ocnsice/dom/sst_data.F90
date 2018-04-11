@@ -407,7 +407,7 @@ end subroutine sstini
 !
 ! !INTERFACE:
 !
-subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_uniform_sst_degC)
+subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_uniform_sst_degC)
 !
 ! !USES:
 !
@@ -419,7 +419,7 @@ subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_uniform_sst_deg
 ! !INPUT PARAMETERS:
 !
   logical, intent(in) :: prev_timestep ! If using previous timestep, set to true
-  logical, intent(in) :: aqua_uniform, aqua_AndKua
+  logical, intent(in) :: aqua_uniform, aqua_AndKua, aqua_3KW1
   real(r8), intent(in) :: aqua_uniform_sst_degC
 !
 ! EOP
@@ -713,10 +713,29 @@ subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_uniform_sst_deg
               			zeta = (sin(3.141593*((clat(j)/pio180- 5.) / 110.)))**2
            		ENDIF
                  do i=1,nlon(j)
-		 	sst_aqua(i,j) = (2.+((27./2.)*(2.-(zeta)-(zeta)**2)))
-			xvar(i,j,1) = sst_aqua(i,j)
+                  sst_aqua(i,j) = (2.+((27./2.)*(2.-(zeta)-(zeta)**2)))
+                  sst_aqua(i,j) = sst_aqua(i,j) + aqua_uniform_sst_degC   ! SR: Allows us to offset SST from namelist
+                  xvar(i,j,1) = sst_aqua(i,j)
                  end do
              end do 
+           else if (aqua_3KW1) then 
+              do j = 1,plat
+                do i=1,nlon(j)
+                  ! First the symmetric control profile
+                  if (clat(j) .gt. (pi/-3.) .and. clat(j) .lt. (pi/3.)) then
+                    sst_aqua(i,j) = 27. * (1. - sin(3*clat(j)/2.)**2)
+                  else
+                    sst_aqua(i,j) = 0.
+                  end if 
+                  ! The add the wavenumber perturbation
+                  if (clat(j) .gt. (-30.*pio180) .and. clat(j) .lt. (30.*pio180)) then
+                    sst_aqua(i,j) = sst_aqua(i,j) + 3. * cos(clon(i,j) - 0.) * cos(pi/2. * clat(j)/(30.*pio180))**2
+                  end if
+                  ! Finally add offset
+                  sst_aqua(i,j) = sst_aqua(i,j) + aqua_uniform_sst_degC
+                  xvar(i,j,1) = sst_aqua(i,j)
+                end do
+              end do
            else if (aqua_uniform) then
              do j=1,plat
                do i=1,nlon(j)

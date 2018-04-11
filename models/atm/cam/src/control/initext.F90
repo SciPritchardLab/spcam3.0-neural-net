@@ -17,7 +17,7 @@ subroutine initext
    use phys_grid, only: get_ncols_p, get_rlat_all_p, get_rlon_all_p,get_lat_all_p, get_lon_all_p
    use pspect
    use comsrf
-   use runtime_opts, only: aqua_AndKua, aqua_uniform, aqua_uniform_sst_degC
+   use runtime_opts, only: aqua_AndKua, aqua_3KW1, aqua_uniform, aqua_uniform_sst_degC
 
    use rgrid
    use shr_orb_mod
@@ -282,12 +282,12 @@ subroutine initext
 !
       if (is_first_step()) then
 !         call sstint(prev_timestep=.true.)
-         call sstint (.true.,aqua_uniform, aqua_AndKua, aqua_uniform_sst_degC)
+         call sstint (.true.,aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_uniform_sst_degC)
          tsice_tmp(:,:) = tsice(:,:)
          call iceint(prev_timestep=.true., startup=.true.)
          tsice(:,:)     = tsice_tmp(:,:)
       else
-         call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_uniform_sst_degC)
+         call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_uniform_sst_degC)
          do lchnk=begchunk,endchunk
             ncol = get_ncols_p(lchnk)
             do i=1,ncol

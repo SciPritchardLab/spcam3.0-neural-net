@@ -371,8 +371,8 @@ end do
 ! [C_P, L_V, L_V, L_V, 24*3600*2e-2, 24*3600*2e-2, 1e-3, -1e-3, -1e-3, 1e-3]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
    PHQ(k1:k2) =      output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
-   PHQC(k1:k2) =     output((2*nlev+1):3*nlev)/2.5e6 ! W/kg --> kg/kg/s
-   PHQI(k1:k2) =     output((3*nlev+1):4*nlev)/2.5e6 ! W/kg --> kg/kg/s
+   PHQC(k1:k2) =     0. !output((2*nlev+1):3*nlev)/2.5e6 ! W/kg --> kg/kg/s
+   PHQI(k1:k2) =     0. !output((3*nlev+1):4*nlev)/2.5e6 ! W/kg --> kg/kg/s
    TOT_PRECL =       output(4*nlev+1)/ (24*3600*2e-2)
    TOT_PRECS =       output(4*nlev+2)/ (24*3600*2e-2)
    FSNT =            output(4*nlev+3)/ (1e-3)

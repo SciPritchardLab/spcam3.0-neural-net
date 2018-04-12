@@ -23,7 +23,7 @@ use pmgrid, only: masterproc
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
-  integer, parameter :: inputlength = 64
+  integer, parameter :: inputlength = 94
   integer, parameter :: outputlength = 60
   integer, parameter :: nchunk = 64
   ! 1st: BASE
@@ -79,7 +79,6 @@ use pmgrid, only: masterproc
   subroutine cloudbrain_base (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                                       TPHYSTND, PHQ, icol)
     ! NN inputs
-    ! I will leave VBP as an input right now even though it is not used in the current NN
     real(r8), intent(in) :: TBP(pver)   
     real(r8), intent(in) :: QBP(pver)
     real(r8), intent(in) :: VBP(pver)
@@ -102,10 +101,11 @@ use pmgrid, only: masterproc
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input(2*nlev+1) = PS
-    input(2*nlev+2) = SOLIN
-    input(2*nlev+3) = SHFLX
-    input(2*nlev+4) = LHFLX
+    input((2*nlev+1):3*nlev)=QBP(k1:k2)
+    input(3*nlev+1) = PS
+    input(3*nlev+2) = SOLIN
+    input(3*nlev+3) = SHFLX
+    input(3*nlev+4) = LHFLX
 
 
 

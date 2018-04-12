@@ -2807,6 +2807,8 @@ CONTAINS
      call add_default ('XXXU3AUX',1,' ')
      call add_default ('DQFCST',1,' ')
 #endif
+     call add_default ('TE   ',1,' ')
+     call add_default ('TW   ',1,' ')
 ! These fields removed 10/30/2003 per CRB decision.
 !      call add_default ('CLDST   ', 1, ' ')
 !      call add_default ('CNVCLD  ', 1, ' ')

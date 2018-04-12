@@ -443,14 +443,14 @@ grqla(:,:,:) = inf
    endif
 !SR Add output here to check whether this is happening.
  ! call outfld('BETA', ,plond   ,lat     )  
- if (masterproc) then
-  write (6,*) 'SR: beta = ', beta
-  write (6,*) 'SR: residual = ', residual
-  write (6,*) 'SR: fixmas = ', fixmas
-  write (6,*) 'SR: engy1 = ', engy1
-  write (6,*) 'SR: engy2 = ', engy2
-  write (6,*) 'SR: difft = ', difft
- endif
+!  if (masterproc) then
+!   write (6,*) 'SR: beta = ', beta
+!   write (6,*) 'SR: residual = ', residual
+!   write (6,*) 'SR: fixmas = ', fixmas
+!   write (6,*) 'SR: engy1 = ', engy1
+!   write (6,*) 'SR: engy2 = ', engy2
+!   write (6,*) 'SR: difft = ', difft
+!  endif
 
   
 !!   write(6,125) residual,beta

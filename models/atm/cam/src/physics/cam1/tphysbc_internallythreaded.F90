@@ -1981,9 +1981,9 @@ end do
       end do ! end column loop
 ! ---- energy fixer attempt #1 ----
       braindq = ptend(c)%q(:ncol,:pver,1)
-      call outfld('BRAINDQ',braindq,pcols,lchnk) 
+      call outfld('NNDQ',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('BRAINDT',braindt,pcols,lchnk) 
+     call outfld('NNDT',braindt,pcols,lchnk) 
      !call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
      !call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
 ! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway

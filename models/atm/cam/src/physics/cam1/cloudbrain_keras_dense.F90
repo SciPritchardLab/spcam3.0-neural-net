@@ -95,13 +95,13 @@ use pmgrid, only: masterproc
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
-    ! inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
+    ! inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
     ! Stack the input variables
     k1=pver-nlev+1
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=QBP(k1:k2)
+    input((2*nlev+1):3*nlev)=VBP(k1:k2)
     input(3*nlev+1) = PS
     input(3*nlev+2) = SOLIN
     input(3*nlev+3) = SHFLX
@@ -194,7 +194,6 @@ end do
   subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                                       TPHYSTND, PHQ, icol)
     ! NN inputs
-    ! I will leave VBP as an input right now even though it is not used in the current NN
     real(r8), intent(in) :: TBP(pver)   
     real(r8), intent(in) :: QBP(pver)
     real(r8), intent(in) :: VBP(pver)
@@ -211,16 +210,16 @@ end do
     integer :: k,j,k1,k2
     integer, intent(in) :: icol
 
-    ! inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
-    ! Stack the input variables
+    ! inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
     k1=pver-nlev+1
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input(2*nlev+1) = PS
-    input(2*nlev+2) = SOLIN
-    input(2*nlev+3) = SHFLX
-    input(2*nlev+4) = LHFLX
+    input((2*nlev+1):3*nlev)=VBP(k1:k2)
+    input(3*nlev+1) = PS
+    input(3*nlev+2) = SOLIN
+    input(3*nlev+3) = SHFLX
+    input(3*nlev+4) = LHFLX
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then

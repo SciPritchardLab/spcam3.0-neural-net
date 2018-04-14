@@ -4,7 +4,7 @@
 ! Limit output to min-max
 !#define LIMITOUTP
 ! Limit input to min-max
-#define INPLIMITER  
+!#define INPLIMITER  
 !#define NOADIAB
 #define DEEP
 !#define TANH
@@ -13,7 +13,7 @@ module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
 use ppgrid,          only: pcols, pver, pverp
 use history,         only: outfld, addfld, add_default, phys_decomp
-use physconst,       only: gravit,cpair
+use physconst,       only: gravit, cpair, latvap, latice
 use pmgrid, only: masterproc
 
   implicit none
@@ -81,7 +81,7 @@ use pmgrid, only: masterproc
   !                              TOT_PRECL(i,c), TOT_PRECS(i,c), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
   !                              i)
   subroutine cloudbrain_deep (TBP, QBP, QCBP, QIBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                              TPHYSTND, PHQ, PHQC, PHQI, TOT_PRECL, TOT_PRECS, FSNT, FSNS, FLNT, FLNS, icol)
+                              TPHYSTND, PHQ, QCAP, QIAP, TOT_PRECL, TOT_PRECS, FSNT, FSNS, FLNT, FLNS, icol)
     ! NN inputs
     real(r8), intent(in) :: TBP(pver)   
     real(r8), intent(in) :: QBP(pver)
@@ -95,8 +95,8 @@ use pmgrid, only: masterproc
     ! NN outputs
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
-    real(r8), intent(out) :: PHQC(pver) ! W/kg
-    real(r8), intent(out) :: PHQI(pver) ! W/kg
+    real(r8), intent(out) :: QCAP(pver) ! W/kg
+    real(r8), intent(out) :: QIAP(pver) ! W/kg
     real(r8), intent(out) :: TOT_PRECL
     real(r8), intent(out) :: TOT_PRECS
     real(r8), intent(out) :: FSNT
@@ -370,15 +370,23 @@ end do
 ! [TPHY_NOKE, PHQ, PHCLDLIQ, PHCLDICE, TOT_PRECL, TOT_PRECS, FSNT, FSNS, FLNT, FLNS]
 ! [C_P, L_V, L_V, L_V, 24*3600*2e-2, 24*3600*2e-2, 1e-3, -1e-3, -1e-3, 1e-3]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
-   PHQ(k1:k2) =      output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
-   PHQC(k1:k2) =     0. !output((2*nlev+1):3*nlev)/2.5e6 ! W/kg --> kg/kg/s
-   PHQI(k1:k2) =     0. !output((3*nlev+1):4*nlev)/2.5e6 ! W/kg --> kg/kg/s
+   PHQ(k1:k2) =      output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
+   QCAP(k1:k2) =     output((2*nlev+1):3*nlev)/(latvap+latice)*1800. !  kg/kg
+   QIAP(k1:k2) =     output((3*nlev+1):4*nlev)/(latvap+latice)*1800. !  kg/kg
    TOT_PRECL =       output(4*nlev+1)/ (24*3600*2e-2)
    TOT_PRECS =       output(4*nlev+2)/ (24*3600*2e-2)
    FSNT =            output(4*nlev+3)/ (1e-3)
    FSNS =            output(4*nlev+4)/ (-1e-3)
    FLNT =            output(4*nlev+5)/ (-1e-3)
    FLNS =            output(4*nlev+6)/ (1e-3)
+
+  ! Partial ReLU
+  do k=1,pver
+    QCAP(k) = max(0., QCAP(k))
+    QIAP(k) = max(0., QIAP(k))
+  end do
+
+
 
   end subroutine cloudbrain_deep
 

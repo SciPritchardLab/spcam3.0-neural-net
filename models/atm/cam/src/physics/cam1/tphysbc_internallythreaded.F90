@@ -5,6 +5,7 @@
 !#define NOBRAINRAD
 !#define BRAINDEBUG
 !#define NOADIAB
+#define BRAINENERGYFIX
 #define DEEP
 #define SPFLUXBYPASS
 #define PCWDETRAIN
@@ -121,7 +122,13 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                QBP(begchunk:endchunk,pcols,pver), &
                QCBP(begchunk:endchunk,pcols,pver), &
                QIBP(begchunk:endchunk,pcols,pver), &
-               VBP(begchunk:endchunk,pcols,pver)
+               QCAP(begchunk:endchunk,pcols,pver), &
+               QIAP(begchunk:endchunk,pcols,pver), &
+               VBP(begchunk:endchunk,pcols,pver), &
+               nndq(pver), nndqc(pver), nndqi(pver), &
+               idq(pver), idqc(pver), idqi(pver), &
+               vdq, vdqc, vdqi, avdq, avdqc, avdqi, &
+               dqconv, errq, abstot, corr
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1978,7 +1985,7 @@ end do
 
   call cloudbrain_deep(        TBP(c,i,:), QBP(c,i,:), QCBP(c,i,:), QIBP(c,i,:), VBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
-                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), ptend(c)%q(i,:,ixcldliq), ptend(c)%q(i,:,ixcldice), &
+                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), QCAP(c,i,:), QIAP(c,i,:), &
                                TOT_PRECL(i,c), TOT_PRECS(i,c), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
                                i)
 
@@ -1988,17 +1995,18 @@ end do
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
       end do ! end column loop
-! ---- energy fixer attempt #1 ----
-    braindq = ptend(c)%q(:ncol,:pver,1)
-    call outfld('NNDQ',braindq,pcols,lchnk) 
-    braindq = ptend(c)%q(:ncol,:pver,ixcldliq)
-    call outfld('NNDQC',braindq,pcols,lchnk)
-    braindq = ptend(c)%q(:ncol,:pver,ixcldice)
-    call outfld('NNDQI',braindq,pcols,lchnk)
+
+    call outfld('NNQCAP',QCAP(c, :ncol, :pver),pcols,lchnk)
+    call outfld('NNQIAP',QIAP(c, :ncol, :pver),pcols,lchnk)
+    ptend(c)%q(:ncol,:pver,ixcldliq) = (QCAP(c, :ncol, :pver) - QCBP(c, :ncol, :pver)) / 1800.
+    ptend(c)%q(:ncol,:pver,ixcldice) = (QIAP(c, :ncol, :pver) - QIBP(c, :ncol, :pver)) / 1800.
+    call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('NNDQC',ptend(c)%q(:ncol,:pver,ixcldliq),pcols,lchnk)
+    call outfld('NNDQI',ptend(c)%q(:ncol,:pver,ixcldice),pcols,lchnk)
     braindt = ptend(c)%s(:ncol,:pver)/cpair 
     call outfld('NNDT',braindt,pcols,lchnk) 
-    call outfld('NNPRECL',TOT_PRECL(:ncol,c),pcols,lchnk)
-    call outfld('NNPRECS',TOT_PRECS(:ncol,c),pcols,lchnk)
+    call outfld('NNPRL',TOT_PRECL(:ncol,c),pcols,lchnk)
+    call outfld('NNPRS',TOT_PRECS(:ncol,c),pcols,lchnk)
     call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
     call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
     call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
@@ -2006,8 +2014,64 @@ end do
      !call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
      !call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
 ! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway
-! #ifdef BRAINENERGYFIX
-!       do i=1,ncol
+#ifdef BRAINENERGYFIX
+  do i=1,ncol
+    ! Step 1: Limit the humidity tendencies so that they the concentrations do not go below zero
+    ! Qs should all be in kg/kg/s units
+    ! This should not be necessary anymore with the PartialReLU
+    ! do k=1,pver
+    !   nndq(k) = max(ptend(c)%q(i,k,1), -1.*QBP(c,i,k)/ztodt)
+    !   nndqc(k) = max(ptend(c)%q(i,k,ixcldliq), -1.*QCBP(c,i,k)/ztodt)
+    !   nndqi(k) = max(ptend(c)%q(i,k,ixcldice), -1.*QIBP(c,i,k)/ztodt)
+    ! end do
+    
+    ! Step 2: Convert to kg/m^2 (I think) 
+    do k=1,pver
+      idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav
+      idqc(k) = ptend(c)%q(i,k,ixcldliq) * state(c)%pdel(i,k) * rgrav
+      idqi(k) = ptend(c)%q(i,k,ixcldice) * state(c)%pdel(i,k) * rgrav
+    end do
+
+    ! Step 3: Vertically integrate normal and absolute
+    vdq = 0.
+    vdqc = 0.
+    vdqi = 0.
+    avdq = 0.
+    avdqc = 0.
+    avdqi = 0.
+    do k=1,pver
+      vdq = vdq + idq(k)
+      avdq = avdq + abs(idq(k))
+      vdqc = vdqc + idqc(k)
+      avdqc = avdqc + abs(idqc(k))
+      vdqi = vdqi + idqi(k)
+      avdqi = avdqi + abs(idqi(k))
+    end do
+
+    ! Step 4: Get the total moisture change and compute violation
+    dqconv = vdq + vdqc + vdqi 
+    errq = dqconv - lhf(i,c) / latvap + TOT_PRECL(i,c)
+    abstot = avdq + avdqc + avdqi + abs(TOT_PRECL(i,c)) ! Absolute sum of all variables we are correcting
+    if (masterproc) then
+      write (555,*) 'errq = ', errq
+      write (555,*) 'avdq = ', avdq
+      write (555,*) 'avdq = ', avdqc
+      write (555,*) 'avdq = ', avdqi
+      write (555,*) 'abs precl = ', avdq
+    endif
+
+    ! Step 5: Apply the correction term
+    do k=1,pver
+      corr = errq * abs(idq(k)) / abstot
+      ptend(c)%q(i,k,1) = nndq(k) - corr / state(c)%pdel(i,k) * gravit
+      corr = errq * abs(idqc(k)) / abstot
+      ptend(c)%q(i,k,ixcldliq) = nndqc(k) - corr / state(c)%pdel(i,k) * gravit
+      corr = errq * abs(idqi(k)) / abstot
+      ptend(c)%q(i,k,ixcldice) = nndqi(k) - corr / state(c)%pdel(i,k) * gravit
+      corr = errq * abs(TOT_PRECL(i,c)) / abstot
+      TOT_PRECL(i,c) = TOT_PRECL(i,c) - corr
+    end do
+
 
 
 ! !  stage 1) apply the moisture budget constraint
@@ -2058,12 +2122,19 @@ end do
 
 
 ! ! ---- end energy fixer attempt
-!       end do ! end column loop
-!       braindq = ptend(c)%q(:ncol,:pver,1)
-!       call outfld('BRAINDQ2',braindq,pcols,lchnk) 
-!      braindt = ptend(c)%s(:ncol,:pver)/cpair 
-!      call outfld('BRAINDT2',braindt,pcols,lchnk) 
-! #endif ! BRAINENERGYFIX
+     end do ! end column loop
+    call outfld('CNNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('CNNDQC',ptend(c)%q(:ncol,:pver,ixcldliq),pcols,lchnk)
+    call outfld('CNNDQI',ptend(c)%q(:ncol,:pver,ixcldice),pcols,lchnk)
+    braindt = ptend(c)%s(:ncol,:pver)/cpair 
+    call outfld('CNNDT',braindt,pcols,lchnk) 
+    call outfld('CNNPRL',TOT_PRECL(:ncol,c),pcols,lchnk)
+    call outfld('CNNPRS',TOT_PRECS(:ncol,c),pcols,lchnk)
+    call outfld('CNNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('CNNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('CNNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    ! call outfld('CNNFLNS',in_flns(:ncol,c),pcols,lchnk) 
+#endif ! BRAINENERGYFIX
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
      ptend(c)%name  = 'cloudbrain'

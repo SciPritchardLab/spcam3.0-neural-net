@@ -19,12 +19,13 @@ use pmgrid, only: masterproc
   implicit none
   
   save 
-
+! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
   integer, parameter :: inputlength = 94
-  integer, parameter :: outputlength = 60
+  integer, parameter :: outputlength = 65
   integer, parameter :: nchunk = 64
   ! 1st: BASE
 #ifndef DEEP
@@ -75,124 +76,11 @@ use pmgrid, only: masterproc
 
   contains
 
-#ifndef DEEP
-  subroutine cloudbrain_base (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                                      TPHYSTND, PHQ, icol)
-    ! NN inputs
-    real(r8), intent(in) :: TBP(pver)   
-    real(r8), intent(in) :: QBP(pver)
-    real(r8), intent(in) :: VBP(pver)
-    real(r8), intent(in) :: PS ! From t
-    real(r8), intent(in) :: SOLIN ! From t
-    real(r8), intent(in) :: SHFLX ! From t
-    real(r8), intent(in) :: LHFLX ! From t
-    ! NN outputs
-    real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
-    real(r8), intent(out) :: PHQ(pver) ! W/kg
-
-    real(r8) :: input(inputlength),x1(width)
-    real(r8) :: output (outputlength)
-    integer :: k,j,k1,k2
-    integer, intent(in) :: icol
-
-    ! inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-    ! Stack the input variables
-    k1=pver-nlev+1
-    k2=pver
-    input(1:nlev)=TBP(k1:k2) 
-    input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=VBP(k1:k2)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
-
-
-
-#ifdef BRAINDEBUG
-    if (masterproc .and. icol .eq. 1) then
-      write (6,*) 'HEY input pre norm=',input
-    endif
-#endif
-
-! Limit inputs to their min max values
-#ifdef INPLIMITER
-do k=1,inputlength
-  input(k) = min(input(k), input_norm_max(k))
-  input(k) = max(input(k), input_norm_min(k))
-end do
-#endif
-
-    ! normalize input:
-    do k=1,inputlength
-      input(k) = (input(k) - input_norm_mean(k))/input_norm_max_rs(k)
-    end do
-#ifdef BRAINDEBUG
-    if (masterproc .and. icol .eq. 1) then
-     write (6,*) 'HEY normalized = ',input
-    endif
-#endif
-#ifdef BRAINDEBUG
-    if (masterproc .and. icol .eq. 1) then
-     write (6,*) 'HEY weights1 = ',weights1
-     write (6,*) 'HEY bias1 = ',bias1
-     write (6,*) 'HEY weights2 = ',weights2
-     write (6,*) 'HEY bias2 = ',bias2
-    endif
-#endif
-! 1st layer: input length-->512.
-    x1(1:width) = 0.
-    do k=1,width
-      do j=1,inputlength
-        x1(k) = x1(k) + weights1(k,j)*input(j)
-      end do
-      x1(k) = x1(k) + bias1(k)
-      !x1(k) = max(0.,x1(k)) ! relu activation.
-      x1(k) = max(0.3 * x1(k), x1(k))  ! Leaky ReLU
-    end do
-! output layer: 512->output length
-   output(1:outputlength) = 0.
-   do k=1,outputlength
-     do j=1,width
-       output(k) = output(k) + weights2(k,j)*x1(j) 
-     end do
-     output(k) = output(k) + bias2(k)
-     ! no activation for output.
-   end do
-
-#ifdef BRAINDEBUG
-   if (masterproc .and. icol .eq. 1) then
-    write (6,*) 'HEY output = ',output
-   endif
-#endif
-
-! SR: Limit outputs to external mins and maxs
-#ifdef LIMITOUTP
-   do k=1,outputlength
-     output(k) = min(output(k), output_norm_max(k))
-     output(k) = max(output(k), output_norm_min(k))
-   end do
-#endif
-
-#ifdef BRAINDEBUG
-   if (masterproc .and. icol .eq. 1) then
-    write (6,*) 'HEY output limit = ',output
-   endif
-#endif
-
-! Unstack the output variables and unit convert them back
-! [TPHYSTND, PHQ]
-   TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
-   PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
-
-  end subroutine cloudbrain_base
-
-
-#else
-
 
   subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                                      TPHYSTND, PHQ, icol)
+                              TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, icol)
+    ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+    ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
     ! NN inputs
     real(r8), intent(in) :: TBP(pver)   
     real(r8), intent(in) :: QBP(pver)
@@ -204,6 +92,11 @@ end do
     ! NN outputs
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
+    real(r8), intent(out) :: FSNT
+    real(r8), intent(out) :: FSNS
+    real(r8), intent(out) :: FLNT
+    real(r8), intent(out) :: FLNS
+    real(r8), intent(out) :: PRECT
 
     real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
@@ -465,13 +358,17 @@ end do
 #endif
 
 ! Unstack the output variables and unit convert them back
-! [TPHYSTND, PHQ]
+! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
-   PHQ(k1:k2) = output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
+   PHQ(k1:k2) =      output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
+   FSNT =            output(2*nlev+1)/ (1e-3)
+   FSNS =            output(2*nlev+2)/ (-1e-3)
+   FLNT =            output(2*nlev+3)/ (-1e-3)
+   FLNS =            output(2*nlev+4)/ (1e-3)
+   PRECT =           output(2*nlev+5)/ (1e3*24*3600*2e-2)
 
   end subroutine cloudbrain_deep
 
-#endif
 
 
 

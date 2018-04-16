@@ -3,7 +3,8 @@
 #define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
-!#define BRAINDEBUG
+#define BRAINDEBUG
+#define BRAINENERGYFIX
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -109,7 +110,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #if defined (CRM) || defined (CLOUDBRAIN)
    real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
                dQdt_adiab(begchunk:endchunk,pcols,pver),&
-               brainrain(pcols,begchunk:endchunk),&
+               NNPRECT(pcols,begchunk:endchunk),&
                brainolr(pcols,begchunk:endchunk), &
                TC(begchunk:endchunk,pcols,pver), &
                QC(begchunk:endchunk,pcols,pver), &
@@ -117,7 +118,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                PS(begchunk:endchunk,pcols), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
-               VBP(begchunk:endchunk,pcols,pver)
+               VBP(begchunk:endchunk,pcols,pver), &
+               idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq, abstot, &
+               corr, drad, absrad, errt
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1960,18 +1963,16 @@ end do
    call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-
+! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
 ! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 !                                       TPHYSTND, PHQ, icol)
-#ifndef DEEP
-  call cloudbrain_base(&
-#else
-  call cloudbrain_deep(&
-#endif                    
-                               TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+
+  call cloudbrain_deep(        TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
                                ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               i)
+                               in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
+                               NNPRECT(i, c), i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
@@ -1979,11 +1980,121 @@ end do
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
       end do ! end column loop
-! ---- energy fixer attempt #1 ----
-      braindq = ptend(c)%q(:ncol,:pver,1)
-      call outfld('NNDQ',braindq,pcols,lchnk) 
-     braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('NNDT',braindt,pcols,lchnk) 
+
+    call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+    call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+
+
+#ifdef BRAINENERGYFIX
+  
+  !!!!! PART 1: MOISTURE FIX !!!!!!!
+  do i=1,ncol
+    ! Step 1: Convert to energy stuff
+    do k=1,pver
+      idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav
+    end do
+
+    ! Step 2: Vertically integrate normal and absolute
+    vdq = 0.
+    avdq = 0.
+    do k=1,pver
+      vdq = vdq + idq(k)
+      avdq = avdq + abs(idq(k))
+    end do
+
+    ! Step 3: Get the total moisture error
+    errq = vdq - lhf(i, c)/latvap + NNPRECT(i, c)*1e3
+    abstot = avdq + abs(NNPRECT(i, c)*1e3)
+#ifdef BRAINDEBUG
+    if (masterproc) then
+      write (555,*) 'errq = ', errq
+      write (555,*) 'avdq = ', avdq
+      write (555,*) 'abs precl = ', abs(NNPRECT(i, c)*1e3)
+    endif
+#endif
+
+    ! Step 4: Apply the correction term
+    do k=1,pver
+      corr = errq * abs(idq(k)) / abstot
+      ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - corr / state(c)%pdel(i,k) * gravit
+    end do
+    corr = errq * abs(NNPRECT(i,c)*1e3) / abstot
+    NNPRECT(i,c) = NNPRECT(i,c) - corr/1e3
+end do ! column loop
+
+
+#ifdef MSEFIX
+  !!!!!!!!! PART 2: MSE FIX !!!!!!!!!!!!!!!
+  do i=1,ncol
+    ! Step 1: Convert to energy stuff
+    do k=1,pver
+      idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav * latvap
+      idt(k) = ptend(c)%s(i,k) * state(c)%pdel(i,k) * rgrav
+    end do
+
+    ! Step 2: Vertically integrate normal and absolute
+    vdq = 0.
+    avdq = 0.
+    vdt = 0.
+    avdt = 0.
+    do k=1,pver
+      vdq = vdq + idq(k)
+      avdq = avdq + abs(idq(k))
+      vdt = vdt + idt(k)
+      avdt = avdt + abs(idt(k))
+    end do
+
+    ! Step 3: Get the total moisture error
+    drad = in_fsnt(i,c) - in_fsns(i,c) - in_flnt(i,c) + in_flns(i,c)
+    absrad = abs(in_fsnt(i,c)) - abs(in_fsns(i,c)) - abs(in_flnt(i,c)) + abs(in_flns(i,c))
+    errt = vdt - shf(i,c) - drad + vdq - lhf(i,c)
+    abstot = avdt + absrad
+#ifdef BRAINDEBUG
+    if (masterproc) then
+      write (555,*) 'errt = ', errt
+      write (555,*) 'avdt = ', avdt
+      write (555,*) 'absrad = ', absrad
+    endif
+#endif
+
+    ! Step 4: Apply the correction term
+    do k=1,pver
+      corr = errt * abs(idt(k)) / abstot
+      ptend(c)%s(i,k) = ptend(c)%s(i,k) - corr / state(c)%pdel(i,k) * gravit
+    end do
+    corr = errt * abs(in_fsnt(i,c)) / abstot
+    in_fsnt(i,c) = in_fsnt(i,c) + corr 
+    corr = errt * abs(in_fsns(i,c)) / abstot
+    in_fsns(i,c) = in_fsns(i,c) - corr
+    corr = errt * abs(in_flnt(i,c)) / abstot
+    in_flnt(i,c) = in_flnt(i,c) - corr
+    corr = errt * abs(in_flns(i,c)) / abstot
+    in_flns(i,c) = in_flns(i,c) + corr
+
+  end do  ! end column loop
+! end MSE if
+#endif
+  call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+  call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+  call outfld('PPPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+  call outfld('PPFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+  call outfld('PPFSNS',in_fsns(:ncol,c),pcols,lchnk)
+  call outfld('PPFLNT',in_flnt(:ncol,c),pcols,lchnk)
+  call outfld('PPFLNS',in_flns(:ncol,c),pcols,lchnk)
+! End energy fix
+#endif
+
+    call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
+    call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
+
 
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
@@ -2000,23 +2111,7 @@ end do
      call physics_update(state(c),tend(c),ptend(c),ztodt)
      
      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
-     
-     call outfld('BRAINRAIN',brainrain(:ncol,c),pcols,lchnk)
-     call outfld('BRAINOLR',brainolr(:ncol,c),pcols,lchnk)
 
-#ifdef BRAINDEBUG
-   do i=1,ncol
-     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-       write (555,*) 'STATE AFTER DTBRAIN: (P,s,T,Q,BRAINDT,BRAINDQ)'
-       do k=1,pver
-         write (555,'(F10.3,E14.7,E14.7,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
-         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1),braindt(i,k),braindq(i,k)
-       end do
-     endif
-   end do  
-#endif
    ! Apply tendencies, check energy.
 !     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
 !for later
@@ -2190,10 +2285,12 @@ endif ! not first step.
    call outfld('PRECTEND',prectend(:,c)  ,pcols   ,lchnk       )
    call outfld('PRECSTEND',precstend(:,c)  ,pcols   ,lchnk       )
 #endif
-   
+
+#ifndef CLOUDBRAIN
    prect(:ncol,c) = precc(:ncol,c) + precl(:ncol,c)
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
+#endif
 
 #if ( defined COUP_CSM )
    call outfld('PRECLav ',precl(:,c)   ,pcols   ,lchnk   )

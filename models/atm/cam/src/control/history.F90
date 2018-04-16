@@ -6170,12 +6170,27 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNTBP','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNQBP','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVBP','K     ',pver, 'A','TC into NN',phys_decomp)
+
 ! SR: Additional debug outputs to check T at several stages
       call addfld ('TE ','_    ',1,    'A','Total energy after CBRAIN/SP',phys_decomp)
       call addfld ('TW ','_    ',1,    'A','Total water after CBRAIN/SP',phys_decomp)
 
       call addfld ('NNDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
       call addfld ('NNDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)
+      call addfld ('NNFSNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFSNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFLNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+
+      call addfld ('PPDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
+      call addfld ('PPDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)
+      call addfld ('PPFSNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFSNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFLNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
+
       call addfld ('dTdtadia','K/s',pver,'A','Internally estimated adiabatic T tendency entering net',phys_decomp)
       call addfld ('dQdtadia','kg/kg/s',pver,'A','Internally estimated adiabatic Q tendency entering net',phys_decomp)
       call addfld ('CMFDQR  ','kg/kg/s ',pver, 'A','Q tendency - shallow convection rainout',phys_decomp)

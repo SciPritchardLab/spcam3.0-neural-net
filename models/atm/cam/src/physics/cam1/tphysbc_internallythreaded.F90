@@ -4,7 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 #define BRAINDEBUG
-#define BRAINENERGYFIX
+#define MOISTUREFIX
+#define MSEFIX
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -120,7 +121,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                QBP(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver), &
                idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq, abstot, &
-               corr, drad, absrad, errt
+               corr, drad, absrad, errt(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -1944,6 +1945,10 @@ end do
      call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
   end do
    if ( is_first_step()) then
+      ptend(c)%q(:,:,1) = 0.  ! necessary?
+      ptend(c)%q(:,:,ixcldliq) = 0.
+      ptend(c)%q(:,:,ixcldice) = 0.
+      ptend(c)%s(:,:) = 0. ! necessary?
       call init_keras_norm()
 #ifndef DEEP
       call init_keras_matrices_base()
@@ -1990,7 +1995,7 @@ end do
     call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
 
 
-#ifdef BRAINENERGYFIX
+#ifdef MOISTUREFIX
   
   !!!!! PART 1: MOISTURE FIX !!!!!!!
   do i=1,ncol
@@ -2026,7 +2031,7 @@ end do
     corr = errq * abs(NNPRECT(i,c)*1e3) / abstot
     NNPRECT(i,c) = NNPRECT(i,c) - corr/1e3
 end do ! column loop
-
+#endif
 
 #ifdef MSEFIX
   !!!!!!!!! PART 2: MSE FIX !!!!!!!!!!!!!!!
@@ -2051,12 +2056,12 @@ end do ! column loop
 
     ! Step 3: Get the total moisture error
     drad = in_fsnt(i,c) - in_fsns(i,c) - in_flnt(i,c) + in_flns(i,c)
-    absrad = abs(in_fsnt(i,c)) - abs(in_fsns(i,c)) - abs(in_flnt(i,c)) + abs(in_flns(i,c))
-    errt = vdt - shf(i,c) - drad + vdq - lhf(i,c)
+    absrad = abs(in_fsnt(i,c)) + abs(in_fsns(i,c)) + abs(in_flnt(i,c)) + abs(in_flns(i,c))
+    errt(i,c) = vdt - shf(i,c) - drad + vdq - lhf(i,c)
     abstot = avdt + absrad
 #ifdef BRAINDEBUG
     if (masterproc) then
-      write (555,*) 'errt = ', errt
+      write (555,*) 'errt = ', errt(i,c)
       write (555,*) 'avdt = ', avdt
       write (555,*) 'absrad = ', absrad
     endif
@@ -2064,21 +2069,22 @@ end do ! column loop
 
     ! Step 4: Apply the correction term
     do k=1,pver
-      corr = errt * abs(idt(k)) / abstot
+      corr = errt(i,c) * abs(idt(k)) / abstot
       ptend(c)%s(i,k) = ptend(c)%s(i,k) - corr / state(c)%pdel(i,k) * gravit
     end do
-    corr = errt * abs(in_fsnt(i,c)) / abstot
+    corr = errt(i,c) * abs(in_fsnt(i,c)) / abstot
     in_fsnt(i,c) = in_fsnt(i,c) + corr 
-    corr = errt * abs(in_fsns(i,c)) / abstot
+    corr = errt(i,c) * abs(in_fsns(i,c)) / abstot
     in_fsns(i,c) = in_fsns(i,c) - corr
-    corr = errt * abs(in_flnt(i,c)) / abstot
+    corr = errt(i,c) * abs(in_flnt(i,c)) / abstot
     in_flnt(i,c) = in_flnt(i,c) - corr
-    corr = errt * abs(in_flns(i,c)) / abstot
+    corr = errt(i,c) * abs(in_flns(i,c)) / abstot
     in_flns(i,c) = in_flns(i,c) + corr
 
   end do  ! end column loop
 ! end MSE if
 #endif
+  call outfld('ERRT',errt(:ncol,c),pcols,lchnk)
   call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
   call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
   call outfld('PPPRECT',NNPRECT(:ncol,c),pcols,lchnk)
@@ -2086,8 +2092,7 @@ end do ! column loop
   call outfld('PPFSNS',in_fsns(:ncol,c),pcols,lchnk)
   call outfld('PPFLNT',in_flnt(:ncol,c),pcols,lchnk)
   call outfld('PPFLNS',in_flns(:ncol,c),pcols,lchnk)
-! End energy fix
-#endif
+
 
     call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
     call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)

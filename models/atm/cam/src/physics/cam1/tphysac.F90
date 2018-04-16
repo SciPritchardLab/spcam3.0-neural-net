@@ -2,6 +2,7 @@
 #include <params.h>
 !#define BRAINCTRLFLUX
 #define CLOUDBRAIN
+#define NODTVKE
 subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                     taux,    tauy,    cflx,    sgh,    lhf,  &
                     landfrac,snowh,   tref,    precc,  precl,&
@@ -187,7 +188,7 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                  cflx     ,pblh     ,tpert    ,qpert    , surfric  ,&
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
 ! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
-#ifdef CLOUDBRAIN
+#ifdef NODTVKE
 ! I think this should still be active for te fluxbypass version
 ! There DTV and VD01 are not applied, but DTVKE is still
 ! But we are also predicting this, so I think we should set it to zero.

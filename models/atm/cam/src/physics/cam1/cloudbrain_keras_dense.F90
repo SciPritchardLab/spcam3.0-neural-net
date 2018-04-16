@@ -13,7 +13,7 @@ module cloudbrain_keras_dense
 use shr_kind_mod,    only: r8 => shr_kind_r8
 use ppgrid,          only: pcols, pver, pverp
 use history,         only: outfld, addfld, add_default, phys_decomp
-use physconst,       only: gravit,cpair
+use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
 
   implicit none
@@ -467,7 +467,7 @@ end do
 ! Unstack the output variables and unit convert them back
 ! [TPHYSTND, PHQ]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
-   PHQ(k1:k2) = output((nlev+1):2*nlev)/2.5e6 ! W/kg --> kg/kg/s
+   PHQ(k1:k2) = output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
 
   end subroutine cloudbrain_deep
 

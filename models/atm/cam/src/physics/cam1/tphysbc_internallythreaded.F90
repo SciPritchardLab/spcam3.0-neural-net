@@ -1984,67 +1984,7 @@ end do
       call outfld('NNDQ',braindq,pcols,lchnk) 
      braindt = ptend(c)%s(:ncol,:pver)/cpair 
      call outfld('NNDT',braindt,pcols,lchnk) 
-     !call outfld('QRL',qrl(:,:,c)/cpair,pcols,lchnk)
-     !call outfld('QRS',qrs(:,:,c)/cpair,pcols,lchnk)
-! SR: We will also not do the energy fix for now since we don't have all the necessary variables anyway
-! #ifdef BRAINENERGYFIX
-!       do i=1,ncol
 
-
-! !  stage 1) apply the moisture budget constraint
-!          spdq_vint = 0.
-!          spdq_abs_vint = 0.
-!          vd01_vint = 0.
-!          do k=1,pver
-!            spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)      
-!            spdq_abs_vint = spdq_abs_vint + abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)      
-!            vd01_vint = vd01_vint + latvap*rgrav*state(c)%vd01(i,k)*state(c)%pdel(i,k)
-!          end do
-! !         if (abs(spdq_vint) .gt. 1.e-2) then
-!            ! W/m^2 excess moistening:
-!            column_moistening_excess = spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
-!            ! Spread it according to absolute value of tendency profile.
-!            do k=1,pver
-!              ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - (column_moistening_excess/rgrav/latvap/state(c)%pdel(i,k))* & ! W/m-> --> kg/kg/s
-!                                                       abs(ptend(c)%q(i,k,1))*state(c)%pdel(i,k)/spdq_abs_vint ! spread it
-!            end do
-! ! stage 2) now use the corrected SPDQ with the MSE budget to predict the heating
-! ! rate that is self consistent.
-!           spdq_vint = 0.
-!           spdt_vint = 0.
-!           spdt_abs_vint = 0.
-!           dtv_vint = 0.
-!           do k=1,pver
-!             spdq_vint = spdq_vint + latvap*rgrav*ptend(c)%q(i,k,1)*state(c)%pdel(i,k)
-!             spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k)
-!             spdt_abs_vint = spdt_abs_vint +abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)
-!             dtv_vint = dtv_vint + cpair*rgrav*state(c)%dtv(i,k)*state(c)%pdel(i,k) ! checked assumption dtv in K/s
-!           end do
-! !         write (6,*) 'HEY excess before,after=',column_moistening_excess,spdq_vint + vd01_vint - lhf(i,c) + brainrain(i,c)*1.e3*latvap
-! !         (sanity check on stage 1, looks good). 
-!           column_heating_excess = spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
-!            ! Spread it according to absolute value of tendency profile.
-!            do k=1,pver
-!              ptend(c)%s(i,k) = ptend(c)%s(i,k) - (column_heating_excess/rgrav/state(c)%pdel(i,k))* & ! W/m-> -->
-!                                                       abs(ptend(c)%s(i,k))*state(c)%pdel(i,k)/spdt_abs_vint
-! ! spread it
-!            end do
-!           spdt_vint = 0.
-!           do k=1,pver
-!            spdt_vint = spdt_vint + rgrav*ptend(c)%s(i,k)*state(c)%pdel(i,k) 
-!           end do
-! !           write (6,*) 'HEY heat excess before,after=',column_heating_excess,spdt_vint + dtv_vint - shf(i,c) - lhf(i,c) - spdq_vint - vd01_vint
-! !         end if 
-
-
-
-! ! ---- end energy fixer attempt
-!       end do ! end column loop
-!       braindq = ptend(c)%q(:ncol,:pver,1)
-!       call outfld('BRAINDQ2',braindq,pcols,lchnk) 
-!      braindt = ptend(c)%s(:ncol,:pver)/cpair 
-!      call outfld('BRAINDT2',braindt,pcols,lchnk) 
-! #endif ! BRAINENERGYFIX
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
      ptend(c)%name  = 'cloudbrain'

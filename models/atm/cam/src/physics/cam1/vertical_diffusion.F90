@@ -2,7 +2,7 @@
 #include <params.h>
 ! CLOUDBRAIN only writes out some output here
 #define CLOUDBRAIN
-#define SPFLUXBYPASS
+!#define SPFLUXBYPASS
 module vertical_diffusion
 
 !---------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 !#define BRAINDEBUG
 !#define NOADIAB
 !#define DEEP
-#define SPFLUXBYPASS
+!#define SPFLUXBYPASS
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS

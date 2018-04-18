@@ -702,7 +702,7 @@ subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_unif
         endif
 
         if(sst_option == 11) then   ! CSU GCM aqua-planet; Marat Khairoutdinov
-           if (aqua_AndKua) then 
+           if (aqua_AndKua .or. aqua_3KW1) then 
               ! pritch; apply Andersen & Kuang (2012) formulation.
              do j = 1,plat
 			IF (clat(j)/pio180 .lt. -60. .or. clat(j)/pio180.gt. 60.) THEN
@@ -718,24 +718,20 @@ subroutine sstint(prev_timestep, aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_unif
                   xvar(i,j,1) = sst_aqua(i,j)
                  end do
              end do 
-           else if (aqua_3KW1) then 
+            if (aqua_3KW1) then 
               do j = 1,plat
                 do i=1,nlon(j)
-                  ! First the symmetric control profile
-                  if (clat(j) .gt. (pi/-3.) .and. clat(j) .lt. (pi/3.)) then
-                    sst_aqua(i,j) = 27. * (1. - sin(3*clat(j)/2.)**2)
-                  else
-                    sst_aqua(i,j) = 0.
-                  end if 
-                  ! The add the wavenumber perturbation
-                  if (clat(j) .gt. (-30.*pio180) .and. clat(j) .lt. (30.*pio180)) then
-                    sst_aqua(i,j) = sst_aqua(i,j) + 3. * cos(clon(i,j) - 0.) * cos(pi/2. * clat(j)/(30.*pio180))**2
+                  ! Add the wavenumber perturbation shifted as and kua profile
+                  if (clat(j) .gt. (-25.*pio180) .and. clat(j) .lt. (35.*pio180)) then
+                    sst_aqua(i,j) = sst_aqua(i,j) + 3. * cos(clon(i,j) - 0.) * &
+                                    cos(pi/2. * (clat(j)-5.*pio180)/(30.*pio180))**2
                   end if
                   ! Finally add offset
                   sst_aqua(i,j) = sst_aqua(i,j) + aqua_uniform_sst_degC
                   xvar(i,j,1) = sst_aqua(i,j)
                 end do
               end do
+            endif
            else if (aqua_uniform) then
              do j=1,plat
                do i=1,nlon(j)

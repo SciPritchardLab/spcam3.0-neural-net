@@ -2083,8 +2083,8 @@ end do ! column loop
 
   end do  ! end column loop
 ! end MSE if
-#endif
   call outfld('ERRT',errt(:ncol,c),pcols,lchnk)
+#endif
   call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
   call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
   call outfld('PPPRECT',NNPRECT(:ncol,c),pcols,lchnk)

@@ -1,5 +1,7 @@
 #include <misc.h>
 #include <params.h>
+! Skip over longwave computation, keep shortwave for SOLIN
+#define CLOUDBRAIN
 
 subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
                   lwup    ,emis    ,          &
@@ -392,6 +394,8 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
 !
 ! Longwave radiation computation
 !
+!SR: Don't need longwave for cloudbrain.
+#ifndef CLOUDBRAIN
 #ifdef CRM
    if (do_lw) then
 #else
@@ -493,6 +497,8 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
      end if
 !
    end if
+   ! SR: Endif CLOUDBRAIN
+#endif
 !
 #ifdef CRM
    qm1(ncol1:ncol,:pver,1) = qm2(ncol1:ncol,:pver)

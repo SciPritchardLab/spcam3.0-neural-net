@@ -4,8 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
-#define MOISTUREFIX
-#define MSEFIX
+!#define MOISTUREFIX
+!#define MSEFIX
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS

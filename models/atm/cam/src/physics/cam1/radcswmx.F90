@@ -1,5 +1,6 @@
 #include <misc.h>
 #include <params.h>
+#define CLOUDBRAIN
 subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
                     pint    ,pmid    ,h2ommr  ,rh      ,o3mmr   , &
                     aermmr  ,cld     ,cicewp  ,cliqwp  ,rel     , &
@@ -813,6 +814,7 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
          do k=1,pverp
             pflx(i,k) = pint(i,k)
          end do
+#ifndef CLOUDBRAIN
 ! 
 ! Compute optical paths:
 ! 
@@ -1932,6 +1934,8 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
 ! 
 ! End do n=1,ndayc
 ! 
+! End ifdef CLOUDBRAIN
+#endif
    end do
 
 !  write (6, '(a, x, i3)') 'radcswmx : exiting, chunk identifier', lchnk

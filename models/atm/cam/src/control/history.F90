@@ -6191,6 +6191,7 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('PPFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
       call addfld ('PPPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
       call addfld ('ERRT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
+      call addfld ('ERRQ','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
 
       call addfld ('dTdtadia','K/s',pver,'A','Internally estimated adiabatic T tendency entering net',phys_decomp)
       call addfld ('dQdtadia','kg/kg/s',pver,'A','Internally estimated adiabatic Q tendency entering net',phys_decomp)

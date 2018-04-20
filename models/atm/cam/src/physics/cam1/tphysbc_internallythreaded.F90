@@ -4,8 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 !#define BRAINDEBUG
-!#define MOISTUREFIX
-!#define MSEFIX
+#define MOISTUREFIX
+#define MSEFIX
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -120,7 +120,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver), &
-               idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq, abstot, &
+               idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq(pcols,begchunk:endchunk), abstot, &
                corr, drad, absrad, errt(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
@@ -1956,24 +1956,26 @@ end do
       call init_keras_matrices_deep()
 #endif
    else
-  ! SR: This is where the OMP statement used to be, but that messed up the writing of the output fields below.
-    do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
-      lchnk = state(c)%lchnk   ! This was missing for some reason...
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
 	    ncol  = state(c)%ncol
 
- 
-   call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
-   call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-   call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
-   call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
+      call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
+      call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
+      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
+    end do
 
+!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
+	    ncol  = state(c)%ncol
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
 ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
 ! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 !                                       TPHYSTND, PHQ, icol)
-
-  call cloudbrain_deep(        TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+        call cloudbrain_deep(  TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
                                ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
@@ -1985,20 +1987,27 @@ end do
          ! i.e. shortwave and longwave heating rates
          ! They are separately wired to arterial ptend structures downstream.         
       end do ! end column loop
+    end do
 
-    call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-    call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-    call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-    call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
-    call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
-    call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
-    call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
+	    ncol  = state(c)%ncol
+      call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+      call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+      call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+      call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+      call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+      call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+      call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
 
 
 #ifdef MOISTUREFIX
   
   !!!!! PART 1: MOISTURE FIX !!!!!!!
   do i=1,ncol
+    ! Step 0: Set negative tendencies to 0
+    !ptend(c)%q(i,k,1) = max(ptend(c)%q(i,k,1), -1.*QBP(c,i,k)/ztodt)
+
     ! Step 1: Convert to energy stuff
     do k=1,pver
       idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav
@@ -2013,11 +2022,11 @@ end do
     end do
 
     ! Step 3: Get the total moisture error
-    errq = vdq - lhf(i, c)/latvap + NNPRECT(i, c)*1e3
+    errq(i,c) = vdq - lhf(i, c)/latvap + NNPRECT(i, c)*1e3
     abstot = avdq + abs(NNPRECT(i, c)*1e3)
 #ifdef BRAINDEBUG
     if (masterproc) then
-      write (555,*) 'errq = ', errq
+      write (555,*) 'errq = ', errq(i,c)
       write (555,*) 'avdq = ', avdq
       write (555,*) 'abs precl = ', abs(NNPRECT(i, c)*1e3)
     endif
@@ -2025,12 +2034,13 @@ end do
 
     ! Step 4: Apply the correction term
     do k=1,pver
-      corr = errq * abs(idq(k)) / abstot
+      corr = errq(i,c) * abs(idq(k)) / abstot
       ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - corr / state(c)%pdel(i,k) * gravit
     end do
-    corr = errq * abs(NNPRECT(i,c)*1e3) / abstot
+    corr = errq(i,c) * abs(NNPRECT(i,c)*1e3) / abstot
     NNPRECT(i,c) = NNPRECT(i,c) - corr/1e3
 end do ! column loop
+  call outfld('ERRQ',errq(:ncol,c),pcols,lchnk)
 #endif
 
 #ifdef MSEFIX
@@ -2082,8 +2092,8 @@ end do ! column loop
     in_flns(i,c) = in_flns(i,c) + corr
 
   end do  ! end column loop
-! end MSE if
   call outfld('ERRT',errt(:ncol,c),pcols,lchnk)
+! end MSE if
 #endif
   call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
   call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 

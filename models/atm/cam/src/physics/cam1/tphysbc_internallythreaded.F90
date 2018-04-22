@@ -3,7 +3,7 @@
 #define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
-!#define BRAINDEBUG
+#define BRAINDEBUG
 #define MOISTUREFIX
 #define MSEFIX
 !#define NOADIAB
@@ -541,13 +541,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
-#ifdef BRAINDEBUG
-   real(r8) :: braindebug_x1,braindebug_x2,braindebug_y1,braindebug_y2
-   braindebug_x1 = 180.*3.14159/180.
-   braindebug_x2 = 182.*3.14159/180.
-   braindebug_y1 = 0.
-   braindebug_y2 = 2.*3.14159/180.
-#endif
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
@@ -1013,24 +1006,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld(dcconnam(m),dqcond(1,1,m,c),pcols   ,lchnk )
       call outfld('DQCOND  ',dqcond(1,1,m,c),pcols   ,lchnk   )
    end do
-
-
-#ifdef BRAINDEBUG
-   call get_rlat_all_p(lchnk, ncol, clat(:,c))
-   call get_rlon_all_p(lchnk, ncol, clon(:,c))
-
-   do i=1,ncol
-     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-       write (666,*) 'STATE AFTER DTCOND:i (P,s,T,Q,DTCOND,DQCOND)'
-       do k=1,pver
-         write (666,'(F10.3,E14.7,E14.7,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
-         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1),dtcond(i,k,c),dqcond(i,k,1,c)
-       end do
-     endif
-   end do  
-#endif
 
 ! Compute total convective and stratiform precipitation and snow rates
    do i=1,ncol
@@ -1965,8 +1940,9 @@ end do
       call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
       call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
     end do
-
+#ifndef BRAINDEBUG
 !$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
+#endif
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
 	    ncol  = state(c)%ncol

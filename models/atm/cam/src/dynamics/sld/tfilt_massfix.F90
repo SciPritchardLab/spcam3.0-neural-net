@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-
+#define NOBETA
 subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
                           q3      ,q3m1    ,ps      ,cwava   ,alpha   , &
                           etamid  ,qfcst   ,div     ,phis    ,omga    , &
@@ -119,7 +119,11 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   do k=1,plev
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
+#ifdef NOBETA
+      t3m1    (i,k) = t3m1(i,k)
+#else
       t3m1    (i,k) = t3m1(i,k) + beta
+#endif
     end do
   end do
 !

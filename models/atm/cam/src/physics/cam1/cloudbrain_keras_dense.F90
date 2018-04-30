@@ -20,12 +20,12 @@ use pmgrid, only: masterproc
   
   save 
 ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
+! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, PRECS]
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
   integer, parameter :: inputlength = 94
-  integer, parameter :: outputlength = 65
+  integer, parameter :: outputlength = 66
   integer, parameter :: nchunk = 64
   ! 1st: BASE
 #ifndef DEEP
@@ -78,7 +78,7 @@ use pmgrid, only: masterproc
 
 
   subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                              TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, icol)
+                              TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, PRECS, icol)
     ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
     ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
     ! NN inputs
@@ -97,6 +97,7 @@ use pmgrid, only: masterproc
     real(r8), intent(out) :: FLNT
     real(r8), intent(out) :: FLNS
     real(r8), intent(out) :: PRECT
+    real(r8), intent(out) :: PRECS
 
     real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
@@ -366,6 +367,7 @@ end do
    FLNT =            output(2*nlev+3)/ (-1e-3)
    FLNS =            output(2*nlev+4)/ (1e-3)
    PRECT =           output(2*nlev+5)/ (1e3*24*3600*2e-2)
+   PRECS =           output(2*nlev+6)/ (1e3*24*3600*2e-2)
 
   end subroutine cloudbrain_deep
 

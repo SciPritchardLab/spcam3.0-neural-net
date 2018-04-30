@@ -58,7 +58,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use physics_types,   only: physics_state, physics_tend, physics_ptend, physics_update, physics_ptend_init
    use diagnostics,     only: diag_dynvar
    use history,         only: outfld, fillvalue
-   use physconst,       only: gravit, latvap, cpair, tmelt, cappa, zvir, rair, rga
+   use physconst,       only: gravit, latvap, latice, cpair, tmelt, cappa, zvir, rair, rga
    use radheat,         only: radheat_net
    use constituents,    only: pcnst, pnats, ppcnst, qmin
    use constituents,    only: dcconnam, cnst_get_ind
@@ -112,6 +112,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
                dQdt_adiab(begchunk:endchunk,pcols,pver),&
                NNPRECT(pcols,begchunk:endchunk),&
+               NNPRECS(pcols,begchunk:endchunk),&
                brainolr(pcols,begchunk:endchunk), &
                TC(begchunk:endchunk,pcols,pver), &
                QC(begchunk:endchunk,pcols,pver), &
@@ -1948,14 +1949,14 @@ end do
 	    ncol  = state(c)%ncol
       do i=1,ncol ! this is the loop over independent GCM columns.
 ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
+! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, PRECS]
 ! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 !                                       TPHYSTND, PHQ, icol)
         call cloudbrain_deep(  TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
                                ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
                                in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
-                               NNPRECT(i, c), i)
+                               NNPRECT(i, c), NNPRECS(i, c), i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
          ! (above upstream solution maintained). 
@@ -1971,6 +1972,7 @@ end do
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
       call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+      call outfld('NNPRECS',NNPRECS(:ncol,c),pcols,lchnk)
       call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
       call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
       call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
@@ -2074,6 +2076,7 @@ end do ! column loop
   call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
   call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
   call outfld('PPPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+  call outfld('PPPRECS',NNPRECS(:ncol,c),pcols,lchnk)
   call outfld('PPFSNT',in_fsnt(:ncol,c),pcols,lchnk)
   call outfld('PPFSNS',in_fsns(:ncol,c),pcols,lchnk)
   call outfld('PPFLNT',in_flnt(:ncol,c),pcols,lchnk)
@@ -2081,6 +2084,7 @@ end do ! column loop
 
 
     call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    call outfld('PRECS',NNPRECS(:ncol,c),pcols,lchnk)
     call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
     call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
     call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
@@ -2281,6 +2285,11 @@ endif ! not first step.
    prect(:ncol,c) = precc(:ncol,c) + precl(:ncol,c)
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
+#else
+   do i=1,ncol
+      tend(c)%flx_net(i) = tend(c)%flx_net(i) + + NNPRECT(i, c)*latvap*1.e3 &
+           + NNPRECS(i, c)*latice*1.e3
+   end do
 #endif
 
 #if ( defined COUP_CSM )

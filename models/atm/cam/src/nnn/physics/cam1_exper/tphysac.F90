@@ -1,5 +1,7 @@
 #include <misc.h>
 #include <params.h>
+! Flux net. Add precip in tphysbc
+#define CLOUDBRAIN
 
 subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                     taux,    tauy,    cflx,    sgh,    lhf,  &
@@ -115,10 +117,16 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
 ! accumulate fluxes into net flux array
 ! jrm Include latent heat of fusion for snow
 !
+#ifdef CLOUDBRAIN
    do i=1,ncol
+      tend%flx_net(i) = tend%flx_net(i) + shf(i)
+   end do
+#else
+  do i=1,ncol
       tend%flx_net(i) = tend%flx_net(i) + shf(i) + (precc(i) + precl(i))*latvap*rhoh2o &
            + (precsc(i) + precsl(i))*latice*rhoh2o
    end do
+#endif
 
 ! Initialize parameterization tendency structure
 

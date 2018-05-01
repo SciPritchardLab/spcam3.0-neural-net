@@ -37,7 +37,7 @@ subroutine scan2 (ztodt, cwava, etamid)
    use mpishorthand
    use physconst, only: cpair
    use history, only: write_inithist, inithist
-   use time_manager, only: get_step_size, get_curr_date, get_nstep
+   use time_manager, only: get_step_size, get_curr_date, get_nstep, is_first_step
    use infnan
 #ifdef CRM
    use runtime_opts, only: crminitsave, crmsavechunks
@@ -440,6 +440,9 @@ grqla(:,:,:) = inf
      beta = -residual*ztodt/(cpair*difft)
    else
      beta = 0.
+   endif
+   if (is_first_step()) then
+    beta = 0.
    endif
 !SR Add output here to check whether this is happening.
  ! call outfld('BETA', ,plond   ,lat     )  

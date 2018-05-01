@@ -1925,6 +1925,12 @@ end do
       ptend(c)%q(:,:,ixcldliq) = 0.
       ptend(c)%q(:,:,ixcldice) = 0.
       ptend(c)%s(:,:) = 0. ! necessary?
+      NNPRECT(:, c) = 0.
+      NNPRECS(:, c) = 0.
+      in_fsnt(:, c) = 0. 
+      in_fsns(:, c) = 0. 
+      in_flnt(:, c) = 0. 
+      in_flns(:, c) = 0.
       call init_keras_norm()
 #ifndef DEEP
       call init_keras_matrices_base()

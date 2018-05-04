@@ -6040,6 +6040,7 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       'Large-scale (stable) precipitation rate (less than '//trim(string)// &
       'mm/hr is set to zero -- to get intensity divide by PRECLFRQ)',phys_decomp)
       call addfld ('PRECT   ','m/s     ',1,    'A','Total (convective and large-scale) precipitation rate',phys_decomp)
+      call addfld ('PRECS   ','m/s     ',1,    'A','Total (convective and large-scale) precipitation rate',phys_decomp)
       call addfld ('BRAINRAIN','mm/day',1,'A','Neural net estimated rain rate (mm/day, I think',phys_decomp) 
       call addfld ('BRAINOLR','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
       call addfld ('NNSHF','W/m2',1,'A','SHF into NN',phys_decomp)
@@ -6146,6 +6147,8 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
      call addfld ('PV2PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of second component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
      call addfld ('PV3PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of third component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
 
+
+      call addfld ('FLXNET','K/s     ',1, 'A','T physics tendency',phys_decomp)
 
 ! MSP: for redundantly tracking total tendency after physics package (so we know MSE budget residual magnitude exactly)
       call addfld ('PVAP','(K m2/kg)/s',plev,'I','PV after physics',phys_decomp)

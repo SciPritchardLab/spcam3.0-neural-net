@@ -2228,7 +2228,18 @@ endif ! not first step.
 !
    do i=1,ncol
       tend(c)%flx_net(i) = in_fsnt(i,c) - in_fsns(i,c) - in_flnt(i,c) + in_flns(i,c)
+      if ( is_first_step()) then
+        tend(c)%flx_net(i) = 0.
+      endif
    end do
+
+      if (masterproc) then
+    write (6,*) 'flx_net = ',tend(c)%flx_net(:)
+    write (6,*) 'in_fsnt = ',in_fsnt(:,c)
+    write (6,*) 'in_fsns = ',in_fsns(:,c)
+    write (6,*) 'in_flnt = ',in_flnt(:,c)
+    write (6,*) 'in_flns = ',in_flns(:,c)
+  end if
 !
 ! Compute net radiative heating
 !
@@ -2293,9 +2304,14 @@ endif ! not first step.
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
 #else
    do i=1,ncol
-      tend(c)%flx_net(i) = tend(c)%flx_net(i) + + NNPRECT(i, c)*latvap*1.e3 &
+      tend(c)%flx_net(i) = tend(c)%flx_net(i) + NNPRECT(i, c)*latvap*1.e3 &
            + NNPRECS(i, c)*latice*1.e3
    end do
+   if (masterproc) then
+    write (6,*) 'flx_net = ',tend(c)%flx_net(:)
+    write (6,*) 'NNPRECT(:, c)*latvap*1.e3 = ',NNPRECT(:, c)*latvap*1.e3
+    write (6,*) 'NNPRECS(:, c)*latice*1.e3 = ',NNPRECS(:, c)*latice*1.e3
+  end if
 #endif
 
 #if ( defined COUP_CSM )

@@ -669,6 +669,11 @@ end do
          call outfld(qphystendnam(m),qphystend(1,1,m,c),pcols   ,c   )
       enddo
       call t_stopf ('tphysac')
+      
+      !SR: Add flx_net to output
+      call outfld('FLXNET',phys_tend(c)%flx_net(:ncol),pcols   ,c   )
+
+
      ! MSP added:
      ! Note that state%t IS UPDATED via tend@dtdt at the end of tphysac.
 #ifdef CLOUDBRAIN

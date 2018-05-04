@@ -6182,6 +6182,7 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNFLNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
       call addfld ('NNFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
       call addfld ('NNPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFSDS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
 
       call addfld ('PPDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
       call addfld ('PPDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)

@@ -24,8 +24,8 @@ use pmgrid, only: masterproc
   private
   ! Define the network architectures
   integer, parameter :: nlev = 30
-  integer, parameter :: inputlength = 94
-  integer, parameter :: outputlength = 65
+  integer, parameter :: inputlength = 64
+  integer, parameter :: outputlength = 62
   integer, parameter :: nchunk = 64
   ! 1st: BASE
 #ifndef DEEP
@@ -77,14 +77,13 @@ use pmgrid, only: masterproc
   contains
 
 
-  subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                              TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT, icol)
-    ! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-    ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
+  subroutine cloudbrain_deep (TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
+                              TPHYSTND, PHQ, FSDS, PRECT, icol)
+    ! - inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
+    ! - outputs : [TPHYSTND, PHQ, FSDS, PRECT]
     ! NN inputs
     real(r8), intent(in) :: TBP(pver)   
     real(r8), intent(in) :: QBP(pver)
-    real(r8), intent(in) :: VBP(pver)
     real(r8), intent(in) :: PS ! From t
     real(r8), intent(in) :: SOLIN ! From t
     real(r8), intent(in) :: SHFLX ! From t
@@ -92,10 +91,7 @@ use pmgrid, only: masterproc
     ! NN outputs
     real(r8), intent(out) :: TPHYSTND(pver) ! W/kg
     real(r8), intent(out) :: PHQ(pver) ! W/kg
-    real(r8), intent(out) :: FSNT
-    real(r8), intent(out) :: FSNS
-    real(r8), intent(out) :: FLNT
-    real(r8), intent(out) :: FLNS
+    real(r8), intent(out) :: FSDS
     real(r8), intent(out) :: PRECT
 
     real(r8) :: input(inputlength),x1(width), x2(width)
@@ -108,11 +104,10 @@ use pmgrid, only: masterproc
     k2=pver
     input(1:nlev)=TBP(k1:k2) 
     input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=VBP(k1:k2)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
+    input(2*nlev+1) = PS
+    input(2*nlev+2) = SOLIN
+    input(2*nlev+3) = SHFLX
+    input(2*nlev+4) = LHFLX
 
 #ifdef BRAINDEBUG
     if (masterproc .and. icol .eq. 1) then
@@ -361,11 +356,8 @@ end do
 ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
    PHQ(k1:k2) =      output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
-   FSNT =            output(2*nlev+1)/ (1e-3)
-   FSNS =            output(2*nlev+2)/ (-1e-3)
-   FLNT =            output(2*nlev+3)/ (-1e-3)
-   FLNS =            output(2*nlev+4)/ (1e-3)
-   PRECT =           output(2*nlev+5)/ (1e3*24*3600*2e-2)
+   FSDS =            output(2*nlev+1)/ (-1e-3)
+   PRECT =           output(2*nlev+2)/ (1e3*24*3600*2e-2)
 
   end subroutine cloudbrain_deep
 

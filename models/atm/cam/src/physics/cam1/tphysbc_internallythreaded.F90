@@ -4,8 +4,8 @@
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
 #define BRAINDEBUG
-#define MOISTUREFIX
-#define MSEFIX
+!#define MOISTUREFIX
+!#define MSEFIX
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -1939,6 +1939,11 @@ end do
       call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
       call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
       call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
+
+      in_fsnt(:ncol,c) = 0.
+      in_fsns(:ncol,c) = 0.
+      in_flnt(:ncol,c) = 0.
+      in_flns(:ncol,c) = 0.
     end do
 #ifndef BRAINDEBUG
 !$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
@@ -1947,14 +1952,14 @@ end do
       lchnk = state(c)%lchnk  
 	    ncol  = state(c)%ncol
       do i=1,ncol ! this is the loop over independent GCM columns.
-! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
-! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-!                                       TPHYSTND, PHQ, icol)
-        call cloudbrain_deep(  TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
+! subroutine cloudbrain_deep (TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
+!                               TPHYSTND, PHQ, FSDS, PRECT, icol)
+!     ! - inputs : [TBP, QBP, PS, SOLIN, SHFLX, LHFLX]
+!     ! - outputs : [TPHYSTND, PHQ, FSDS, PRECT]
+        call cloudbrain_deep(  TBP(c,i,:), QBP(c,i,:), PS(c,i), &
                                solin(i,c), shf(i,c), lhf(i,c), &
                                ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
+                               fsds(i, c), &
                                NNPRECT(i, c), i)
 
          ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
@@ -1971,10 +1976,7 @@ end do
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
       call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-      call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
-      call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
-      call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
-      call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+      call outfld('NNFSDS',in_fsnt(:ncol,c),pcols,lchnk)
 
 
 #ifdef MOISTUREFIX

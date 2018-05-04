@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-
+!#define NOBETA
 subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
                           q3      ,q3m1    ,ps      ,cwava   ,alpha   , &
                           etamid  ,qfcst   ,div     ,phis    ,omga    , &
@@ -58,6 +58,7 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   integer ifcnt                     ! Counter
   real(r8) qfcst1(plond,plev,pcnst) ! slt moisture forecast temporary
   real(r8) engycorr(plond,plev)   ! energy equivalent to T correction
+  real(r8) tmpbeta(plond,plev)   ! SR: for writing to history
   real(r8) rpmid (plond,plev)       ! 1./pmid
   real(r8) pdel  (plond,plev)       ! pdel(k)   = pint  (k+1)-pint  (k)
   real(r8) pint  (plond,plevp)      ! pressure at model interfaces (n  )
@@ -119,14 +120,20 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   do k=1,plev
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
-      t3m1    (i,k) = t3m1(i,k) + beta  ! SR: Turn on beta for snow version
+      tmpbeta(i,k) = beta
+#ifdef NOBETA
+      t3m1    (i,k) = t3m1(i,k)
+#else
+      t3m1    (i,k) = t3m1(i,k) + beta
+#endif
     end do
   end do
 !
 ! Output Energy correction term
+! SR: And beta, grrrrrr....
 !
   call outfld('ENGYCORR',engycorr ,plond   ,lat     )
-
+  call outfld('BETA',tmpbeta ,plond   ,lat     )
 !
 ! Compute q tendency due to mass adjustment
 ! If LFIXLIM = .T., then:

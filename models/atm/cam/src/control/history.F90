@@ -6120,6 +6120,7 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('CLDMED  ','fraction',1,    'A','Vertically-integrated mid-level cloud 700 mb > ptop > 400 mb',phys_decomp)
       call addfld ('CLDHGH  ','fraction',1,    'A','Vertically-integrated high cloud ptop < 400 mb',phys_decomp)
       call addfld ('ENGYCORR','W/m2    ',plev, 'A','Energy correction for over-all conservation',dyn_decomp)
+      call addfld ('BETA','K    ',plev, 'A','Energy correction for over-all conservation',dyn_decomp)
 !
 ! Put TS1 on history file since it will be different than TS in a coupled
 ! run

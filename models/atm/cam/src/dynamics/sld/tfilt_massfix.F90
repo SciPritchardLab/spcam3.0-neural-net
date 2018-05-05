@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-
+#define BETAFIX
 subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
                           q3      ,q3m1    ,ps      ,cwava   ,alpha   , &
                           etamid  ,qfcst   ,div     ,phis    ,omga    , &
@@ -116,10 +116,16 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
 !
 ! Add temperature correction for energy conservation
 !
+! SR: Hack
+!beta = 0.0005
   do k=1,plev
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
-      t3m1    (i,k) = t3m1(i,k)! + beta  ! SR: Comment out beta correction
+#ifdef BETAFIX
+      t3m1    (i,k) = t3m1(i,k) + 0.00025 ! + beta  ! SR: Comment out beta correction
+#else
+      t3m1    (i,k) = t3m1(i,k)
+#endif
     end do
   end do
 !

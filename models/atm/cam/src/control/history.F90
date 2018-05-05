@@ -2,7 +2,7 @@
 #include <params.h>
 ! MSP on Kraken Cray XT5. For mysterious reasons, history files do not write correctly
 ! Unless this is defined:
-#define HDEBUG 
+!#define HDEBUG 
 
 module history
 !----------------------------------------------------------------------- 

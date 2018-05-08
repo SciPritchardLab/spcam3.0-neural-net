@@ -172,7 +172,7 @@ contains
     ftem(:ncol,:) = state%t(:ncol,:)*state%t(:ncol,:)
     call outfld('TT      ',ftem    ,pcols   ,lchnk   )
 
-#if ( defined COUP_CSM )
+!#if ( defined COUP_CSM )
 !
 ! Output U, V, T, Q, P and Z at bottom level
 !
@@ -180,7 +180,7 @@ contains
     call outfld ('VBOT    ', state%v(1,pver)  ,  pcols, lchnk)
     call outfld ('QBOT    ', state%q(1,pver,1),  pcols, lchnk)
     call outfld ('ZBOT    ', state%zm(1,pver) , pcols, lchnk)
-#endif
+!#endif
 
     return
   end subroutine diag_dynvar

@@ -22,6 +22,7 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   use constituents, only: pcnst, pnats, qmin
   use constituents, only: tottnam
   use physconst, only: cpair, gravit
+  use runtime_opts, only: betafix
 
   implicit none
 
@@ -122,7 +123,7 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
 #ifdef BETAFIX
-      t3m1    (i,k) = t3m1(i,k) + 0.00025 ! + beta  ! SR: Comment out beta correction
+      t3m1    (i,k) = t3m1(i,k) + betafix ! + beta  ! SR: Comment out beta correction
 #else
       t3m1    (i,k) = t3m1(i,k)
 #endif

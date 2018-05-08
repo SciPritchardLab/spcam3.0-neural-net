@@ -537,7 +537,7 @@ module runtime_opts
   logical, public :: fluxdamp_equatoronly
 #endif
   logical, public :: aqua_uniform, aqua_AndKua, aqua_3KW1
-  real(r8), public :: aqua_uniform_sst_degC
+  real(r8), public :: aqua_uniform_sst_degC, betafix
 
   real(r8), public :: tau_t            ! time scale for nudging T  with analyses (seconds)
   real(r8), public :: tau_u            ! time scale for nudging u  with analyses (seconds)  
@@ -748,7 +748,7 @@ subroutine read_namelist
   fluxdampfac,fluxdamp_equatoronly,flux_dylat,flux_critlat_deg, &
 #endif
                     analyses_time_interp, less_surface_nudging, nudge_dse_not_T, &
-                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1
+                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix
 
 
 #endif
@@ -1823,6 +1823,7 @@ subroutine distnl
   call mpibcast (aqua_uniform_sst_degC, 1, mpir8, 0, mpicom) ! pritch
   call mpibcast (aqua_AndKua, 1,mpilog,0,mpicom)
   call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
+  call mpibcast (betafix, 1, mpir8, 0, mpicom) ! pritch
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'
 ! ASK   call flush(idjb_out)
@@ -2105,6 +2106,8 @@ subroutine preset
    aqua_uniform_sst_degC = 0.
    aqua_AndKua = .false.
    aqua_3KW1 = .false.
+
+   betafix = 0.
 #if ( defined COUP_CSM )
 !
 ! Communications with the flux coupler

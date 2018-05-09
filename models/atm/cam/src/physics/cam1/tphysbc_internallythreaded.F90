@@ -1976,8 +1976,8 @@ end do
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
       call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-      call outfld('NNFSDS',in_fsnt(:ncol,c),pcols,lchnk)
-      call outfld('FSDS',in_fsnt(:ncol,c),pcols,lchnk)
+      call outfld('NNFSDS',fsds(:ncol,c),pcols,lchnk)
+      call outfld('FSDS',fsds(:ncol,c),pcols,lchnk)
 
 
 #ifdef MOISTUREFIX

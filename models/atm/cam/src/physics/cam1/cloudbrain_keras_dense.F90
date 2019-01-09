@@ -361,11 +361,11 @@ end do
 ! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
    TPHYSTND(k1:k2) = output(1:nlev) ! W/kg
    PHQ(k1:k2) =      output((nlev+1):2*nlev)/(latvap+latice) ! W/kg --> kg/kg/s
-   FSNT =            output(2*nlev+1)/ (1e-3)
-   FSNS =            output(2*nlev+2)/ (-1e-3)
-   FLNT =            output(2*nlev+3)/ (-1e-3)
-   FLNS =            output(2*nlev+4)/ (1e-3)
-   PRECT =           output(2*nlev+5)/ (1e3*24*3600*2e-2)
+   FSNT =            output(2*nlev+1)/ (1e-3) * 10.
+   FSNS =            output(2*nlev+2)/ (-1e-3) * 10.
+   FLNT =            output(2*nlev+3)/ (-1e-3) * 10.
+   FLNS =            output(2*nlev+4)/ (1e-3) * 10.
+   PRECT =           output(2*nlev+5)/ (1e3*24*3600*2e-2) * 10.
 
   end subroutine cloudbrain_deep
 

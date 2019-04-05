@@ -538,6 +538,9 @@ module runtime_opts
 #endif
   logical, public :: aqua_uniform, aqua_AndKua, aqua_3KW1
   real(r8), public :: aqua_uniform_sst_degC, betafix
+! CLOUDBRAIN namelist variables: nn_nint, inputlength, outputlength, activation_type
+  integer, public :: nn_nint, inputlength, outputlength, activation_type
+
 
   real(r8), public :: tau_t            ! time scale for nudging T  with analyses (seconds)
   real(r8), public :: tau_u            ! time scale for nudging u  with analyses (seconds)  
@@ -748,7 +751,10 @@ subroutine read_namelist
   fluxdampfac,fluxdamp_equatoronly,flux_dylat,flux_critlat_deg, &
 #endif
                     analyses_time_interp, less_surface_nudging, nudge_dse_not_T, &
-                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix
+                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix, &
+! CLOUDBRAIN namelist variables: nn_nint, inputlength, outputlength, activation_type
+                    nn_nint, inputlength, outputlength, activation_type
+
 
 
 #endif
@@ -1824,6 +1830,11 @@ subroutine distnl
   call mpibcast (aqua_AndKua, 1,mpilog,0,mpicom)
   call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
   call mpibcast (betafix, 1, mpir8, 0, mpicom) ! pritch
+! CLOUDBRAIN namelist variables: nn_nint, inputlength, outputlength, activation_type
+  call mpibcast (nn_nint, 1, mpiint, 0, mpicom)
+  call mpibcast (inputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (outputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (activation_type, 1, mpiint, 0, mpicom)
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'
 ! ASK   call flush(idjb_out)
@@ -2106,6 +2117,11 @@ subroutine preset
    aqua_uniform_sst_degC = 0.
    aqua_AndKua = .false.
    aqua_3KW1 = .false.
+! CLOUDBRAIN namelist variables: nn_nint, inputlength, outputlength, activation_type
+   nn_nint = 5
+   inputlength = 94
+   outputlength = 65
+   activation_type = 1
 
    betafix = 0.
 #if ( defined COUP_CSM )

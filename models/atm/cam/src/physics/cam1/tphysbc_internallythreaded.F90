@@ -46,7 +46,16 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Author: CCM1, CMS Contact: J. Truesdale
 ! 
 !-----------------------------------------------------------------------
-     
+
+! CLOUDBRAIN assert statement
+#ifdef CLOUDBRAIN
+#ifndef CRM
+  write (6,*) 'YO  CLOUDBRAIN currently cant be defined without #define CRM'
+  call endrun
+#endif
+#endif
+
+
    use shr_kind_mod,    only: r8 => shr_kind_r8
    use ppgrid
    use pmgrid, only: masterproc,iam
@@ -555,9 +564,13 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
 #if defined (CRM) || defined (CLOUDBRAIN)
-! Full phy implementation
-! [TBP, QBP, VBP, PS, SOLIN, TS]
-! BP is defined as T at the beginning of time step before any physics updates
+! || means OR I guess
+! At this point the BP and adiabatic variables can be computed and stored for later
+! BP is defined as T at the beginning of time step before any physics update
+! PS also needs to be stored here?
+! Current version: PNAS with
+! Inputs: [QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+! Outputs: [PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT]
    do c=begchunk,endchunk
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
@@ -566,19 +579,20 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
           TBP(c,i,k) = state(c)%t(i,k)
           QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
           VBP(c,i,k) = state(c)%v(i,k)
-          dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
-          dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
    end do
+   ! Now write the variables to tape for debugging
    do c=begchunk,endchunk
-    ncol  = state(c)%ncol
+      ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
       call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
-      call outfld ('NNPS',PS(c,:ncol),pcols,lchnk)
+      call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -724,8 +738,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call t_stopf ('dadadj')
    call physics_update (state(c), tend(c), ptend(c), ztodt)
 
-!#if defined (CRM) || defined (CLOUDBRAIN)
-#ifdef CRM
+#if defined (CRM) || defined (CLOUDBRAIN)
+
 ! Save the state and tend variables to overwrite conventional physics effects
 ! leter before calling the superparameterization. Conventional moist
 ! physics is allowed to compute tendencies due to conventional
@@ -733,13 +747,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
     state_save(c) = state(c)
     tend_save(c) = tend(c)
+#endif
 
-#endif
-! SR: debug09 changes to make sure || statement was working
-#ifdef CLOUDBRAIN
-    state_save(c) = state(c)
-    tend_save(c) = tend(c)
-#endif
 !
 !===================================================
 ! Moist convection
@@ -923,18 +932,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                in_srfflx_state2d(c)%ts,      in_srfflx_state2d(c)%sst, state(c)%pint(1,pverp),       zdu(:,:,c),  in_ocnfrac(:,c), &
                rhdfda(:,:,c),   rhu00(:,:,c) , state(c)%phis)
    call t_stopf('cldnrh')
-!#if defined (CRM) || defined (CLOUDBRAIN)
-#ifdef CRM
-   call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
-   call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
-   call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
-#else
-   call outfld('CONCLD  ',concld(:,:,c), pcols,lchnk)
-   call outfld('CLDST   ',cldst(:,:,c),  pcols,lchnk)
-   call outfld('CNVCLD  ',clc(:,c),    pcols,lchnk)
-#endif
-!SR: Make sure
-#ifdef CLOUDBRAIN 
+#if defined (CRM) || defined (CLOUDBRAIN)
    call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
    call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
    call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
@@ -1029,7 +1027,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! send dynamical variables, and derived variables to history file
 !===================================================
 !
-!#ifndef CRM
 #if !defined(CRM) && !defined(CLOUDBRAIN)
    call diag_dynvar (lchnk, ncol, state(c))
 #endif
@@ -1084,22 +1081,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 ! Dump cloud field information to history tape buffer (diagnostics)
 !
-!#if defined (CRM) || defined (CLOUDBRAIN)
-#ifdef CRM
-      call outfld('_CLOUD  ',cld,  pcols,lchnk)
-      call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
-      call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)
-      call outfld('_CLDMED ',clmed(:,c)  ,pcols,lchnk)
-      call outfld('_CLDHGH ',clhgh(:,c)  ,pcols,lchnk)
-#else
-      call outfld('CLDTOT  ',cltot(:,c)  ,pcols,lchnk)
-      call outfld('CLDLOW  ',cllow(:,c)  ,pcols,lchnk)
-      call outfld('CLDMED  ',clmed(:,c)  ,pcols,lchnk)
-      call outfld('CLDHGH  ',clhgh(:,c)  ,pcols,lchnk)
-      call outfld('CLOUD   ',cld    ,pcols,lchnk)
-#endif
-!SR: Make sure
-#ifdef CLOUDBRAIN
+#if defined (CRM) || defined (CLOUDBRAIN)
       call outfld('_CLOUD  ',cld,  pcols,lchnk)
       call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
       call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)
@@ -1135,12 +1117,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      
 
 
-#ifdef CLOUDBRAIN
-#ifndef CRM
-  write (6,*) 'YO  CLOUDBRAIN currently cant be defined without #define CRM'
-  call endrun
-#endif
-#endif
+
 
 !INSERT or CLOUDBRAIN:
 #ifdef CRM
@@ -1316,7 +1293,7 @@ end do
    else
 
 #ifdef SPFLUXBYPASS
-#ifndef CLOUDBRAIN
+#ifndef CLOUDBRAIN  !SR: I don't think this is necessary because it is in a larger ifndef CLOUDBRAIN loop
  ! pritch -- apply surface flux perturbations to lowest level DSE,
  ! constituents here, right before superparameterization, insated of
  ! instead of in vertical diffusion routine. To avoid exposiing dycore to a
@@ -1905,66 +1882,70 @@ end do
   call t_stopf('crm')
 #endif ! ndef CLOUDBRAIN
 
+!========================================================
+!=================== CLOUDBRAIN =========================
+!========================================================
 #ifdef CLOUDBRAIN
-  ! SR: I am commenting out a lot of things I think are unneccessary.
-  ! As in SP, forget previous stuff (we will retain SP's qrl,qrs)
   call t_startf ('cloudbrain')
+
+  ! As in SP retrieve state at the start of routine
   do c=begchunk,endchunk
     state(c) = state_save(c)
     tend(c) = tend_save(c)
-     lchnk = state(c)%lchnk
-	   ncol  = state(c)%ncol
-! SR: TE, TW and S before BRAIN or SP
-     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
-     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
-     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+    lchnk = state(c)%lchnk
+    ncol  = state(c)%ncol
+    ! SR: TE, TW and S before BRAIN or SP
+    call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+    call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+    call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
   end do
-   if ( is_first_step()) then
-      ptend(c)%q(:,:,1) = 0.  ! necessary?
-      ptend(c)%q(:,:,ixcldliq) = 0.
-      ptend(c)%q(:,:,ixcldice) = 0.
-      ptend(c)%s(:,:) = 0. ! necessary?
-      call init_keras_norm()
-#ifndef DEEP
-      call init_keras_matrices_base()
-#else
-      call init_keras_matrices_deep()
-#endif
-   else
+
+  ! First time step
+  if ( is_first_step()) then
+    ! Set tendencies to zero at first step
+    ! I think this is only important for variables we are not using, e.g. liq and ice
+    ptend(c)%q(:,:,1) = 0.  ! necessary?
+    ptend(c)%q(:,:,ixcldliq) = 0.
+    ptend(c)%q(:,:,ixcldice) = 0.
+    ptend(c)%s(:,:) = 0. ! necessary?
+
+    ! Initialize network matrices
+    call init_keras_norm()  ! Normalization matrix
+    call init_keras_matrices()  ! Network matrices
+
+  ! For all other time steps
+  else
+    ! At this point write to tape the other input variable
+    ! Can't be in parallel loop
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
-	    ncol  = state(c)%ncol
-
+      ncol  = state(c)%ncol
+      
       call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
       call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-      call outfld ('NNSOLIN',solin(:ncol,c),pcols,lchnk)
-      call outfld ('NNTS',ts(:ncol,c),pcols,lchnk)
+      call outfld('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld('NNTS',ts(:ncol,c),pcols,lchnk)
     end do
+
+! Compute the networks in parallel except for debugging purposes, where the order is important
 #ifndef BRAINDEBUG
 !$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
 #endif
+
+    ! This is the main computation loop which is parallel
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
 	    ncol  = state(c)%ncol
-      do i=1,ncol ! this is the loop over independent GCM columns.
-! - inputs : [TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! - outputs : [TPHYSTND, PHQ, FSNT, FSNS, FLNT, FLNS, PRECT]
-! subroutine cloudbrain_deep (TBP, QBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-!                                       TPHYSTND, PHQ, icol)
-        call cloudbrain_deep(  TBP(c,i,:), QBP(c,i,:), VBP(c,i,:), PS(c,i), &
-                               solin(i,c), shf(i,c), lhf(i,c), &
-                               ptend(c)%s(i,:), ptend(c)%q(i,:,1), &
-                               in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
-                               NNPRECT(i, c), i)
 
-         ! Note that cloudbrain stomps on upstream QRS, QRL for k=nlev:pver
-         ! (above upstream solution maintained). 
-         ! Based on downstream logic, key is just that qrs and qrl arrays populated
-         ! i.e. shortwave and longwave heating rates
-         ! They are separately wired to arterial ptend structures downstream.         
+      do i=1,ncol ! this is the loop over independent GCM columns.
+        ! This is neural network
+        call cloudbrain(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
+                        i)         
       end do ! end column loop
     end do
 
+    ! Now save all the neural network outputs outside of parallel loop
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
 	    ncol  = state(c)%ncol
@@ -1976,156 +1957,34 @@ end do
       call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
       call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
 
-
-#ifdef MOISTUREFIX
-  
-  !!!!! PART 1: MOISTURE FIX !!!!!!!
-  do i=1,ncol
-    ! Step 0: Set negative tendencies to 0
-    !ptend(c)%q(i,k,1) = max(ptend(c)%q(i,k,1), -1.*QBP(c,i,k)/ztodt)
-
-    ! Step 1: Convert to energy stuff
-    do k=1,pver
-      idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav
-    end do
-
-    ! Step 2: Vertically integrate normal and absolute
-    vdq = 0.
-    avdq = 0.
-    do k=1,pver
-      vdq = vdq + idq(k)
-      avdq = avdq + abs(idq(k))
-    end do
-
-    ! Step 3: Get the total moisture error
-    errq(i,c) = vdq - lhf(i, c)/latvap + NNPRECT(i, c)*1e3
-    abstot = avdq + abs(NNPRECT(i, c)*1e3)
-#ifdef BRAINDEBUG
-    if (masterproc) then
-      write (555,*) 'errq = ', errq(i,c)
-      write (555,*) 'avdq = ', avdq
-      write (555,*) 'abs precl = ', abs(NNPRECT(i, c)*1e3)
-    endif
-#endif
-
-    ! Step 4: Apply the correction term
-    do k=1,pver
-      corr = errq(i,c) * abs(idq(k)) / abstot
-      ptend(c)%q(i,k,1) = ptend(c)%q(i,k,1) - corr / state(c)%pdel(i,k) * gravit
-    end do
-    corr = errq(i,c) * abs(NNPRECT(i,c)*1e3) / abstot
-    NNPRECT(i,c) = NNPRECT(i,c) - corr/1e3
-end do ! column loop
-  call outfld('ERRQ',errq(:ncol,c),pcols,lchnk)
-#endif
-
-#ifdef MSEFIX
-  !!!!!!!!! PART 2: MSE FIX !!!!!!!!!!!!!!!
-  do i=1,ncol
-    ! Step 1: Convert to energy stuff
-    do k=1,pver
-      idq(k) = ptend(c)%q(i,k,1) * state(c)%pdel(i,k) * rgrav * latvap
-      idt(k) = ptend(c)%s(i,k) * state(c)%pdel(i,k) * rgrav
-    end do
-
-    ! Step 2: Vertically integrate normal and absolute
-    vdq = 0.
-    avdq = 0.
-    vdt = 0.
-    avdt = 0.
-    do k=1,pver
-      vdq = vdq + idq(k)
-      avdq = avdq + abs(idq(k))
-      vdt = vdt + idt(k)
-      avdt = avdt + abs(idt(k))
-    end do
-
-    ! Step 3: Get the total moisture error
-    drad = in_fsnt(i,c) - in_fsns(i,c) - in_flnt(i,c) + in_flns(i,c)
-    absrad = abs(in_fsnt(i,c)) + abs(in_fsns(i,c)) + abs(in_flnt(i,c)) + abs(in_flns(i,c))
-    errt(i,c) = vdt - shf(i,c) - drad + vdq - lhf(i,c)
-    abstot = avdt + absrad
-#ifdef BRAINDEBUG
-    if (masterproc) then
-      write (555,*) 'errt = ', errt(i,c)
-      write (555,*) 'avdt = ', avdt
-      write (555,*) 'absrad = ', absrad
-    endif
-#endif
-
-    ! Step 4: Apply the correction term
-    do k=1,pver
-      corr = errt(i,c) * abs(idt(k)) / abstot
-      ptend(c)%s(i,k) = ptend(c)%s(i,k) - corr / state(c)%pdel(i,k) * gravit
-    end do
-    corr = errt(i,c) * abs(in_fsnt(i,c)) / abstot
-    in_fsnt(i,c) = in_fsnt(i,c) + corr 
-    corr = errt(i,c) * abs(in_fsns(i,c)) / abstot
-    in_fsns(i,c) = in_fsns(i,c) - corr
-    corr = errt(i,c) * abs(in_flnt(i,c)) / abstot
-    in_flnt(i,c) = in_flnt(i,c) - corr
-    corr = errt(i,c) * abs(in_flns(i,c)) / abstot
-    in_flns(i,c) = in_flns(i,c) + corr
-
-  end do  ! end column loop
-  call outfld('ERRT',errt(:ncol,c),pcols,lchnk)
-! end MSE if
-#endif
-  call outfld('PPDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-  call outfld('PPDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-  call outfld('PPPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-  call outfld('PPFSNT',in_fsnt(:ncol,c),pcols,lchnk)
-  call outfld('PPFSNS',in_fsns(:ncol,c),pcols,lchnk)
-  call outfld('PPFLNT',in_flnt(:ncol,c),pcols,lchnk)
-  call outfld('PPFLNS',in_flns(:ncol,c),pcols,lchnk)
-
-
-    call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
-    call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
-    call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
-    call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
-    call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
+      ! Redundant to have the separate NN outputs but let's leave it for now
+      call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+      call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
+      call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
+      call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
+      call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
 
 
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
-     ptend(c)%name  = 'cloudbrain'
-     ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
-     ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-     ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-     ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
-     ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
-     ptend(c)%lv    = .FALSE.
+      ptend(c)%name  = 'cloudbrain'
+      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+      ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+      ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
+      ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+      ptend(c)%lv    = .FALSE.
  
-     ! SR: New energy computation here
+      ! New energy computation here
+      call physics_update(state(c),tend(c),ptend(c),ztodt)
+      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
 
-     call physics_update(state(c),tend(c),ptend(c),ztodt)
-     
-     call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+      ! SR: I am not sure what this does.
+      call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
+      ! many things to history file tape.
 
-   ! Apply tendencies, check energy.
-!     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
-!for later
-      ! and water integrals of input state.
-! ----------
-!    check energy integrals
-!    INSERT update the water sink terms below once precip variables done.
-
-!     wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) +
-!prectend(:ncol,c)*1.e-3 ! include precip storage term
-!     icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) +
-!precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
-!     write(6,'(a,12e10.3)')'prect=',(prect(i),i=1,12)
-!     call check_energy_chng(state(c), tend(c), "crm", nstep, ztodt, zero,
-!wtricesink(:,c), icesink(:,c), zero)
-! -----------
-   call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
-   ! many things to history file tape.
-
-!    INSERT need to send precip, liquid water paths, other desired diags (mass
-!    fluxes?) to history file tapes at this stage, see SP outfld logic for inspiration. 
-  end do ! end chunk loop 
-endif ! not first step.
+    end do ! end chunk loop 
+  endif ! not first step.
   call t_stopf ('cloudbrain')
 #endif 
 ! END OF CLOUDBRAIN
@@ -2222,6 +2081,7 @@ endif ! not first step.
 !
 ! Compute net radiative heating
 !
+! SR Is this necessary?
    call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
 
      call outfld('TEPRE_R',state(c)%te_cur(:ncol),pcols,lchnk)

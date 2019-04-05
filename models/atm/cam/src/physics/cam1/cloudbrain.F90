@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -8,15 +8,23 @@ use ppgrid,          only: pcols, pver, pverp
 use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
-use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
+!use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type, width
 
-! Need nn_nint, inputlength, outputlength
 
   implicit none
   save 
 
   private
   ! Define variables for this entire module
+  integer, parameter :: nn_nint = 5
+  integer, parameter :: inputlength = 94
+  integer, parameter :: outputlength = 65
+  integer, parameter :: activation_type = 1
+  integer, parameter :: width = 256
+
+
+
+  ! Files to be used later
   real :: weights_inp(width, inputlength)
   real :: bias_inp(width)
   real :: weights_int(nn_nint, width, width)
@@ -27,10 +35,11 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
   real :: inp_div(inputlength)
   real :: out_scale(outputlength)
 
+  public neural_net, init_keras_matrices, init_keras_norm
 
   contains
 
-  subroutine cloudbrain (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
@@ -54,72 +63,72 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
     ! Allocate utilities
     real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
-    integer :: k, nlev
+    integer :: k, nlev, n
     integer, intent(in) :: icol
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev)=TBP(k1:k2) 
-    input((nlev+1):2*nlev)=QBP(k1:k2)
-    input((2*nlev+1):3*nlev)=VBP(k1:k2)
+    input(1:nlev)=TBP(:) 
+    input((nlev+1):2*nlev)=QBP(:)
+    input((2*nlev+1):3*nlev)=VBP(:)
     input(3*nlev+1) = PS
     input(3*nlev+2) = SOLIN
     input(3*nlev+3) = SHFLX
     input(3*nlev+4) = LHFLX
-    #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input
       endif
-    #endif
+#endif
 
     ! 2. Normalize input
     do k=1,inputlength
       input(k) = (input(k) - inp_sub(k))/inp_div(k)
     end do
-    #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input post norm=',input
       endif
-    #endif
+#endif
 
     ! 3. Neural network matrix multiplications and activations
     ! 3.1 1st layer: input length-->256.
-    matmul(input, x1, inputlength, width, weights_inp, bias_inp, activation_type)
-    #ifdef BRAINDEBUG
+    call matmul(input, x1, inputlength, width, weights_inp, bias_inp, activation_type)
+#ifdef BRAINDEBUG
         if (masterproc .and. icol .eq. 1) then
           write (6,*) 'BRAINDEBUG layer = ',1
           write (6,*) 'BRAINDEBUG output = ',x1
         endif
-      #endif
+#endif
     ! 3.2 Intermediate layers
     do n=1,nn_nint
-      matmul(x1, x2, width, width, weights_int(n, :, :), bias_int(n, :), activation_type)
+      call matmul(x1, x2, width, width, weights_int(n, :, :), bias_int(n, :), activation_type)
       x1(:) = x2(:)
-      #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
         if (masterproc .and. icol .eq. 1) then
           write (6,*) 'BRAINDEBUG layer = ',n+1
           write (6,*) 'BRAINDEBUG output = ',x1
         endif
-      #endif
+#endif
     end do
     ! 3.3 Last layer with linear activation
-    matmul(x1, output, width, outputlength, weights_out, bias_out, 0)
-    #ifdef BRAINDEBUG
+    call matmul(x1, output, width, outputlength, weights_out, bias_out, 0)
+#ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG layer = ',nn_nint+2
         write (6,*) 'BRAINDEBUG output = ',output
       endif
-    #endif
+#endif
 
     ! 4. Unnormalize output
     do k=1,outputlength
       output(k) = output(k) / out_scale(k)
     end do
-    #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG out post scale = ',output
       endif
-    #endif
+#endif
 
     ! 5. Split output into components
     PHQ(:) =      output(1:nlev)
@@ -130,7 +139,7 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
     FLNS =        output(2*nlev+4)
     PRECT =       output(2*nlev+5)
 
-  end subroutine cloudbrain
+  end subroutine neural_net
 
 
   subroutine matmul(inp, out, len_in, len_out, weights, bias, act_type)
@@ -153,7 +162,7 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
     end do
 
     if (act_type .eq. 1) then
-      leaky_relu(out, len_out, 0.3)
+      call leaky_relu(out, len_out, 0.3)
     end if
 
   end subroutine matmul
@@ -162,7 +171,8 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
   subroutine leaky_relu(x, len, alpha)
     real, intent(inout)    :: x(len)
     integer, intent(in)    :: len
-    real, intent(in)    :: alpha
+    real, intent(in)       :: alpha
+    integer                :: k
     do k=1,len
       x(k) = max(alpha * x(k), x(k))  ! Leaky ReLU
     end do
@@ -195,16 +205,16 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
       read(555,*) weights_inp(k,:)
     end do
     close (555)
-    #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
       if (masterproc) then
         write (6,*) 'BRAINDEBUG weights_inp = ',weights_inp
         write (6,*) 'BRAINDEBUG bias_inp = ',bias_inp
       endif
-    #endif
+#endif
 
     ! 2. Intermediate layers
     do n=1,nn_nint
-      write (str, 'I1') n+1
+      write (str, '(I1)') n+1
       write (6,*) 'CLOUDBRAIN: reading layer*_bias', n+1, pref//trim(str)//suf_bias
       open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
       if (ios .ne. 0) then
@@ -219,16 +229,16 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
         read(555,*) weights_int(n, k,:)
       end do
       close (555)
-      #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
         if (masterproc) then
           write (6,*) 'BRAINDEBUG weights_* = ',n+1, weights_int(n, k,:)
           write (6,*) 'BRAINDEBUG bias_* = ',n+1, bias_int(n, :)
         endif
-      #endif
+#endif
     end do
 
     ! 3. Output layer
-    write (str, 'I1') nn_nint+1
+    write (str, '(I1)') nn_nint+1
     write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', n+1, pref//trim(str)//suf_bias
     open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
     if (ios .ne. 0) then
@@ -243,12 +253,12 @@ use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type
       read(555,*) weights_out(k,:)
     end do
     close (555)
-    #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
       if (masterproc) then
         write (6,*) 'BRAINDEBUG weights_out = ',weights_out
         write (6,*) 'BRAINDEBUG bias_out = ',bias_out
       endif
-    #endif
+#endif
 
   end subroutine init_keras_matrices
     
@@ -260,39 +270,39 @@ subroutine init_keras_norm()
   open (unit=555,file='./keras_matrices/inp_sub.txt',status='old',action='read')
   read(555,*) inp_sub(:)
   close (555)
-  #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
     if (masterproc) then
       write (6,*) 'BRAINDEBUG inp_sub = ',inp_sub
     endif
-  #endif
+#endif
 
   ! 2. Read div
   write (6,*) 'CLOUDBRAIN: reading inp_div'
   open (unit=555,file='./keras_matrices/inp_div.txt',status='old',action='read')
   read(555,*) inp_div(:)
   close (555)
-  #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
     if (masterproc) then
       write (6,*) 'BRAINDEBUG inp_div = ',inp_div
     endif
-  #endif
+#endif
 
   ! 3. Read out_scale
   write (6,*) 'CLOUDBRAIN: reading out_scale'
   open (unit=555,file='./keras_matrices/out_scale.txt',status='old',action='read')
   read(555,*) out_scale(:)
   close (555)
-  #ifdef BRAINDEBUG
+#ifdef BRAINDEBUG
     if (masterproc) then
       write (6,*) 'BRAINDEBUG out_scale = ',out_scale
     endif
-  #endif
+#endif
 
   end subroutine init_keras_norm
 
   
 
-end module cloudbrain_keras_dense
+end module cloudbrain
 
 
 

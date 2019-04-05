@@ -1,13 +1,16 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Fri Apr  5 06:54:33 CDT 2019 on login1.stampede2.tacc.utexas.edu   \n\
+Libraries compiled on Fri Apr  5 07:50:38 CDT 2019 on login1.stampede2.tacc.utexas.edu   \n\
 Machine characteristics: Linux login1.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc  -openmp  -O  -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
 C Compiler version:  \n\
-icc: command line error: option '-openmp' is not supported. Please use the replacement option '-qopenmp'  \n\
+icc: command line remark #10411: option '-openmp' is deprecated and will be removed in a future release. Please use the replacement option '-qopenmp'  \n\
+icc (ICC) 17.0.4 20170411  \n\
+Copyright (C) 1985-2017 Intel Corporation.  All rights reserved.  \n\
+  \n\
 C++ Compiler version:  \n\
-icc (ICC) 18.0.2 20180210  \n\
-Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.  \n\
+icc (ICC) 17.0.4 20170411  \n\
+Copyright (C) 1985-2017 Intel Corporation.  All rights reserved.  \n\
   \n\
 Using Fortran compiler: mpif90 -openmp  -O -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                           \n\
 Fortran Compiler version:  \n\
@@ -62,10 +65,6 @@ The following environment variables are used:  \n\
    I_MPI_LINK      specify the version of the Intel(R) MPI Library  \n\
    I_MPI_DEBUG_INFO_STRIP  \n\
                    turn on/off the debug information stripping during static linking  \n\
-   I_MPI_FCFLAGS  \n\
-                   special flags needed for compilation  \n\
-   I_MPI_LDFLAGS   \n\
-                   special flags needed for linking  \n\
 ----------------------------------------------------------------------------  \n\
 -----------------------------------------  \n\
 Using ESMF flags:                       \n\

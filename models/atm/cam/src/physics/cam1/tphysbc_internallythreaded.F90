@@ -101,11 +101,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-#ifdef DEEP
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_deep, cloudbrain_deep
-#else
-    use cloudbrain_keras_dense, only: init_keras_norm, init_keras_matrices_base, cloudbrain_base
-#endif
+    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net
 #endif
    implicit none
 
@@ -1938,8 +1934,8 @@ end do
 	    ncol  = state(c)%ncol
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-        ! This is neural network
-        call cloudbrain(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        ! This is the neural network
+        call neural_net(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
                         i)         
       end do ! end column loop

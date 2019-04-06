@@ -3,7 +3,7 @@
 #define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
-!#define BRAINDEBUG
+#define BRAINDEBUG
 !#define MOISTUREFIX
 !#define MSEFIX
 !#define NOADIAB

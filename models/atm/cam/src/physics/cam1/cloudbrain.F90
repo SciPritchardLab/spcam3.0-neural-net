@@ -16,7 +16,7 @@ use pmgrid, only: masterproc
 
   private
   ! Define variables for this entire module
-  integer, parameter :: nn_nint = 5
+  integer, parameter :: nn_nint = 6
   integer, parameter :: inputlength = 94
   integer, parameter :: outputlength = 65
   integer, parameter :: activation_type = 1
@@ -68,8 +68,8 @@ use pmgrid, only: masterproc
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev)=TBP(:) 
-    input((nlev+1):2*nlev)=QBP(:)
+    input(1:nlev)=QBP(:) 
+    input((nlev+1):2*nlev)=TBP(:)
     input((2*nlev+1):3*nlev)=VBP(:)
     input(3*nlev+1) = PS
     input(3*nlev+2) = SOLIN
@@ -132,7 +132,7 @@ use pmgrid, only: masterproc
 
     ! 5. Split output into components
     PHQ(:) =      output(1:nlev)
-    TPHYSTND(:) = output((nlev+1):2*nlev)  ! This is still the wrong unit, needs to be converted to W/m^2
+    TPHYSTND(:) = output((nlev+1):2*nlev)  * cpair! This is still the wrong unit, needs to be converted to W/m^2
     FSNT =        output(2*nlev+1)
     FSNS =        output(2*nlev+2)
     FLNT =        output(2*nlev+3)
@@ -191,7 +191,9 @@ use pmgrid, only: masterproc
     suf_kernel = '_kernel.txt'
 
     ! 1. Input layer
-    write (6,*) 'CLOUDBRAIN: reading layer1_bias'
+    if (masterproc) then
+      write (6,*) 'CLOUDBRAIN: reading layer1_bias'
+    endif
     open (unit=555,file='./keras_matrices/layer1_bias.txt',status='old',action='read',iostat=ios)
     if (ios .ne. 0) then
       write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
@@ -199,7 +201,9 @@ use pmgrid, only: masterproc
     endif
     read(555,*) bias_inp(:)
     close (555)
-    write (6,*) 'CLOUDBRAIN: reading layer1_kernel'
+    if (masterproc) then
+      write (6,*) 'CLOUDBRAIN: reading layer1_kernel'
+    endif
     open (unit=555,file='./keras_matrices/layer1_kernel.txt',status='old',action='read') 
     do k=1,width
       read(555,*) weights_inp(k,:)
@@ -215,7 +219,9 @@ use pmgrid, only: masterproc
     ! 2. Intermediate layers
     do n=1,nn_nint
       write (str, '(I1)') n+1
-      write (6,*) 'CLOUDBRAIN: reading layer*_bias', n+1, pref//trim(str)//suf_bias
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_bias', n+1, pref//trim(str)//suf_bias
+      endif
       open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
       if (ios .ne. 0) then
         write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
@@ -223,7 +229,9 @@ use pmgrid, only: masterproc
       endif
       read(555,*) bias_int(n, :)
       close (555)
-      write (6,*) 'CLOUDBRAIN: reading layer*_kernel', n+1, pref//trim(str)//suf_kernel
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_kernel', n+1, pref//trim(str)//suf_kernel
+      endif
       open (unit=555, file=pref//trim(str)//suf_kernel, status='old', action='read') 
       do k=1,width
         read(555,*) weights_int(n, k,:)
@@ -238,8 +246,10 @@ use pmgrid, only: masterproc
     end do
 
     ! 3. Output layer
-    write (str, '(I1)') nn_nint+1
-    write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', n+1, pref//trim(str)//suf_bias
+    write (str, '(I1)') nn_nint+2
+    if (masterproc) then
+      write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', nn_nint+2, pref//trim(str)//suf_bias
+    endif
     open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
     if (ios .ne. 0) then
       write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
@@ -247,7 +257,9 @@ use pmgrid, only: masterproc
     endif
     read(555,*) bias_out(:)
     close (555)
-    write (6,*) 'CLOUDBRAIN: reading layer*_kernel = output', n+1, pref//trim(str)//suf_kernel
+    if (masterproc) then
+      write (6,*) 'CLOUDBRAIN: reading layer*_kernel = output', nn_nint+2, pref//trim(str)//suf_kernel
+    endif
     open (unit=555, file=pref//trim(str)//suf_kernel, status='old', action='read') 
     do k=1,outputlength
       read(555,*) weights_out(k,:)
@@ -266,7 +278,9 @@ use pmgrid, only: masterproc
 subroutine init_keras_norm()
 
   ! 1. Read sub
-  write (6,*) 'CLOUDBRAIN: reading inp_sub'
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: reading inp_sub'
+  endif
   open (unit=555,file='./keras_matrices/inp_sub.txt',status='old',action='read')
   read(555,*) inp_sub(:)
   close (555)
@@ -277,7 +291,9 @@ subroutine init_keras_norm()
 #endif
 
   ! 2. Read div
-  write (6,*) 'CLOUDBRAIN: reading inp_div'
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: reading inp_div'
+  endif
   open (unit=555,file='./keras_matrices/inp_div.txt',status='old',action='read')
   read(555,*) inp_div(:)
   close (555)
@@ -288,7 +304,9 @@ subroutine init_keras_norm()
 #endif
 
   ! 3. Read out_scale
-  write (6,*) 'CLOUDBRAIN: reading out_scale'
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: reading out_scale'
+  endif
   open (unit=555,file='./keras_matrices/out_scale.txt',status='old',action='read')
   read(555,*) out_scale(:)
   close (555)

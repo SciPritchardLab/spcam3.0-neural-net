@@ -3,7 +3,7 @@
 #define CLOUDBRAIN
 !#define BRAINCTRLFLUX
 !#define NOBRAINRAD
-!#define BRAINDEBUG
+#define BRAINDEBUG
 !#define NOADIAB
 #define DEEP
 #define SPFLUXBYPASS
@@ -112,17 +112,28 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 !
 
 #if defined (CRM) || defined (CLOUDBRAIN)
-   real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
-               dQdt_adiab(begchunk:endchunk,pcols,pver),&
+   real(r8) :: Tdt_adiabatic(begchunk:endchunk,pcols,pver),&
+               Qdt_adiabatic(begchunk:endchunk,pcols,pver),&
+               QCdt_adiabatic(begchunk:endchunk,pcols,pver),&
+               QIdt_adiabatic(begchunk:endchunk,pcols,pver),&
+               Vdt_adiabatic(begchunk:endchunk,pcols,pver),&
                NNPRECT(pcols,begchunk:endchunk),&
+               NNPRECTEND(pcols,begchunk:endchunk),&
+               NNPRECST(pcols,begchunk:endchunk),&
+               NNPRECSTEN(pcols,begchunk:endchunk),&
                brainolr(pcols,begchunk:endchunk), &
                TC(begchunk:endchunk,pcols,pver), &
                QC(begchunk:endchunk,pcols,pver), &
+               QCC(begchunk:endchunk,pcols,pver), &
+               QIC(begchunk:endchunk,pcols,pver), &
                VC(begchunk:endchunk,pcols,pver), &
                PS(begchunk:endchunk,pcols), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
+               QCBP(begchunk:endchunk,pcols,pver), &
+               QIBP(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver), &
+               DTVKE(begchunk:endchunk,pcols,pver), &
                idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq(pcols,begchunk:endchunk), abstot, &
                corr, drad, absrad, errt(pcols,begchunk:endchunk)
 #endif
@@ -563,18 +574,28 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! BP is defined as T at the beginning of time step before any physics update
 ! PS also needs to be stored here?
 ! Current version: PNAS with
-! Inputs: [QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! Outputs: [PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT]
+! Inputs: [QBP, QCBP, QIBP, TBP, VBP, Qdt_adiabatic, QCdt_adiabatic, QIdt_adiabatic, Tdt_adiabatic, Vdt_adiabatic, PS, SOLIN, SHFLX, LHFLX]
+! Outputs: [PHQ, PHCLDLIQ, PHCLDICE, TPHYSTND, QRL, QRS, DTVKE, FSNT, FSNS, FLNT, FLNS, PRECT, PRECTEND, PRECST, PRECSTEN]
    do c=begchunk,endchunk
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
      do i=1,ncol
        do k=1,pver
-          TBP(c,i,k) = state(c)%t(i,k)
-          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
-          VBP(c,i,k) = state(c)%v(i,k)
-         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
-         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+         TC(c,i,k) = state(c)%tap(i,k) - state(c)%dtv(i,k)*ztodt
+         QC(c,i,k) = state(c)%qap(i,k) - state(c)%vd01(i,k)*ztodt
+         QCC(c,i,k) = state(c)%qcap(i,k)
+         QIC(c,i,k) = state(c)%qiap(i,k)
+
+         TBP(c,i,k) = state(c)%t(i,k)
+         QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+         QCBP(c,i,k) = state(c)%q(i,k,2)   ! index 1 is vapor
+         QIBP(c,i,k) = state(c)%q(i,k,3)   ! index 1 is vapor
+         VBP(c,i,k) = state(c)%v(i,k)
+
+         Tdt_adiabatic(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         Qdt_adiabatic(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+         QCdt_adiabatic(c,i,k) = (QCBP(c,i,k) - QCC(c,i,k))/ztodt
+         QIdt_adiabatic(c,i,k) = (QIBP(c,i,k) - QIC(c,i,k))/ztodt
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
@@ -585,6 +606,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       lchnk = state(c)%lchnk
       call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQCBP',QCBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQIBP',QIBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
@@ -1899,8 +1922,8 @@ end do
     ! Set tendencies to zero at first step
     ! I think this is only important for variables we are not using, e.g. liq and ice
     ptend(c)%q(:,:,1) = 0.  ! necessary?
-    ptend(c)%q(:,:,ixcldliq) = 0.
-    ptend(c)%q(:,:,ixcldice) = 0.
+    ptend(c)%q(:,:,ixcldliq) = 1.
+    ptend(c)%q(:,:,ixcldice) = 2.
     ptend(c)%s(:,:) = 0. ! necessary?
 
     ! Initialize network matrices
@@ -1933,8 +1956,15 @@ end do
 
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! This is the neural network
-        call neural_net(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
-                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
+        ! inputs: [QBP, QCBP, QIBP, TBP, VBP, Qdt_adiabatic, QCdt_adiabatic, QIdt_adiabatic, Tdt_adiabatic, Vdt_adiabatic, PS, SOLIN, SHFLX, LHFLX]
+        ! outputs: [PHQ, PHCLDLIQ, PHCLDICE, TPHYSTND, QRL, QRS, DTVKE, FSNT, FSNS, FLNT, FLNS, PRECT, PRECTEND, PRECST, PRECSTEN]
+        call neural_net(QBP(c,i,:), QCBP(c,i,:), QIBP(c,i,:), TBP(c,i,:), VBP(c,i,:), &
+                        Qdt_adiabatic(c,i,:), QCdt_adiabatic(c,i,:), QIdt_adiabatic(c,i,:), Tdt_adiabatic(c,i,:), Vdt_adiabatic(c,i,:),  &
+                        PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+                        ptend(c)%q(i,:,1), ptend(c)%q(i,:,2), ptend(c)%q(i,:,3), ptend(c)%s(i,:), &
+                        qrl(i,:,c), qrs(i,:,c), DTVKE(c,i,:), &
+                        in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), &
+                        NNPRECT(i, c), NNPRECTEND(i, c), NNPRECST(i, c), NNPRECSTEN(i, c), &
                         i)         
       end do ! end column loop
     end do
@@ -1942,14 +1972,22 @@ end do
     ! Now save all the neural network outputs outside of parallel loop
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
-	    ncol  = state(c)%ncol
+	   ncol  = state(c)%ncol
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+      call outfld('NNDQC',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+      call outfld('NNDQI',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
       call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+      call outfld('NNPRECTEND',NNPRECTEND(:ncol,c),pcols,lchnk)
+      call outfld('NNPRECST',NNPRECST(:ncol,c),pcols,lchnk)
+      call outfld('NNPRECSTEN',NNPRECSTEN(:ncol,c),pcols,lchnk)
       call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
       call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
       call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
       call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+      call outfld('NNQRS',qrs(:ncol,:,c),pcols,lchnk)
+      call outfld('NNQRL',qrl(:ncol,:,c),pcols,lchnk)
+      call outfld('NNDTVKE',DTVKE(c, :ncol, :),pcols,lchnk)
 
       ! Redundant to have the separate NN outputs but let's leave it for now
       call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
@@ -1958,14 +1996,15 @@ end do
       call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
       call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
 
-
+      ! I think this should be done but I am really not sure...
+      ptend(c)%s(:ncol,:pver) = ptend(c)%s(:ncol,:pver) + DTVKE(c, :ncol, :) * cpair
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
       ptend(c)%name  = 'cloudbrain'
       ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
       ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-      ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-      ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+      ptend(c)%lq(ixcldliq) = .TRUE. ! allowed to update GCM liquid water
+      ptend(c)%lq(ixcldice) = .TRUE. ! allowed to update GCM ice water 
       ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
       ptend(c)%lv    = .FALSE.
  

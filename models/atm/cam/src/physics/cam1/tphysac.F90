@@ -189,11 +189,14 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
 ! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
 #ifdef NODTVKE
+#ifdef CLOUDBRAIN
+! If neural net predicts DTV, do not apply it here.
 ! I think this should still be active for te fluxbypass version
 ! There DTV and VD01 are not applied, but DTVKE is still
 ! But we are also predicting this, so I think we should set it to zero.
   ptend%s = 0.
   ptend%q = 0.
+#endif
 #endif
    call physics_update (state, tend, ptend, ztodt)
 ! Check energy integrals

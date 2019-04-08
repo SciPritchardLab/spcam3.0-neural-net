@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-!#define BRAINDEBUG
+#define BRAINDEBUG
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -17,8 +17,8 @@ use pmgrid, only: masterproc
   private
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 6
-  integer, parameter :: inputlength = 94
-  integer, parameter :: outputlength = 65
+  integer, parameter :: inputlength = 304
+  integer, parameter :: outputlength = 218
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
 
@@ -39,27 +39,47 @@ use pmgrid, only: masterproc
 
   contains
 
-  subroutine neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                         PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
+  subroutine neural_net (QBP, QCBP, QIBP, TBP, VBP, &
+                         Qdt_adiabatic, QCdt_adiabatic, QIdt_adiabatic, Tdt_adiabatic, Vdt_adiabatic, &
+                         PS, SOLIN, SHFLX, LHFLX, &
+                         PHQ, PHCLDLIQ, PHCLDICE, TPHYSTND, QRL, QRS, DTVKE, &
+                         FSNT, FSNS, FLNT, FLNS, PRECT, PRECTEND, PRECST, PRECSTEN, &
                          icol)
-    ! PNAS version: First row = inputs, second row = outputs
+    ! Weak constraint version
+    ! inputs: [QBP, QCBP, QIBP, TBP, VBP, Qdt_adiabatic, QCdt_adiabatic, QIdt_adiabatic, Tdt_adiabatic, Vdt_adiabatic, PS, SOLIN, SHFLX, LHFLX]
+    ! outputs: [PHQ, PHCLDLIQ, PHCLDICE, TPHYSTND, QRL, QRS, DTVKE, FSNT, FSNS, FLNT, FLNS, PRECT, PRECTEND, PRECST, PRECSTEN]
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
     real(r8), intent(in) :: QBP(:)
+    real(r8), intent(in) :: QCBP(:)
+    real(r8), intent(in) :: QIBP(:)
     real(r8), intent(in) :: TBP(:)   
     real(r8), intent(in) :: VBP(:)
+    real(r8), intent(in) :: Qdt_adiabatic(:)
+    real(r8), intent(in) :: QCdt_adiabatic(:)
+    real(r8), intent(in) :: QIdt_adiabatic(:)
+    real(r8), intent(in) :: Tdt_adiabatic(:)   
+    real(r8), intent(in) :: Vdt_adiabatic(:)
     real(r8), intent(in) :: PS
     real(r8), intent(in) :: SOLIN
     real(r8), intent(in) :: SHFLX
     real(r8), intent(in) :: LHFLX
     ! Allocate outputs
     real(r8), intent(out) :: PHQ(:)
+    real(r8), intent(out) :: PHCLDLIQ(:)
+    real(r8), intent(out) :: PHCLDICE(:)
     real(r8), intent(out) :: TPHYSTND(:)
+    real(r8), intent(out) :: QRS(:)
+    real(r8), intent(out) :: QRL(:)
+    real(r8), intent(out) :: DTVKE(:)
     real(r8), intent(out) :: FSNT
     real(r8), intent(out) :: FSNS
     real(r8), intent(out) :: FLNT
     real(r8), intent(out) :: FLNS
     real(r8), intent(out) :: PRECT
+    real(r8), intent(out) :: PRECTEND
+    real(r8), intent(out) :: PRECST
+    real(r8), intent(out) :: PRECSTEN
     ! Allocate utilities
     real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
@@ -69,12 +89,19 @@ use pmgrid, only: masterproc
     ! 1. Concatenate input vector to neural network
     nlev=30
     input(1:nlev)=QBP(:) 
-    input((nlev+1):2*nlev)=TBP(:)
-    input((2*nlev+1):3*nlev)=VBP(:)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
+    input((nlev+1):2*nlev)=QCBP(:)
+    input((2*nlev+1):3*nlev)=QIBP(:)
+    input((3*nlev+1):4*nlev)=TBP(:)
+    input((4*nlev+1):5*nlev)=VBP(:)
+    input((5*nlev+1):6*nlev)=Qdt_adiabatic(:)
+    input((6*nlev+1):7*nlev)=QCdt_adiabatic(:)
+    input((7*nlev+1):8*nlev)=QIdt_adiabatic(:)
+    input((8*nlev+1):9*nlev)=Tdt_adiabatic(:)
+    input((9*nlev+1):10*nlev)=Vdt_adiabatic(:)
+    input(10*nlev+1) = PS
+    input(10*nlev+2) = SOLIN
+    input(10*nlev+3) = SHFLX
+    input(10*nlev+4) = LHFLX
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input
@@ -132,12 +159,20 @@ use pmgrid, only: masterproc
 
     ! 5. Split output into components
     PHQ(:) =      output(1:nlev)
-    TPHYSTND(:) = output((nlev+1):2*nlev)  * cpair! This is still the wrong unit, needs to be converted to W/m^2
-    FSNT =        output(2*nlev+1)
-    FSNS =        output(2*nlev+2)
-    FLNT =        output(2*nlev+3)
-    FLNS =        output(2*nlev+4)
-    PRECT =       output(2*nlev+5)
+    PHCLDLIQ(:) =     output((nlev+1):2*nlev)
+    PHCLDICE(:) =     output((2*nlev+1):3*nlev)
+    TPHYSTND(:) = output((3*nlev+1):4*nlev) * cpair
+    QRS(:) =      output((4*nlev+1):5*nlev)
+    QRL(:) =      output((5*nlev+1):6*nlev)
+    DTVKE(:) =    output((6*nlev+1):7*nlev)
+    FSNT =        output(7*nlev+1)
+    FSNS =        output(7*nlev+2)
+    FLNT =        output(7*nlev+3)
+    FLNS =        output(7*nlev+4)
+    PRECT =       output(7*nlev+5)
+    PRECTEND =    output(7*nlev+6)
+    PRECST =      output(7*nlev+7)
+    PRECSTEN =    output(7*nlev+8)
 
   end subroutine neural_net
 

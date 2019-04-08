@@ -56,6 +56,7 @@ module physics_types
 #endif
 #ifdef CLOUDBRAIN
           tap, qap, & ! T,Q after physics.
+          qcap, qiap, & ! QC and QI after physics
           dtv, vd01, & ! vertical diffusion of T, Q (for energy checker)
           vap, &      ! SR, also add v-component of wind
 #endif

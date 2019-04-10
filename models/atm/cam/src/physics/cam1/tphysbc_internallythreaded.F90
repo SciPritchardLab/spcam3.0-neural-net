@@ -585,6 +585,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
          QC(c,i,k) = state(c)%qap(i,k) - state(c)%vd01(i,k)*ztodt
          QCC(c,i,k) = state(c)%qcap(i,k)
          QIC(c,i,k) = state(c)%qiap(i,k)
+         VC(c,i,k)  = state(c)%vap(i,k)
 
          TBP(c,i,k) = state(c)%t(i,k)
          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
@@ -596,6 +597,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
          Qdt_adiabatic(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
          QCdt_adiabatic(c,i,k) = (QCBP(c,i,k) - QCC(c,i,k))/ztodt
          QIdt_adiabatic(c,i,k) = (QIBP(c,i,k) - QIC(c,i,k))/ztodt
+         Vdt_adiabatic(c,i,k) = (VBP(c,i,k) - VC(c,i,k))/ztodt
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
@@ -610,6 +612,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNQIBP',QIBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
+      call outfld('NNT_adiab',Tdt_adiabatic(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQ_adiab',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQC_adiab',QCBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQI_adiab',QIBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNV_adiab',VBP(c,:ncol,:),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:

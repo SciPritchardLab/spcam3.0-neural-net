@@ -1,5 +1,5 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Mon Apr  8 05:54:19 CDT 2019 on login1.stampede2.tacc.utexas.edu   \n\
+Libraries compiled on Mon Apr  8 06:05:31 CDT 2019 on login1.stampede2.tacc.utexas.edu   \n\
 Machine characteristics: Linux login1.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc  -openmp  -O  -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/05488/tg847872/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\

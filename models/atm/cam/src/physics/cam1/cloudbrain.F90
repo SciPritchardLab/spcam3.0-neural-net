@@ -20,17 +20,16 @@ use pmgrid, only: masterproc
   integer, parameter :: inputlength = 304
   integer, parameter :: outputlength = 218
   integer, parameter :: activation_type = 1
-  integer, parameter :: max_width = 256
-  integer, parameter :: widths(6) = [ 256, 256,256,256,256,214 ]
+  integer, parameter :: width = 256
 
-  ! WARNING: A lot of hrad-coding here. Be careful when changing NN architecture
+
 
   ! Files to be used later
-  real :: weights_inp(widths(1), inputlength)
-  real :: bias_inp(widths(1))
-  real :: weights_int(nn_nint, max_width, max_width)
-  real :: bias_int(nn_nint, max_width)
-  real :: weights_out(outputlength, widths(6))
+  real :: weights_inp(width, inputlength)
+  real :: bias_inp(width)
+  real :: weights_int(nn_nint, width, width)
+  real :: bias_int(nn_nint, width)
+  real :: weights_out(outputlength, width)
   real :: bias_out(outputlength)
   real :: inp_sub(inputlength)
   real :: inp_div(inputlength)
@@ -82,7 +81,7 @@ use pmgrid, only: masterproc
     real(r8), intent(out) :: PRECST
     real(r8), intent(out) :: PRECSTEN
     ! Allocate utilities
-    real(r8) :: input(inputlength),x1(max_width), x2(max_width)
+    real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
@@ -121,7 +120,7 @@ use pmgrid, only: masterproc
 
     ! 3. Neural network matrix multiplications and activations
     ! 3.1 1st layer: input length-->256.
-    call matmul(input, x1, inputlength, max_width, weights_inp, bias_inp, activation_type)
+    call matmul(input, x1, inputlength, width, weights_inp, bias_inp, activation_type)
 #ifdef BRAINDEBUG
         if (masterproc .and. icol .eq. 1) then
           write (6,*) 'BRAINDEBUG layer = ',1
@@ -130,7 +129,7 @@ use pmgrid, only: masterproc
 #endif
     ! 3.2 Intermediate layers
     do n=1,nn_nint
-      call matmul(x1, x2, max_width, widths(n), weights_int(n, :, :), bias_int(n, :), activation_type)
+      call matmul(x1, x2, width, width, weights_int(n, :, :), bias_int(n, :), activation_type)
       x1(:) = x2(:)
 #ifdef BRAINDEBUG
         if (masterproc .and. icol .eq. 1) then
@@ -140,7 +139,7 @@ use pmgrid, only: masterproc
 #endif
     end do
     ! 3.3 Last layer with linear activation
-    call matmul(x1, output, widths(nn_nint), outputlength, weights_out, bias_out, 0)
+    call matmul(x1, output, width, outputlength, weights_out, bias_out, 0)
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG layer = ',nn_nint+2
@@ -241,7 +240,7 @@ use pmgrid, only: masterproc
       write (6,*) 'CLOUDBRAIN: reading layer1_kernel'
     endif
     open (unit=555,file='./keras_matrices/layer1_kernel.txt',status='old',action='read') 
-    do k=1,max_width
+    do k=1,width
       read(555,*) weights_inp(k,:)
     end do
     close (555)
@@ -263,13 +262,13 @@ use pmgrid, only: masterproc
         write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
         stop
       endif
-      read(555,*) bias_int(n, :widths(n))
+      read(555,*) bias_int(n, :)
       close (555)
       if (masterproc) then
         write (6,*) 'CLOUDBRAIN: reading layer*_kernel', n+1, pref//trim(str)//suf_kernel
       endif
       open (unit=555, file=pref//trim(str)//suf_kernel, status='old', action='read') 
-      do k=1,widths(n)
+      do k=1,width
         read(555,*) weights_int(n, k,:)
       end do
       close (555)

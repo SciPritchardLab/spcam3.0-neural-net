@@ -613,10 +613,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
       call outfld('NNT_adiab',Tdt_adiabatic(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQ_adiab',QBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQC_adiab',QCBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQI_adiab',QIBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNV_adiab',VBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQ_adiab',Qdt_adiabatic(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQC_adiab',QCdt_adiabatic(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQI_adiab',QIdt_adiabatic(c,:ncol,:),pcols,lchnk)
+      call outfld('NNV_adiab',Vdt_adiabatic(c,:ncol,:),pcols,lchnk)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -1979,15 +1979,15 @@ end do
     ! Now save all the neural network outputs outside of parallel loop
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
-	   ncol  = state(c)%ncol
+      ncol  = state(c)%ncol
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDQC',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDQI',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-      call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-      call outfld('NNPRECTEND',NNPRECTEND(:ncol,c),pcols,lchnk)
-      call outfld('NNPRECST',NNPRECST(:ncol,c),pcols,lchnk)
-      call outfld('NNPRECSTEN',NNPRECSTEN(:ncol,c),pcols,lchnk)
+      call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+      call outfld('PRECTEND',NNPRECTEND(:ncol,c),pcols,lchnk)
+      call outfld('PRECST',NNPRECST(:ncol,c),pcols,lchnk)
+      call outfld('PRECSTEN',NNPRECSTEN(:ncol,c),pcols,lchnk)
       call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
       call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
       call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
@@ -2004,7 +2004,7 @@ end do
       call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
 
       ! I think this should be done but I am really not sure...
-      ptend(c)%s(:ncol,:pver) = ptend(c)%s(:ncol,:pver) + DTVKE(c, :ncol, :) * cpair
+      ptend(c)%s(:ncol,:pver) = ptend(c)%s(:ncol,:pver) + DTVKE(c, :ncol, :) * cpair / 60 / 30
 
       ! Finish up: linkages from cloudbrain to arterial physics variables
       ptend(c)%name  = 'cloudbrain'

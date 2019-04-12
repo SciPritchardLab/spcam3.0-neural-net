@@ -16,7 +16,7 @@ use pmgrid, only: masterproc
 
   private
   ! Define variables for this entire module
-  integer, parameter :: nn_nint = 6
+  integer, parameter :: nn_nint = 8
   integer, parameter :: inputlength = 94
   integer, parameter :: outputlength = 65
   integer, parameter :: activation_type = 1
@@ -182,6 +182,7 @@ use pmgrid, only: masterproc
   subroutine init_keras_matrices()
     integer :: n, k, ios
     character(len=1) :: str
+    character(len=2) :: str10  ! Yeah, I don't know how to deal with one vs two characters
     character(len=22) :: pref
     character(len=9) :: suf_bias
     character(len=11) :: suf_kernel
@@ -246,21 +247,39 @@ use pmgrid, only: masterproc
     end do
 
     ! 3. Output layer
-    write (str, '(I1)') nn_nint+2
-    if (masterproc) then
-      write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', nn_nint+2, pref//trim(str)//suf_bias
+    if (nn_nint+2 .lt. 10) then
+      write (str, '(I1)') nn_nint+2
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', nn_nint+2, pref//trim(str)//suf_bias
+      endif
+      open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
+      if (ios .ne. 0) then
+        write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
+        stop
+      endif
+      read(555,*) bias_out(:)
+      close (555)
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_kernel = output', nn_nint+2, pref//trim(str)//suf_kernel
+      endif
+      open (unit=555, file=pref//trim(str)//suf_kernel, status='old', action='read')
+    else
+      write (str10, '(I2)') nn_nint+2
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_bias = output', nn_nint+2, pref//trim(str10)//suf_bias
+      endif
+      open (unit=555, file=pref//trim(str10)//suf_bias, status='old', action='read', iostat=ios)
+      if (ios .ne. 0) then
+        write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
+        stop
+      endif
+      read(555,*) bias_out(:)
+      close (555)
+      if (masterproc) then
+        write (6,*) 'CLOUDBRAIN: reading layer*_kernel = output', nn_nint+2, pref//trim(str10)//suf_kernel
+      endif
+      open (unit=555, file=pref//trim(str10)//suf_kernel, status='old', action='read')
     endif
-    open (unit=555, file=pref//trim(str)//suf_bias, status='old', action='read', iostat=ios)
-    if (ios .ne. 0) then
-      write (6,*) 'CLOUDBRAIN keras matrices unable to load, abort.'
-      stop
-    endif
-    read(555,*) bias_out(:)
-    close (555)
-    if (masterproc) then
-      write (6,*) 'CLOUDBRAIN: reading layer*_kernel = output', nn_nint+2, pref//trim(str)//suf_kernel
-    endif
-    open (unit=555, file=pref//trim(str)//suf_kernel, status='old', action='read') 
     do k=1,outputlength
       read(555,*) weights_out(k,:)
     end do

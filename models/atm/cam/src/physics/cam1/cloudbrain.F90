@@ -17,7 +17,7 @@ use pmgrid, only: masterproc
   private
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 6
-  integer, parameter :: inputlength = 304
+  integer, parameter :: inputlength = 154
   integer, parameter :: outputlength = 218
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
@@ -93,15 +93,15 @@ use pmgrid, only: masterproc
     input((2*nlev+1):3*nlev)=QIBP(:)
     input((3*nlev+1):4*nlev)=TBP(:)
     input((4*nlev+1):5*nlev)=VBP(:)
-    input((5*nlev+1):6*nlev)=Qdt_adiabatic(:)
-    input((6*nlev+1):7*nlev)=QCdt_adiabatic(:)
-    input((7*nlev+1):8*nlev)=QIdt_adiabatic(:)
-    input((8*nlev+1):9*nlev)=Tdt_adiabatic(:)
-    input((9*nlev+1):10*nlev)=Vdt_adiabatic(:)
-    input(10*nlev+1) = PS
-    input(10*nlev+2) = SOLIN
-    input(10*nlev+3) = SHFLX
-    input(10*nlev+4) = LHFLX
+!    input((5*nlev+1):6*nlev)=Qdt_adiabatic(:)
+!    input((6*nlev+1):7*nlev)=QCdt_adiabatic(:)
+!    input((7*nlev+1):8*nlev)=QIdt_adiabatic(:)
+!    input((8*nlev+1):9*nlev)=Tdt_adiabatic(:)
+!    input((9*nlev+1):10*nlev)=Vdt_adiabatic(:)
+    input(5*nlev+1) = PS
+    input(5*nlev+2) = SOLIN
+    input(5*nlev+3) = SHFLX
+    input(5*nlev+4) = LHFLX
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input

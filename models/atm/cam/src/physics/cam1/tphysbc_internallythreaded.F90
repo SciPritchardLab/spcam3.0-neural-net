@@ -1981,8 +1981,8 @@ end do
       lchnk = state(c)%lchnk  
       ncol  = state(c)%ncol
       call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-      call outfld('NNDQC',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-      call outfld('NNDQI',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+      call outfld('NNDQC',ptend(c)%q(:ncol,:pver,2),pcols,lchnk) 
+      call outfld('NNDQI',ptend(c)%q(:ncol,:pver,3),pcols,lchnk) 
       call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
       call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
       call outfld('PRECTEND',NNPRECTEND(:ncol,c),pcols,lchnk)

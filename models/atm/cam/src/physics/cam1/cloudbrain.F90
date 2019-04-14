@@ -17,7 +17,7 @@ use pmgrid, only: masterproc
   private
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 8
-  integer, parameter :: inputlength = 94
+  integer, parameter :: inputlength = 66 !94
   integer, parameter :: outputlength = 65
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
@@ -63,19 +63,28 @@ use pmgrid, only: masterproc
     ! Allocate utilities
     real(r8) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
-    integer :: k, nlev, n
+    integer :: k, nlev, n, cut_off, ncut
     integer, intent(in) :: icol
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev)=QBP(:) 
-    input((nlev+1):2*nlev)=TBP(:)
-    input((2*nlev+1):3*nlev)=VBP(:)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
+    cut_off=15
+    ncut=nlev-cut_off+1
+    input(1:ncut)=QBP(cut_off:nlev) 
+    input((ncut+1):2*ncut)=TBP(cut_off:nlev)
+    input((2*ncut+1):(2*ncut+nlev))=VBP(:)
+    input((2*ncut+nlev)+1) = PS
+    input((2*ncut+nlev)+2) = SOLIN
+    input((2*ncut+nlev)+3) = SHFLX
+    input((2*ncut+nlev)+4) = LHFLX
 #ifdef BRAINDEBUG
+      if (masterproc .and. icol .eq. 1) then
+        write (6,*) 'QBP_full=',QBP
+        write (6,*) 'QBP=',QBP(cut_off:nlev)
+        write (6,*) 'TBP=',TBP(cut_off:nlev)
+        write (6,*) 'VBP=',VBP(:)
+        write (6,*) 'Rest=',PS, SOLIN, SHFLX, LHFLX
+      endif
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input
       endif

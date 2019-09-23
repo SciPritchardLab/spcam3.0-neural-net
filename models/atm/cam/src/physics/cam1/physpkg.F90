@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 ! CLOUDBRAIN doesn't actually do anyting here but import some things
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 #define XEONPHI ! Pritch at TACC / Stampede
 
 subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)

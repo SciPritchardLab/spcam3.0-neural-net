@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
                     pint    ,pmid    ,h2ommr  ,rh      ,o3mmr   , &
                     aermmr  ,cld     ,cicewp  ,cliqwp  ,rel     , &

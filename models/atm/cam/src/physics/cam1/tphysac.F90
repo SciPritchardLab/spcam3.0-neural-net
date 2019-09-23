@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINCTRLFLUX
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 #define NODTVKE
 subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                     taux,    tauy,    cflx,    sgh,    lhf,  &

@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 ! Skip over longwave computation, keep shortwave for SOLIN
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 
 subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
                   lwup    ,emis    ,          &

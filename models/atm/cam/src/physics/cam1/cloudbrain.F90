@@ -1,6 +1,7 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
+#define INPUTREGULARIZE
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
@@ -8,6 +9,9 @@ use ppgrid,          only: pcols, pver, pverp
 use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
+#ifdef INPUTREGULARIZE
+use ifport ! to access rand() needed for gasdev_s
+#endif
 !use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type, width
 
 
@@ -65,6 +69,17 @@ use pmgrid, only: masterproc
     real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
+#ifdef INPUTREGULARIZE
+    integer nregularize
+    real(r8) :: std_regularize, pertval
+    real(r8) :: outputs_ensemble(outputlength,16)
+    nregularize = 16
+    std_regularize = 0.1
+
+!$OMP PARALLEL DO PRIVATE (i,nlev,input,k,pertval,x1,x2,n,output)
+    do i=1,nregularize
+#endif
+
 
     ! 1. Concatenate input vector to neural network
     nlev=30
@@ -84,6 +99,10 @@ use pmgrid, only: masterproc
     ! 2. Normalize input
     do k=1,inputlength
       input(k) = (input(k) - inp_sub(k))/inp_div(k)
+#ifdef INPUTREGULARIZE
+      call gasdev_s (perval) ! generate random standard pseudnormal
+      input (k) = input(k) + std_regularize*pertval*input(k)
+#endif
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
@@ -122,14 +141,31 @@ use pmgrid, only: masterproc
 
     ! 4. Unnormalize output
     do k=1,outputlength
+#ifdef INPUTREGULARIZE
+     outputs_ensemble(k,i) = output(k) / out_scale(k) ! allow multiple threads to work on same shared mem array.
+#else
       output(k) = output(k) / out_scale(k)
+#endif
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG out post scale = ',output
       endif
 #endif
+#ifdef INPUTREGULARIZE
+    end do !i, finished ensemble of NN calculations.
+!$OMP END PARALLEL DO
 
+! Calculate the regularization ensemble mean
+    do k=1,outputlength
+      output(k) = 0.
+      do i=1,nregularize
+        output(k) = output(k) + outputs_ensemble(k,i)
+      end do
+      output(k) = output(k)/nregularize
+    end do
+
+#endif
     ! 5. Split output into components
     PHQ(:) =      output(1:nlev)
     TPHYSTND(:) = output((nlev+1):2*nlev)  * cpair! This is still the wrong unit, needs to be converted to W/m^2
@@ -337,7 +373,43 @@ subroutine init_keras_norm()
 
   end subroutine init_keras_norm
 
-  
+
+#ifdef INPUTREGULARIZE
+! pseudonormal random number generator, added by pritch:
+! (for input regularization)
+SUBROUTINE gasdev_s(harvest)
+! Numerical Recipes routine for generating a single normal random deviate,
+! adapted to use the compiler's random number generator.
+
+IMPLICIT NONE
+REAL, INTENT(OUT) :: harvest
+
+! Local variables
+REAL          :: rsq, v1, v2
+REAL, SAVE    :: g
+LOGICAL, SAVE :: gaus_stored = .false.
+
+IF (gaus_stored) THEN
+   harvest = g
+   gaus_stored = .false.
+ELSE
+   DO
+      v1 = rand()
+      v2 = rand()
+      v1 = 2.0*v1 - 1.0
+      v2 = 2.0*v2 - 1.0
+      rsq = v1**2 + v2**2
+      if (rsq > 0.0 .and. rsq < 1.0) EXIT
+   END DO
+   rsq = SQRT(-2.0*LOG(rsq)/rsq)
+   harvest = v1*rsq
+   g = v2*rsq
+   gaus_stored = .true.
+END IF
+
+RETURN
+END SUBROUTINE gasdev_s
+#endif  
 
 end module cloudbrain
 

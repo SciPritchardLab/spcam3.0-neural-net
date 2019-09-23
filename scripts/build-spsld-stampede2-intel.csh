@@ -4,6 +4,8 @@ module load netcdf
 set rpath="$HOME/repositories/spcam3.0-neural-net"
 setenv camroot $rpath/models/atm/cam
 setenv esmfroot $rpath/models/utils/esmf/build/linux_intel
+echo $camroot
+exit(0)
 cp $camroot/bld/Makefile.stampede $camroot/bld/Makefile
 # Note I had to install my own version of netcdf3.6.3 to be old enough to play nice with spcam3.
 setenv INC_NETCDF   $HOME/include 

@@ -1323,7 +1323,7 @@ end do
 ! INSERT add MIC offload syntax
 ! INSERT Make c,k,m,i,lchnk,ncol,coef,ii,jj,mm,ifld,cld private.
 
-!$OMP PARALLEL DO PRIVATE (C,K,M,I,LCHNK,NCOL,II,JJ,MM,IFLD)
+!---------  asdf $asdfOasdfMP PARALLEL DO PRIVATE (C,K,M,I,LCHNK,NCOL,II,JJ,MM,IFLD)
    do c=begchunk,endchunk ! pritch new chunk loop
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk

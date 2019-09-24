@@ -10,6 +10,7 @@ use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
 #ifdef INPUTREGULARIZE
+use omp_lib
 use ifport ! to access rand() needed for gasdev_s
 #endif
 !use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type, width
@@ -49,6 +50,8 @@ use ifport ! to access rand() needed for gasdev_s
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
+    implicit none
+
     real(r8), intent(in) :: QBP(:)
     real(r8), intent(in) :: TBP(:)   
     real(r8), intent(in) :: VBP(:)
@@ -70,19 +73,20 @@ use ifport ! to access rand() needed for gasdev_s
     integer :: k, nlev, n
     integer, intent(in) :: icol
 #ifdef INPUTREGULARIZE
-    integer nregularize
+    integer nregularize, i, myid
     real(r8) :: std_regularize, pertval
     real(r8) :: outputs_ensemble(outputlength,16)
-    nregularize = 16
-    std_regularize = 0.1
+    nregularize = 8
+    std_regularize = 0.01
+    nlev=30
 
-!$OMP PARALLEL DO PRIVATE (i,nlev,input,k,pertval,x1,x2,n,output)
+!$OMP PARALLEL DO PRIVATE (i,input,k,pertval,x1,x2,n,output)
     do i=1,nregularize
+      myid = OMP_GET_THREAD_NUM()
+      call seed(myid*myid*102+1235)
 #endif
 
-
     ! 1. Concatenate input vector to neural network
-    nlev=30
     input(1:nlev)=QBP(:) 
     input((nlev+1):2*nlev)=TBP(:)
     input((2*nlev+1):3*nlev)=VBP(:)
@@ -98,11 +102,11 @@ use ifport ! to access rand() needed for gasdev_s
 
     ! 2. Normalize input
     do k=1,inputlength
-      input(k) = (input(k) - inp_sub(k))/inp_div(k)
 #ifdef INPUTREGULARIZE
-      call gasdev_s (perval) ! generate random standard pseudnormal
+      call gasdev_s (pertval) ! generate random standard pseudnormal
       input (k) = input(k) + std_regularize*pertval*input(k)
 #endif
+      input(k) = (input(k) - inp_sub(k))/inp_div(k)
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
@@ -385,7 +389,7 @@ IMPLICIT NONE
 REAL, INTENT(OUT) :: harvest
 
 ! Local variables
-REAL          :: rsq, v1, v2
+REAL      :: rsq, v1, v2
 REAL, SAVE    :: g
 LOGICAL, SAVE :: gaus_stored = .false.
 

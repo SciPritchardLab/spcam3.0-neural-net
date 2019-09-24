@@ -59,6 +59,9 @@ subroutine qneg3 (subnam  ,idx     ,ncol    ,ncold   ,lver    ,lconst  , &
 !jr Disable this routine for purposes of advection test
       return
 #endif
+#ifdef CLOUDBRAIN
+      return
+#endif
       nvals = 0
       found = .false.
       worst = 1.e35

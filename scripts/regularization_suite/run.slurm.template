@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH -J nnregREGNUMxREGAMT
+#SBATCH -o log.REGNUMxREGAMT.o%j       
+#SBATCH -e err.REGNUMxREGAMT.e%j       
+#SBATCH -p development
+#SBATCH -N 16
+#SBATCH -n 64              
+#SBATCH -t 01:59:00
+#SBATCH --mail-user=mspritch@uci.edu
+#SBATCH --mail-type=all    
+#SBATCH -A TG-ATM190002
+export I_MPI_COMPATIBILITY=4
+export OMP_NUM_THREADS=16
+export MKL_NUM_THREADS=1
+cd RUNDIR
+ibrun -n 64 ./EXENAME < atm_in

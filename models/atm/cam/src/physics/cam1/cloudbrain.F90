@@ -75,9 +75,9 @@ use ifport ! to access rand() needed for gasdev_s
 #ifdef INPUTREGULARIZE
     integer nregularize, i, myid
     real(r8) :: std_regularize, pertval
-    real(r8) :: outputs_ensemble(outputlength,16)
-    nregularize = 8
-    std_regularize = 0.01
+    real(r8) :: outputs_ensemble(outputlength,32)
+    nregularize = 32
+    std_regularize = 0.25
     nlev=30
 
 !$OMP PARALLEL DO PRIVATE (i,input,k,pertval,x1,x2,n,output)
@@ -102,11 +102,11 @@ use ifport ! to access rand() needed for gasdev_s
 
     ! 2. Normalize input
     do k=1,inputlength
+      input(k) = (input(k) - inp_sub(k))/inp_div(k)
 #ifdef INPUTREGULARIZE
       call gasdev_s (pertval) ! generate random standard pseudnormal
       input (k) = input(k) + std_regularize*pertval*input(k)
 #endif
-      input(k) = (input(k) - inp_sub(k))/inp_div(k)
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then

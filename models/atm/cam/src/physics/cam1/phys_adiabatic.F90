@@ -39,7 +39,6 @@ subroutine phys_adiabatic (phys_state, phys_tend)
   real(r8) rpdel(pcols,pver)                   ! 1./(pintm1(k+1)-pintm1(k))
 !-----------------------------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE (I, K, LCHNK, NCOL, RPDEL)
   do lchnk=begchunk,endchunk
      ncol = get_ncols_p(lchnk)
 !

@@ -75,9 +75,9 @@ use ifport ! to access rand() needed for gasdev_s
 #ifdef INPUTREGULARIZE
     integer nregularize, i, myid
     real(r8) :: std_regularize, pertval
-    real(r8) :: outputs_ensemble(outputlength,32)
-    nregularize = 32
-    std_regularize = 0.25
+    real(r8) :: outputs_ensemble(outputlength,128)
+    nregularize = 128
+    std_regularize = 0.2
     nlev=30
 
 !$OMP PARALLEL DO PRIVATE (i,input,k,pertval,x1,x2,n,output)

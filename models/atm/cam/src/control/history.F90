@@ -4426,7 +4426,6 @@ end function sec2hms
 #endif
             end if
 
-!$OMP PARALLEL DO PRIVATE (F)
 
             do f=1,nflds(t)
                call h_normalize (f, t)  ! Normalized averaged fields and/or put fillvalue
@@ -4455,7 +4454,6 @@ end function sec2hms
 ! by compiling with -Mbounds.  Appeared to be only multitasking that caused
 ! problems.
 !
-!$OMP PARALLEL DO PRIVATE (F)
 
             do f=1,nflds(t)
                call h_zero (f, t)

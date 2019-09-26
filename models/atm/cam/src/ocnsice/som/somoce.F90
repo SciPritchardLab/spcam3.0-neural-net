@@ -82,7 +82,6 @@ subroutine somoce (srf_state, srfflx)
      som_conschk = mod (get_nstep(), som_conschk_frq) == 0
   end if
 
-!$OMP PARALLEL DO PRIVATE (I, C, NCOL)
 
   do c=begchunk,endchunk
      ncol = get_ncols_p(c)
@@ -145,7 +144,6 @@ subroutine somoce (srf_state, srfflx)
 !BPB Renormalize for area of warm ocean:
   qdiff = qdiff * wght/wghtw
 
-!$OMP PARALLEL DO PRIVATE (I, C, NCOL, CLAT, CLON, COSZNEXT)
 
   do c=begchunk,endchunk
      ncol = get_ncols_p(c)

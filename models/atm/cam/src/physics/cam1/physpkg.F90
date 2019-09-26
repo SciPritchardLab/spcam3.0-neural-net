@@ -179,7 +179,6 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 #ifdef PVBUDGET
 ! Mike Pritchard, store PV before physics:
   call calculate_physics_PV (phys_state,pv1,pv2,pv3)
-!$OMP PARALLEL DO PRIVATE (C,NCOL)
   do c=begchunk,endchunk
      ncol = get_ncols_p(c)
      pvtot_tmp(:ncol,:pver,c) = phys_state(c)%pv(:ncol,:pver)
@@ -210,7 +209,6 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 #ifndef XEONPHI
 ! Standard threading... here in the scope of physpkg, surrounding tphysbc
 
-!$OMP PARALLEL DO PRIVATE (C,NCOL)
    call t_startf ('tphysbc')
    do c=begchunk, endchunk
       ncol = get_ncols_p(c)
@@ -361,9 +359,7 @@ end do
 !
 
 #ifdef FLUXDAMP
-!$OMP PARALLEL DO PRIVATE (C,NCOL,I,DUBOT,DVBOT,DWINDBOT)
 #else
-!$OMP PARALLEL DO PRIVATE (C,NCOL,I)
 #endif
       do c=begchunk,endchunk
          ncol = get_ncols_p(c)
@@ -508,7 +504,6 @@ end do
 ! output shf/lhf fluxes for ice/ocn/som_offline 
 !
 #ifndef FLUXDAMP
-!$OMP PARALLEL DO PRIVATE (C,NCOL,I)
 #endif
    do c=begchunk,endchunk
       ncol = get_ncols_p(c)
@@ -638,7 +633,6 @@ end do
    call t_startf ('ac_physics')
       dtinv=1./ztodt
 
-!$OMP PARALLEL DO PRIVATE (C, NCOL, M, AUX)
 
    do c=begchunk,endchunk
       ncol = get_ncols_p(c)
@@ -692,7 +686,6 @@ end do
 #ifdef PVBUDGET
     ! Mike Pritchard, store PV before physics:
    call calculate_physics_PV (phys_state,pv1,pv2,pv3)
-!$OMP PARALLEL DO PRIVATE (C, NCOL, AUX)
 
    do c=begchunk,endchunk
       ncol = get_ncols_p(c)

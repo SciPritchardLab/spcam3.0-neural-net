@@ -54,7 +54,6 @@ subroutine camice(srf_state,srfflx)
   dtime = get_step_size()
   cdaynext = get_curr_calday(offset=dtime)
 
-!$OMP PARALLEL DO PRIVATE (LCHNK, NCOL, CLAT, CLON, COSZNEXT)
 
   do lchnk=begchunk,endchunk
      ncol = get_ncols_p(lchnk)

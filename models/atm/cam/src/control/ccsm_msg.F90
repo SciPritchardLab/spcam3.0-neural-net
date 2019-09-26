@@ -319,7 +319,6 @@ CONTAINS
 ! Note that coupler has convention that fluxes are positive downward.
 !
 
-!$OMP PARALLEL DO PRIVATE(lchnk,i,ncols)
     do lchnk=begchunk,endchunk
        ncols = get_ncols_p(lchnk)                                                 
        do i=1,ncols                                                               
@@ -443,7 +442,6 @@ CONTAINS
 ! Divide total precipitation and snowfall into rain and snowfall
 !
     if (flxave) then
-!$OMP PARALLEL DO PRIVATE(lchnk,i,ncols)
        do lchnk=begchunk, endchunk
           ncols = get_ncols_p(lchnk)
           do i=1,ncols
@@ -454,7 +452,6 @@ CONTAINS
           end do
        end do
     else
-!$OMP PARALLEL DO PRIVATE(lchnk,i,ncols)
        do lchnk=begchunk, endchunk
           ncols = get_ncols_p(lchnk)
           do i=1,ncols
@@ -471,7 +468,6 @@ CONTAINS
 ! This code removed 3/2003, TC
 ! CLM2.2 now accepts both rain and snow on same grid point, prc_err == 0.
 !
-!$OMP PARALLEL DO PRIVATE(lchnk,ncols)
     do lchnk=begchunk, endchunk
        ncols = get_ncols_p(lchnk)
        prc_err(1:ncols,lchnk)  = 0.
@@ -481,7 +477,6 @@ CONTAINS
 ! Note that coupler has convention that fluxes are positive downward.
 !
 
-!$OMP PARALLEL DO PRIVATE(lchnk,ncols,i)
     do lchnk=begchunk, endchunk
        ncols = get_ncols_p(lchnk)
        do i=1,ncols
@@ -516,7 +511,6 @@ CONTAINS
 ! Output to history file the snow and rain actually sent to coupler as well as the
 ! error between what is sent and what is reported on history file in PRECT/PRECS
 !
-!$OMP PARALLEL DO PRIVATE(lchnk)
     do lchnk=begchunk, endchunk
        call outfld('CPLRAINC', rainconv(1,lchnk), pcols, lchnk)
        call outfld('CPLRAINL', rainlrsc(1,lchnk), pcols, lchnk)
@@ -1049,7 +1043,6 @@ CONTAINS
        rcount = 1./countfa
     end if
 
-!$OMP PARALLEL DO PRIVATE(lchnk,ncols,i)
     do lchnk=begchunk,endchunk
        ncols = get_ncols_p(lchnk)                                                 
        if (countfa == 1) then

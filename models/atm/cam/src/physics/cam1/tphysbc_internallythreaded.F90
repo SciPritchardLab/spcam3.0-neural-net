@@ -1923,7 +1923,6 @@ end do
 
 ! Compute the networks in parallel except for debugging purposes, where the order is important
 #ifndef BRAINDEBUG
-!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
 #endif
 
     ! This is the main computation loop which is parallel

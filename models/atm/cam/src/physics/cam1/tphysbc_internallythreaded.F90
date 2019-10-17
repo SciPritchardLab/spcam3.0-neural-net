@@ -12,6 +12,7 @@
 #define SP_DIR_NS
 #define NOMOMTRANS
 #undef CRM3D
+#define HEATBOMBS
 subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_state2d, & 
                     qpert, in_surface_state2d, &
                     snowh,   &
@@ -100,6 +101,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
     use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net
+#endif
+#ifdef HEATBOMBS
+    use heat_bombs, only: heating_bombs
 #endif
    implicit none
 
@@ -731,6 +735,14 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    ptend(c)%q(:ncol,:,1) = (ptend(c)%q(:ncol,:,1) - state(c)%q(:ncol,:,1))/ztodt
    call t_stopf ('dadadj')
    call physics_update (state(c), tend(c), ptend(c), ztodt)
+
+#ifdef HEATBOMBS
+!  ptend(c)%s(:ncol,pver) = 0.
+! ptend(c)%lq(1) = .false.
+!  ptend(c)%ls = .true.
+  call heating_bombs(state(c)%lchnk, ncol)
+!  call physics_update(state(c),tend(c),ptend(c),ztodt)
+#endif
 
 #if defined (CRM) || defined (CLOUDBRAIN)
 

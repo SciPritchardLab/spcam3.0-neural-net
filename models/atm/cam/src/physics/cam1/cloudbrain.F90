@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
-#define INPUTREGULARIZE
+!#define INPUTREGULARIZE
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8

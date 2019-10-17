@@ -201,6 +201,7 @@ PRIVATE
    character(len=16) :: host                ! host name
    character(len=nlen) :: ctitle = ' '      ! Case title
    character(len=8)  :: inithist = 'YEARLY' ! If set to '6-HOURLY, 'DAILY', 'MONTHLY' or
+!   character(len=8)  :: inithist = 'DAILY' ! If set to '6-HOURLY, 'DAILY', 'MONTHLY' or
                                             ! 'YEARLY' then write IC file
    character(len=10) :: fincl(pflds,ptapes) ! List of fields to add to primary h-file
    character(len=max_chars) :: fincllonlat(pflds,ptapes) ! List of fields to add to primary h-file

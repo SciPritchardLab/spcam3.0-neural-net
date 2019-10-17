@@ -3,7 +3,7 @@
 ! CLOUDBRAIN doesn't actually do anyting here but import some things
 !#define CLOUDBRAIN
 #define XEONPHI ! Pritch at TACC / Stampede
-
+#define OMP_ORIG
 subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 
 
@@ -210,6 +210,9 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 ! Standard threading... here in the scope of physpkg, surrounding tphysbc
 
    call t_startf ('tphysbc')
+#ifdef OMP_ORIG
+!$OMP PARALLEL DO PRIVATE (C,NCOL)
+#endif
    do c=begchunk, endchunk
       ncol = get_ncols_p(c)
       tphystend(:ncol,:,c) = phys_state(c)%t(:ncol,:)
@@ -255,7 +258,10 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
       call srfflx_state_reset (srfflx_state2d(c))
 #endif
       end do ! loop over chunks
-   
+#ifdef OMP_ORIG
+!$OMP PARALLEL END DO 
+#endif
+ 
 #else 
 ! For MIC / XEON PHI at TACC STAMPEDE.
 ! Pritch custom threading... separated chunk loops inside tphysbc.

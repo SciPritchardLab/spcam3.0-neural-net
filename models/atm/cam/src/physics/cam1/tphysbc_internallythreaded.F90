@@ -937,9 +937,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 ! cloud water and ice parameterizations
    call t_startf('cldwat_tend')
+
    call cldcond_tend(state(c), ptend(c), ztodt, &
        tcwat, qcwat, lcwat, prec_pcw(:,c), snow_pcw(:,c), in_icefrac(:,c), rhdfda(:,:,c), rhu00(:,:,c), cld, nevapr(:,:,c), prain(:,:,c), qme(:,:,c), snowh(:,c))
    call physics_update (state(c), tend(c), ptend(c), ztodt)
+
 !   if(lchnk.eq.478.and.nstep.le.96) then
 !        i = 10
 !	write(22,*) state%t(i,:),   state%q(i,:,:), cld(i,:), prec_zmc(i), prec_cmf(i), prec_sed(i), &

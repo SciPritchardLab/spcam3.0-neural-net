@@ -84,13 +84,13 @@ subroutine qneg3a (subnam  ,lchnk     ,q       ,mfirst  ,mlast   , &
          end if
       end do
       if (found) then
-         write(6,9000)subnam,m,get_lat_p(lchnk,iw),nvals,worst,get_lon_p(lchnk,iw),kw
+!         write(6,9000)subnam,m,get_lat_p(lchnk,iw),nvals,worst,get_lon_p(lchnk,iw),kw
       end if
    end do
 !
    return
-9000 format(' QNEG3A from ',a,':m=',i3,' lat=',i3, &
-            ' Min. mixing ratio violated at ',i4,' points.  ', &
-            ' Worst =',e8.1,' at i,k=',i4,i3)
+!9000 format(' QNEG3A from ',a,':m=',i3,' lat=',i3, &
+!            ' Min. mixing ratio violated at ',i4,' points.  ', &
+!            ' Worst =',e8.1,' at i,k=',i4,i3)
 end subroutine qneg3a
 

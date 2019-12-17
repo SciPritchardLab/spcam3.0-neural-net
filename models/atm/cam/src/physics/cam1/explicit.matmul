@@ -10,12 +10,6 @@ use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
 !use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type, width
 
-! -------- NEURAL-FORTRAN --------
-! imports
-use mod_kinds, only: ik, rk
-use mod_network , only: network_type
-use mod_ensemble, only: ensemble_type
-! --------------------------------
 
   implicit none
   save 
@@ -28,28 +22,21 @@ use mod_ensemble, only: ensemble_type
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
 
-#ifdef NEURALLIB
-#ifdef ENSEMBLE
-  type(ensemble_type) :: cloudbrain_ensemble
-#else
-  type(network_type) :: cloudbrain_net
-  integer(ik) :: fileunit, num_layers
-  integer(ik) :: n
-#endif
-#else
+
+
+  ! Files to be used later
   real :: weights_inp(width, inputlength)
   real :: bias_inp(width)
   real :: weights_int(nn_nint, width, width)
   real :: bias_int(nn_nint, width)
   real :: weights_out(outputlength, width)
   real :: bias_out(outputlength)
-#endif
-
   real :: inp_sub(inputlength)
   real :: inp_div(inputlength)
   real :: out_scale(outputlength)
 
   public neural_net, init_keras_matrices, init_keras_norm
+
   contains
 
   subroutine neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
@@ -104,16 +91,7 @@ use mod_ensemble, only: ensemble_type
       endif
 #endif
 
-! 3. Neural network matrix multiplications and activations
-#ifdef NEURALLIB
-#ifdef ENSEMBLE
-    output = cloudbrain_ensemble % average(input)
-#else
-    ! use neural fortran library
-    output = cloudbrain_net % output(input)
-#endif
-#else
-    ! hard code layers
+    ! 3. Neural network matrix multiplications and activations
     ! 3.1 1st layer: input length-->256.
     call matmul(input, x1, inputlength, width, weights_inp, bias_inp, activation_type)
 #ifdef BRAINDEBUG
@@ -141,7 +119,7 @@ use mod_ensemble, only: ensemble_type
         write (6,*) 'BRAINDEBUG output = ',output
       endif
 #endif
-#endif
+
     ! 4. Unnormalize output
     do k=1,outputlength
       output(k) = output(k) / out_scale(k)
@@ -163,8 +141,7 @@ use mod_ensemble, only: ensemble_type
 
   end subroutine neural_net
 
-#ifdef NEURALLIB
-#else
+
   subroutine matmul(inp, out, len_in, len_out, weights, bias, act_type)
     ! Also do LeakyReLU in here
     ! Neural network matrix multiplication
@@ -175,7 +152,7 @@ use mod_ensemble, only: ensemble_type
     real, intent(in)    :: bias(len_out)
     real, intent(in)    :: weights(len_out,len_in)
     integer             :: k, j
-  
+
     out(:) = 0.
     do k=1,len_out
       do j=1,len_in
@@ -183,14 +160,14 @@ use mod_ensemble, only: ensemble_type
       end do
       out(k) = out(k) + bias(k)
     end do
-  
+
     if (act_type .eq. 1) then
       call leaky_relu(out, len_out, 0.3)
     end if
-  
+
   end subroutine matmul
-  
-  
+
+
   subroutine leaky_relu(x, len, alpha)
     real, intent(inout)    :: x(len)
     integer, intent(in)    :: len
@@ -200,26 +177,9 @@ use mod_ensemble, only: ensemble_type
       x(k) = max(alpha * x(k), x(k))  ! Leaky ReLU
     end do
   end subroutine leaky_relu
-#endif
 
 
-  subroutine init_keras_matrices()    
-#ifdef NEURALLIB
-#ifdef ENSEMBLE
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loading -------'
-    cloudbrain_ensemble = ensemble_type('./Models/')
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loaded -------'
-#else
-    call cloudbrain_net % load('./keras_matrices/model.txt')
-    write (6,*) '------- NEURAL-FORTRAN: loaded network from txt file -------'
-#endif
-#ifdef BRAINDEBUG
-    do n = 1, size(cloudbrain_net % layers)
-        write (6,*) 'BRAINDEBUG layer weight', n, cloudbrain_net % layers(n) % w(1$
-    end do
-#endif
-#else
-    ! load weights and bias for each layer
+  subroutine init_keras_matrices()
     integer :: n, k, ios
     character(len=1) :: str
     character(len=2) :: str10  ! Yeah, I don't know how to deal with one vs two characters
@@ -330,7 +290,6 @@ use mod_ensemble, only: ensemble_type
         write (6,*) 'BRAINDEBUG bias_out = ',bias_out
       endif
 #endif
-#endif
 
   end subroutine init_keras_matrices
     
@@ -378,4 +337,9 @@ subroutine init_keras_norm()
 
   end subroutine init_keras_norm
 
+  
+
 end module cloudbrain
+
+
+

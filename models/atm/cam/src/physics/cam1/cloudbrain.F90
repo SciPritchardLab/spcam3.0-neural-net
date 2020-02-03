@@ -74,7 +74,7 @@ use mod_ensemble, only: ensemble_type
     real(r8), intent(out) :: FLNS
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
-    real(r8) :: input(inputlength),x1(width), x2(width)
+    real(rk) :: input(inputlength),x1(width), x2(width)
     real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol

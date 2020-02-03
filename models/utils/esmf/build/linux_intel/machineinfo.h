@@ -1,5 +1,5 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Thu Nov 21 15:56:19 CST 2019 on login2.stampede2.tacc.utexas.edu   \n\
+Libraries compiled on Mon Feb  3 15:06:51 CST 2020 on login2.stampede2.tacc.utexas.edu   \n\
 Machine characteristics: Linux login2.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc  -qopenmp  -O  -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/include -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/build/linux_intel -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/include   -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\

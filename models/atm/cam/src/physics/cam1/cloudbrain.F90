@@ -30,6 +30,7 @@ use mod_ensemble, only: ensemble_type
 
 #ifdef NEURALLIB
 #ifdef ENSEMBLE
+  real(rk) :: noise = 0.2
   type(ensemble_type) :: cloudbrain_ensemble
 #else
   type(network_type) :: cloudbrain_net
@@ -81,8 +82,8 @@ use mod_ensemble, only: ensemble_type
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev)=QBP(:) 
-    input((nlev+1):2*nlev)=TBP(:)
+    input(1:nlev)=TBP(:) !QBP(:) 
+    input((nlev+1):2*nlev)=QBP(:) !TBP(:)
     input((2*nlev+1):3*nlev)=VBP(:)
     input(3*nlev+1) = PS
     input(3*nlev+2) = SOLIN
@@ -107,7 +108,9 @@ use mod_ensemble, only: ensemble_type
 ! 3. Neural network matrix multiplications and activations
 #ifdef NEURALLIB
 #ifdef ENSEMBLE
+    print *, 'Averaging input start'
     output = cloudbrain_ensemble % average(input)
+    print *, 'Averaging output end'
 #else
     ! use neural fortran library
     output = cloudbrain_net % output(input)
@@ -135,17 +138,19 @@ use mod_ensemble, only: ensemble_type
     end do
     ! 3.3 Last layer with linear activation
     call matmul(x1, output, width, outputlength, weights_out, bias_out, 0)
+#endif
+
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG layer = ',nn_nint+2
         write (6,*) 'BRAINDEBUG output = ',output
       endif
 #endif
-#endif
+
     ! 4. Unnormalize output
     do k=1,outputlength
       output(k) = output(k) / out_scale(k)
     end do
+
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG out post scale = ',output
@@ -153,8 +158,8 @@ use mod_ensemble, only: ensemble_type
 #endif
 
     ! 5. Split output into components
-    PHQ(:) =      output(1:nlev)
-    TPHYSTND(:) = output((nlev+1):2*nlev)  * cpair! This is still the wrong unit, needs to be converted to W/m^2
+    TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
+    PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
     FSNT =        output(2*nlev+1)
     FSNS =        output(2*nlev+2)
     FLNT =        output(2*nlev+3)
@@ -207,18 +212,18 @@ use mod_ensemble, only: ensemble_type
 #ifdef NEURALLIB
 #ifdef ENSEMBLE
     write (6,*) '------- NEURAL-FORTRAN: ensemble loading -------'
-    cloudbrain_ensemble = ensemble_type('./Models/')
+    cloudbrain_ensemble = ensemble_type('./Models/', noise)
     write (6,*) '------- NEURAL-FORTRAN: ensemble loaded -------'
 #else
     call cloudbrain_net % load('./keras_matrices/model.txt')
     write (6,*) '------- NEURAL-FORTRAN: loaded network from txt file -------'
 #endif
+#else
 #ifdef BRAINDEBUG
     do n = 1, size(cloudbrain_net % layers)
         write (6,*) 'BRAINDEBUG layer weight', n, cloudbrain_net % layers(n) % w(1$
     end do
 #endif
-#else
     ! load weights and bias for each layer
     integer :: n, k, ios
     character(len=1) :: str

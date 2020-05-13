@@ -30,7 +30,7 @@ use mod_ensemble, only: ensemble_type
 
 #ifdef NEURALLIB
 #ifdef ENSEMBLE
-  real(rk) :: noise = 0.2
+  real(rk) :: noise = 0.0
   type(ensemble_type) :: cloudbrain_ensemble
 #else
   type(network_type) :: cloudbrain_net
@@ -75,15 +75,24 @@ use mod_ensemble, only: ensemble_type
     real(r8), intent(out) :: FLNS
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
+#ifdef NEURALLIB
     real(rk) :: input(inputlength),x1(width), x2(width)
+#else
+    real(r8) :: input(inputlength),x1(width), x2(width)
+#endif
     real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev)=TBP(:) !QBP(:) 
-    input((nlev+1):2*nlev)=QBP(:) !TBP(:)
+#ifdef NEURALLIB
+    input(1:nlev) = TBP(:) !QBP(:) 
+    input((nlev+1):2*nlev) = QBP(:) !TBP(:)
+#else
+    input(1:nlev) = QBP(:)
+    input((nlev+1):2*nlev) = TBP(:)
+#endif
     input((2*nlev+1):3*nlev)=VBP(:)
     input(3*nlev+1) = PS
     input(3*nlev+2) = SOLIN
@@ -108,9 +117,7 @@ use mod_ensemble, only: ensemble_type
 ! 3. Neural network matrix multiplications and activations
 #ifdef NEURALLIB
 #ifdef ENSEMBLE
-    print *, 'Averaging input start'
     output = cloudbrain_ensemble % average(input)
-    print *, 'Averaging output end'
 #else
     ! use neural fortran library
     output = cloudbrain_net % output(input)
@@ -158,8 +165,13 @@ use mod_ensemble, only: ensemble_type
 #endif
 
     ! 5. Split output into components
+#ifdef NEURALLIB
     TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
     PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
+#else
+    PHQ(:) = output(1:nlev) 
+    TPHYSTND(:) = output((nlev+1):2*nlev) * cpair
+#endif
     FSNT =        output(2*nlev+1)
     FSNS =        output(2*nlev+2)
     FLNT =        output(2*nlev+3)

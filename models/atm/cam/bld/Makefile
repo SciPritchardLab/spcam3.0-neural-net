@@ -57,9 +57,9 @@ null  :=
 space := $(null) $(null)
 comma := $(null),$(null)
 
-NEURAL_MOD := -I/home1/06528/tg858273/neural-fortran/build/include/
-NEURAL_A := -L/home1/06528/tg858273/neural-fortran/build/lib/
-NEURAL_O := -L/home1/06528/tg858273/neural-fortran/build/CMakeFiles/neural.dir/
+NEURAL_MOD := -I/home1/06528/tg858273/FKB/build/include/
+NEURAL_A := -L/home1/06528/tg858273/FKB/build/lib/
+NEURAL_O := -L/home1/06528/tg858273/FKB/build/CMakeFiles/neural.dir/
 
 # Determine distribution root directory
 ifeq ($(ROOTDIR),$(null))

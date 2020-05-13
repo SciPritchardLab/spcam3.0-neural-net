@@ -27,7 +27,7 @@ mkdir -p $blddir                || echo "cannot create $blddir" && exit 1
 if ( ! -x $blddir/cam ) then
     cd $blddir                  || echo "cd $blddir failed" && exit 1
 
-    $cfgdir/configure_mmf -fflags "-DNEURALLIB -DDEEP -DCLOUDBRAIN" -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
+    $cfgdir/configure_mmf -fflags "-DDEEP -DCLOUDBRAIN" -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
 # Use this non-SP build script when using CLOUDBRAIN to avoid stomping on state_save compiler messages:
 #    $cfgdir/configure -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
     echo "building CAM in $blddir ..."

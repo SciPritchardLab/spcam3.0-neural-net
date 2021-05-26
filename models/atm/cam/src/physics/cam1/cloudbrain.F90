@@ -27,11 +27,12 @@ use mod_ensemble, only: ensemble_type
 
 #ifdef NEURALLIB
 !  type(network_type) :: cloudbrain_net
-  type(network_type) :: cloudbrain_net(65)
+  type(network_type) :: cloudbrain_net(outputlength)
   integer(ik) :: fileunit, num_layers
   integer(ik) :: n
 #endif
 
+  integer :: inputmask_causal_relevance(outputlength,inputlength)
   real :: inp_sub(inputlength)
   real :: inp_div(inputlength)
   real :: out_scale(outputlength) ! HEY needs updating.
@@ -62,10 +63,10 @@ use mod_ensemble, only: ensemble_type
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
 #ifdef NEURALLIB
-    real(rk) :: input(inputlength)
+    real(rk) :: input(inputlength),input_trimmed(inputlength)
 #endif
     real(r8) :: output (outputlength)
-    integer :: k, nlev, n,count
+    integer :: j,k, nlev, n,nrelevant
     integer, intent(in) :: icol
 
     ! 1. Concatenate input vector to neural network
@@ -101,7 +102,16 @@ use mod_ensemble, only: ensemble_type
 #ifdef NEURALLIB
     ! use neural fortran library
    do k=1,outputlength
-     output = cloudbrain_net(k) % output(input) ! note coupling to many NNs here, one for each output
+     do j=1,inputlength
+       nrelevant = 0
+       if (inputmask_causal_relevance(k,j) .eq. 1) then ! is relevant input?
+         nrelevant = nrelevant + 1
+         input_trimmed(nrelevant) = input(j)
+       endif
+     end do
+! TODO: Add debug print after the trimming of input_trimmed(1:nrelevant)
+     output = cloudbrain_net(k) % output(input_trimmed(1:nrelevant)) ! note coupling to many NNs here, one for each output
+     ! note #2, only passing the subset of the input vector that is causally relevant.
    end do
 #endif
 
@@ -157,18 +167,29 @@ use mod_ensemble, only: ensemble_type
       tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_model.txt'
       write (6,*) 'Attempting to load NN for: ',trim(tmpstr)
       call cloudbrain_net(count) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
+      ! INSERT TODO: read in the 1/0 files here, leveraging same string
+      ! handling, then store in a outputlength x
+      ! inputlength array to be added to module private contents. THEN TODO --
+      ! subset the input vector in the call to the cloudbrain from the main NN
+      ! subroutine. 
+      tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_inputlist.txt'
+      open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
+      read(555,*) inputmask_causal_relevance(count,:)
     end do
   end do
   ! 5 x scalar output variables next.
   do kvar=3,7
+    count = count + 1
     write (kvarstr,"(I0)") kvar-1 ! -1 because 0 based counting
     write (klevstr,"(I0)") 0  ! 0 is the convention used here for the scalars
     tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_model.txt'
     write (6,*) 'Attempting to load NN for: ',trim(tmpstr)
-    call cloudbrain_net(count+kvar) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
+    call cloudbrain_net(count) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
+    tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_inputlist.txt'
+    open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
+    read(555,*) inputmask_causal_relevance(count,:)
   end do
 #endif
-! TODO: Construct the input causal 1/0 matrix (noutput)
   end subroutine init_keras_matrices
     
 subroutine init_keras_norm()

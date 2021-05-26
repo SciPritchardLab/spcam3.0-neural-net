@@ -144,14 +144,28 @@ use mod_ensemble, only: ensemble_type
 ! Upgrade into a loop over all the laods
  ! LOGIC FOR LOADING ALL THE SEPARATE NNS IS HERE  
   integer :: k,count
-
+  integer :: kvar,klev
+  character (256) :: tmpstr
+  character (256) :: kvarstr,klevstr
   count = 0
-  do k=1,65
-      ! HEY insert the fortran string handling here.
-      ! (pending successful txt conversion of the saved models via FKB)
-      call cloudbrain_net(count) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/0_15_model.h5')
-      ! YO do arrays of cloiudbrain_net % load operations work? TBD...
-      write (6,*) 'Causal-coupler loaded network ', count
+  ! 2x 1x30 output variables first...
+  do kvar=1,2 
+    do klev = 1,30
+      count = count + 1
+      write (kvarstr,"(I0)") kvar-1 ! -1 because 0 based counting
+      write (klevstr,"(I0)") klev-1
+      tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_model.txt'
+      write (6,*) 'Attempting to load NN for: ',trim(tmpstr)
+      call cloudbrain_net(count) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
+    end do
+  end do
+  ! 5 x scalar output variables next.
+  do kvar=3,7
+    write (kvarstr,"(I0)") kvar-1 ! -1 because 0 based counting
+    write (klevstr,"(I0)") 0  ! 0 is the convention used here for the scalars
+    tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_model.txt'
+    write (6,*) 'Attempting to load NN for: ',trim(tmpstr)
+    call cloudbrain_net(count+kvar) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
   end do
 #endif
 ! TODO: Construct the input causal 1/0 matrix (noutput)

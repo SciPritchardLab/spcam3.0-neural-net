@@ -72,10 +72,10 @@ use mod_ensemble, only: ensemble_type
     ! 1. Concatenate input vector to neural network
     nlev=30
 ! HEY we are not sure of the input order
-! HEY the input normalization files look suspicious.
+! The input normalization file inp_sub suggests Q comes before T...
 #ifdef NEURALLIB
-    input(1:nlev) = TBP(:)
-    input((nlev+1):2*nlev) = QBP(:)
+    input(1:nlev) = QBP(:)
+    input((nlev+1):2*nlev) = TBP(:)
 #endif
     input((2*nlev+1):3*nlev)=VBP(:)
     input(3*nlev+1) = PS

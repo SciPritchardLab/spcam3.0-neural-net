@@ -123,9 +123,9 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
 ! 5/13/20 JO: RETURNING TO NORMAL CORRECTION
-!#ifdef BETAFIX
+#ifdef BETAFIX
 !      t3m1    (i,k) = t3m1(i,k) + betafix ! + beta  ! SR: Comment out beta correction
-!#else
+#else
       t3m1    (i,k) = t3m1(i,k) + beta
 #endif
     end do

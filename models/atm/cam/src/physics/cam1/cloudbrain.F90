@@ -65,7 +65,7 @@ use mod_ensemble, only: ensemble_type
 #ifdef NEURALLIB
     real(rk) :: input(inputlength),input_trimmed(inputlength)
 #endif
-    real(r8) :: output (outputlength)
+    real(r8) :: output (outputlength),tmpoutput(outputlength)
     integer :: j,k, nlev, n,nrelevant
     integer, intent(in) :: icol
 
@@ -110,8 +110,9 @@ use mod_ensemble, only: ensemble_type
        endif
      end do
 ! TODO: Add debug print after the trimming of input_trimmed(1:nrelevant)
-     output = cloudbrain_net(k) % output(input_trimmed(1:nrelevant)) ! note coupling to many NNs here, one for each output
-     ! note #2, only passing the subset of the input vector that is causally relevant.
+!     output(k) = cloudbrain_net(k) % output(input_trimmed(1:nrelevant)) ! note coupling to many NNs here, one for each output
+     tmpoutput = cloudbrain_net(k) % output(input) ! note coupling to many NNs here, one for each output
+     output(k) = tmpoutput(1)
    end do
 #endif
 
@@ -172,9 +173,12 @@ use mod_ensemble, only: ensemble_type
       ! inputlength array to be added to module private contents. THEN TODO --
       ! subset the input vector in the call to the cloudbrain from the main NN
       ! subroutine. 
-      tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_inputlist.txt'
+      tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_input_list.txt'
       open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
       read(555,*) inputmask_causal_relevance(count,:)
+      tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_out_scale.txt'
+      open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
+      read(555,*) out_scale(count)
     end do
   end do
   ! 5 x scalar output variables next.
@@ -185,9 +189,12 @@ use mod_ensemble, only: ensemble_type
     tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_model.txt'
     write (6,*) 'Attempting to load NN for: ',trim(tmpstr)
     call cloudbrain_net(count) % load('/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr))
-    tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_inputlist.txt'
+    tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_input_list.txt'
     open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
     read(555,*) inputmask_causal_relevance(count,:)
+    tmpstr = trim(kvarstr)//'_'//trim(klevstr)//'_out_scale.txt'
+    open(unit=555,file='/home1/08098/tg873976/usmile/causality_convection/dummy_singleNNs_FKB_renamed/'//trim(tmpstr),status='old',action='read')
+    read(555,*) out_scale(count)
   end do
 #endif
   end subroutine init_keras_matrices
@@ -216,21 +223,6 @@ subroutine init_keras_norm()
 #ifdef BRAINDEBUG
     if (masterproc) then
       write (6,*) 'BRAINDEBUG inp_div = ',inp_div
-    endif
-#endif
-
-  ! HEY still need to think about output scaling.
-  ! 3. Read out_scale
-  if (masterproc) then
-    write (6,*) 'CLOUDBRAIN: reading out_scale'
-  endif
-!  open (unit=555,file='./keras_matrices/out_scale.txt',status='old',action='read')
-!  read(555,*) out_scale(:)
-!  close (555)
-   out_scale(:) = 1.
-#ifdef BRAINDEBUG
-    if (masterproc) then
-      write (6,*) 'BRAINDEBUG out_scale = ',out_scale
     endif
 #endif
 

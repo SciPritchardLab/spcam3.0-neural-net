@@ -25,20 +25,7 @@ INTEGER, PARAMETER :: inputlength  = 94
 INTEGER, PARAMETER :: outputlength = 65
 
 #ifdef NEURALLIB
-!  type(network_type) :: cloudbrain_net
-! 210609 FIS. Hey this needs work here. It runs but will not work for the
-!             CausalSingleNNs. It only "picks up" the input list from the
-!             first SingleNN (i.e., 0_0_input_list.txt), which will be
-!             applied to the rest.
-!             Solutions?
-!               - Elegant. Create new type in FKB? e.g., similar to ensemble_type
-!                 that will allow the proper initialization for each
-!                 singlenn.
-!               - Ugly (but quick). Hard code each singlenn, i.e., 
-!                 type(network_type) :: 0_0_cloudbrain_net
-!                 ...
 TYPE(network_type) :: cloudbrain_net(outputlength)
-! 210609
 INTEGER(ik) :: fileunit, num_layers
 INTEGER(ik) :: n
 #endif
@@ -46,7 +33,7 @@ INTEGER(ik) :: n
 INTEGER :: inputmask_causal_relevance(outputlength,inputlength)
 REAL :: inp_sub(inputlength)
 REAL :: inp_div(inputlength)
-REAL :: out_scale(outputlength) ! HEY needs updating; Fine already?
+REAL :: out_scale(outputlength)
 
 PUBLIC neural_net, init_keras_matrices, init_keras_norm
 CONTAINS
@@ -74,9 +61,12 @@ CONTAINS
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
 #ifdef NEURALLIB
+    ! Why do we need this here? Can we delete the the IF clause?
     real(rk) :: input(inputlength),input_trimmed(inputlength)
+    real(rk), allocatable :: input_trimmed_a(:), input_trimmed_b(:)
 #endif
-    real(r8) :: output (outputlength),tmpoutput(outputlength)
+    real(r8) :: output (outputlength)
+    real(r8) :: tmpoutput(1)
     integer :: j,k, nlev, n,nrelevant
     integer, intent(in) :: icol
 
@@ -118,7 +108,7 @@ CONTAINS
       END DO
 ! Debug point: print after the trimming of input_trimmed(1:nrelevant)
 #ifdef BRAINDEBUG
-      IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 1) THEN
+      IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
         WRITE (6,*) 'Length of the input vector=',inputlength
         WRITE (6,*) 'input=',input(:)
         WRITE (6,*) 'Length of the trimmed input vector=',nrelevant
@@ -126,9 +116,29 @@ CONTAINS
       ENDIF
 #endif
       ! note coupling to many NNs here, one for each output
-      tmpoutput = cloudbrain_net(k) % output(input_trimmed(1:nrelevant))
+!      tmpoutput = cloudbrain_net(k) % output(input_trimmed(1:nrelevant))
 !      tmpoutput = cloudbrain_net(k) % output(input)
+!      output(k) = tmpoutput(1)
+      allocate(input_trimmed_a(nrelevant))
+      input_trimmed_a = input_trimmed(1:nrelevant)
+#ifdef BRAINDEBUG
+      IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
+        WRITE (6,*) 'Length of the input vector=',inputlength
+        WRITE (6,*) 'input=',input(:)
+        WRITE (6,*) 'Length of the input_trimmed_a=',size(input_trimmed_a)
+        WRITE (6,*) 'input_trimmed_a=',input_trimmed_a(:)
+      ENDIF
+#endif
+      call move_alloc(input_trimmed_a, input_trimmed_b)
+#ifdef BRAINDEBUG
+      IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
+        WRITE (6,*) 'Length of the input_trimmed_b=',SIZE(input_trimmed_b)
+        WRITE (6,*) 'input_trimmed_b=',input_trimmed_b(:)
+      ENDIF
+#endif
+      tmpoutput = cloudbrain_net(k) % output(input_trimmed_b(:))
       output(k) = tmpoutput(1)
+
     END DO
 #endif
 

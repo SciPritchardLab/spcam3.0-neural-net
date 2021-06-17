@@ -1,7 +1,7 @@
 #include <misc.h>
 #include <params.h>
-#define BRAINDEBUG
-#define NEURALLIB
+!#define BRAINDEBUG
+!#define NEURALLIB
 MODULE cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
 use ppgrid,          only: pcols, pver, pverp
@@ -23,13 +23,7 @@ PRIVATE
 ! Define variables for this entire module
 INTEGER, PARAMETER :: inputlength  = 94
 INTEGER, PARAMETER :: outputlength = 65
-
-#ifdef NEURALLIB
 TYPE(network_type) :: cloudbrain_net(outputlength)
-INTEGER(ik) :: fileunit, num_layers
-INTEGER(ik) :: n
-#endif
-
 INTEGER :: inputmask_causal_relevance(outputlength,inputlength)
 REAL :: inp_sub(inputlength)
 REAL :: inp_div(inputlength)
@@ -60,11 +54,8 @@ CONTAINS
     real(r8), intent(out) :: FLNS
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
-#ifdef NEURALLIB
-    ! Why do we need this here? Can we delete the the IF clause?
     real(rk) :: input(inputlength),input_trimmed(inputlength)
-    real(rk), allocatable :: input_trimmed_a(:), input_trimmed_b(:)
-#endif
+    real(rk), allocatable :: input_trimmed_tmp(:), input_trimmed_alloc(:)
     real(r8) :: output (outputlength)
     real(r8) :: tmpoutput(1)
     integer :: j,k, nlev, n,nrelevant
@@ -96,7 +87,6 @@ CONTAINS
 #endif
 
     ! 3. Neural network matrix multiplications and activations
-#ifdef NEURALLIB
     ! use neural fortran library
     DO k=1,outputlength
       nrelevant = 0
@@ -108,7 +98,8 @@ CONTAINS
       END DO
 ! Debug point: print after the trimming of input_trimmed(1:nrelevant)
 #ifdef BRAINDEBUG
-      IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
+      IF (masterproc .AND. icol .EQ. 1) THEN
+        WRITE (6,*) 'k variable is ',k
         WRITE (6,*) 'Length of the input vector=',inputlength
         WRITE (6,*) 'input=',input(:)
         WRITE (6,*) 'Length of the trimmed input vector=',nrelevant
@@ -116,31 +107,27 @@ CONTAINS
       ENDIF
 #endif
       ! note coupling to many NNs here, one for each output
-!      tmpoutput = cloudbrain_net(k) % output(input_trimmed(1:nrelevant))
-!      tmpoutput = cloudbrain_net(k) % output(input)
-!      output(k) = tmpoutput(1)
-      allocate(input_trimmed_a(nrelevant))
-      input_trimmed_a = input_trimmed(1:nrelevant)
+      allocate(input_trimmed_tmp(nrelevant))
+      input_trimmed_tmp = input_trimmed(1:nrelevant)
 #ifdef BRAINDEBUG
       IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
         WRITE (6,*) 'Length of the input vector=',inputlength
         WRITE (6,*) 'input=',input(:)
-        WRITE (6,*) 'Length of the input_trimmed_a=',size(input_trimmed_a)
-        WRITE (6,*) 'input_trimmed_a=',input_trimmed_a(:)
+        WRITE (6,*) 'Length of the input_trimmed_tmp=',size(input_trimmed_tmp)
+        WRITE (6,*) 'input_trimmed_tmp=',input_trimmed_tmp(:)
       ENDIF
 #endif
-      call move_alloc(input_trimmed_a, input_trimmed_b)
+      call move_alloc(input_trimmed_tmp, input_trimmed_alloc)
 #ifdef BRAINDEBUG
       IF (masterproc .AND. icol .EQ. 1 .AND. k .EQ. 65) THEN
-        WRITE (6,*) 'Length of the input_trimmed_b=',SIZE(input_trimmed_b)
-        WRITE (6,*) 'input_trimmed_b=',input_trimmed_b(:)
+        WRITE (6,*) 'Length of the input_trimmed_alloc=',SIZE(input_trimmed_alloc)
+        WRITE (6,*) 'input_trimmed_alloc=',input_trimmed_alloc(:)
       ENDIF
 #endif
-      tmpoutput = cloudbrain_net(k) % output(input_trimmed_b(:))
+      tmpoutput = cloudbrain_net(k) % output(input_trimmed_alloc(:))
       output(k) = tmpoutput(1)
 
     END DO
-#endif
 
 #ifdef BRAINDEBUG
     IF (masterproc .AND. icol .EQ. 1) THEN
@@ -151,6 +138,11 @@ CONTAINS
     ! 4. Unnormalize output
     DO k=1,outputlength
       output(k) = output(k) / out_scale(k)
+! 210616 FIS; For some reason predicted FSNS(k=61), FSNT(k=62), prect(k=65) 
+!             may be negative
+      IF ( ANY( k == (/ 61, 62, 65 /) ) .AND. output(k) .LT. 0._r8 ) THEN
+        output(k) = 0._r8
+      ENDIF
     END DO
 
 #ifdef BRAINDEBUG
@@ -171,10 +163,6 @@ CONTAINS
   END SUBROUTINE neural_net
 
   SUBROUTINE init_keras_matrices()    
-#ifdef NEURALLIB
-! HEY manage the enumerated filenames here:
-! Upgrade into a loop over all the loads
-! LOGIC FOR LOADING ALL THE SEPARATE NNS IS HERE  
     INTEGER :: k,count
     INTEGER :: kvar,klev
     CHARACTER (256) :: tmpstr
@@ -189,11 +177,6 @@ CONTAINS
         tmpstr = TRIM(kvarstr)//'_'//TRIM(klevstr)//'_model.txt'
         WRITE (6,*) 'Attempting to load NN for: ',TRIM(tmpstr)
         CALL cloudbrain_net(count) % load('./models/'//TRIM(tmpstr))
-        ! INSERT TODO: read in the 1/0 files here, leveraging same string
-        ! handling, then store in a outputlength x
-        ! inputlength array to be added to module private contents. THEN TODO --
-        ! subset the input vector in the call to the cloudbrain from the main NN
-        ! subroutine. 
         tmpstr = TRIM(kvarstr)//'_'//TRIM(klevstr)//'_input_list.txt'
         OPEN(unit=555,file='./models/'//TRIM(tmpstr),status='old',action='read')
         READ(555,*) inputmask_causal_relevance(count,:)
@@ -217,7 +200,7 @@ CONTAINS
       OPEN(unit=555,file='./models/'//TRIM(tmpstr),status='old',action='read')
       READ(555,*) out_scale(count)
     END DO
-#endif
+
   END SUBROUTINE init_keras_matrices
 
   SUBROUTINE init_keras_norm()
@@ -225,7 +208,7 @@ CONTAINS
     IF (masterproc) THEN
       WRITE (6,*) 'CLOUDBRAIN: reading inp_sub'
     ENDIF
-    OPEN(unit=555,file='./models/0_0_inp_sub.txt',status='old',action='read')
+    OPEN(unit=555,file='./models/inp_sub.txt',status='old',action='read')
     READ(555,*) inp_sub(:)
     CLOSE (555)
 #ifdef BRAINDEBUG
@@ -238,7 +221,7 @@ CONTAINS
     IF (masterproc) THEN
       WRITE (6,*) 'CLOUDBRAIN: reading inp_div'
     ENDIF
-    OPEN(unit=555,file='./models/0_0_inp_div.txt',status='old',action='read')
+    OPEN(unit=555,file='./models/inp_div.txt',status='old',action='read')
     READ(555,*) inp_div(:)
     CLOSE (555)
 #ifdef BRAINDEBUG

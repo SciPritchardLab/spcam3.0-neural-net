@@ -9,7 +9,7 @@
 ! HEY note these SSTs are redundant, will be prescribed constant SSTs within the aquaplanet code:
  bndtvs                 = '/work2/08098/tg873976/stampede2/csmdata_cam3_sp_frombranson/sst_HadOIBl_bc_64x128_1949_2004_c050526.nc'
  sstcyc                 = .true.
- caseid                 = 'AndKua_aqua_SPCAM3.0_debug41b'
+ caseid                 = 'AndKua_aqua_caseid'
 ! HEY zeroing out these horizontally asymmetric particulate emissions:
  co_emis                = '/work2/08098/tg873976/stampede2/zeroed_cam3_bcs/co_emis_64x128_zeroed.nc'
  dms_emis               = '/work2/08098/tg873976/stampede2/zeroed_cam3_bcs/dms_emis_64x128_zeroed.nc'
@@ -17,11 +17,18 @@ iyear_ad                = 1950
 ! Atmospheric initial condition file:
  !ncdata = '/work2/08098/tg873976/stampede2/csmdata_cam3_sp_frombranson/aqua_init_64x128_L30.nc'
  ncdata = 'spinup_AndKua_aqua_SPCAM3.0.cam2.i.0000-12-02-00000.nc' ! spun up for almost a year.
- nelapse                =  35136  ! How many 30 minute time steps --> 2 years
+mss_irt                 = 0 ! Not saving restart files on the MSS system
+! nrevsn                 = '/home1/08098/tg873976/scratch/SPCAM3.0_8col_v1.0/AndKua_aqua_caseid.cam2.r.0001-02-01-00000' ! restart file for branch cases
+! archive_dir            = '/home1/08098/tg873976/scratch/SPCAM3.0_8col_v1.0'
+! rest_pfile             = '/home1/08098/tg873976/scratch/SPCAM3.0_8col_v1.0/AndKua_aqua_caseid.cam2.r.0001-02-01-00000'
+! nelapse                = 52704  ! How many 30 minute time steps --> 3 years (366 days)
+! nelapse                = 35136  ! How many 30 minute time steps --> 2 years (366 days)
+ nelapse                = 1488  ! How many 30 minute time steps --> 31 days
 ! nelapse                = 3  ! How many 30 minute time steps
  dtime                  = 1800
  start_ymd              = 0101
  nsrest                 = 0
+ nrefrq                 = 1
 ! HEY zeroing out these horizontally asymmetric particulate emissions:
  oxid                   = '/work2/08098/tg873976/stampede2/zeroed_cam3_bcs/oxid_64x128_zeroed.nc'
  soil_erod              = '/work2/08098/tg873976/stampede2/csmdata_cam3_sp_frombranson/dust_64x128_c021028.nc'
@@ -64,13 +71,15 @@ iyear_ad                = 1950
 !fincl2 = 'PS:A','QAP:I','TAP:I','TPHYSTND:A','PHQ:A','SHFLX:A','LHFLX:A','SPDT','SPDQ','FLUT','QRL','QRS','SOLIN','DTV','VD01','UAP','VAP','UPHYSTND','VPHYSTND','SPQC','SPQI','T:I','TS','PRECT','BRAINDQ','BRAINDT','NNTBP','NNQBP','NNVBP','NNTS','NNSOLIN','NNPS','TEOUT','TEINP','TEFIX','DBGT1','DBGT2', 'DBGT3','TTEND','DBGT4','DBGT5','DBGT6','TEPRE','TWPRE','TEPOST','TWPOST','SPRE','SPOST','TEPRE_R','TWPRE_R','TEPOST_R','TWPOST_R','SPRE_R','SPOST_R','ENGYCORR','NNSHF','NNLHF'
 
 ! CAM3.0
-fincl2 = 'PS:A','QAP:I','TAP:I','TPHYSTND:A','PHQ:A','SHFLX:A','LHFLX:A','CLDTOT','CLOUD','OMEGA','Z3','PRECT','FLUT','QRL','QRS','SOLIN'
+!fincl2 = 'PS:A','QAP:I','TAP:I','TPHYSTND:A','PHQ:A','SHFLX:A','LHFLX:A','CLDTOT','CLOUD','OMEGA','Z3','PRECT','FLUT','QRL','QRS','SOLIN'
 ! SPCAM3.0
 !fincl2 = 'PS:A','QAP:I','TAP:I','TPHYSTND:A','PHQ:A','SHFLX:A','LHFLX:A','CLDTOT','CLOUD','OMEGA','Z3','PRECT','FLUT','QRL','QRS','SOLIN','DTV','VD01','UAP','VAP','UPHYSTND','VPHYSTND','T:I','TS', 'SPDT','SPDQ','SPDQC','SPDQI', 'SPQC:I','SPQI:I','SPQS:I','SPQG:I','SPQR:I', 'SPMC:I','SPMCUP:I','SPMCDN:I','SPMCUUP:I','SPMCUDN:I'
-
+! SingleNNsCAM3.0 & CausalSingleNNsCAM3.0
+fexcl1 = 'SPDT','SPDQ','SPDQC','SPDQI', 'SPQC','SPQI','SPQS','SPQG','SPQR', 'SPMC','SPMCUP','SPMCDN','SPMCUUP','SPMCUDN'
+fincl2 = 'PS:A','QAP:I','TAP:I','TPHYSTND:A','PHQ:A','SHFLX:A','LHFLX:A','CLDTOT','CLOUD','OMEGA','Z3','PRECT','FLUT','QRL','QRS','SOLIN','FSNT','FSNS','FLNT','FLNS'
 
  nhtfrq = 0,1
-  mfilt = 1,48
+ mfilt = 1,48
 /
 &clmexp
  finidat                = '/work2/08098/tg873976/stampede2/csmdata_cam3_sp_frombranson/clmi_0000-09-01_64x128_T42_USGS_c030609.nc'

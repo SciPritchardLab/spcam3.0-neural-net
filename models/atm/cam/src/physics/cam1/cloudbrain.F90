@@ -142,6 +142,9 @@ CONTAINS
 !             may be negative
       IF ( ANY( k == (/ 61, 62, 65 /) ) .AND. output(k) .LT. 0._r8 ) THEN
         output(k) = 0._r8
+! 210628 FIS; Hardcoding dQ/dt above 50hPa is zero (30lev config).
+      ELSE IF ( ANY( k == (/ 1, 2, 3, 4, 5 /) ) ) THEN
+        output(k) = 0._r8
       ENDIF
     END DO
 

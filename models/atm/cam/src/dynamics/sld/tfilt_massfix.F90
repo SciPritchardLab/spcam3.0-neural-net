@@ -127,7 +127,7 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
 !      t3m1    (i,k) = t3m1(i,k) + betafix ! + beta  ! SR: Comment out beta correction
 !#else
       t3m1    (i,k) = t3m1(i,k) + beta
-#endif
+!#endif
     end do
   end do
 !

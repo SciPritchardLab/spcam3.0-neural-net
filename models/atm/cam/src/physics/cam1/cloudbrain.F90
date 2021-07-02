@@ -1,3 +1,5 @@
+#ifdef CLOUDBRAIN
+
 #include <misc.h>
 #include <params.h>
 !#define BRAINDEBUG
@@ -396,3 +398,4 @@ subroutine init_keras_norm()
   end subroutine init_keras_norm
 
 end module cloudbrain
+#endif

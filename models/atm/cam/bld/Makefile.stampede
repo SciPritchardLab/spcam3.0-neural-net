@@ -168,7 +168,8 @@ CPPDEF    := -DCAM -DNO_SHR_VMATH -DHIDE_SHR_MSG
 
 $(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
 #	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf_c++ -lnetcdff -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
-	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
+	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
 
 debug: $(OBJS)
 	echo "FFLAGS: $(FFLAGS)"

@@ -1,6 +1,6 @@
 #include <misc.h>
 ! CLOUDBRAIN doesn't actually do anyting here but import some things
-#define CLOUDBRAIN
+!#define CLOUDBRAIN
 !-------------------------------------------------------------------------------
 !physics data types module
 !-------------------------------------------------------------------------------

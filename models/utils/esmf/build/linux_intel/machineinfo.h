@@ -1,8 +1,8 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Wed May 13 13:50:39 CDT 2020 on login2.stampede2.tacc.utexas.edu   \n\
-Machine characteristics: Linux login2.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
+Libraries compiled on Fri Jul  2 12:51:00 CDT 2021 on login1.stampede2.tacc.utexas.edu   \n\
+Machine characteristics: Linux login1.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
-Using C compiler: mpicc  -qopenmp  -O  -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/include -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/build/linux_intel -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/include   -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
+Using C compiler: mpicc  -qopenmp  -O  -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
 C Compiler version:  \n\
 icc (ICC) 18.0.2 20180210  \n\
 Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.  \n\
@@ -11,7 +11,7 @@ C++ Compiler version:  \n\
 icc (ICC) 18.0.2 20180210  \n\
 Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.  \n\
   \n\
-Using Fortran compiler: mpif90 -qopenmp  -O -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/include -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/build/linux_intel -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/include   -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/Infrastructure/mpiuni                           \n\
+Using Fortran compiler: mpif90 -qopenmp  -O -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                           \n\
 Fortran Compiler version:  \n\
 Error: Command line argument is needed!  \n\
 Simple script to compile and/or link MPI programs.  \n\
@@ -74,11 +74,11 @@ Using ESMF flags:                       \n\
 -----------------------------------------  \n\
 Using configuration flags:  \n\
 -----------------------------------------  \n\
-Using include paths: -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/include -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/build/linux_intel -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/include   -I/home1/06528/tg858273/repositories/neural-net/models/utils/esmf/src/Infrastructure/mpiuni    \n\
+Using include paths: -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni    \n\
 -----------------------------------------  \n\
-Using ESMF directory: /home1/06528/tg858273/repositories/neural-net/models/utils/esmf  \n\
+Using ESMF directory: /home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/home1/06528/tg858273/jordan-nn-build/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpif90  -O -Wl,-rpath,/home1/06528/tg858273/jordan-nn-build/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/home1/06528/tg858273/jordan-nn-build/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/scratch/08110/tg874091/smoketest/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpif90  -O -Wl,-rpath,/scratch/08110/tg874091/smoketest/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/scratch/08110/tg874091/smoketest/obj/esmf/lib/libO/linux_intel "; 

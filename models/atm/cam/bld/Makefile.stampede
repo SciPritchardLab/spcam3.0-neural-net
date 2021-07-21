@@ -57,9 +57,9 @@ null  :=
 space := $(null) $(null)
 comma := $(null),$(null)
 
-NEURAL_MOD := -I/home1/06528/tg858273/FKB/build/include/
-NEURAL_A := -L/home1/06528/tg858273/FKB/build/lib/
-NEURAL_O := -L/home1/06528/tg858273/FKB/build/CMakeFiles/neural.dir/
+NEURAL_MOD := -I/home1/00993/tg802402/repositories/FKB/build/include/
+NEURAL_A := -L/home1/00993/tg802402/repositories/FKB/build/lib/
+NEURAL_O := -L/home1/00993/tg802402/repositories/FKB/build/CMakeFiles/neural.dir/
 
 # Determine distribution root directory
 ifeq ($(ROOTDIR),$(null))
@@ -169,7 +169,8 @@ CPPDEF    := -DCAM -DNO_SHR_VMATH -DHIDE_SHR_MSG
 $(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
 #	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf_c++ -lnetcdff -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
 #	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
-	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
 
 debug: $(OBJS)
 	echo "FFLAGS: $(FFLAGS)"

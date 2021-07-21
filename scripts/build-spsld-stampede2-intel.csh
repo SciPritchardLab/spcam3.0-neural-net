@@ -14,7 +14,7 @@ setenv LIB_NETCDF   /home1/00993/tg802402/lib
 setenv MPICH_DIR $MPICH_HOME # on stampede, this is env variable for impi home after module set right.
 
 # user override if desired. Expectation is you will use this scripts in a local dir, where obj created
-set wrkdir       = $SCRATCH/smoketest
+set wrkdir       = $SCRATCH/smoketestNN
 set blddir       = $wrkdir/obj
 set rundir       = $wrkdir/run
 set cfgdir       = $camroot/bld
@@ -28,9 +28,8 @@ if ( ! -x $blddir/cam ) then
     cd $blddir                  || echo "cd $blddir failed" && exit 1
 
 #    $cfgdir/configure_mmf -fflags "-DDEEP -DCLOUDBRAIN" -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
-    $cfgdir/configure_mmf -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
+    $cfgdir/configure_mmf -fflags "-DCLOUDBRAIN -DNEURALLIB -DBRAINDEBUG" -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
 # Use this non-SP build script when using CLOUDBRAIN to avoid stomping on state_save compiler messages:
-#    $cfgdir/configure -fc mpif90 -cc cc -spmd -smp -dyn sld -res 64x128 -pcols 8 -nlev 30 -cam_exedir $rundir -mpi_inc $MPICH_DIR/intel64/include -mpi_lib $MPICH_DIR/intel64/lib || echo "configure failed" && exit 1
     echo "building CAM in $blddir ..."
     rm -f Depends
     gmake -j 8 >&! Make.out #-j 8 #>&! MAKE.out      || echo "CAM build failed: see $blddir/MAKE.out" && exit 1

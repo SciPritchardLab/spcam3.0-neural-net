@@ -1,0 +1,11 @@
+#!/bin/csh
+#SBATCH -A TG-ATM190002
+#SBATCH -N 1
+#SBATCH -n 64
+#SBATCH -t 06:00:00
+#SBATCH -p normal
+
+cd /scratch/00993/tg802402/jerry_NN_ensemble_FKB/run_XXX
+ibrun -n 64 ./cam  < atm_in > logfile
+
+

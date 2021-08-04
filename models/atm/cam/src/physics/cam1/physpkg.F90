@@ -671,11 +671,11 @@ end do
       call t_stopf ('tphysac')
      ! MSP added:
      ! Note that state%t IS UPDATED via tend@dtdt at the end of tphysac.
-#ifdef CLOUDBRAIN
-  phys_state(c)%tap = phys_state(c)%t
-  phys_state(c)%qap = phys_state(c)%q(:,:,1)
-  phys_state(c)%vap = phys_state(c)%v   ! SR: Add v-wind
-#endif
+!#ifdef CLOUDBRAIN
+!  phys_state(c)%tap = phys_state(c)%t
+!  phys_state(c)%qap = phys_state(c)%q(:,:,1)
+!  phys_state(c)%vap = phys_state(c)%v   ! SR: Add v-wind
+!#endif
      aux(:ncol,:pver) = phys_state(c)%t(:ncol,:pver)
      call outfld ('TAP',aux,pcols,c)
      aux(:ncol,:pver) = phys_state(c)%q(:ncol,:pver,1)

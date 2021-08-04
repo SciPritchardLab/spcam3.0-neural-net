@@ -1133,7 +1133,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 ! Initialize stuff:
-#ifndef CLOUDBRAIN ! save time
+!#ifndef CLOUDBRAIN ! save time
 
 call t_startf ('crm')
 do c=begchunk,endchunk
@@ -1289,7 +1289,7 @@ end do
    else
 
 #ifdef SPFLUXBYPASS
-#ifndef CLOUDBRAIN  !SR: I don't think this is necessary because it is in a larger ifndef CLOUDBRAIN loop
+!#ifndef CLOUDBRAIN  !SR: I don't think this is necessary because it is in a larger ifndef CLOUDBRAIN loop
  ! pritch -- apply surface flux perturbations to lowest level DSE,
  ! constituents here, right before superparameterization, insated of
  ! instead of in vertical diffusion routine. To avoid exposiing dycore to a
@@ -1315,7 +1315,7 @@ end do
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do
-#endif
+!#endif
 #endif
 
 ! ================= BEGIN THREADED ZONE OF MOST WORK ===================
@@ -1876,7 +1876,7 @@ end do
 ! End of superparameterization zone.
   end do ! end pritch new chunk loop
   call t_stopf('crm')
-#endif ! ndef CLOUDBRAIN
+!#endif ! ndef CLOUDBRAIN
 
 !========================================================
 !=================== CLOUDBRAIN =========================

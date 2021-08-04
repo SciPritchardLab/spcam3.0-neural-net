@@ -814,7 +814,7 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
          do k=1,pverp
             pflx(i,k) = pint(i,k)
          end do
-#ifndef CLOUDBRAIN
+!#ifndef CLOUDBRAIN
 ! 
 ! Compute optical paths:
 ! 
@@ -1935,7 +1935,7 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
 ! End do n=1,ndayc
 ! 
 ! End ifdef CLOUDBRAIN
-#endif
+!#endif
    end do
 
 !  write (6, '(a, x, i3)') 'radcswmx : exiting, chunk identifier', lchnk

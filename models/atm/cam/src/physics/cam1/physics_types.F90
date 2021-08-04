@@ -54,11 +54,11 @@ module physics_types
 #ifdef PVBUDGET
           pv,      &  ! Potential vorticity (added by Mike Pritchard)
 #endif
-#ifdef CLOUDBRAIN
-          tap, qap, & ! T,Q after physics.
-          dtv, vd01, & ! vertical diffusion of T, Q (for energy checker)
-          vap, &      ! SR, also add v-component of wind
-#endif
+!#ifdef CLOUDBRAIN
+!          tap, qap, & ! T,Q after physics.
+!          dtv, vd01, & ! vertical diffusion of T, Q (for energy checker)
+!          vap, &      ! SR, also add v-component of wind
+!#endif
           zm      ! geopotential height above surface at midpoints (m)
      real(r8), dimension(pcols,pver,ppcnst) :: &
           q         ! constituent mixing ratio (kg/kg moist air)

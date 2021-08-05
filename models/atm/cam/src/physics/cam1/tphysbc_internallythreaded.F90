@@ -539,7 +539,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
    integer :: nstepNN ! time step at which to couple to NN (to allow SP to spin up)
-   nstepNN = 5 ! Beginning of second sim-day
+   nstepNN = 49 ! Beginning of second sim-day
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:

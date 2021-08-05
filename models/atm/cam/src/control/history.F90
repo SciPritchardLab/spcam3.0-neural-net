@@ -6226,6 +6226,10 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('_SWCF   ','W/m2    ',1,    'A','SW cloud forcing',phys_decomp)
       call addfld ('_FLWDS  ','W/m2    ',1,    'A','Downwelling longwave flux at the surface',phys_decomp)
       call addfld ('_FLWDSC ','W/m2    ',1,    'A','Clearsky downwelling longwave flux at the surface',phys_decomp)
+#ifdef SPFLUXBYPASS
+      call addfld ('SPTFLUX ','K/s     ',pver, 'A','T tendency due to surface fluxes via SPFLUXBYPASS',phys_decomp)
+      call addfld ('SPQFLUX ','kg/kg/s ',pver, 'A','Q tendency due to surface fluxes via SPFLUXBYPASS',phys_decomp)
+#endif
       call addfld ('SPDT    ','K/s     ',pver, 'A','T tendency due to CRM',phys_decomp)
       call addfld ('SPDQ    ','kg/kg/s ',pver, 'A','Q tendency due to CRM',phys_decomp)
       call addfld ('SPDQC   ','kg/kg/s ',pver, 'A','QC tendency due to CRM',phys_decomp)

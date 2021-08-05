@@ -1,12 +1,7 @@
 #include <misc.h>
 #include <params.h>
-!#define CLOUDBRAIN
-!#define BRAINCTRLFLUX
-!#define NOBRAINRAD
-!#define BRAINDEBUG
 !#define NOADIAB
-#define DEEP
-#define SPFLUXBYPASS
+!#define SPFLUXBYPASS ! important to be #defined but now happens externally
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -544,7 +539,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
    integer :: nstepNN ! time step at which to couple to NN (to allow SP to spin up)
-   nstepNN = 49 ! Beginning of second sim-day
+   nstepNN = 5 ! Beginning of second sim-day
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
@@ -1300,6 +1295,7 @@ end do
     call get_rlat_all_p(lchnk, ncol, clat(:,c))
     call get_rlon_all_p(lchnk, ncol, clon(:,c))
     ncol  = state(c)%ncol
+    lchnk = state(c)%lchnk 
     ptend(c)%lu = .false.
     ptend(c)%lv = .false.
     ptend(c)%ls = .true.
@@ -1314,6 +1310,8 @@ end do
         !write (6,*) 'SR: c, i, cflx = ', c, i, tmp1*cflx(i, 1, c)
         !write (6,*) 'SR: c, i, lhf = ', c, i, tmp1*lhf(i,c)/latvap
     end do
+    call outfld('SPTFLUX',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk)
+    call outfld('SPQFLUX',ptend(c)%q(:ncol,:pver,1),pcols,lchnk)
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do
 !#endif

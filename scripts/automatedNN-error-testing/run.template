@@ -2,12 +2,12 @@
 #SBATCH -A TG-ATM190002
 #SBATCH -N 1
 #SBATCH -n 64
-#SBATCH -t 06:00:00
+#SBATCH -t 12:00:00
 #SBATCH -p normal
 #SBATCH -J XXX
-#SBATCH --mail_user=jerryl9@uci.edu
-#SBATCH --mail-type=all
+
 cd RUNDIR
+setenv I_MPI_COMPATIBILITY 4
 ibrun -n 64 ./cam  < atm_in > logfile
 
 

@@ -8,6 +8,7 @@
 #SBATCH --mail_user=jerryl9@uci.edu
 #SBATCH --mail-type=all
 cd RUNDIR
+sentenv I_MPI_COMPATIBILITY 4
 ibrun -n 64 ./cam  < atm_in > logfile
 
 

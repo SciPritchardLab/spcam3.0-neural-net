@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-#define BETAFIX
+!#define BETAFIX
 subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
                           q3      ,q3m1    ,ps      ,cwava   ,alpha   , &
                           etamid  ,qfcst   ,div     ,phis    ,omga    , &

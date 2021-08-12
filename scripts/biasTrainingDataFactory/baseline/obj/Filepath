@@ -1,0 +1,17 @@
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/physics/cam1
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/physics/crm
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/dynamics/sld
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/control
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atmlnd_share
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/csm_share
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/utils
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/timing
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/advection/slt
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/atm/cam/src/ocnsice/dom
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/main
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/biogeophys
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/biogeochem
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/mksrfdata
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/ecosysdyn
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/lnd/clm2/src/riverroute
+/home1/08110/tg874091/repos/spcam3.0-neural-net/models/ice/csim4

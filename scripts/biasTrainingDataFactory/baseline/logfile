@@ -1,0 +1,3414 @@
+TACC:  Starting up job 8204591 
+TACC:  Starting parallel tasks... 
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+t_setoption: option disabled: Usr Sys   
+          64 pes participating in computation
+ -----------------------------------
+ NODE#  NAME
+  0  c455-014.stampede2.tacc.utexas.edu
+  1  c455-014.stampede2.tacc.utexas.edu
+  2  c455-014.stampede2.tacc.utexas.edu
+  3  c455-014.stampede2.tacc.utexas.edu
+  4  c455-014.stampede2.tacc.utexas.edu
+  5  c455-014.stampede2.tacc.utexas.edu
+  6  c455-014.stampede2.tacc.utexas.edu
+  7  c455-014.stampede2.tacc.utexas.edu
+  8  c455-014.stampede2.tacc.utexas.edu
+  9  c455-014.stampede2.tacc.utexas.edu
+ 10  c455-014.stampede2.tacc.utexas.edu
+ 11  c455-014.stampede2.tacc.utexas.edu
+ 12  c455-014.stampede2.tacc.utexas.edu
+ 13  c455-014.stampede2.tacc.utexas.edu
+ 14  c455-014.stampede2.tacc.utexas.edu
+ 15  c455-014.stampede2.tacc.utexas.edu
+ 16  c455-014.stampede2.tacc.utexas.edu
+ 17  c455-014.stampede2.tacc.utexas.edu
+ 18  c455-014.stampede2.tacc.utexas.edu
+ 19  c455-014.stampede2.tacc.utexas.edu
+ 20  c455-014.stampede2.tacc.utexas.edu
+ 21  c455-014.stampede2.tacc.utexas.edu
+ 22  c455-014.stampede2.tacc.utexas.edu
+ 23  c455-014.stampede2.tacc.utexas.edu
+ 24  c455-014.stampede2.tacc.utexas.edu
+ 25  c455-014.stampede2.tacc.utexas.edu
+ 26  c455-014.stampede2.tacc.utexas.edu
+ 27  c455-014.stampede2.tacc.utexas.edu
+ 28  c455-014.stampede2.tacc.utexas.edu
+ 29  c455-014.stampede2.tacc.utexas.edu
+ 30  c455-014.stampede2.tacc.utexas.edu
+ 31  c455-014.stampede2.tacc.utexas.edu
+ 32  c455-014.stampede2.tacc.utexas.edu
+ 33  c455-014.stampede2.tacc.utexas.edu
+ 34  c455-014.stampede2.tacc.utexas.edu
+ 35  c455-014.stampede2.tacc.utexas.edu
+ 36  c455-014.stampede2.tacc.utexas.edu
+ 37  c455-014.stampede2.tacc.utexas.edu
+ 38  c455-014.stampede2.tacc.utexas.edu
+ 39  c455-014.stampede2.tacc.utexas.edu
+ 40  c455-014.stampede2.tacc.utexas.edu
+ 41  c455-014.stampede2.tacc.utexas.edu
+ 42  c455-014.stampede2.tacc.utexas.edu
+ 43  c455-014.stampede2.tacc.utexas.edu
+ 44  c455-014.stampede2.tacc.utexas.edu
+ 45  c455-014.stampede2.tacc.utexas.edu
+ 46  c455-014.stampede2.tacc.utexas.edu
+ 47  c455-014.stampede2.tacc.utexas.edu
+ 48  c455-014.stampede2.tacc.utexas.edu
+ 49  c455-014.stampede2.tacc.utexas.edu
+ 50  c455-014.stampede2.tacc.utexas.edu
+ 51  c455-014.stampede2.tacc.utexas.edu
+ 52  c455-014.stampede2.tacc.utexas.edu
+ 53  c455-014.stampede2.tacc.utexas.edu
+ 54  c455-014.stampede2.tacc.utexas.edu
+ 55  c455-014.stampede2.tacc.utexas.edu
+ 56  c455-014.stampede2.tacc.utexas.edu
+ 57  c455-014.stampede2.tacc.utexas.edu
+ 58  c455-014.stampede2.tacc.utexas.edu
+ 59  c455-014.stampede2.tacc.utexas.edu
+ 60  c455-014.stampede2.tacc.utexas.edu
+ 61  c455-014.stampede2.tacc.utexas.edu
+ 62  c455-014.stampede2.tacc.utexas.edu
+ 63  c455-014.stampede2.tacc.utexas.edu
+ ------------------------------------------------------------
+ NCAR Community Atmospheric Model (CAM)
+ $Name:  $ 
+ $Date: 2003/12/18 16:21:31 $
+ ------------------------------------------------------------
+ (Online documentation is available on the CAM
+  home page: http://www.ccsm.ucar.edu/models/atm-cam/
+  License information is available as a link from above or from:
+  home page: http://www.ccsm.ucar.edu/models/atm-cam/license.html)
+ ------------------------------------------------------------
+ DATE 07/30/21 TIME 11:50:23
+ ------------------------------------------------------------
+ DYCORE is SLD
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ scon set to fixed value of    1367000.00000000     
+ Filename specifier for tape            1  = %c.cam2.h%t.%y-%m.nc
+ Filename specifier for tape            2  = %c.cam2.h%t.%y-%m-%d-%s.nc
+ Filename specifier for tape            3  = %c.cam2.h%t.%y-%m-%d-%s.nc
+ Filename specifier for tape            4  = %c.cam2.h%t.%y-%m-%d-%s.nc
+ Filename specifier for tape            5  = %c.cam2.h%t.%y-%m-%d-%s.nc
+ Filename specifier for tape            6  = %c.cam2.h%t.%y-%m-%d-%s.nc
+ AEROSOL_SETOPTS:  prognostic sulfur aerosols are off     
+ AEROSOL_SETOPTS:  feedback of prognostic sulfur aerosols is disabled
+ AEROSOL_SETOPTS:  prognostic carbon aerosols are off     
+ AEROSOL_SETOPTS:  feedback of prognostic carbon aerosols is disabled
+ AEROSOL_SETOPTS:  prognostic sea salt aerosols are off     
+ AEROSOL_SETOPTS:  feedback of prognostic sea salt aerosols is disabled
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ READ_NAMELIST:rest_pfile= 
+ ./cam2.AndKua_aqua_caseid.rpointer                                             
+                                                                                
+                                                                                
+                    
+  ------------------------------------------
+      *** INPUT VARIABLES (CAMEXP) ***
+  ------------------------------------------
+          Initial run
+  ********** CASE = AndKua_aqua_caseid **********
+                                                                                                                                                                                                                                                                 
+ Initial dataset is: spinup_AndKua_aqua_SPCAM3.0.cam2.i.0000-12-02-00000.nc
+  History-file archive directory = /TG874091/csm/AndKua_aqua_caseid/atm/hist/
+  Restart-file archive directory = /TG874091/csm/AndKua_aqua_caseid/atm/rest/
+  Initial-file archive directory = /TG874091/csm/AndKua_aqua_caseid/atm/init/
+ Time-variant boundary dataset (sst) is: 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/sst_HadOIBl_bc_64x12
+ 8_1949_2004_c050526.nc
+ Time-variant boundary dataset (ozone) is: 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/pcmdio3.r8.64x1_L60_
+ clim_c970515.nc
+ Time-invariant (absorption/emissivity) factor dataset is: 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/abs_ems_factors_fast
+ vx.c030508.nc
+ Time-variant boundary dataset (aerosols) is: 
+ /work/08110/tg874091/stampede2/zeroed_cam3_bcs/AerosolMass_64x128_zeroed.nc
+ Aerosol Optics dataset is: 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/AerosolOptics_c03052
+ 9.nc
+ Time-variant boundary dataset (carbon emissions) is: 
+ /work/08110/tg874091/stampede2/zeroed_cam3_bcs/co_emis_64x128_zeroed.nc
+ Time-variant boundary dataset (DMS emissions) is: 
+ /work/08110/tg874091/stampede2/zeroed_cam3_bcs/dms_emis_64x128_zeroed.nc
+ Time-variant boundary dataset (soil erodibility) is: 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/dust_64x128_c021028.
+ nc
+ Time-variant boundary dataset (oxidants) is: 
+ /work/08110/tg874091/stampede2/zeroed_cam3_bcs/oxid_64x128_zeroed.nc
+ Time-variant boundary dataset (SOx emissions) is: 
+ /scratch/00993/tg802402/sox_emis_64x128_zeroed.nc
+ READ_NAMELIST3:rest_pfile=
+ ./cam2.AndKua_aqua_caseid.rpointer                                             
+                                                                                
+                                                                                
+                    
+ Restart pointer file is: ./cam2.AndKua_aqua_caseid.rpointer
+ Restart flag (NSREST) 0=no,1=yes,3=branch            0
+ Output files will NOT be disposed to Mass Store
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Initial conditions history files will be written yearly.
+ Time filter coefficient (EPS)                      0.060
+ DEL2 Horizontal diffusion coefficient (DIF2)   0.000E+00
+ DEL4 Horizontal diffusion coefficient (DIF4)   0.000E+00
+ Number of levels Courant limiter applied               5
+ Lowest level for dry adiabatic adjust (NLVDRY)         3
+ Frequency of Shortwave Radiation calc. (IRADSW)         1
+ Frequency of Longwave Radiation calc. (IRADLW)          1
+ Frequency of Absorptivity/Emissivity calc. (IRADAE)     1
+ Frequency of SST Initialization calc. (ITSST)           1
+ SST dataset will be reused for each model year
+ Snow will accumulate to a maximum over sea-ice
+ ICE dataset will be reused for each model year
+ OZONE dataset will be reused for each model year
+ Output files will be disposed ASYNCHRONOUSLY
+ divergence damper NOT invoked
+ Visible optical depth (tauback) =   0.000000000000000E+000
+(shr_orb_print) Orbital parameters calculated for year: AD      1950
+  ------------------------------------------
+ ISCCP calcs and history IO will NOT be done
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ Problem factors: 2**           6  * 3**           0  * 5**           0
+ procid            0  assigned            1  latitude values from           1 
+  through            1
+ procid            1  assigned            1  latitude values from           2 
+  through            2
+ procid            2  assigned            1  latitude values from           3 
+  through            3
+ procid            3  assigned            1  latitude values from           4 
+  through            4
+ procid            4  assigned            1  latitude values from           5 
+  through            5
+ procid            5  assigned            1  latitude values from           6 
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+  through            6
+ procid            6  assigned            1  latitude values from           7 
+  through            7
+ procid            7  assigned            1  latitude values from           8 
+  through            8
+ procid            8  assigned            1  latitude values from           9 
+  through            9
+ procid            9  assigned            1  latitude values from          10 
+  through           10
+ procid           10  assigned            1  latitude values from          11 
+  through           11
+ procid           11  assigned            1  latitude values from          12 
+  through           12
+ procid           12  assigned            1  latitude values from          13 
+  through           13
+ procid           13  assigned            1  latitude values from          14 
+  through           14
+ procid           14  assigned            1  latitude values from          15 
+  through           15
+ procid           15  assigned            1  latitude values from          16 
+  through           16
+ procid           16  assigned            1  latitude values from          17 
+  through           17
+ procid           17  assigned            1  latitude values from          18 
+  through           18
+ procid           18  assigned            1  latitude values from          19 
+  through           19
+ procid           19  assigned            1  latitude values from          20 
+  through           20
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ Pritch Andersen & Kuang 2012 aquaplanet SSTs activated
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ procid           20  assigned            1  latitude values from          21 
+  through           21
+ procid           21  assigned            1  latitude values from          22 
+  through           22
+ procid           22  assigned            1  latitude values from          23 
+  through           23
+ procid           23  assigned            1  latitude values from          24 
+  through           24
+ procid           24  assigned            1  latitude values from          25 
+  through           25
+ procid           25  assigned            1  latitude values from          26 
+  through           26
+ procid           26  assigned            1  latitude values from          27 
+  through           27
+ procid           27  assigned            1  latitude values from          28 
+  through           28
+ procid           28  assigned            1  latitude values from          29 
+  through           29
+ procid           29  assigned            1  latitude values from          30 
+  through           30
+ procid           30  assigned            1  latitude values from          31 
+  through           31
+ procid           31  assigned            1  latitude values from          32 
+  through           32
+ procid           32  assigned            1  latitude values from          33 
+  through           33
+ procid           33  assigned            1  latitude values from          34 
+  through           34
+ procid           34  assigned            1  latitude values from          35 
+  through           35
+ procid           35  assigned            1  latitude values from          36 
+  through           36
+ procid           36  assigned            1  latitude values from          37 
+  through           37
+ procid           37  assigned            1  latitude values from          38 
+  through           38
+ procid           38  assigned            1  latitude values from          39 
+  through           39
+ procid           39  assigned            1  latitude values from          40 
+  through           40
+ procid           40  assigned            1  latitude values from          41 
+  through           41
+ procid           41  assigned            1  latitude values from          42 
+  through           42
+ procid           42  assigned            1  latitude values from          43 
+  through           43
+ procid           43  assigned            1  latitude values from          44 
+  through           44
+ procid           44  assigned            1  latitude values from          45 
+  through           45
+ procid           45  assigned            1  latitude values from          46 
+  through           46
+ procid           46  assigned            1  latitude values from          47 
+  through           47
+ procid           47  assigned            1  latitude values from          48 
+  through           48
+ procid           48  assigned            1  latitude values from          49 
+  through           49
+ procid           49  assigned            1  latitude values from          50 
+  through           50
+ procid           50  assigned            1  latitude values from          51 
+  through           51
+ procid           51  assigned            1  latitude values from          52 
+  through           52
+ procid           52  assigned            1  latitude values from          53 
+  through           53
+ procid           53  assigned            1  latitude values from          54 
+  through           54
+ procid           54  assigned            1  latitude values from          55 
+  through           55
+ procid           55  assigned            1  latitude values from          56 
+  through           56
+ procid           56  assigned            1  latitude values from          57 
+  through           57
+ procid           57  assigned            1  latitude values from          58 
+  through           58
+ procid           58  assigned            1  latitude values from          59 
+  through           59
+ procid           59  assigned            1  latitude values from          60 
+  through           60
+ procid           60  assigned            1  latitude values from          61 
+  through           61
+ procid           61  assigned            1  latitude values from          62 
+  through           62
+ procid           62  assigned            1  latitude values from          63 
+  through           63
+ procid           63  assigned            1  latitude values from          64 
+  through           64
+ -----------------------------------------
+ Number of lats passed north & south =            3
+ Node  Partition  Extended Partition
+ -----------------------------------------
+  0      1-  1        -2-  4
+  1      2-  2        -1-  5
+  2      3-  3         0-  6
+  3      4-  4         1-  7
+  4      5-  5         2-  8
+  5      6-  6         3-  9
+  6      7-  7         4- 10
+  7      8-  8         5- 11
+  8      9-  9         6- 12
+  9     10- 10         7- 13
+ 10     11- 11         8- 14
+ 11     12- 12         9- 15
+ 12     13- 13        10- 16
+ 13     14- 14        11- 17
+ 14     15- 15        12- 18
+ 15     16- 16        13- 19
+ 16     17- 17        14- 20
+ 17     18- 18        15- 21
+ 18     19- 19        16- 22
+ 19     20- 20        17- 23
+ 20     21- 21        18- 24
+ 21     22- 22        19- 25
+ 22     23- 23        20- 26
+ 23     24- 24        21- 27
+ 24     25- 25        22- 28
+ 25     26- 26        23- 29
+ 26     27- 27        24- 30
+ 27     28- 28        25- 31
+ 28     29- 29        26- 32
+ 29     30- 30        27- 33
+ 30     31- 31        28- 34
+ 31     32- 32        29- 35
+ 32     33- 33        30- 36
+ 33     34- 34        31- 37
+ 34     35- 35        32- 38
+ 35     36- 36        33- 39
+ 36     37- 37        34- 40
+ 37     38- 38        35- 41
+ 38     39- 39        36- 42
+ 39     40- 40        37- 43
+ 40     41- 41        38- 44
+ 41     42- 42        39- 45
+ 42     43- 43        40- 46
+ 43     44- 44        41- 47
+ 44     45- 45        42- 48
+ 45     46- 46        43- 49
+ 46     47- 47        44- 50
+ 47     48- 48        45- 51
+ 48     49- 49        46- 52
+ 49     50- 50        47- 53
+ 50     51- 51        48- 54
+ 51     52- 52        49- 55
+ 52     53- 53        50- 56
+ 53     54- 54        51- 57
+ 54     55- 55        52- 58
+ 55     56- 56        53- 59
+ 56     57- 57        54- 60
+ 57     58- 58        55- 61
+ 58     59- 59        56- 62
+ 59     60- 60        57- 63
+ 60     61- 61        58- 64
+ 61     62- 62        59- 65
+ 62     63- 63        60- 66
+ 63     64- 64        61- 67
+ procid            0  assigned           64  spectral coefficients and 
+           1  m values:            1
+ procid            1  assigned           63  spectral coefficients and 
+           1  m values:            2
+ procid            2  assigned           62  spectral coefficients and 
+           1  m values:            3
+ procid            3  assigned           61  spectral coefficients and 
+           1  m values:            4
+ procid            4  assigned           60  spectral coefficients and 
+           1  m values:            5
+ procid            5  assigned           59  spectral coefficients and 
+           1  m values:            6
+ procid            6  assigned           58  spectral coefficients and 
+           1  m values:            7
+ procid            7  assigned           57  spectral coefficients and 
+           1  m values:            8
+ procid            8  assigned           56  spectral coefficients and 
+           1  m values:            9
+ procid            9  assigned           55  spectral coefficients and 
+           1  m values:           10
+ procid           10  assigned           54  spectral coefficients and 
+           1  m values:           11
+ procid           11  assigned           53  spectral coefficients and 
+           1  m values:           12
+ procid           12  assigned           52  spectral coefficients and 
+           1  m values:           13
+ procid           13  assigned           51  spectral coefficients and 
+           1  m values:           14
+ procid           14  assigned           50  spectral coefficients and 
+           1  m values:           15
+ procid           15  assigned           49  spectral coefficients and 
+           1  m values:           16
+ procid           16  assigned           48  spectral coefficients and 
+           1  m values:           17
+ procid           17  assigned           47  spectral coefficients and 
+           1  m values:           18
+ procid           18  assigned           46  spectral coefficients and 
+           1  m values:           19
+ procid           19  assigned           45  spectral coefficients and 
+           1  m values:           20
+ procid           20  assigned           44  spectral coefficients and 
+           1  m values:           21
+ procid           21  assigned           43  spectral coefficients and 
+           1  m values:           22
+ procid           22  assigned           42  spectral coefficients and 
+           1  m values:           23
+ procid           23  assigned           41  spectral coefficients and 
+           1  m values:           24
+ procid           24  assigned           40  spectral coefficients and 
+           1  m values:           25
+ procid           25  assigned           39  spectral coefficients and 
+           1  m values:           26
+ procid           26  assigned           38  spectral coefficients and 
+           1  m values:           27
+ procid           27  assigned           37  spectral coefficients and 
+           1  m values:           28
+ procid           28  assigned           36  spectral coefficients and 
+           1  m values:           29
+ procid           29  assigned           35  spectral coefficients and 
+           1  m values:           30
+ procid           30  assigned           34  spectral coefficients and 
+           1  m values:           31
+ procid           31  assigned           33  spectral coefficients and 
+           1  m values:           32
+ procid           32  assigned           32  spectral coefficients and 
+           1  m values:           33
+ procid           33  assigned           31  spectral coefficients and 
+           1  m values:           34
+ procid           34  assigned           30  spectral coefficients and 
+           1  m values:           35
+ procid           35  assigned           29  spectral coefficients and 
+           1  m values:           36
+ procid           36  assigned           28  spectral coefficients and 
+           1  m values:           37
+ procid           37  assigned           27  spectral coefficients and 
+           1  m values:           38
+ procid           38  assigned           26  spectral coefficients and 
+           1  m values:           39
+ procid           39  assigned           25  spectral coefficients and 
+           1  m values:           40
+ procid           40  assigned           24  spectral coefficients and 
+           1  m values:           41
+ procid           41  assigned           23  spectral coefficients and 
+           1  m values:           42
+ procid           42  assigned           22  spectral coefficients and 
+           1  m values:           43
+ procid           43  assigned           21  spectral coefficients and 
+           1  m values:           44
+ procid           44  assigned           20  spectral coefficients and 
+           1  m values:           45
+ procid           45  assigned           19  spectral coefficients and 
+           1  m values:           46
+ procid           46  assigned           18  spectral coefficients and 
+           1  m values:           47
+ procid           47  assigned           17  spectral coefficients and 
+           1  m values:           48
+ procid           48  assigned           16  spectral coefficients and 
+           1  m values:           49
+ procid           49  assigned           15  spectral coefficients and 
+           1  m values:           50
+ procid           50  assigned           14  spectral coefficients and 
+           1  m values:           51
+ procid           51  assigned           13  spectral coefficients and 
+           1  m values:           52
+ procid           52  assigned           12  spectral coefficients and 
+           1  m values:           53
+ procid           53  assigned           11  spectral coefficients and 
+           1  m values:           54
+ procid           54  assigned           10  spectral coefficients and 
+           1  m values:           55
+ procid           55  assigned            9  spectral coefficients and 
+           1  m values:           56
+ procid           56  assigned            8  spectral coefficients and 
+           1  m values:           57
+ procid           57  assigned            7  spectral coefficients and 
+           1  m values:           58
+ procid           58  assigned            6  spectral coefficients and 
+           1  m values:           59
+ procid           59  assigned            5  spectral coefficients and 
+           1  m values:           60
+ procid           60  assigned            4  spectral coefficients and 
+           1  m values:           61
+ procid           61  assigned            3  spectral coefficients and 
+           1  m values:           62
+ procid           62  assigned            2  spectral coefficients and 
+           1  m values:           63
+ procid           63  assigned            1  spectral coefficients and 
+           1  m values:           64
+ SPMDBUF: Allocating SPMD buffers of size         5344
+ **** Summary of Logical Unit assignments ****
+ 
+    Restart pointer unit (nsds)     =            1
+    Master restart unit (nrg)       =            2
+    Abs/ems unit for restart (nrg2) =            3
+    History restart unit (luhrest)  =            4
+ Advected constituent list:
+   1  Q         Specific humidity                                                                                                               
+   2  CLDLIQ    Grid box averaged liquid condensate amount                                                                                      
+   3  CLDICE    Grid box averaged ice condensate amount                                                                                         
+ No nonadvected constituents
+ (GETFIL): attempting to find local file 
+ spinup_AndKua_aqua_SPCAM3.0.cam2.i.0000-12-02-00000.nc
+ (GETFIL): using spinup_AndKua_aqua_SPCAM3.0.cam2.i.0000-12-02-00000.nc
+  in current working directory
+  ********** Time Manager Configuration **********
+   Calendar type:            NO_LEAP
+   Timestep size (seconds):          1800
+   Start date (ymd tod):              101           0
+   Stop date (ymd tod):               111           0
+   Reference date (ymd tod):          101           0
+   Current step number:                 0
+   Ending step number:                480
+   Current date (ymd tod):            101           0
+   Use perpetual diurnal cycle date (ymd):      1980110
+  ************************************************
+ ghg_surfvals_init: ghg surface values are fixed as follows
+   co2 volume mixing ratio =   3.550000000000000E-004
+   ch4 volume mixing ratio =   1.714000000000000E-006
+   n2o volume mixing ratio =   3.110000000000000E-007
+   f11 volume mixing ratio =   2.800000000000000E-010
+   f12 volume mixing ratio =   5.030000000000000E-010
+1 Layer Locations (*1000) 
+   1    2.2552              0.0000              2.2552
+                  3.6435              0.0000              3.6435
+   2    5.0317              0.0000              5.0317
+                  7.5948              0.0000              7.5948
+   3   10.1579              0.0000             10.1579
+                 14.3566              0.0000             14.3566
+   4   18.5553              0.0000             18.5553
+                 24.6122              0.0000             24.6122
+   5   30.6691              0.0000             30.6691
+                 38.2683              0.0000             38.2683
+   6   45.8675              0.0000             45.8675
+                 54.5955              0.0000             54.5955
+   7   63.3235              0.0000             63.3235
+                 72.0125              0.0000             72.0125
+   8   80.7014              0.0000             80.7014
+                 87.8212              0.0000             87.8212
+   9   94.9410              0.0000             94.9410
+                103.3171              0.0000            103.3171
+  10  111.6932              0.0000            111.6932
+                121.5472              0.0000            121.5472
+  11  131.4013              0.0000            131.4013
+                142.9940              0.0000            142.9940
+  12  154.5868              0.0000            154.5868
+                168.2251              0.0000            168.2251
+  13  181.8634              0.0000            181.8634
+                178.2307             19.6774            197.9081
+  14  174.5980             39.3548            213.9528
+                170.3243             62.5043            232.8286
+  15  166.0507             85.6538            251.7044
+                161.0229            112.8879            273.9108
+  16  155.9952            140.1221            296.1172
+                150.0803            172.1616            322.2419
+  17  144.1654            204.2012            348.3666
+                137.2069            241.8940            379.1009
+  18  130.2483            279.5869            409.8352
+                122.0619            323.9306            445.9926
+  19  113.8756            368.2744            482.1499
+                104.2447            420.4425            524.6872
+  20   94.6139            472.6106            567.2244
+                 84.9792            524.7995            609.7787
+  21   75.3445            576.9885            652.3330
+                 66.5017            624.8877            691.3894
+  22   57.6589            672.7870            730.4459
+                 50.1968            713.2077            763.4045
+  23   42.7346            753.6284            796.3631
+                 37.1887            783.6697            820.8584
+  24   31.6427            813.7110            845.3537
+                 28.4319            831.1028            859.5348
+  25   25.2212            848.4946            873.7159
+                 22.2090            864.8113            887.0202
+  26   19.1967            881.1279            900.3246
+                 16.4074            896.2372            912.6445
+  27   13.6180            911.3464            924.9645
+                 11.0746            925.1238            936.1984
+  28    8.5311            938.9012            947.4323
+                  6.2550            951.2305            957.4855
+  29    3.9788            963.5598            967.5386
+                  1.9894            974.3360            976.3254
+  30    0.0000            985.1122            985.1122
+                  0.0000            992.5561            992.5561
+  31    0.0000           1000.0000           1000.0000
+ reference pressures (Pa)
+   1       225.5240
+                          364.3466       277.6452
+   2       503.1692
+                          759.4820       512.6256
+   3      1015.7947
+                         1435.6632       839.7370
+   4      1855.5317
+                         2461.2220      1211.3806
+   5      3066.9123
+                         3826.8300      1519.8354
+   6      4586.7477
+                         5459.5480      1745.6006
+   7      6332.3483
+                         7201.2451      1737.7935
+   8      8070.1418
+                         8782.1230      1423.9624
+   9      9494.1042
+                        10331.7127      1675.2169
+  10     11169.3211
+                        12154.7241      1970.8060
+  11     13140.1271
+                        14299.4039      2318.5536
+  12     15458.6807
+                        16822.5080      2727.6546
+  13     18186.3353
+                        19790.8087      3208.9468
+  14     21395.2821
+                        23282.8619      3775.1596
+  15     25170.4417
+                        27391.0817      4441.2799
+  16     29611.7216
+                        32224.1902      5224.9372
+  17     34836.6588
+                        37910.0904      6146.8631
+  18     40983.5219
+                        44599.2574      7231.4709
+  19     48214.9929
+                        52468.7175      8507.4492
+  20     56722.4421
+                        60977.8695      8510.8548
+  21     65233.2969
+                        69138.9430      7811.2923
+  22     73044.5892
+                        76340.4481      6591.7179
+  23     79636.3071
+                        82085.8369      4899.0596
+  24     84535.3667
+                        85953.4767      2836.2200
+  25     87371.5866
+                        88702.0249      2660.8765
+  26     90032.4631
+                        91264.4547      2463.9831
+  27     92496.4462
+                        93619.8398      2246.7872
+  28     94743.2335
+                        95748.5480      2010.6290
+  29     96753.8625
+                        97632.5407      1757.3566
+  30     98511.2190
+                        99255.6095      1488.7810
+  31    100000.0000
+
+     Truncation Parameters
+     NTRM =   63
+     NTRN =   63
+     NTRK =   63
+
+ REFERENCE TEMPERATURES FOR SEMI-IMPLICIT SCHEME = 
+   350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000
+   350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000  350.000
+   350.000  350.000  350.000  350.000  350.000  350.000
+ GRAVITY WAVE PHASE SPEEDS (M/S) FOR MEAN STATE = 
+   369.064  220.635  139.794   97.968   73.403   57.572   46.489   38.401   32.172   27.303   23.380   20.145
+    17.448   15.144   13.144   11.401    9.872    8.516    7.307    6.213    5.235    4.362    3.597    2.920
+     2.353    1.839    1.402    1.068    0.722    0.360
+ GRAVITY WAVE EQUIVALENT DEPTHS (M) FOR MEAN STATE = 
+ 13890.106 4964.221 1992.854  978.752  549.448  338.009  220.398  150.378  105.548   76.020   55.744   41.386
+    31.045   23.388   17.617   13.256    9.938    7.396    5.445    3.936    2.795    1.940    1.319    0.869
+     0.565    0.345    0.200    0.116    0.053    0.013
+ nlon(           1 )=         128  wnummax(           1 )=          63
+ nlon(           2 )=         128  wnummax(           2 )=          63
+ nlon(           3 )=         128  wnummax(           3 )=          63
+ nlon(           4 )=         128  wnummax(           4 )=          63
+ nlon(           5 )=         128  wnummax(           5 )=          63
+ nlon(           6 )=         128  wnummax(           6 )=          63
+ nlon(           7 )=         128  wnummax(           7 )=          63
+ nlon(           8 )=         128  wnummax(           8 )=          63
+ nlon(           9 )=         128  wnummax(           9 )=          63
+ nlon(          10 )=         128  wnummax(          10 )=          63
+ nlon(          11 )=         128  wnummax(          11 )=          63
+ nlon(          12 )=         128  wnummax(          12 )=          63
+ nlon(          13 )=         128  wnummax(          13 )=          63
+ nlon(          14 )=         128  wnummax(          14 )=          63
+ nlon(          15 )=         128  wnummax(          15 )=          63
+ nlon(          16 )=         128  wnummax(          16 )=          63
+ nlon(          17 )=         128  wnummax(          17 )=          63
+ nlon(          18 )=         128  wnummax(          18 )=          63
+ nlon(          19 )=         128  wnummax(          19 )=          63
+ nlon(          20 )=         128  wnummax(          20 )=          63
+ nlon(          21 )=         128  wnummax(          21 )=          63
+ nlon(          22 )=         128  wnummax(          22 )=          63
+ nlon(          23 )=         128  wnummax(          23 )=          63
+ nlon(          24 )=         128  wnummax(          24 )=          63
+ nlon(          25 )=         128  wnummax(          25 )=          63
+ nlon(          26 )=         128  wnummax(          26 )=          63
+ nlon(          27 )=         128  wnummax(          27 )=          63
+ nlon(          28 )=         128  wnummax(          28 )=          63
+ nlon(          29 )=         128  wnummax(          29 )=          63
+ nlon(          30 )=         128  wnummax(          30 )=          63
+ nlon(          31 )=         128  wnummax(          31 )=          63
+ nlon(          32 )=         128  wnummax(          32 )=          63
+ nlon(          33 )=         128  wnummax(          33 )=          63
+ nlon(          34 )=         128  wnummax(          34 )=          63
+ nlon(          35 )=         128  wnummax(          35 )=          63
+ nlon(          36 )=         128  wnummax(          36 )=          63
+ nlon(          37 )=         128  wnummax(          37 )=          63
+ nlon(          38 )=         128  wnummax(          38 )=          63
+ nlon(          39 )=         128  wnummax(          39 )=          63
+ nlon(          40 )=         128  wnummax(          40 )=          63
+ nlon(          41 )=         128  wnummax(          41 )=          63
+ nlon(          42 )=         128  wnummax(          42 )=          63
+ nlon(          43 )=         128  wnummax(          43 )=          63
+ nlon(          44 )=         128  wnummax(          44 )=          63
+ nlon(          45 )=         128  wnummax(          45 )=          63
+ nlon(          46 )=         128  wnummax(          46 )=          63
+ nlon(          47 )=         128  wnummax(          47 )=          63
+ nlon(          48 )=         128  wnummax(          48 )=          63
+ nlon(          49 )=         128  wnummax(          49 )=          63
+ nlon(          50 )=         128  wnummax(          50 )=          63
+ nlon(          51 )=         128  wnummax(          51 )=          63
+ nlon(          52 )=         128  wnummax(          52 )=          63
+ nlon(          53 )=         128  wnummax(          53 )=          63
+ nlon(          54 )=         128  wnummax(          54 )=          63
+ nlon(          55 )=         128  wnummax(          55 )=          63
+ nlon(          56 )=         128  wnummax(          56 )=          63
+ nlon(          57 )=         128  wnummax(          57 )=          63
+ nlon(          58 )=         128  wnummax(          58 )=          63
+ nlon(          59 )=         128  wnummax(          59 )=          63
+ nlon(          60 )=         128  wnummax(          60 )=          63
+ nlon(          61 )=         128  wnummax(          61 )=          63
+ nlon(          62 )=         128  wnummax(          62 )=          63
+ nlon(          63 )=         128  wnummax(          63 )=          63
+ nlon(          64 )=         128  wnummax(          64 )=          63
+ PHYS_GRID_INIT:  Using PCOLS=           8   opt=           0 
+   chunks_per_thread=           1
+ _________________________________________
+ _ Super-parameterization run ____________
+ crm_nx=           8    crm_ny=           1    crm_nz=          28
+ crm_dx=   4000.00000000000         crm_dy=   4000.00000000000         crm_dt=
+   20.0000000000000     
+ _________________________________________
+ INIDAT: Will not filter input PHIS: attribute 
+ from_hires is either false or not present
+INIDAT: MASS OF INITIAL DATA BEFORE CORRECTION =     1.0042805713E+04
+ DRY MASS WILL BE HELD =     1.0016357065E+04
+ MASS OF MOISTURE AFTER REMOVAL OF NEGATIVES =     2.6448647933E+01
+
+*********************************************************************
+INIDAT: Globally averaged geopotential height =     0.0000000000 meters
+*********************************************************************
+
+  _______________________________________________________
+  _______ initializing aerosol optical properties _______
+  _______________________________________________________
+ (GETFIL): attempting to find local file AerosolOptics_c030529.nc
+ (GETFIL): using 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/AerosolOptics_c03052
+ 9.nc
+  aer_optics_initialize : nrh_opac =  8
+  aer_optics_initialize : nbnd = 19
+  _______ hygroscopic growth in visible band _______
+  SO4
+     rh    ext (m^2 g-1)      ssa      asm
+  0.000            5.581    1.000    0.650
+  0.801           13.614    1.000    0.742
+  0.836           16.185    1.000    0.750
+  0.858           17.971    1.000    0.755
+  0.873           19.389    1.000    0.759
+  0.885           20.585    1.000    0.762
+  0.896           21.630    1.000    0.764
+  0.904           23.093    1.000    0.766
+  0.912           24.959    1.000    0.769
+  0.919           26.745    1.000    0.771
+  0.925           28.462    1.000    0.772
+  0.930           30.121    1.000    0.774
+  0.935           31.730    1.000    0.775
+  0.940           33.293    1.000    0.777
+  0.944           34.817    1.000    0.778
+  0.948           36.305    1.000    0.779
+  0.952           38.717    1.000    0.781
+  0.956           41.820    1.000    0.782
+  0.959           44.986    1.000    0.783
+  0.963           48.213    1.000    0.784
+  0.966           51.498    1.000    0.785
+  0.969           54.841    1.000    0.786
+  0.971           58.241    1.000    0.787
+  0.974           61.695    1.000    0.788
+  0.977           65.207    1.000    0.789
+  0.979           68.771    1.000    0.789
+  0.982           75.009    1.000    0.790
+  0.984           82.961    1.000    0.791
+  0.986           91.458    1.000    0.791
+  0.988          100.506    1.000    0.791
+  0.990          110.112    1.000    0.792
+  0.992          120.296    1.000    0.792
+  0.994          131.074    1.000    0.793
+  0.996          142.463    1.000    0.793
+  0.998          154.473    1.000    0.794
+  1.000          166.809    1.000    0.794
+  SSLT
+     rh    ext (m^2 g-1)      ssa      asm
+  0.000            0.395    1.000    0.752
+  0.801            1.495    1.000    0.825
+  0.836            1.689    1.000    0.828
+  0.858            1.818    1.000    0.829
+  0.873            1.918    1.000    0.831
+  0.885            2.000    1.000    0.831
+  0.896            2.072    1.000    0.832
+  0.904            2.173    1.000    0.833
+  0.912            2.303    1.000    0.834
+  0.919            2.425    1.000    0.835
+  0.925            2.540    1.000    0.836
+  0.930            2.650    1.000    0.836
+  0.935            2.755    1.000    0.837
+  0.940            2.856    1.000    0.838
+  0.944            2.953    1.000    0.838
+  0.948            3.047    1.000    0.839
+  0.952            3.215    1.000    0.839
+  0.956            3.436    1.000    0.840
+  0.959            3.660    1.000    0.841
+  0.963            3.885    1.000    0.841
+  0.966            4.113    1.000    0.842
+  0.969            4.343    1.000    0.842
+  0.971            4.575    1.000    0.843
+  0.974            4.808    1.000    0.843
+  0.977            5.044    1.000    0.844
+  0.979            5.281    1.000    0.844
+  0.982            5.740    1.000    0.845
+  0.984            6.339    1.000    0.846
+  0.986            6.977    1.000    0.847
+  0.988            7.656    1.000    0.848
+  0.990            8.376    1.000    0.849
+  0.992            9.138    1.000    0.849
+  0.994            9.943    1.000    0.850
+  0.996           10.793    1.000    0.851
+  0.998           11.688    1.000    0.852
+  1.000           12.607    1.000    0.852
+  OCPHI
+     rh    ext (m^2 g-1)      ssa      asm
+  0.000            3.421    0.965    0.621
+  0.801            8.298    0.986    0.710
+  0.836            9.396    0.987    0.717
+  0.858           10.130    0.988    0.722
+  0.873           10.698    0.989    0.725
+  0.885           11.168    0.989    0.727
+  0.896           11.573    0.990    0.729
+  0.904           12.145    0.990    0.732
+  0.912           12.870    0.991    0.734
+  0.919           13.551    0.991    0.737
+  0.925           14.195    0.991    0.739
+  0.930           14.808    0.992    0.741
+  0.935           15.394    0.992    0.742
+  0.940           15.956    0.992    0.744
+  0.944           16.498    0.993    0.745
+  0.948           17.022    0.993    0.747
+  0.952           17.884    0.993    0.749
+  0.956           18.985    0.994    0.751
+  0.959           20.091    0.994    0.752
+  0.963           21.200    0.994    0.754
+  0.966           22.312    0.994    0.756
+  0.969           23.427    0.995    0.758
+  0.971           24.546    0.995    0.759
+  0.974           25.667    0.995    0.761
+  0.977           26.793    0.995    0.762
+  0.979           27.922    0.996    0.764
+  0.982           29.780    0.996    0.765
+  0.984           32.068    0.996    0.767
+  0.986           34.448    0.996    0.769
+  0.988           36.918    0.997    0.771
+  0.990           39.477    0.997    0.773
+  0.992           42.126    0.997    0.774
+  0.994           44.865    0.997    0.776
+  0.996           47.696    0.998    0.777
+  0.998           50.617    0.998    0.779
+  1.000           53.574    0.998    0.781
+ AEROSOLS:  Background aerosol will be limited to bottom            5 
+  model interfaces. Top interface is    90032.4631482363       pascals
+ (GETFIL): attempting to find local file AerosolMass_64x128_zeroed.nc
+ (GETFIL): using 
+ /work/08110/tg874091/stampede2/zeroed_cam3_bcs/AerosolMass_64x128_zeroed.nc
+ aerosol_initialize: reading aerosol dataset....  If this seems to be taking too
+ long, perhaps the dataset is being read from an nfs-mounted filesystem.
+  
+ GW_INTI: pgwv =            0
+ GW_INTI: c(l) =   0.000000000000000E+000
+  
+ KTOPBG  =           0
+ KBOTBG  =           8
+ KTOPORO =           0
+ KBOTORO =          30
+ TRBINTI: PBL height will be limited to bottom           13 
+  model levels. Top is    44599.2574095726       pascals
+ RADINI: ntoplw =           1  pressure:   364.346569404006     
+ (GETFIL): attempting to find local file abs_ems_factors_fastvx.c030508.nc
+ (GETFIL): using 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/abs_ems_factors_fast
+ vx.c030508.nc
+  *** SATURATION VAPOR PRESSURE TABLE COMPLETED ***
+ MFINTI: Convection will be capped at intfc            5  which is 
+   3066.91229343414       pascals
+ ZM: Found spectral dycore at non-T85 resolution
+ INTI: model level nearest 700 mb is          21 which is
+   69138.9430314302      pascals
+ inimc: model levels bracketing 1 mb not found
+ inimc: model level nearest 1 mb is           1 which is   364.346569404006     
+ pascals
+ cloud water initialization by inimc complete 
+ BLDFLD:nfmaster=         466
+  ******* MASTER FIELD LIST *******
+    1 PS_match N/m^2   
+    2 frc_day  None    
+    3 MSUL_V   Kg/m^2  
+    4 MSSLT_V  Kg/m^2  
+    5 MDUST1_V Kg/m^2  
+    6 MDUST2_V Kg/m^2  
+    7 MDUST3_V Kg/m^2  
+    8 MDUST4_V Kg/m^2  
+    9 MOCPHO_V Kg/m^2  
+   10 MOCPHI_V Kg/m^2  
+   11 MBCPHO_V Kg/m^2  
+   12 MBCPHI_V Kg/m^2  
+   13 MBG_V    Kg/m^2  
+   14 SULOD_v  None    
+   15 SSLTOD_v None    
+   16 CAROD_v  None    
+   17 DUSTOD_v None    
+   18 BGOD_v   None    
+   19 AEROD_v  None    
+   20 AERSSA_v None    
+   21 AERASM_v None    
+   22 AERFWD_v None    
+   23 TTGWORO  K/s     
+   24 UTGWORO  m/s2    
+   25 VTGWORO  m/s2    
+   26 TAUGWX   N/m2    
+   27 TAUGWY   N/m2    
+   28 VD01     kg/kg/s 
+   29 VDCLDLIQ kg/kg/s 
+   30 VDCLDICE kg/kg/s 
+   31 TAUTMSX  N/m2    
+   32 TAUTMSY  N/m2    
+   33 ZMFLXPRC kg/m2/s 
+   34 ZMFLXSNW kg/m2/s 
+   35 ZMNTPRPD kg/kg/s 
+   36 ZMNTSNPD kg/kg/s 
+   37 ZMEIHEAT W/kg    
+   38 HKFLXPRC kg/m2/s 
+   39 HKFLXSNW kg/m2/s 
+   40 HKNTPRPD kg/kg/s 
+   41 HKNTSNPD kg/kg/s 
+   42 HKEIHEAT W/kg    
+   43 FWAUT    fraction
+   44 FSAUT    fraction
+   45 FRACW    fraction
+   46 FSACW    fraction
+   47 FSACI    fraction
+   48 CME      kg/kg/s 
+   49 ZMDLF    kg/kg/s 
+   50 PRODPREC kg/kg/s 
+   51 EVAPPREC kg/kg/s 
+   52 EVAPSNOW kg/kg/s 
+   53 HPROGCLD W/kg    
+   54 HEVAP    W/kg    
+   55 HMELT    W/kg    
+   56 HREPART  W/kg    
+   57 FICE     fraction
+   58 ICWMR    kg/kg   
+   59 ICIMR    kg/kg   
+   60 PCSNOW   m/s     
+   61 DQSED    kg/kg/s 
+   62 DLSED    kg/kg/s 
+   63 DISED    kg/kg/s 
+   64 HSED     W/kg    
+   65 SNOWSED  m/s     
+   66 RAINSED  m/s     
+   67 PRECSED  m/s     
+   68 GCLDLWP  gram/m2 
+   69 ICLDLWP  gram/m2 
+   70 TGCLDCWP gram/m2 
+   71 TGCLDLWP gram/m2 
+   72 TGCLDIWP gram/m2 
+   73 EFFCLD   fraction
+   74 SETLWP   gram/m2 
+   75 LWSH     m       
+   76 TEINP    W/m2    
+   77 TEOUT    W/m2    
+   78 TEFIX    W/m2    
+   79 PHIS     m2/s2   
+   80 PS       Pa      
+   81 T        K       
+   82 U        m/s     
+   83 V        m/s     
+   84 ETADOT   1/s     
+   85 SGH      m       
+   86 US       m/s     
+   87 VS       m/s     
+   88 TTEND    K/s     
+   89 STEND    W/kg    
+   90 PVTEND   (K m2/kg
+   91 UTEND    m/s2    
+   92 VTEND    m/s2    
+   93 OMGATEND Pa/s2   
+   94 QTEND    kg/kg/s 
+   95 QCTEND   kg/kg/s 
+   96 QITEND   kg/kg/s 
+   97 QLEVER   kg/kg/s 
+   98 Q        kg/kg   
+   99 TEQ      kg/kg/s 
+  100 PHQ      kg/kg/s 
+  101 SFQ      kg/m2/s 
+  102 DCQ      kg/kg/s 
+  103 CLDLIQ   kg/kg   
+  104 TECLDLIQ kg/kg/s 
+  105 PHCLDLIQ kg/kg/s 
+  106 SFCLDLIQ kg/m2/s 
+  107 DCCLDLIQ kg/kg/s 
+  108 CLDICE   kg/kg   
+  109 TECLDICE kg/kg/s 
+  110 PHCLDICE kg/kg/s 
+  111 SFCLDICE kg/m2/s 
+  112 DCCLDICE kg/kg/s 
+  113 DUH      K/s     
+  114 DVH      K/s     
+  115 DTH      K/s     
+  116 SNOWHICE m       
+  117 SNOWHLND m       
+  118 SICTHK   m       
+  119 PRECL    m/s     
+  120 PRECC    m/s     
+  121 PRECSH   m/s     
+  122 PRECCFRQ fraction
+  123 PRECCINT mm/hr   
+  124 PRECLFRQ fraction
+  125 PRECLINT mm/hr   
+  126 PRECT    m/s     
+  127 BRAINRAI mm/day  
+  128 BRAINOLR W/m2    
+  129 NNSHF    W/m2    
+  130 NNLHF    W/m2    
+  131 NNSOLIN  W/m2    
+  132 NNPS     W/m2    
+  133 NNTS     W/m2    
+  134 EVAPPCT  percent 
+  135 PRECTMX  m/s     
+  136 PRECSL   m/s     
+  137 PRECSC   m/s     
+  138 PRECTEND m/s     
+  139 PRECSTEN m/s     
+  140 SHFLX    W/m2    
+  141 LHFLX    W/m2    
+  142 QFLX     kg/m2/s 
+  143 PBLH     m       
+  144 USTAR    m/s     
+  145 TREFHT   K       
+  146 CGH      K/m     
+  147 CGQ      1/m     
+  148 CGS      s/m2    
+  149 TPERT    K       
+  150 QPERT    kg/kg   
+  151 KVH      m2/s    
+  152 KVM      m2/s    
+  153 DUV      m/s2    
+  154 DVV      m/s2    
+  155 DTV      K/s     
+  156 UCONVMOM m/s2    
+  157 VCONVMOM m/s2    
+  158 DTVKE    K/s     
+  159 FSNS     W/m2    
+  160 FLNS     W/m2    
+  161 FLNT     W/m2    
+  162 FLUT     W/m2    
+  163 FLUTC    W/m2    
+  164 FSNT     W/m2    
+  165 FSNTOA   W/m2    
+  166 FSNTOAC  W/m2    
+  167 FLWDS    W/m2    
+  168 FLWDSC   W/m2    
+  169 FSUTOA   W/m2    
+  170 FSUTOAC  W/m2    
+  171 LWCF     W/m2    
+  172 SWCF     W/m2    
+  173 CLOUD    fraction
+  174 FLNTC    W/m2    
+  175 FSNTC    W/m2    
+  176 FLNSC    W/m2    
+  177 FSNSC    W/m2    
+  178 FSDSC    W/m2    
+  179 OMEGA    Pa/s    
+  180 DQP      kg/kg/s 
+  181 TAUX     N/m2    
+  182 TAUY     N/m2    
+  183 SRFRAD   W/m2    
+  184 QRS      K/s     
+  185 QRL      K/s     
+  186 CLDTOT   fraction
+  187 CLDLOW   fraction
+  188 CLDMED   fraction
+  189 CLDHGH   fraction
+  190 ENGYCORR W/m2    
+  191 TS1      K       
+  192 TS2      K       
+  193 TS3      K       
+  194 TS4      K       
+  195 TS       K       
+  196 TSMN     K       
+  197 TSMX     K       
+  198 SOLIN    W/m2    
+  199 FU       m/s     
+  200 FV       m/s     
+  201 TPHYSTND K/s     
+  202 UPHYSTND m/s2    
+  203 VPHYSTND m/s2    
+  204 PVPHYSTN K m2/kg/
+  205 PV1PHYST K m2/kg/
+  206 PV2PHYST K m2/kg/
+  207 PV3PHYST K m2/kg/
+  208 PVAP     (K m2/kg
+  209 TAP      K       
+  210 QAP      kg/kg   
+  211 QCAP     kg/kg   
+  212 QIAP     kg/kg   
+  213 UAP      m/s     
+  214 VAP      kg/kg   
+  215 LPSTEN   Pa/s    
+  216 DTCOND   K/s     
+  217 CMFDT    K/s     
+  218 CMFDQ    kg/kg/s 
+  219 ZMDT     K/s     
+  220 ZMDQ     kg/kg/s 
+  221 NNTAP    K       
+  222 NNQAP    kg/kg   
+  223 NNTC     K       
+  224 NNQC     K       
+  225 NNVC     K       
+  226 NNTBP    K       
+  227 NNQBP    K       
+  228 NNVBP    K       
+  229 TE       _       
+  230 TW       _       
+  231 NNDT     K/s     
+  232 NNDQ     kg/kg/s 
+  233 NNFSNT   W/m2    
+  234 NNFSNS   W/m2    
+  235 NNFLNT   W/m2    
+  236 NNFLNS   W/m2    
+  237 NNPRECT  W/m2    
+  238 PPDT     K/s     
+  239 PPDQ     kg/kg/s 
+  240 PPFSNT   W/m2    
+  241 PPFSNS   W/m2    
+  242 PPFLNT   W/m2    
+  243 PPFLNS   W/m2    
+  244 PPPRECT  W/m2    
+  245 ERRT     W/m2    
+  246 ERRQ     W/m2    
+  247 dTdtadia K/s     
+  248 dQdtadia kg/kg/s 
+  249 CMFDQR   kg/kg/s 
+  250 QC       kg/kg/s 
+  251 CMFMC    kg/m2/s 
+  252 CMFSL    W/m2    
+  253 CMFLQ    W/m2    
+  254 CNVCLD   fraction
+  255 FSDS     W/m2    
+  256 FSNIRTOA W/m2    
+  257 FSNRTOAC W/m2    
+  258 FSNRTOAS W/m2    
+  259 O3VMR    m3/m3   
+  260 CLDST    fraction
+  261 CONCLD   fraction
+  262 PRES     Pa      
+  263 DPRES    Pa      
+  264 HEIGHT   m       
+  265 _QRS     K/s     
+  266 _QRL     K/s     
+  267 _FSDS    W/m2    
+  268 _FSNS    W/m2    
+  269 _FLNS    W/m2    
+  270 _FLUT    W/m2    
+  271 _FSNTOA  W/m2    
+  272 _LWCF    W/m2    
+  273 _SWCF    W/m2    
+  274 _FLWDS   W/m2    
+  275 _FLWDSC  W/m2    
+  276 SPDT     K/s     
+  277 SPDQ     kg/kg/s 
+  278 SPDQC    kg/kg/s 
+  279 SPDQI    kg/kg/s 
+  280 SPMC     kg/m2/s 
+  281 SPMCUP   kg/m2/s 
+  282 SPMCDN   kg/m2/s 
+  283 SPMCUUP  kg/m2/s 
+  284 SPMCUDN  kg/m2/s 
+  285 SPQC     kg/kg   
+  286 SPQI     kg/kg   
+  287 SPQS     kg/kg   
+  288 SPQG     kg/kg   
+  289 SPQR     kg/kg   
+  290 SPQTFLX  kg/m2/s 
+  291 SPUFLX   m2/s2   
+  292 SPVFLX   m2/s2   
+  293 SPQTFLXS kg/m2/s 
+  294 TKE      kg/m/s2 
+  295 TKES     kg/m/s2 
+  296 SPQPFLX  kg/m2/s 
+  297 SPPFLX   m/s     
+  298 SPQTLS   kg/kg/s 
+  299 SPQTTR   kg/kg/s 
+  300 SPQPTR   kg/kg/s 
+  301 SPQPEVP  kg/kg/s 
+  302 SPQPFALL kg/kg/s 
+  303 SPQPSRC  kg/kg/s 
+  304 SPTLS    kg/kg/s 
+  305 SPULS    m/s2    
+  306 SPVLS    m/s2    
+  307 CLOUDTOP         
+  308 CLOUDR           
+  309 _CLDST   fraction
+  310 _CONCLD  fraction
+  311 _CNVCLD  fraction
+  312 _CLOUD           
+  313 _CLDTOT          
+  314 _CLDLOW          
+  315 _CLDMED          
+  316 _CLDHGH          
+  317 CRM_U    m/s     
+  318 CRM_V    m/s     
+  319 CRM_W    m/s     
+  320 CRM_TABS K       
+  321 CRM_QV   g/kg    
+  322 CRM_QC   g/kg    
+  323 CRM_QI   g/kg    
+  324 CRM_QPC  g/kg    
+  325 CRM_QPI  g/kg    
+  326 CRM_PREC m/s     
+  327 CRM_QRS  K/s     
+  328 CRM_QRL  K/s     
+  329 CRM_FSNT W/m2    
+  330 CRMFSNTC W/m2    
+  331 CRM_FSUT W/m2    
+  332 CRM_FSNS W/m2    
+  333 CRMFSDSC W/m2    
+  334 CRM_FSDS W/m2    
+  335 CRM_FLUT W/m2    
+  336 CRMFLUTC W/m2    
+  337 CRM_FLNS W/m2    
+  338 CRMFLNSC W/m2    
+  339 CRM_FLDS W/m2    
+  340 _FISCCP1 mixed   
+  341 _TCLDAR  fraction
+  342 _MNPTOP  mb      
+  343 _MNTAU   unitless
+  344 _MNTTOP  K       
+  345 _CLOUDY  fraction
+  346 CLDTOTR          
+  347 CLDHGHR          
+  348 CLDMEDR          
+  349 CLDLOWR          
+  350 CLDTOTRD         
+  351 CLDHGHRD         
+  352 CLDMEDRD         
+  353 CLDLOWRD         
+  354 LWPR     kg/m2   
+  355 IWPR     kg/m2   
+  356 LOBR     m       
+  357 HIBR     m       
+  358 PRECR    m/s     
+  359 FSDSR    W/m2    
+  360 FLDSR    W/m2    
+  361 FSUTR    W/m2    
+  362 FLUTR    W/m2    
+  363 FSDSCR   W/m2    
+  364 FSUTCR   W/m2    
+  365 Z0M      m       
+  366 BFLX     K*kg/m2/
+  367 TAUX_CRM N/m2    
+  368 TAUY_CRM N/m2    
+  369 TIMINGF          
+  370 RELHUM   percent 
+  371 SULFBIO  kg/kg   
+  372 SULFANT  kg/kg   
+  373 SULFMMR  kg/kg   
+  374 AERMMR   kg/kg   
+  375 REL      um      
+  376 TAUVIS   unitless
+  377 MSO4     gram/cm3
+  378 LWC      kg/m3   
+  379 CLDFRQ   fraction
+  380 WREL     um      
+  381 WLWC     kg/m3   
+  382 TREFHTMN K       
+  383 TREFHTMX K       
+  384 TREFMNAV K       
+  385 TREFMXAV K       
+  386 LANDFRAC fraction
+  387 ICEFRAC  fraction
+  388 OCNFRAC  fraction
+  389 UBOT     m/s     
+  390 VBOT     m/s     
+  391 QBOT     kg/kg   
+  392 TBOT     K       
+  393 PBOT     Pa      
+  394 ZBOT     m       
+  395 PRECCav  m/s     
+  396 PRECLav  m/s     
+  397 UNTEND   m/s2    
+  398 VNTEND   m/s2    
+  399 SNTEND   W/kg    
+  400 QNTEND   kg/kg/s 
+  401 LPSNTEN  Pa/s    
+  402 MSPSA    J/kg    
+  403 MSPS     J/kg    
+  404 MSPZ     m       
+  405 Z700     m       
+  406 Z500     m       
+  407 Z300     m       
+  408 Z050     m       
+  409 Q850     kg/kg   
+  410 Q200     kg/kg   
+  411 T850     K       
+  412 T300     K       
+  413 U850     m/s     
+  414 U200     m/s     
+  415 V850     m/s     
+  416 V200     m/s     
+  417 OMEGA850 Pa/s    
+  418 OMEGA500 Pa/s    
+  419 SOLL     W/m2    
+  420 SOLS     W/m2    
+  421 SOLLD    W/m2    
+  422 SOLSD    W/m2    
+  423 HR       K/s     
+  424 VT       K m/s   
+  425 VU       m2/s2   
+  426 VV       m2/s2   
+  427 WSPEED   m/s     
+  428 UU       m2/s2   
+  429 ZZ       m2      
+  430 TT       K2      
+  431 OMEGAT   K Pa/s  
+  432 OMEGAU   K Pa/s  
+  433 VZ       m2/s    
+  434 VQ       m/skg/kg
+  435 Z3       m       
+  436 MQ       kg/m2   
+  437 TMQ      kg/m2   
+  438 PSL      Pa      
+  439 LANDMCOS unitless
+  440 TSICE    K       
+  441 FSNSLND  W/m2    
+  442 FLNSLND  W/m2    
+  443 LHFLXLND W/m2    
+  444 SHFLXLND W/m2    
+  445 FSNSOCN  W/m2    
+  446 FLNSOCN  W/m2    
+  447 LHFLXOCN W/m2    
+  448 SHFLXOCN W/m2    
+  449 FSNSICE  W/m2    
+  450 FLNSICE  W/m2    
+  451 LHFLXICE W/m2    
+  452 SHFLXICE W/m2    
+  453 FSNSOI   W/m2    
+  454 FLNSOI   W/m2    
+  455 LHFLXOI  W/m2    
+  456 SHFLXOI  W/m2    
+  457 FISCCP1  mixed   
+  458 TCLDAREA fraction
+  459 HCLDAREA fraction
+  460 MCLDAREA fraction
+  461 LCLDAREA fraction
+  462 MEANPTOP mb      
+  463 MEANTAU  unitless
+  464 MEANTTOP K       
+  465 CLOUDY   fraction
+  466 NSTEP    timestep
+ FLDLST: Included fields tape            1 =         157
+           1  CLDHGH             1  A
+           2  CLDLOW             1  A
+           3  CLDMED             1  A
+           4  CLDTOT             1  A
+           5  CLOUD             30  A
+           6  CLOUDR            30  A
+           7  CLOUDTOP          30  A
+           8  DCQ               30  A
+           9  DPRES             30  A
+          10  DTCOND            30  A
+          11  DTH               30  A
+          12  DTV               30  A
+          13  DTVKE             30  A
+          14  DUV               30  A
+          15  DVV               30  A
+          16  FICE              30  A
+          17  FLNS               1  A
+          18  FLNSC              1  A
+          19  FLNSOI             1  A
+          20  FLNT               1  A
+          21  FLNTC              1  A
+          22  FLUT               1  A
+          23  FLUTC              1  A
+          24  FLWDS              1  A
+          25  FLWDSC             1  A
+          26  FSDS               1  A
+          27  FSDSC              1  A
+          28  FSNS               1  A
+          29  FSNSC              1  A
+          30  FSNSOI             1  A
+          31  FSNT               1  A
+          32  FSNTC              1  A
+          33  FSNTOA             1  A
+          34  FSNTOAC            1  A
+          35  FSUTOA             1  A
+          36  FSUTOAC            1  A
+          37  GCLDLWP           30  A
+          38  HEIGHT            30  A
+          39  ICEFRAC            1  A
+          40  ICLDLWP           30  A
+          41  LANDFRAC           1  A
+          42  LHFLX              1  A
+          43  LHFLXOI            1  A
+          44  LWCF               1  A
+          45  OCNFRAC            1  A
+          46  OMEGA             30  A
+          47  OMEGAT            30  A
+          48  PBLH               1  A
+          49  PHCLDICE          30  A
+          50  PHCLDLIQ          30  A
+          51  PHIS               1  I
+          52  PHQ               30  A
+          53  PRECC              1  A
+          54  PRECL              1  A
+          55  PRECSC             1  A
+          56  PRECSH             1  A
+          57  PRECSL             1  A
+          58  PRECT              1  A
+          59  PRES              30  A
+          60  PS                 1  A
+          61  PSL                1  A
+          62  Q                 30  A
+          63  QAP               30  I
+          64  QCAP              30  I
+          65  QCTEND            30  A
+          66  QFLX               1  A
+          67  QIAP              30  I
+          68  QITEND            30  A
+          69  QRL               30  A
+          70  QRS               30  A
+          71  QTEND             30  A
+          72  RELHUM            30  A
+          73  SHFLX              1  A
+          74  SHFLXOI            1  A
+          75  SNOWHICE           1  A
+          76  SNOWHLND           1  A
+          77  SOLIN              1  A
+          78  SPDQ              30  A
+          79  SPDQC             30  A
+          80  SPDQI             30  A
+          81  SPDT              30  A
+          82  SPMC              30  A
+          83  SPMCDN            30  A
+          84  SPMCUDN           30  A
+          85  SPMCUP            30  A
+          86  SPMCUUP           30  A
+          87  SPPFLX            30  A
+          88  SPQC              30  A
+          89  SPQG              30  A
+          90  SPQI              30  A
+          91  SPQPEVP           30  A
+          92  SPQPFALL          30  A
+          93  SPQPFLX           30  A
+          94  SPQPSRC           30  A
+          95  SPQPTR            30  A
+          96  SPQR              30  A
+          97  SPQS              30  A
+          98  SPQTFLX           30  A
+          99  SPQTFLXS          30  A
+         100  SPQTLS            30  A
+         101  SPQTTR            30  A
+         102  SPTLS             30  A
+         103  SPULS             30  A
+         104  SPVLS             30  A
+         105  SRFRAD             1  A
+         106  SWCF               1  A
+         107  T                 30  A
+         108  TAP               30  I
+         109  TAUX               1  A
+         110  TAUY               1  A
+         111  TE                 1  A
+         112  TGCLDIWP           1  A
+         113  TGCLDLWP           1  A
+         114  TIMINGF            1  A
+         115  TKE               30  A
+         116  TKES              30  A
+         117  TMQ                1  A
+         118  TPHYSTND          30  A
+         119  TREFHT             1  A
+         120  TS                 1  A
+         121  TSMN               1  M
+         122  TSMX               1  X
+         123  TTEND             30  A
+         124  TTGWORO           30  A
+         125  TW                 1  A
+         126  U                 30  A
+         127  UAP               30  I
+         128  UPHYSTND          30  A
+         129  UTEND             30  A
+         130  UTGWORO           30  A
+         131  UU                30  A
+         132  V                 30  A
+         133  VAP               30  I
+         134  VD01              30  A
+         135  VPHYSTND          30  A
+         136  VQ                30  A
+         137  VT                30  A
+         138  VTEND             30  A
+         139  VTGWORO           30  A
+         140  VU                30  A
+         141  VV                30  A
+         142  Z3                30  A
+         143  _CLDHGH            1  A
+         144  _CLDLOW            1  A
+         145  _CLDMED            1  A
+         146  _CLDTOT            1  A
+         147  _CLOUD            30  A
+         148  _CONCLD           30  A
+         149  _FLNS              1  A
+         150  _FLUT              1  A
+         151  _FSDS              1  A
+         152  _FSNS              1  A
+         153  _FSNTOA            1  A
+         154  _LWCF              1  A
+         155  _QRL              30  A
+         156  _QRS              30  A
+         157  _SWCF              1  A
+ FLDLST: Included fields tape            2 =           3
+           1  PS                 1  A
+           2  TAP               30  A
+           3  TPHYSTND          30  A
+ History File 1 write frequency MONTHLY
+ History File            2  write frequency            1
+ Accumulation precision history file            1 =           8
+ Packing density history file            1 =           2
+ Number of time samples per file (MFILT) for history file            1  is 
+           1
+ Accumulation precision history file            2 =           8
+ Packing density history file            2 =           2
+ Number of time samples per file (MFILT) for history file            2  is 
+          48
+ (GETFIL): attempting to find local file pcmdio3.r8.64x1_L60_clim_c970515.nc
+ (GETFIL): using 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/pcmdio3.r8.64x1_L60_
+ clim_c970515.nc
+ INITEXT: NCOPN returns id           27  for file 
+ /work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/pcmdio3.r8.64x1_L60_
+ clim_c970515.nc
+ OZNINI: Read ozone data for dates         1216           0  and          116
+           0
+ INITEXT: attribute from_hires is either false or not present.
+          Where sea ice exists, its initial temperature will be just below freez
+ ing
+(shr_orb_params) Calculate characteristics of the orbit:
+(shr_orb_params) CVS revision: $Revision: 1.5.18.1 $
+(shr_orb_params) CVS Tag     : $Name:  $
+(shr_orb_params) Calculate orbit for year:      1950
+(shr_orb_params) ------ Computed Orbital Parameters ------
+(shr_orb_params) Eccentricity      =   1.672393E-02
+(shr_orb_params) Obliquity (deg)   =   2.344627E+01
+(shr_orb_params) Obliquity (rad)   =   4.092146E-01
+(shr_orb_params) Long of perh(deg) =   1.020390E+02
+(shr_orb_params) Long of perh(rad) =   4.922510E+00
+(shr_orb_params) Long at v.e.(rad) =  -3.262537E-02
+(shr_orb_params) -----------------------------------------
+ nstep, te           0   3309818334.75479       0.000000000000000E+000
+  0.000000000000000E+000   98481.3596734192     
+ CLOUDBRAIN: reading inp_sub
+ BRAINDEBUG inp_sub =    224.443588256836        217.654876708984     
+   201.536239624023        219.771423339844        216.451126098633     
+   211.554595947266        207.199417114258        205.972686767578     
+   206.516265869141        207.822753906250        209.530944824219     
+   211.329223632812        213.818923950195        217.656906127930     
+   223.077911376953        229.734970092773        237.239807128906     
+   245.210632324219        253.310485839844        260.558471679688     
+   266.252960205078        270.189147949219        272.849639892578     
+   274.932434082031        276.527801513672        278.121795654297     
+   279.682861328125        281.157470703125        282.448822021484     
+   283.730529785156       1.300814460591937E-006  1.268540017917985E-006
+  1.047706064127851E-006  1.118606860472937E-006  1.096245682674635E-006
+  1.082867356672068E-006  1.106805143535894E-006  1.175573515865835E-006
+  1.335740421382070E-006  1.841966309257259E-006  3.564472535799723E-006
+  8.532576430297922E-006  1.996672108361963E-005  4.273809463484213E-005
+  8.601818990428001E-005  1.635692315176129E-004  2.979593409691006E-004
+  5.325371166691184E-004  9.234933531843126E-004  1.510603702627122E-003
+  2.356241922825575E-003  3.606172744184732E-003  4.961477592587471E-003
+  5.745021626353264E-003  6.321083754301071E-003  6.843469571322203E-003
+  7.267287001013756E-003  7.579439319670200E-003  7.760785985738039E-003
+  8.223784156143665E-003  0.203921809792519       5.314720422029495E-002
+  5.167489126324654E-002 -6.131355464458466E-002  5.683860555291176E-002
+ -4.117828607559204E-002  1.738734170794487E-002 -7.473186403512955E-002
+ -0.105926848948002      -0.180628672242165      -0.326351642608643     
+ -0.478308618068695      -0.529786407947540      -0.410433918237686     
+ -0.170890852808952       4.790439084172249E-002  0.137165710330009     
+  9.979471564292908E-002  3.346721082925797E-002  7.068766281008720E-003
+  1.279438659548759E-002  3.703917935490608E-002  0.112795650959015     
+  0.187113270163536       0.208719670772552       0.218605771660805     
+  0.258286178112030       0.319371372461319       0.361786335706711     
+  0.381943732500076        98277.2578125000        326.077880859375     
+   11.2640762329102        73.3238067626953     
+ CLOUDBRAIN: reading inp_div
+ BRAINDEBUG inp_div =    24.9116134643555        20.4700546264648     
+   16.9089260101318        18.0294189453125        14.2781620025635     
+   13.4924497604370        15.2924623489380        15.6030340194702     
+   13.5409116744995        11.1234531402588        8.97362804412842     
+   7.60540246963501        8.05792999267578        9.79216670989990     
+   11.5618762969971        12.9251995086670        13.6613378524780     
+   13.7547779083252        13.3998756408691        12.9079828262329     
+   12.3676929473877        11.4860649108887        10.7300338745117     
+   10.6036548614502        10.5255594253540        10.4746208190918     
+   10.4802646636963        10.5187110900879        10.5818176269531     
+   10.5876655578613       2.527197864310438E-007  2.381281660746026E-007
+  2.469961657425301E-007  1.554872426368092E-007  1.406546203952530E-007
+  1.509218350292940E-007  2.126895566334497E-007  3.315304013540299E-007
+  4.371971158434462E-007  9.485441410106432E-007  3.418199639781960E-006
+  1.099138717108872E-005  2.947400571429171E-005  6.884314643684775E-005
+  1.466326502850279E-004  2.811778686009347E-004  4.900498897768557E-004
+  8.123641018755734E-004  1.279436983168125E-003  1.874767476692796E-003
+  2.570494078099728E-003  3.358490765094757E-003  4.064674954861403E-003
+  4.453130532056093E-003  4.738321993499994E-003  5.019902251660824E-003
+  5.256712902337313E-003  5.414504557847977E-003  5.503360182046890E-003
+  5.746709648519754E-003   16.0894985198975        11.7904968261719     
+   9.30263328552246        7.61581707000732        6.16704130172729     
+   5.53399229049683        5.77878475189209        6.62070178985596     
+   7.41306114196777        8.43953514099121        9.71575260162354     
+   10.9476652145386        11.7895765304565        12.0751562118530     
+   11.8152160644531        11.0613489151001        9.92205142974854     
+   8.58433723449707        7.32987403869629        6.44644069671631     
+   5.98825407028198        5.81740474700928        5.85671758651733     
+   6.04674577713013        6.30526590347290        6.59528255462646     
+   6.74734878540039        6.69041442871094        6.45720720291138     
+   6.09074211120605        1800.20715332031        422.951446533203     
+   15.1355733871460        79.7713623046875     
+ CLOUDBRAIN: reading out_scale
+ BRAINDEBUG out_scale =    1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        1004.64001464844        1004.64001464844     
+   1004.64001464844        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000        2834700.00000000        2834700.00000000     
+   2834700.00000000       1.000000047497451E-003 -1.000000047497451E-003
+ -1.000000047497451E-003  1.000000047497451E-003   1728000.00000000     
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+ ------- NEURAL-FORTRAN: loaded network from txt file -------
+
+                                                                                                     COURANT
+          NSTEP    RMSD                   RMST                   STPS         STQ                   HOR   VERT
+ NSTEP =       0   8.051643075976043E-06  2.516765723766796E+02  9.84814E+04  2.644864793346191E+01 3.10  0.61
+ SR: beta =                      NaN
+ SR: residual =                      NaN
+ SR: fixmas =   0.999999563500749     
+ SR: engy1 =                      NaN
+ SR: engy2 =    2522346678.98441     
+ SR: difft =    10019.8075210913     
+WSHIST: writing time sample   0 to h-file 2 DATE=0000/01/01 NCSEC=     0
+ 
+ WSHIST: nhfil(           2 )=AndKua_aqua_caseid.cam2.h1.0000-01-01-00000.nc
+ Opening netcdf history file AndKua_aqua_caseid.cam2.h1.0000-01-01-00000.nc
+ define dimensions
+ H_DEFINE: Successfully opened netcdf file 
+ nstep, te           1                     NaN                     NaN
+                     NaN   98481.3596734192     
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9037088E-06  1.8891496E-06  1.7587762E-06
+  1.7570841E-06  1.7427531E-06  1.6576513E-06  1.5940370E-06  1.5920912E-06
+  1.5923886E-06  1.5992799E-06  1.6422980E-06  1.7184195E-06  2.1907024E-06
+  4.1937187E-06  7.7584145E-06  1.6326150E-05  3.4403751E-05  8.0006044E-05
+  2.4521907E-04  5.1732955E-04  8.1878394E-04  1.1264065E-03  1.4920642E-03
+  1.9111112E-03  2.2697735E-03  2.4838927E-03  2.7039493E-03  2.8348863E-03
+  2.8195512E-03  2.9524004E-03  0.3462279      0.2012583      8.3362535E-02
+ -0.1483811     -0.7361668      -1.158187      -1.523052      -2.061448    
+  -2.748133      -3.296937      -3.898623      -4.520777      -4.988342    
+  -4.805959      -3.664894      -2.412358      -1.452242      -1.379618    
+  -1.677023      -1.633690      -1.269568      -1.185756      -1.212965    
+  -1.032573     -0.8036852     -0.9859834      -1.034546      -1.011631    
+ -0.9062549     -0.8824966       99701.26       483.5416       2.771770    
+   10.79626    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385624       2.606200       2.878871    
+   4.106300       4.596417       3.808488       2.290812       1.256348    
+  0.5870308     -0.2558514     -0.5623354     -0.6199542     -0.6031083    
+ -0.5598869     -0.5337132     -0.5236652     -0.5378138     -0.5570545    
+ -0.5301350     -0.5298119     -0.5981177     -0.7383573     -0.8535525    
+ -0.8609473     -0.8550095     -0.8684585     -0.8680972     -0.8762673    
+ -0.8978578     -0.9172873      8.8446559E-03  1.2561906E-02  3.4063091E-03
+ -1.1432464E-02 -0.1285877     -0.2018450     -0.2665679     -0.3000764    
+ -0.3564259     -0.3692512     -0.3676783     -0.3692540     -0.3781778    
+ -0.3640139     -0.2957206     -0.2224197     -0.1601894     -0.1723386    
+ -0.2333588     -0.2545217     -0.2141463     -0.2101959     -0.2263659    
+ -0.2017096     -0.1605650     -0.1826441     -0.1916059     -0.1989417    
+ -0.1963761     -0.2076004      0.7910201      0.3722974     -0.5610826    
+ -0.7838345    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9037054E-06  1.8891233E-06  1.7583086E-06
+  1.7567345E-06  1.7431142E-06  1.6586994E-06  1.5938725E-06  1.5923339E-06
+  1.5925583E-06  1.5989212E-06  1.6421692E-06  1.7181768E-06  2.1884005E-06
+  4.1885901E-06  7.6977303E-06  1.5826594E-05  3.3884720E-05  7.5606375E-05
+  2.3942626E-04  5.0715619E-04  8.0420461E-04  1.1262054E-03  1.4731566E-03
+  1.8713576E-03  2.2064876E-03  2.5135365E-03  2.7093452E-03  2.7923435E-03
+  2.8362453E-03  3.0220735E-03  0.1970698      8.2512140E-02  7.6596200E-02
+ -0.1321292     -0.8231236      -1.183609      -1.513284      -2.034960    
+  -2.735106      -3.266896      -3.862945      -4.472421      -4.906565    
+  -4.672957      -3.477403      -2.222800      -1.278466      -1.172148    
+  -1.424517      -1.390919      -1.042103     -0.9540532     -0.9583264    
+ -0.7638043     -0.5325215     -0.7070332     -0.7304478     -0.7043474    
+ -0.6125221     -0.5959868       99703.09       483.9125       2.649262    
+   9.886187    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385610       2.606089       2.876978    
+   4.104052       4.598986       3.815432       2.290039       1.257080    
+  0.5874190     -0.2562296     -0.5623730     -0.6199763     -0.6031864    
+ -0.5599614     -0.5341270     -0.5254419     -0.5388730     -0.5624704    
+ -0.5346626     -0.5352384     -0.6037895     -0.7384172     -0.8582042    
+ -0.8698744     -0.8683656     -0.8625532     -0.8670707     -0.8841245    
+ -0.8948243     -0.9051633     -4.2587068E-04  2.4905596E-03  2.6789522E-03
+ -9.2985006E-03 -0.1426879     -0.2064388     -0.2648778     -0.2960756    
+ -0.3546685     -0.3656917     -0.3640061     -0.3648369     -0.3712414    
+ -0.3529994     -0.2798520     -0.2052827     -0.1426754     -0.1481702    
+ -0.1989099     -0.2168620     -0.1761611     -0.1703667     -0.1828878    
+ -0.1572610     -0.1175591     -0.1403486     -0.1465367     -0.1530128    
+ -0.1508870     -0.1605602      0.7920356      0.3731744     -0.5691766    
+ -0.7952430    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9037009E-06  1.8890970E-06  1.7577596E-06
+  1.7563362E-06  1.7433022E-06  1.6593756E-06  1.5936770E-06  1.5921951E-06
+  1.5925556E-06  1.5987393E-06  1.6425059E-06  1.7179149E-06  2.1905003E-06
+  4.1798608E-06  7.6570759E-06  1.5353171E-05  3.3157841E-05  7.3818090E-05
+  2.3438592E-04  4.9785792E-04  7.9192471E-04  1.1193032E-03  1.4757944E-03
+  1.8376407E-03  2.1931110E-03  2.4758982E-03  2.6541818E-03  2.9117847E-03
+  2.9576293E-03  3.0130662E-03  4.4196106E-02 -3.6750421E-02  6.9586940E-02
+ -0.1178783     -0.9076131      -1.206515      -1.500601      -2.005002    
+  -2.716432      -3.232084      -3.821332      -4.418200      -4.820638    
+  -4.544803      -3.307977      -2.067010      -1.140388     -0.9867294    
+  -1.175132      -1.141872     -0.8112743     -0.7203205     -0.6988982    
+ -0.4885848     -0.2540213     -0.4174861     -0.4147503     -0.3837995    
+ -0.3042422     -0.2947620       99704.25       484.3991       2.620013    
+   9.977766    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385592       2.605979       2.874755    
+   4.101490       4.600322       3.819913       2.289120       1.256662    
+  0.5874127     -0.2564214     -0.5622745     -0.6200001     -0.6031152    
+ -0.5600882     -0.5344043     -0.5271257     -0.5403562     -0.5646717    
+ -0.5386021     -0.5401981     -0.6085668     -0.7404724     -0.8575552    
+ -0.8774459     -0.8711888     -0.8700511     -0.8775646     -0.8620650    
+ -0.8727680     -0.9067307     -9.9273268E-03 -7.6245833E-03  1.9254816E-03
+ -7.4272677E-03 -0.1563881     -0.2105779     -0.2626829     -0.2915506    
+ -0.3521494     -0.3615667     -0.3597231     -0.3598842     -0.3639530    
+ -0.3423864     -0.2655123     -0.1911986     -0.1287590     -0.1265705    
+ -0.1648868     -0.1782287     -0.1376142     -0.1301886     -0.1385919    
+ -0.1117457     -7.3389597E-02 -9.6446492E-02 -9.9748291E-02 -0.1051012    
+ -0.1031450     -0.1111040      0.7926822      0.3743249     -0.5711091    
+ -0.7940950    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036947E-06  1.8890707E-06  1.7571542E-06
+  1.7559111E-06  1.7432670E-06  1.6600952E-06  1.5938328E-06  1.5917890E-06
+  1.5922380E-06  1.5989251E-06  1.6417201E-06  1.7188327E-06  2.1968253E-06
+  4.1632647E-06  7.6205356E-06  1.5008362E-05  3.2084350E-05  7.2236879E-05
+  2.3144773E-04  4.9112662E-04  7.8611483E-04  1.1042947E-03  1.4639631E-03
+  1.8534096E-03  2.2051551E-03  2.5457344E-03  2.7813294E-03  2.9222057E-03
+  3.0147056E-03  3.0861716E-03 -0.1120153     -0.1558397      6.2302068E-02
+ -0.1059755     -0.9888112      -1.226957      -1.485461      -1.972054    
+  -2.692187      -3.192441      -3.773938      -4.358537      -4.731831    
+  -4.423891      -3.160224      -1.949007      -1.042534     -0.8287336    
+ -0.9343399     -0.8912338     -0.5817062     -0.4897578     -0.4404815    
+ -0.2128952      2.5751175E-02 -0.1236379     -9.4359547E-02 -5.6963511E-02
+  1.1880040E-02  1.4733003E-02   99704.72       485.0003       2.592660    
+   9.463013    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385568       2.605869       2.872304    
+   4.098755       4.600072       3.824681       2.289852       1.255437    
+  0.5866864     -0.2562255     -0.5625044     -0.6199166     -0.6029006    
+ -0.5603293     -0.5346535     -0.5283519     -0.5425468     -0.5666181    
+ -0.5408986     -0.5437886     -0.6108270     -0.7449412     -0.8604660    
+ -0.8739048     -0.8686469     -0.8561392     -0.8533769     -0.8601403    
+ -0.8623968     -0.8940094     -1.9636229E-02 -1.7725032E-02  1.1423837E-03
+ -5.8643701E-03 -0.1695545     -0.2142719     -0.2600631     -0.2865742    
+ -0.3488789     -0.3568694     -0.3548450     -0.3544343     -0.3564203    
+ -0.3323731     -0.2530071     -0.1805305     -0.1188968     -0.1081654    
+ -0.1320360     -0.1393486     -9.9277779E-02 -9.0555333E-02 -9.4468810E-02
+ -6.6152684E-02 -2.9018363E-02 -5.1892187E-02 -5.2264340E-02 -5.6249861E-02
+ -5.4188490E-02 -6.0289983E-02  0.7929426      0.3757462     -0.5729163    
+ -0.8005479    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036866E-06  1.8890441E-06  1.7565150E-06
+  1.7554183E-06  1.7429832E-06  1.6611089E-06  1.5948641E-06  1.5919887E-06
+  1.5922534E-06  1.5987284E-06  1.6407978E-06  1.7217056E-06  2.1992371E-06
+  4.1422045E-06  7.5518747E-06  1.4587637E-05  3.0801042E-05  6.9850932E-05
+  2.2988227E-04  4.8499217E-04  7.6889567E-04  1.0721528E-03  1.4732104E-03
+  1.8445784E-03  2.2148385E-03  2.5634835E-03  2.7789653E-03  2.9720175E-03
+  3.0733503E-03  3.1823607E-03 -0.2711340     -0.2741316      5.4636981E-02
+ -9.6787773E-02  -1.065940      -1.244986      -1.468299      -1.936576    
+  -2.662478      -3.147902      -3.720927      -4.293801      -4.641263    
+  -4.312286      -3.037265      -1.872005     -0.9886505     -0.7030919    
+ -0.7075757     -0.6438301     -0.3580630     -0.2675820     -0.1889797    
+  5.7118431E-02  0.3005055      0.1678792      0.2234743      0.2688153    
+  0.3287372      0.3256364       99704.52       485.7145       2.567562    
+   8.676147    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385536       2.605757       2.869716    
+   4.095587       4.598053       3.831397       2.294701       1.256039    
+  0.5867215     -0.2564329     -0.5627742     -0.6196553     -0.6028188    
+ -0.5606352     -0.5351217     -0.5298482     -0.5451655     -0.5695552    
+ -0.5421221     -0.5470607     -0.6175258     -0.7545115     -0.8581910    
+ -0.8758879     -0.8666033     -0.8526034     -0.8538267     -0.8509406    
+ -0.8517407     -0.8772713     -2.9525828E-02 -2.7757844E-02  3.1841415E-04
+ -4.6579661E-03 -0.1820612     -0.2175297     -0.2570933     -0.2812156    
+ -0.3448712     -0.3515920     -0.3493888     -0.3485211     -0.3487382    
+ -0.3231305     -0.2426002     -0.1735691     -0.1134661     -9.3529254E-02
+ -0.1010990     -0.1009703     -6.1930794E-02 -5.2363757E-02 -5.1526364E-02
+ -2.1498313E-02  1.4557005E-02 -7.6913424E-03 -5.1593427E-03 -7.5564878E-03
+ -5.1181829E-03 -9.2447335E-03  0.7928341      0.3774348     -0.5745745    
+ -0.8104119    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036765E-06  1.8890169E-06  1.7559147E-06
+  1.7547904E-06  1.7425634E-06  1.6619991E-06  1.5962859E-06  1.5920945E-06
+  1.5922874E-06  1.5983105E-06  1.6409122E-06  1.7246667E-06  2.1951139E-06
+  4.1266426E-06  7.4805980E-06  1.4130041E-05  2.9253784E-05  6.9463254E-05
+  2.2249496E-04  4.8045613E-04  7.3393364E-04  1.0276869E-03  1.5071030E-03
+  1.9408051E-03  2.2494355E-03  2.4284103E-03  2.5659867E-03  2.8995597E-03
+  3.0083258E-03  3.1365459E-03 -0.4326784     -0.3910728      4.6414938E-02
+ -9.0695590E-02  -1.138278      -1.260649      -1.449509      -1.898988    
+  -2.627438      -3.098413      -3.662480      -4.224316      -4.549871    
+  -4.211656      -2.941618      -1.838282     -0.9815432     -0.6141217    
+ -0.5000822     -0.4044991     -0.1449217     -5.8880605E-02  4.9763605E-02
+  0.3153119      0.5638978      0.4502795      0.5313592      0.5860206    
+  0.6390127      0.6308545       99703.66       486.5400       2.545086    
+   8.997925    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385496       2.605642       2.867286    
+   4.091548       4.595069       3.837296       2.301386       1.256358    
+  0.5867993     -0.2568734     -0.5627408     -0.6193858     -0.6029587    
+ -0.5608612     -0.5356078     -0.5314757     -0.5483229     -0.5700324    
+ -0.5478960     -0.5494802     -0.6311270     -0.7677514     -0.8498526    
+ -0.8542792     -0.8593017     -0.8795110     -0.8943422     -0.8643228    
+ -0.8635561     -0.8852437     -3.9566197E-02 -3.7676100E-02 -5.6542631E-04
+ -3.8580280E-03 -0.1937909     -0.2203600     -0.2538416     -0.2755383    
+ -0.3401444     -0.3457281     -0.3433731     -0.3421741     -0.3409863    
+ -0.3147969     -0.2345050     -0.1705205     -0.1127498     -8.3165005E-02
+ -7.2791077E-02 -6.3844196E-02 -2.6337575E-02 -1.6488414E-02 -1.0762351E-02
+  2.1201266E-02  5.6330394E-02  3.5127185E-02  4.0471159E-02  3.9855409E-02
+  4.2932857E-02  4.0867064E-02  0.7923567      0.3793867     -0.5760595    
+ -0.8063781    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036650E-06  1.8889889E-06  1.7554376E-06
+  1.7541079E-06  1.7420753E-06  1.6628560E-06  1.5982118E-06  1.5922466E-06
+  1.5922426E-06  1.5978437E-06  1.6413969E-06  1.7253928E-06  2.1887327E-06
+  4.1136914E-06  7.4377658E-06  1.3713151E-05  2.7183189E-05  7.1342358E-05
+  2.1260380E-04  4.7363463E-04  6.4876792E-04  9.8935002E-04  1.5191211E-03
+  1.9127283E-03  2.2451391E-03  2.5237848E-03  2.7739196E-03  2.9382950E-03
+  2.9910970E-03  3.0926862E-03 -0.5961197     -0.5061837      3.7391447E-02
+ -8.8084385E-02  -1.205166      -1.273989      -1.429433      -1.859661    
+  -2.587222      -3.043945      -3.598797      -4.150351      -4.458395    
+  -4.123221      -2.875116      -1.849080      -1.022952     -0.5653679    
+ -0.3167581     -0.1779615      5.3353027E-02  0.1315315      0.2701302    
+  0.5557165      0.8097121      0.7168222      0.8219779      0.8871776    
+  0.9353909      0.9232628       99702.18       487.4749       2.617044    
+   9.705492    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385450       2.605525       2.865354    
+   4.087159       4.591599       3.842974       2.310441       1.256817    
+  0.5866969     -0.2573656     -0.5625990     -0.6193198     -0.6031752    
+ -0.5610493     -0.5358999     -0.5329583     -0.5525481     -0.5677193    
+ -0.5556269     -0.5531188     -0.6642591     -0.7791663     -0.8468959    
+ -0.8605841     -0.8602085     -0.8605117     -0.8547865     -0.8571688    
+ -0.8666867     -0.8928758     -4.9724452E-02 -4.7439132E-02 -1.5354195E-03
+ -3.5151618E-03 -0.2046370     -0.2227705     -0.2503675     -0.2695982    
+ -0.3347194     -0.3392741     -0.3368185     -0.3354178     -0.3332273    
+ -0.3074732     -0.2288765     -0.1714967     -0.1169232     -7.7485606E-02
+ -4.7780532E-02 -2.8702702E-02  6.7730327E-03  1.6243041E-02  2.6863944E-02
+  6.0958944E-02  9.5315948E-02  7.5541332E-02  8.3542697E-02  8.4868625E-02
+  8.8831678E-02  8.8875711E-02  0.7915322      0.3815971     -0.5713052    
+ -0.7975082    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036522E-06  1.8889597E-06  1.7551117E-06
+  1.7535226E-06  1.7415305E-06  1.6639426E-06  1.6001545E-06  1.5925608E-06
+  1.5922392E-06  1.5970455E-06  1.6420919E-06  1.7253255E-06  2.1860960E-06
+  4.0877785E-06  7.3950282E-06  1.3298014E-05  2.5060692E-05  7.1206414E-05
+  2.0493464E-04  4.6535642E-04  5.5958197E-04  9.7573444E-04  1.5240905E-03
+  1.9457503E-03  2.2800611E-03  2.5555482E-03  2.7805266E-03  2.9595324E-03
+  2.9721719E-03  3.1218133E-03 -0.7608868     -0.6190585      2.7262859E-02
+ -8.9332283E-02  -1.266016      -1.285042      -1.408352      -1.818904    
+  -2.542006      -2.984503      -3.530098      -4.072125      -4.367357    
+  -4.047715      -2.838829      -1.904531      -1.113457     -0.5594646    
+ -0.1620100      3.1306379E-02  0.2327266      0.2992480      0.4668882    
+  0.7727108       1.032043      0.9610156       1.088310       1.165074    
+   1.210774       1.195917       99700.13       488.5170       2.879905    
+   10.63138    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385400       2.605402       2.864035    
+   4.083395       4.587726       3.850173       2.319575       1.257765    
+  0.5866891     -0.2582071     -0.5623956     -0.6193259     -0.6032646    
+ -0.5614257     -0.5361913     -0.5344347     -0.5568793     -0.5678866    
+ -0.5616210     -0.5575343     -0.6989551     -0.7832204     -0.8456733    
+ -0.8531686     -0.8528383     -0.8541842     -0.8535296     -0.8532465    
+ -0.8701255     -0.8878073     -5.9965115E-02 -5.7012498E-02 -2.6242067E-03
+ -3.6790180E-03 -0.2145040     -0.2247679     -0.2467196     -0.2634421    
+ -0.3286199     -0.3322309     -0.3297476     -0.3282724     -0.3255054    
+ -0.3012202     -0.2258053     -0.1765097     -0.1260447     -7.6797932E-02
+ -2.6668562E-02  3.7598442E-03  3.6727265E-02  4.5073159E-02  6.0459223E-02
+  9.6845075E-02  0.1305771      0.1125668      0.1230148      0.1264050    
+  0.1314791      0.1336411      0.7903951      0.3840609     -0.5539381    
+ -0.7859014    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036389E-06  1.8889291E-06  1.7549366E-06
+  1.7531534E-06  1.7408770E-06  1.6650819E-06  1.6026015E-06  1.5932272E-06
+  1.5924827E-06  1.5973393E-06  1.6412849E-06  1.7266622E-06  2.1840058E-06
+  4.0508321E-06  7.3396468E-06  1.2941253E-05  2.2559743E-05  6.8899913E-05
+  2.0709146E-04  4.2863406E-04  5.3668261E-04  9.6273661E-04  1.5303368E-03
+  1.9878875E-03  2.2837233E-03  2.5428629E-03  2.7306078E-03  2.9124874E-03
+  3.0820500E-03  3.2882215E-03 -0.9263745     -0.7293625      1.5678776E-02
+ -9.4795384E-02  -1.320319      -1.293839      -1.386480      -1.776959    
+  -2.491981      -2.920140      -3.456617      -3.989803      -4.277054    
+  -3.985361      -2.833018      -2.003631      -1.252421     -0.5980262    
+ -3.9618824E-02  0.2191918      0.3895989      0.4403924      0.6353426    
+  0.9611846       1.225474       1.176819       1.323848       1.412975    
+   1.458497       1.442265       99697.57       489.6636       3.088957    
+   9.722577    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385347       2.605274       2.863326    
+   4.081020       4.583079       3.857722       2.331080       1.259775    
+  0.5872461     -0.2578973     -0.5626317     -0.6192043     -0.6033356    
+ -0.5619624     -0.5365691     -0.5357035     -0.5619828     -0.5707259    
+ -0.5599353     -0.5771220     -0.7078636     -0.7870905     -0.8441366    
+ -0.8437063     -0.8520654     -0.8567112     -0.8630259     -0.8619352    
+ -0.8501599     -0.8588502     -7.0250563E-02 -6.6367827E-02 -3.8694544E-03
+ -4.3963543E-03 -0.2233094     -0.2263576     -0.2429347     -0.2571068    
+ -0.3218716     -0.3246045     -0.3221845     -0.3207528     -0.3178458    
+ -0.2960564     -0.2253134     -0.1854689     -0.1400503     -8.1290022E-02
+ -9.9709807E-03  3.2905456E-02  6.2923938E-02  6.9335587E-02  8.9221813E-02
+  0.1280145      0.1612548      0.1452877      0.1579230      0.1634583    
+  0.1698429      0.1740874      0.7889717      0.3867719     -0.5401261    
+ -0.7972940    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036253E-06  1.8888970E-06  1.7548476E-06
+  1.7529018E-06  1.7401138E-06  1.6660869E-06  1.6058150E-06  1.5937754E-06
+  1.5928395E-06  1.5974181E-06  1.6402428E-06  1.7292391E-06  2.1793469E-06
+  4.0158056E-06  7.2778917E-06  1.2633948E-05  1.9321767E-05  6.7035158E-05
+  2.1250905E-04  3.8190701E-04  5.2154204E-04  9.5786690E-04  1.5484049E-03
+  1.9788819E-03  2.2643360E-03  2.5259235E-03  2.7303563E-03  2.9986692E-03
+  3.1030525E-03  3.2684105E-03  -1.091952     -0.8368286      2.2574365E-03
+ -0.1047909      -1.367650      -1.300401      -1.363958      -1.733999    
+  -2.437346      -2.850956      -3.378593      -3.903494      -4.187558    
+  -3.935864      -2.857108      -2.144248      -1.437980     -0.6815712    
+  4.7375731E-02  0.3820513      0.5208917      0.5517206      0.7714676    
+   1.116686       1.385239       1.358833       1.522805       1.624835    
+   1.672534       1.656346       99694.58       490.9121       3.294504    
+   10.43913    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385293       2.605139       2.862966    
+   4.079401       4.577653       3.864381       2.346189       1.261429    
+  0.5880620     -0.2578143     -0.5629366     -0.6189699     -0.6034936    
+ -0.5624712     -0.5369902     -0.5367965     -0.5685902     -0.5730214    
+ -0.5557009     -0.6020463     -0.7137538     -0.7885405     -0.8396914    
+ -0.8457286     -0.8561571     -0.8600857     -0.8630737     -0.8460183    
+ -0.8463436     -0.8622975     -8.0541573E-02 -7.5482473E-02 -5.3122006E-03
+ -5.7088216E-03 -0.2309841     -0.2275432     -0.2390373     -0.2506180    
+ -0.3145015     -0.3164069     -0.3141539     -0.3128690     -0.3102547    
+ -0.2919573     -0.2273523     -0.1981813     -0.1587520     -9.1022283E-02
+  1.8975115E-03  5.8168933E-02  8.4848993E-02  8.8472687E-02  0.1124643    
+  0.1537312      0.1865932      0.1728853      0.1874097      0.1951245    
+  0.2029898      0.2092360      0.7873096      0.3897237     -0.5265458    
+ -0.7883114    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9036113E-06  1.8888635E-06  1.7547683E-06
+  1.7526605E-06  1.7393061E-06  1.6667633E-06  1.6083154E-06  1.5942070E-06
+  1.5932509E-06  1.5969576E-06  1.6401780E-06  1.7306287E-06  2.1730073E-06
+  3.9901693E-06  7.2018574E-06  1.2316724E-05  1.7987719E-05  7.1496979E-05
+  2.0557511E-04  3.3176556E-04  5.1414495E-04  9.5620821E-04  1.5476103E-03
+  1.9636992E-03  2.2982687E-03  2.5316516E-03  2.7727552E-03  3.0016326E-03
+  3.0290745E-03  3.1712891E-03  -1.256972     -0.9412526     -1.3396663E-02
+ -0.1195792      -1.407670      -1.304736      -1.340854      -1.690123    
+  -2.378304      -2.777103      -3.296266      -3.813248      -4.098716    
+  -3.898419      -2.909693      -2.323173      -1.667074     -0.8094839    
+  9.6766643E-02  0.5167984      0.6241145      0.6306995      0.8720164    
+   1.235550       1.507367       1.502468       1.680289       1.795477    
+   1.847677       1.832976       99691.23       492.2594       3.494085    
+   12.30856    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385238       2.604998       2.862644    
+   4.077850       4.571911       3.868863       2.357945       1.262730    
+  0.5890031     -0.2582997     -0.5629556     -0.6188434     -0.6037087    
+ -0.5628436     -0.5375087     -0.5379246     -0.5713125     -0.5675290    
+ -0.5611205     -0.6287916     -0.7166315     -0.7890343     -0.8398869    
+ -0.8491380     -0.8489957     -0.8589446     -0.8550081     -0.8454710    
+ -0.8597859     -0.8791979     -9.0797953E-02 -8.4339090E-02 -6.9949608E-03
+ -7.6506045E-03 -0.2374734     -0.2283266     -0.2350393     -0.2439909    
+ -0.3065369     -0.3076561     -0.3056804     -0.3046257     -0.3027191    
+ -0.2888564     -0.2318030     -0.2143570     -0.1818414     -0.1059230    
+  8.6358143E-03  7.9071477E-02  0.1020865      0.1020490      0.1296325    
+  0.1733886      0.2059624      0.1946637      0.2107499      0.2206299    
+  0.2301135      0.2382357      0.7854521      0.3929092     -0.5133595    
+ -0.7648766    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9035969E-06  1.8888290E-06  1.7547128E-06
+  1.7525955E-06  1.7384086E-06  1.6673753E-06  1.6099434E-06  1.5951119E-06
+  1.5939136E-06  1.5968357E-06  1.6400442E-06  1.7333434E-06  2.1668591E-06
+  3.9748097E-06  7.1342379E-06  1.1805102E-05  1.7809340E-05  7.2894196E-05
+  1.9502245E-04  3.0325513E-04  5.1409053E-04  9.5837848E-04  1.5462323E-03
+  1.9624534E-03  2.3124416E-03  2.5375471E-03  2.7592508E-03  2.9340426E-03
+  3.0232256E-03  3.2097956E-03  -1.420782      -1.042487     -3.1673957E-02
+ -0.1393454      -1.440134      -1.306842      -1.317166      -1.645359    
+  -2.315056      -2.698780      -3.209860      -3.719056      -4.010163    
+  -3.871733      -2.988555      -2.536205      -1.935515     -0.9800146    
+  0.1072437      0.6209704      0.6974080      0.6755595      0.9346035    
+   1.314991       1.588793       1.604085       1.792457       1.920749    
+   1.979694       1.967900       99687.63       493.7023       3.671348    
+   12.69516    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385181       2.604854       2.862420    
+   4.077432       4.565530       3.872918       2.365599       1.265460    
+  0.5905189     -0.2584283     -0.5629947     -0.6185964     -0.6039173    
+ -0.5630667     -0.5379699     -0.5397442     -0.5716765     -0.5658090    
+ -0.5693683     -0.6439991     -0.7166526     -0.7883881     -0.8402259    
+ -0.8494178     -0.8460046     -0.8577701     -0.8575770     -0.8579541    
+ -0.8608487     -0.8724973     -0.1009792     -9.2925228E-02 -8.9597050E-03
+ -1.0246024E-02 -0.2427376     -0.2287071     -0.2309402     -0.2372297    
+ -0.2980049     -0.2983756     -0.2967870     -0.2960218     -0.2952079    
+ -0.2866463     -0.2384776     -0.2336161     -0.2088964     -0.1257883    
+  1.0065175E-02  9.5231093E-02  0.1143261      0.1097603      0.1403188    
+  0.1865263      0.2188764      0.2100713      0.2273738      0.2393540    
+  0.2505585      0.2603880      0.7834515      0.3963206     -0.5016479    
+ -0.7600302    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9035817E-06  1.8887940E-06  1.7545917E-06
+  1.7525263E-06  1.7375426E-06  1.6678827E-06  1.6126569E-06  1.5961704E-06
+  1.5948131E-06  1.5969338E-06  1.6399194E-06  1.7349813E-06  2.1633191E-06
+  3.9677443E-06  7.0940400E-06  1.1163101E-05  1.7828148E-05  7.7336575E-05
+  1.7717140E-04  2.9909165E-04  5.2202598E-04  9.5040491E-04  1.5365013E-03
+  1.9636147E-03  2.2808674E-03  2.5430436E-03  2.7794631E-03  2.9415500E-03
+  3.0146819E-03  3.2719399E-03  -1.582736      -1.140438     -5.2940764E-02
+ -0.1641824      -1.464889      -1.306699      -1.292825      -1.599675    
+  -2.247798      -2.616227      -3.119572      -3.620841      -3.921334    
+  -3.854058      -3.090716      -2.778272      -2.238100      -1.190317    
+  7.8428134E-02  0.6927737      0.7395631      0.6853191      0.9577550    
+   1.353172       1.627441       1.661102       1.856619       1.997644    
+   2.065446       2.057915       99683.88       495.2373       3.832143    
+   12.29654    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385121       2.604707       2.861930    
+   4.076987       4.559373       3.876280       2.378357       1.268652    
+  0.5925763     -0.2583249     -0.5630312     -0.6184474     -0.6040374    
+ -0.5631694     -0.5382440     -0.5420275     -0.5716381     -0.5603405    
+ -0.5833206     -0.6462199     -0.7135655     -0.7907623     -0.8426200    
+ -0.8491570     -0.8526682     -0.8566753     -0.8537320     -0.8565676    
+ -0.8624011     -0.8616834     -0.1110450     -0.1012328     -1.1245811E-02
+ -1.3507267E-02 -0.2467517     -0.2286814     -0.2267280     -0.2303295    
+ -0.2889320     -0.2885939     -0.2874940     -0.2870504     -0.2876734    
+ -0.2851826     -0.2471242     -0.2555002     -0.2393926     -0.1502867    
+  6.1339284E-03  0.1063695      0.1213657      0.1114380      0.1442718    
+  0.1928407      0.2250058      0.2187163      0.2368830      0.2508473    
+  0.2638385      0.2751670      0.7813641      0.3999499     -0.4910242    
+ -0.7650272    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9035658E-06  1.8887590E-06  1.7543229E-06
+  1.7523344E-06  1.7368782E-06  1.6681507E-06  1.6146605E-06  1.5972211E-06
+  1.5957775E-06  1.5976473E-06  1.6401200E-06  1.7309560E-06  2.1660885E-06
+  3.9580659E-06  7.0459000E-06  1.0597550E-05  1.6877491E-05  8.5444284E-05
+  1.5815879E-04  3.0329439E-04  5.2835862E-04  9.4113109E-04  1.5184926E-03
+  1.9791937E-03  2.2520029E-03  2.5023376E-03  2.8078381E-03  2.9722527E-03
+  3.0300315E-03  3.2835456E-03  -1.742199      -1.235056     -7.7520974E-02
+ -0.1940752      -1.481875      -1.304272      -1.267702      -1.552980    
+  -2.176717      -2.529714      -3.025556      -3.518459      -3.831480    
+  -3.843242      -3.212501      -3.043570      -2.568747      -1.436524    
+  1.0877708E-02  0.7311057      0.7500184      0.6597826      0.9409287    
+   1.349238       1.622269       1.672055       1.871306       2.024372    
+   2.102960       2.100950       99680.06       496.8607       3.988278    
+   12.85889    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.385058       2.604560       2.860841    
+   4.075752       4.554649       3.878056       2.387778       1.271822    
+  0.5947822     -0.2575727     -0.5629725     -0.6188136     -0.6039435    
+ -0.5633100     -0.5385724     -0.5440388     -0.5735780     -0.5503601    
+ -0.5981808     -0.6439782     -0.7111019     -0.7935236     -0.8470505    
+ -0.8456585     -0.8587599     -0.8647842     -0.8483341     -0.8508972    
+ -0.8596120     -0.8596638     -0.1209559     -0.1092577     -1.3888096E-02
+ -1.7432364E-02 -0.2495060     -0.2282428     -0.2223805     -0.2232766    
+ -0.2793434     -0.2783430     -0.2778173     -0.2776985     -0.2800519    
+ -0.2842868     -0.2574316     -0.2794844     -0.2727170     -0.1789677    
+ -3.0818405E-03  0.1123158      0.1231117      0.1070483      0.1413988    
+  0.1921901      0.2241855      0.2203771      0.2390598      0.2548423    
+  0.2696481      0.2822326      0.7792463      0.4037882     -0.4807085    
+ -0.7579778    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9035490E-06  1.8887246E-06  1.7539240E-06
+  1.7520356E-06  1.7363902E-06  1.6682087E-06  1.6168591E-06  1.5982192E-06
+  1.5968120E-06  1.5987819E-06  1.6395984E-06  1.7278502E-06  2.1746605E-06
+  3.9307320E-06  7.0039596E-06  1.0243932E-05  1.7045959E-05  8.2420302E-05
+  1.6554099E-04  3.1415035E-04  5.3314975E-04  9.3413622E-04  1.5036757E-03
+  2.0000776E-03  2.2828500E-03  2.5170718E-03  2.7942397E-03  2.9674002E-03
+  3.0604785E-03  3.3322980E-03  -1.898559      -1.326334     -0.1056794    
+ -0.2288888      -1.491120      -1.299506      -1.241615      -1.505140    
+  -2.101986      -2.439530      -2.927914      -3.411696      -3.739691    
+  -3.836780      -3.349626      -3.325723      -2.920658      -1.713849    
+ -9.3937583E-02  0.7355554      0.7288358      0.5995115      0.8845004    
+   1.303309       1.573276       1.636628       1.836291       2.000391    
+   2.091464       2.096100       99676.30       498.5686       4.127820    
+   12.45218    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.384991       2.604415       2.859226    
+   4.073831       4.551180       3.878440       2.398115       1.274832    
+  0.5971485     -0.2563765     -0.5631251     -0.6190962     -0.6036526    
+ -0.5637070     -0.5388584     -0.5452965     -0.5732343     -0.5540826    
+ -0.5924109     -0.6381876     -0.7092381     -0.7956063     -0.8506958    
+ -0.8409688     -0.8522497     -0.8618490     -0.8509210     -0.8517933    
+ -0.8540795     -0.8511803     -0.1306741     -0.1169994     -1.6915025E-02
+ -2.2003580E-02 -0.2510051     -0.2273816     -0.2178663     -0.2160509    
+ -0.2692624     -0.2676571     -0.2677674     -0.2679464     -0.2722664    
+ -0.2837517     -0.2690374     -0.3049924     -0.3081846     -0.2112736    
+ -1.7381581E-02  0.1130060      0.1195743      9.6687846E-02  0.1317640    
+  0.1845945      0.2164153      0.2150055      0.2338704      0.2512579    
+  0.2678677      0.2814364      0.7771588      0.4078263     -0.4714890    
+ -0.7630762    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG input pre norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN  1.9035307E-06  1.8886915E-06  1.7534719E-06
+  1.7516602E-06  1.7357960E-06  1.6681979E-06  1.6183991E-06  1.5993555E-06
+  1.5978870E-06  1.5999984E-06  1.6383615E-06  1.7283666E-06  2.1805138E-06
+  3.8958278E-06  7.0061851E-06  9.8070523E-06  1.7281114E-05  8.2363629E-05
+  1.7337628E-04  3.3902368E-04  5.4571999E-04  9.2581572E-04  1.5253101E-03
+  1.9898671E-03  2.2702410E-03  2.5015175E-03  2.8154904E-03  2.9690096E-03
+  3.0590757E-03  3.3475982E-03  -2.051234      -1.414302     -0.1376075    
+ -0.2683595      -1.492738      -1.292328      -1.214343      -1.455987    
+  -2.023766      -2.345970      -2.826678      -3.300260      -3.644915    
+  -3.831880      -3.497293      -3.617953      -3.286496      -2.016718    
+ -0.2336861      0.7063845      0.6766608      0.5057737      0.7897217    
+   1.216449       1.481473       1.555626       1.752558       1.926391    
+   2.031371       2.043626       99672.70       500.3569       4.261887    
+   12.75761    
+ BRAINDEBUG input post norm=            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN            NaN            NaN            NaN
+            NaN            NaN   2.384919       2.604276       2.857396    
+   4.071416       4.546956       3.878369       2.405355       1.278260    
+  0.5996073     -0.2550940     -0.5634870     -0.6190493     -0.6034540    
+ -0.5642140     -0.5388432     -0.5468502     -0.5727544     -0.5541524    
+ -0.5862868     -0.6249202     -0.7043478     -0.7980838     -0.8453733    
+ -0.8432617     -0.8549108     -0.8649475     -0.8468784     -0.8514962    
+ -0.8543345     -0.8485179     -0.1401632     -0.1244604     -2.0347180E-02
+ -2.7186304E-02 -0.2512674     -0.2260844     -0.2131469     -0.2086267    
+ -0.2587108     -0.2565711     -0.2573477     -0.2577674     -0.2642274    
+ -0.2833459     -0.2815355     -0.3314115     -0.3450559     -0.2465551    
+ -3.6447193E-02  0.1084809      0.1108614      8.0574498E-02  0.1155811    
+  0.1702297      0.2018556      0.2027237      0.2214606      0.2401973    
+  0.2585614      0.2728209      0.7751539      0.4120544     -0.4626313    
+ -0.7592473    
+ BRAINDEBUG output =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ BRAINDEBUG out post scale =                      NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+                     NaN                     NaN                     NaN
+ NSTEP =       1   7.950792941368042E-06                    NaN  9.84814E+04                    NaN 3.10  0.55
+ SR: beta =                      NaN
+ SR: residual =                      NaN
+ SR: fixmas =                      NaN
+ SR: engy1 =                      NaN
+ SR: engy2 =                      NaN
+ SR: difft =                      NaN
+WSHIST: writing time sample   1 to h-file 2 DATE=0000/01/01 NCSEC=  1800
+ 
+ nstep, te           2                     NaN                     NaN
+                     NaN                     NaN
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+  interval was not found for col i            1
+ ENDRUN IS BEING CALLED
+TACC:  MPI job exited with code: 1 
+TACC:  Shutdown complete. Exiting. 

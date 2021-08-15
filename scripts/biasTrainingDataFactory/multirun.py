@@ -17,20 +17,14 @@ rundir = "$SCRATCH/biasTrainingData/run_" + modLabel + "/"
 os.system(" ".join(["mkdir", "-p", rundir]))
 os.system(" ".join(["cp", "-r", "baseline/*", rundir]))
 modelNum = str(modelNum)
+
+#Copying in Jordan's NN to overwrite keras_matrices/model.txt
 os.system(" ".join(["cp", pathOttmodels + modLabel + ".txt", rundir + "/keras_matrices/model.txt"]))
-#Making a custom run file
-os.system(" ".join(["cp", "run.template", "run.csh"]))
-with fileinput.FileInput("run.csh", inplace=True) as file:
-    for line in file:
-        print(line.replace("RUNDIR", rundir), end='')
-with fileinput.FileInput("run.csh", inplace=True) as file:
-    for line in file:
-        print(line.replace("XXX", modLabel), end='')
-os.system(" ".join(["mv", "run.csh", rundir]))
 
 #PICK A FREQUENCY
 everyWhich = int(sys.argv[2])
 for i in range(len(icFiles)):
     if (i+1)%everyWhich==0: 
         os.system(" ".join(["python", "singlerun.py", modelNum, icFiles[i]]))
-        os.system(" ".join(["rm", rundir, "atm_in"]))
+        os.system(" ".join(["rm", rundir + "atm_in"]))
+        os.system(" ".join(["rm", rundir + "run.csh"]))

@@ -32,8 +32,8 @@ iyear_ad                = 1950
 
  empty_htapes = .false.
 
- nhtfrq = 0
-  mfilt = 1
+ nhtfrq = 0,1
+  mfilt = 1,48
 /
 &clmexp
  finidat                = '/work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/clmi_0000-09-01_64x128_T42_USGS_c030609.nc'

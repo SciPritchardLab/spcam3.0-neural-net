@@ -15,7 +15,7 @@
  dms_emis               = '/work/08110/tg874091/stampede2/zeroed_cam3_bcs/dms_emis_64x128_zeroed.nc'
 iyear_ad                = 1950
 ! Atmospheric initial condition file:
- ncdata = 'AndKua_aqua_caseid.cam2.i.0000-ZZ-YY-00000.nc'
+ ncdata = 'initialConditionFileName'
  nelapse                =  8640  ! How many 30 minute time steps --> 2 years
  dtime = 1800
  start_ymd = 0101

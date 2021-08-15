@@ -1,5 +1,6 @@
 import os
 import sys
+import fileinput
 pathOttmodels = "/work/08110/tg874091/stampede2/all_models_fkb_ott_et_al/"
 icPath = "$SCRATCH/icSpawn32/run/"
 icFiles = os.popen(" ".join(["ls", icPath + "And*.i.*.nc"])).read().splitlines()

@@ -16,7 +16,7 @@
 iyear_ad                = 1950
 ! Atmospheric initial condition file:
  ncdata = 'initialConditionFileName'
- nelapse                =  8640  ! How many 30 minute time steps --> 2 years
+ nelapse                =  8640  ! How many 30 minute time steps --> 6 months
  dtime = 1800
  start_ymd = 0101
  nsrest         = 0
@@ -34,6 +34,9 @@ iyear_ad                = 1950
 
  nhtfrq = 0,1
   mfilt = 1,48
+! NN inputs then NN provisional outputs then ingredients for diag-SP corrections
+ fincl2 = 'NNQBP:I','NNTBP:I','NNVBP:I','NNPS:I','NNSOLIN:I','NNSHF:I','NNLHF:I','NNDQ:I','NNDT:I','SPDT:I','QRL:I','QRS:I','SPTFLUX:I','SPDQ:I','SPQFLUX:I'
+
 /
 &clmexp
  finidat                = '/work/08110/tg874091/stampede2/csmdata_cam3_sp_frombranson/clmi_0000-09-01_64x128_T42_USGS_c030609.nc'

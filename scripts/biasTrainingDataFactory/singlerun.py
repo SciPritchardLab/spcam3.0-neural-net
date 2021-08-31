@@ -42,7 +42,6 @@ with fileinput.FileInput("atm_in", inplace=True) as file:
     for line in file:
         print(line.replace("initialConditionFileName", initFile), end='')
 os.system(" ".join(["mv", "atm_in", rundir]))
-os.system(" ".join(["rm", "atm_in"]))
 
 #Making a custom run file
 os.system(" ".join(["cp", "run.template", "run.csh"]))
@@ -53,7 +52,6 @@ with fileinput.FileInput("run.csh", inplace=True) as file:
     for line in file:
         print(line.replace("INITCOND", nickname), end='')
 os.system(" ".join(["mv", "run.csh", rundir]))
-os.system(" ".join(["rm", "run.csh"]))
 
 #RUNNING THE MODEL
 os.system(" ".join(["sbatch", rundir + "/run.csh"]))

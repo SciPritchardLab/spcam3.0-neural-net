@@ -37,6 +37,8 @@ use mod_ensemble, only: ensemble_type
   type(network_type) :: cloudbrain_net
 #ifdef NNBIASCORRECTOR
   type(network_type) :: corrector_net
+  integer, parameter :: corrector_inputlength = 155
+  integer, parameter :: corrector_outputlength = 60
 #endif
   integer(ik) :: fileunit, num_layers
   integer(ik) :: n
@@ -144,9 +146,8 @@ use mod_ensemble, only: ensemble_type
   end subroutine neural_net
 
 subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
-                         PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
-                         icol)
-    ! PNAS version: First row = inputs, second row = outputs
+                         PHQ, TPHYSTND, icol)
+                         
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
     real(r8), intent(in) :: QBP(:)
@@ -157,78 +158,69 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     real(r8), intent(in) :: SHFLX
     real(r8), intent(in) :: LHFLX
     ! Allocate outputs
-    real(r8), intent(out) :: PHQ(:)
-    real(r8), intent(out) :: TPHYSTND(:)
-    real(r8), intent(out) :: FSNT
-    real(r8), intent(out) :: FSNS
-    real(r8), intent(out) :: FLNT
-    real(r8), intent(out) :: FLNS
-    real(r8), intent(out) :: PRECT
+    real(r8), intent(inout) :: PHQ(:)  ! note these are also inputs for corrector containing NNDT and NNDQ from NN#1
+    real(r8), intent(inout) :: TPHYSTND(:)
     ! Allocate utilities
-    real(rk) :: input(inputlength),x1(width), x2(width)
+    real(r8) :: input(corrector_inputlength)
     real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev) = TBP(:) 
-    input((nlev+1):2*nlev) = QBP(:) 
-    input((2*nlev+1):3*nlev)=VBP(:)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
+    ! Jerry says input order is (Slack, 9/3/21):
+    !NNDT (30) NNDQ (30) NNLHF (1) NNPS (1) NNQBP (30) NNSHF (1) NNSOLIN (1) NNTBP (30) NNVBP (30)
+    input(1:nlev) = TPHYSTND(:) ! NNDT
+    input((nlev+1):2*nlev) = PHQ(:) ! NNDQ
+    input(2*nlev + 1) = LHFLX
+    input(2*nlev + 2) = PS
+    n = 2*nlev+2
+    input((n+1):(n+nlev)) = QBP(:)
+    input(n+nlev+1) = SHFLX
+    input(n+nlev+2) = SOLIN
+    n = n+nlev+2
+    input((n+1):(n+nlev)) = TBP(:)
+    input((n+nlev+1):(n+2*nlev)) = VBP(:)
+
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG input pre norm=',input
+        write (6,*) 'BRAINDEBUG CORRECTOR input pre norm=',input
       endif
 #endif
 
     ! 2. Normalize input
     do k=1,inputlength
-      input(k) = (input(k) - inp_sub(k))/inp_div(k)
+      input(k) = (input(k) - corrector_inp_sub(k))/corrector_inp_div(k)
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG input post norm=',input
+        write (6,*) 'BRAINDEBUG CORRECTOR input post norm=',input
       endif
 #endif
 
 ! 3. Neural network matrix multiplications and activations
 
-#ifdef ENSEMBLE
-    output = cloudbrain_ensemble % average(input)
-#else
-    ! use neural fortran library
-    output = cloudbrain_net % output(input)
-#endif
+    output = corrector_net % output(input) ! FKB.
 
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG output = ',output
+        write (6,*) 'BRAINDEBUG CORRECTOR output = ',output
       endif
 #endif
 
-    ! 4. Unnormalize output
-    do k=1,outputlength
-      output(k) = output(k) / out_scale(k)
-    end do
+    ! 4. Unnormalize output (not needed for corrector NN, outputs are in W/kg from training env)
 
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG out post scale = ',output
+        write (6,*) 'BRAINDEBUG CORRECTOR output (W/kg) = ',output
       endif
 #endif
 
+! Now overwrite the input heating rates, NNDT and NNDQ, with the bias-corrected equivalents, 
+! which will be received by the GCM that called this subroutine:
 
-    TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
-    PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
-    FSNT =        output(2*nlev+1)
-    FSNS =        output(2*nlev+2)
-    FLNT =        output(2*nlev+3)
-    FLNS =        output(2*nlev+4)
-    PRECT =       output(2*nlev+5)
+    TPHYSTND(:) =      output(1:nlev) ! no cpair multiplication here, already in W/kg
+    PHQ(:) = output((nlev+1):2*nlev)/latvap ! W/kg --> kg/kg/s
 
   end subroutine corrector_neural_net
 
@@ -240,9 +232,10 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 #else
     call cloudbrain_net % load('./keras_matrices/model.txt')
     write (6,*) '------- NEURAL-FORTRAN: loaded network from txt file -------'
+#endif
+
 #ifdef NNBIASCORRECTOR
     call corrector_net % load('./keras_matrics/bias_corrector/model.txt')  
-#endif
 #endif ! ENSEMBLE
 
   end subroutine init_keras_matrices
@@ -288,6 +281,33 @@ subroutine init_keras_norm()
     endif
 #endif
 
+#ifdef NNBIASCORRECTOR
+ ! 1. Read sub
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: reading inp_sub'
+  endif
+  open (unit=555,file='./keras_matrices/bias_corrector/inp_sub.txt',status='old',action='read')
+  read(555,*) corrector_inp_sub(:)
+  close (555)
+#ifdef BRAINDEBUG
+    if (masterproc) then
+      write (6,*) 'BRAINDEBUG CORRECTOR inp_sub = ',corrector_inp_sub
+    endif
+#endif
+
+  ! 2. Read div
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: reading inp_div'
+  endif
+  open (unit=555,file='./keras_matrices/bias_corrector/inp_div.txt',status='old',action='read')
+  read(555,*) corrector_inp_div(:)
+  close (555)
+#ifdef BRAINDEBUG
+    if (masterproc) then
+      write (6,*) 'BRAINDEBUG CORRECTOR inp_div = ',corrector_inp_div
+    endif
+#endif
+#endif ! NNBIASCORRECTOR
   end subroutine init_keras_norm
 
 end module cloudbrain

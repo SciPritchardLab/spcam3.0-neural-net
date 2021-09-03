@@ -95,6 +95,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
     use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net
+#ifdef NNBIASCORRECTOR
+    use cloudbrain, only: neural_net_corrector
+#endif
 #endif
    implicit none
 
@@ -1967,9 +1970,11 @@ end do
     ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
     ptend(c)%lv    = .FALSE.
 
+#ifndef NNBIASCORRECTOR.     ! don't apply NNDT changes to actual GCM state, use as inputs to secondary NN instead shortly..
     ! New energy computation here
     call physics_update(state(c),tend(c),ptend(c),ztodt)
     call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+#endif
 
     ! SR: I am not sure what this does.
     call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
@@ -1977,7 +1982,37 @@ end do
 
   end do ! end chunk loop 
   call t_stopf ('cloudbrain')
-#endif 
+#ifdef NNBIASCORRECTOR
+    do c=begchunk,endchunk 
+      do i=1,ncol ! this is the loop over independent GCM columns.
+        ! note this time ptend(c)%q,s are intent:(inout) -- received as inputs NNDT,NNDQ, overwritten with corrector's outputs.
+        call neural_net_corrector(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), i)
+      end do ! end column loop
+    end do
+  endif 
+   ! Now save all the neural network outputs outside of parallel loop
+  do c=begchunk,endchunk 
+    lchnk = state(c)%lchnk  
+    ncol  = state(c)%ncol
+    call outfld('NNDQFIX',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('NNDTFIX',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+
+    ! Finish up: linkages from cloudbrain to arterial physics variables
+    ptend(c)%name  = 'cloudbrainfix'
+    ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+    ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+    ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
+    ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+    ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+    ptend(c)%lv    = .FALSE.
+
+    ! Only the corrected tendencies emerging from _corrector felt by GCM:
+    call physics_update(state(c),tend(c),ptend(c),ztodt)
+    call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+#endif ! NNBIASCORRECTOR
+
+#endif  ! CLOUDBRAIN
 ! END OF CLOUDBRAIN
   
 #endif ! CRM

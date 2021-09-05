@@ -79,7 +79,7 @@ use mod_ensemble, only: ensemble_type
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
     real(rk) :: input(inputlength),x1(width), x2(width)
-    real(r8) :: output (outputlength)
+    real(rk) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
@@ -161,8 +161,8 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     real(r8), intent(inout) :: PHQ(:)  ! note these are also inputs for corrector containing NNDT and NNDQ from NN#1
     real(r8), intent(inout) :: TPHYSTND(:)
     ! Allocate utilities
-    real(r8) :: input(corrector_inputlength)
-    real(r8) :: output (outputlength)
+    real(rk) :: input(corrector_inputlength)
+    real(rk) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
@@ -235,7 +235,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 #endif
 
 #ifdef NNBIASCORRECTOR
-    call corrector_net % load('./keras_matrics/bias_corrector/model.txt')  
+    call corrector_net % load('./keras_matrices/bias_corrector/model.txt')  
 #endif ! ENSEMBLE
 
   end subroutine init_keras_matrices

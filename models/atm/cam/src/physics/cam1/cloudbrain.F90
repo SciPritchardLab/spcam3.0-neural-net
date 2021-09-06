@@ -170,7 +170,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     nlev=30
     ! Jerry says input order is (Slack, 9/3/21):
     !NNDT (30) NNDQ (30) NNLHF (1) NNPS (1) NNQBP (30) NNSHF (1) NNSOLIN (1) NNTBP (30) NNVBP (30)
-    input(1:nlev) = TPHYSTND(:) ! NNDT
+    input(1:nlev) = TPHYSTND(:)/cpair ! NNDT
     input((nlev+1):2*nlev) = PHQ(:) ! NNDQ
     input(2*nlev + 1) = LHFLX
     input(2*nlev + 2) = PS

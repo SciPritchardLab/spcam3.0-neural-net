@@ -1989,7 +1989,7 @@ end do
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! note this time ptend(c)%q,s are intent:(inout) -- received as inputs NNDT,NNDQ, overwritten with corrector's outputs.
         call corrector_neural_net(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
-                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), i)
+                        ptend(c)%q(i,:,1), ptend(c)%s(i,:)/cpair, i)
       end do ! end column loop
     end do
    ! Now save all the neural network outputs outside of parallel loop

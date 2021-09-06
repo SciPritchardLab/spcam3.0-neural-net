@@ -181,7 +181,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     n = n+nlev+2
     input((n+1):(n+nlev)) = TBP(:)
     input((n+nlev+1):(n+2*nlev)) = VBP(:)
-
+    input(corrector_input_length) = 1. ! Jerry says imoportant to pad by 1 for y-intercept (need to understand, was this importantly missed in prior work??)
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG CORRECTOR input pre norm=',input

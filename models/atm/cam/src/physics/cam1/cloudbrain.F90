@@ -189,7 +189,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 #endif
 
     ! 2. Normalize input
-    do k=1,inputlength
+    do k=1,corrector_inputlength
       input(k) = (input(k) - corrector_inp_sub(k))/corrector_inp_div(k)
     end do
 #ifdef BRAINDEBUG

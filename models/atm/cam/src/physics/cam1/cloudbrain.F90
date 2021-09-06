@@ -49,8 +49,8 @@ use mod_ensemble, only: ensemble_type
   real :: out_scale(outputlength)
 
 #ifdef NNBIASCORRECTOR
-  real :: corrector_inp_sub(inputlength)
-  real :: corrector_inp_div(inputlength)
+  real :: corrector_inp_sub(corrector_inputlength)
+  real :: corrector_inp_div(corrector_inputlength)
   public corrector_neural_net
 #endif
   public neural_net, init_keras_matrices, init_keras_norm

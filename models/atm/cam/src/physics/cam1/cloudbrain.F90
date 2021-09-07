@@ -162,7 +162,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     real(r8), intent(inout) :: TPHYSTND(:)
     ! Allocate utilities
     real(rk) :: input(corrector_inputlength)
-    real(rk) :: output (outputlength)
+    real(rk) :: output (corrector_outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 

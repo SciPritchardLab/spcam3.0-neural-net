@@ -1983,8 +1983,8 @@ end do
   end do ! end chunk loop 
   call t_stopf ('cloudbrain')
   call t_startf ('NNbiascorrector')
-  if ( nstep .ge. nstepNN ) then  ! only turn on NN + diag SP after SP has spun up.
 #ifdef NNBIASCORRECTOR
+  if ( nstep .ge. nstepNN ) then  ! only turn on NN + diag SP after SP has spun up.
     do c=begchunk,endchunk 
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! note this time ptend(c)%q,s are intent:(inout) -- received as inputs NNDT,NNDQ, overwritten with corrector's outputs.

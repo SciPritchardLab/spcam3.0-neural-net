@@ -1901,7 +1901,9 @@ end do
   ptend(c)%s(:,:) = 0. ! necessary?
 
   if ( nstep .ge. nstepNN ) then  ! only turn on NN + diag SP after SP has spun up.
-
+#ifdef ALTERNATESP
+   if (mod(nstep,2) .eq. 0) then
+#endif
     ! As in SP retrieve state at the start of routine
     do c=begchunk,endchunk
       state(c) = state_save(c)
@@ -2012,6 +2014,9 @@ end do
       call physics_update(state(c),tend(c),ptend(c),ztodt)
       call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
     end do
+#ifdef ALTERNATESP
+   end if !(mod(nstep,2) .eq. 0)
+#endif
   endif  ! if a NN couplingtimestep.
 #endif ! NNBIASCORRECTOR
 

@@ -1940,6 +1940,9 @@ end do
                         i)         
       end do ! end column loop
     end do
+#ifdef ALTERNATESP
+   endif !(mod(nstep,2) .eq. 0) then
+#endif
   endif ! note that for time steps earlier the ptend will be zero so no effect.
 
     ! Now save all the neural network outputs outside of parallel loop
@@ -1986,6 +1989,10 @@ end do
   call t_stopf ('cloudbrain')
   call t_startf ('NNbiascorrector')
 #ifdef NNBIASCORRECTOR
+#ifdef ALTERNATESP
+    write (6,*) 'YO ALTERNATESP and NNBIASCORRECTOR cannot be #ifdef at same time.'
+  call endrun
+#endif
   if ( nstep .ge. nstepNN ) then  ! only turn on NN + diag SP after SP has spun up.
     do c=begchunk,endchunk 
       do i=1,ncol ! this is the loop over independent GCM columns.
@@ -2014,9 +2021,6 @@ end do
       call physics_update(state(c),tend(c),ptend(c),ztodt)
       call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
     end do
-#ifdef ALTERNATESP
-   end if !(mod(nstep,2) .eq. 0)
-#endif
   endif  ! if a NN couplingtimestep.
 #endif ! NNBIASCORRECTOR
 

@@ -145,6 +145,7 @@ use mod_ensemble, only: ensemble_type
 
   end subroutine neural_net
 
+#ifdef NNBIASCORRECTOR
 subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, icol)
                          
@@ -223,6 +224,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     PHQ(:) = output((nlev+1):2*nlev)/latvap ! W/kg --> kg/kg/s
 
   end subroutine corrector_neural_net
+#endif ! NNBIASCORRECTOR
 
   subroutine init_keras_matrices()    
 #ifdef ENSEMBLE

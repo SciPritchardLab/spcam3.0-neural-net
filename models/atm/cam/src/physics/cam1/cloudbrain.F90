@@ -49,8 +49,8 @@ use mod_ensemble, only: ensemble_type
   real :: out_scale(outputlength)
 
 #ifdef NNBIASCORRECTOR
-  real :: corrector_inp_sub(inputlength)
-  real :: corrector_inp_div(inputlength)
+  real :: corrector_inp_sub(corrector_inputlength)
+  real :: corrector_inp_div(corrector_inputlength)
   public corrector_neural_net
 #endif
   public neural_net, init_keras_matrices, init_keras_norm
@@ -79,7 +79,7 @@ use mod_ensemble, only: ensemble_type
     real(r8), intent(out) :: PRECT
     ! Allocate utilities
     real(rk) :: input(inputlength),x1(width), x2(width)
-    real(r8) :: output (outputlength)
+    real(rk) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
@@ -145,6 +145,7 @@ use mod_ensemble, only: ensemble_type
 
   end subroutine neural_net
 
+#ifdef NNBIASCORRECTOR
 subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, icol)
                          
@@ -161,8 +162,8 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     real(r8), intent(inout) :: PHQ(:)  ! note these are also inputs for corrector containing NNDT and NNDQ from NN#1
     real(r8), intent(inout) :: TPHYSTND(:)
     ! Allocate utilities
-    real(r8) :: input(corrector_inputlength)
-    real(r8) :: output (outputlength)
+    real(rk) :: input(corrector_inputlength)
+    real(rk) :: output (corrector_outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
 
@@ -170,7 +171,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     nlev=30
     ! Jerry says input order is (Slack, 9/3/21):
     !NNDT (30) NNDQ (30) NNLHF (1) NNPS (1) NNQBP (30) NNSHF (1) NNSOLIN (1) NNTBP (30) NNVBP (30)
-    input(1:nlev) = TPHYSTND(:) ! NNDT
+    input(1:nlev) = TPHYSTND(:)/cpair ! NNDT
     input((nlev+1):2*nlev) = PHQ(:) ! NNDQ
     input(2*nlev + 1) = LHFLX
     input(2*nlev + 2) = PS
@@ -181,7 +182,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     n = n+nlev+2
     input((n+1):(n+nlev)) = TBP(:)
     input((n+nlev+1):(n+2*nlev)) = VBP(:)
-
+    input(corrector_inputlength) = 1. ! Jerry says imoportant to pad by 1 for y-intercept (need to understand, was this importantly missed in prior work??)
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG CORRECTOR input pre norm=',input
@@ -189,7 +190,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 #endif
 
     ! 2. Normalize input
-    do k=1,inputlength
+    do k=1,corrector_inputlength
       input(k) = (input(k) - corrector_inp_sub(k))/corrector_inp_div(k)
     end do
 #ifdef BRAINDEBUG
@@ -223,6 +224,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
     PHQ(:) = output((nlev+1):2*nlev)/latvap ! W/kg --> kg/kg/s
 
   end subroutine corrector_neural_net
+#endif ! NNBIASCORRECTOR
 
   subroutine init_keras_matrices()    
 #ifdef ENSEMBLE
@@ -235,7 +237,7 @@ subroutine corrector_neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
 #endif
 
 #ifdef NNBIASCORRECTOR
-    call corrector_net % load('./keras_matrics/bias_corrector/model.txt')  
+    call corrector_net % load('./keras_matrices/bias_corrector/model.txt')  
 #endif ! ENSEMBLE
 
   end subroutine init_keras_matrices

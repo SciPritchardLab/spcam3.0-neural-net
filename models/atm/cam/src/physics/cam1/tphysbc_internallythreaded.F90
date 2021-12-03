@@ -542,6 +542,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
    integer :: nstepNN ! time step at which to couple to NN (to allow SP to spin up)
+   logical :: nncoupled
    nstepNN = 49 ! Beginning of second sim-day
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
@@ -1900,8 +1901,19 @@ end do
   ptend(c)%q(:,:,ixcldice) = 0.
   ptend(c)%s(:,:) = 0. ! necessary?
 
-  if ( nstep .ge. nstepNN ) then  ! only turn on NN + diag SP after SP has spun up.
+! ------- is it a NN-coupling time step? ----
+  nncoupled = .false.
+  if (nstep .ge. nstepNN) then ! --- only if we are spun up...
+#ifdef ALTERNATESP
+    if (mod(nstep,2) .eq. 0) then !--- even then, only every other time step (if this switch is in)
+#endif
+      nncoupled = .true.
+#ifdef ALTERNATESP
+    end if ! mod nstep?
+#endif
+  endif !state of nncoupled
 
+  if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
     ! As in SP retrieve state at the start of routine
     do c=begchunk,endchunk
       state(c) = state_save(c)
@@ -1938,7 +1950,7 @@ end do
                         i)         
       end do ! end column loop
     end do
-  endif ! note that for time steps earlier the ptend will be zero so no effect.
+  endif ! nncoupled? -- note we might want to enable diagnostic NN and delete this if clause, pritch.
 
     ! Now save all the neural network outputs outside of parallel loop
   do c=begchunk,endchunk 
@@ -1970,11 +1982,13 @@ end do
     ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
     ptend(c)%lv    = .FALSE.
 
+    if (nncoupled) then
 #ifndef NNBIASCORRECTOR.     ! don't apply NNDT changes to actual GCM state, use as inputs to secondary NN instead shortly..
     ! New energy computation here
-    call physics_update(state(c),tend(c),ptend(c),ztodt)
-    call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+      call physics_update(state(c),tend(c),ptend(c),ztodt)
+      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
 #endif
+    endif
 
     ! SR: I am not sure what this does.
     call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
@@ -1982,7 +1996,13 @@ end do
 
   end do ! end chunk loop 
   call t_stopf ('cloudbrain')
+  call t_startf ('NNbiascorrector')
 #ifdef NNBIASCORRECTOR
+#ifdef ALTERNATESP
+    write (6,*) 'YO ALTERNATESP and NNBIASCORRECTOR cannot be #ifdef at same time.'
+  call endrun
+#endif
+   if (nncoupled) then
     do c=begchunk,endchunk 
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! note this time ptend(c)%q,s are intent:(inout) -- received as inputs NNDT,NNDQ, overwritten with corrector's outputs.
@@ -1990,26 +2010,27 @@ end do
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), i)
       end do ! end column loop
     end do
-  endif 
    ! Now save all the neural network outputs outside of parallel loop
-  do c=begchunk,endchunk 
-    lchnk = state(c)%lchnk  
-    ncol  = state(c)%ncol
-    call outfld('NNDQFIX',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-    call outfld('NNDTFIX',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-
-    ! Finish up: linkages from cloudbrain to arterial physics variables
-    ptend(c)%name  = 'cloudbrainfix'
-    ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
-    ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-    ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-    ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
-    ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
-    ptend(c)%lv    = .FALSE.
-
-    ! Only the corrected tendencies emerging from _corrector felt by GCM:
-    call physics_update(state(c),tend(c),ptend(c),ztodt)
-    call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
+      ncol  = state(c)%ncol
+      call outfld('NNDQFIX',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+      call outfld('NNDTFIX',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+  
+      ! Finish up: linkages from cloudbrain to arterial physics variables
+      ptend(c)%name  = 'cloudbrainfix'
+      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+      ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+      ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
+      ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+      ptend(c)%lv    = .FALSE.
+  
+      ! Only the corrected tendencies emerging from _corrector felt by GCM:
+      call physics_update(state(c),tend(c),ptend(c),ztodt)
+      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+    end do
+  endif  ! if a NN couplingtimestep.
 #endif ! NNBIASCORRECTOR
 
 #endif  ! CLOUDBRAIN
@@ -2118,7 +2139,7 @@ end do
 !
 ! No radiation if full physics cloudbrain
 #ifdef CLOUDBRAIN
-  if ( nstep .ge. nstepNN ) then
+  if ( nncoupled ) then
     ptend(c)%s = 0.
   end if
 #endif

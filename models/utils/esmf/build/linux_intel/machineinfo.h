@@ -1,6 +1,6 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Tue Feb  8 14:38:06 CST 2022 on login2.stampede2.tacc.utexas.edu   \n\
-Machine characteristics: Linux login2.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
+Libraries compiled on Tue Feb  8 18:51:30 CST 2022 on login1.stampede2.tacc.utexas.edu   \n\
+Machine characteristics: Linux login1.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc  -qopenmp  -O  -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
 C Compiler version:  \n\
@@ -79,6 +79,6 @@ Using include paths: -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/ut
 Using ESMF directory: /home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/scratch/08110/tg874091/solinDebug/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpif90  -O -Wl,-rpath,/scratch/08110/tg874091/solinDebug/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/scratch/08110/tg874091/solinDebug/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/scratch/08110/tg874091/smoketestNN/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpif90  -O -Wl,-rpath,/scratch/08110/tg874091/smoketestNN/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/scratch/08110/tg874091/smoketestNN/obj/esmf/lib/libO/linux_intel "; 

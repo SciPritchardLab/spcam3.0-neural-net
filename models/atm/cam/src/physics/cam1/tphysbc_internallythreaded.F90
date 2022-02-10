@@ -587,6 +587,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
+      call outfld('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      ! moved this line from above (Jerry 2/9/22)
    end do
 #endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
@@ -1934,7 +1936,9 @@ end do
       
       call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
       call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-      call outfld('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      !call outfld('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      ! Jerry is moving this on 2/9/22 because NNSOLIN gave zeros. Moving this
+      ! to line 590
       call outfld('NNTS',ts(:ncol,c),pcols,lchnk)
     end do
 

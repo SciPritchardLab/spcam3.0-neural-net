@@ -544,6 +544,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
+   real(r8) :: humidity(pver)
 #endif
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
@@ -1935,7 +1936,14 @@ end do
 
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! This is the neural network
-        call neural_net(QBP(c,i,:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        do k=1,pver
+#ifdef RHNN
+          humidity(k) =  461.*state(c)%pmid(i,k)*QBP(c,i,k)/(287.*tom_esat(real(TBP(c,i,k)))) ! note function tom_esat below refercing SAM's sat.F90
+#else
+          humidity(k)= QBP(c,i,k)
+#endif
+        end do        
+        call neural_net(humidity(:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
                         i)         
       end do ! end column loop
@@ -2228,3 +2236,67 @@ end do ! PRITCH FINAL CHUNK (should be no need to thread it).
 
    return
 end subroutine tphysbc_internallythreaded
+
+  real function tom_esat(T) 
+  ! For consistency with the python port of Tom's RH-calculator, this is how it
+  ! was done in the training environment (Caution: could be porting bugs here)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real, parameter :: T00 = 253.16
+    real, external :: esatw_crm,esati_crm ! register functions from crm source.
+    real :: omtmp,omega
+    omtmp = (T-T00)/(T0-T00)
+    omega = max(0.,min(1.,omtmp))
+!tf.where(T>T0,eliq(T),tf.where(T<T00,eice(T),(omega*eliq(T)+(1-omega)*eice(T))))
+    if (T .gt. T0) then
+      tom_esat = tom_eliq(T)
+    elseif (T .lt. T00) then
+      tom_esat = tom_eice(T)
+    else
+      tom_esat = omega*tom_eliq(T) + (1.-omega)*tom_eice(T)
+    endif
+  end
+
+  real function tom_eliq(T)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real, parameter :: cliq = -80. 
+    real a0,a1,a2,a3,a4,a5,a6,a7,a8
+    data a0,a1,a2,a3,a4,a5,a6,a7,a8 /&
+       6.11239921, 0.443987641, 0.142986287e-1, &
+       0.264847430e-3, 0.302950461e-5, 0.206739458e-7, &
+       0.640689451e-10, -0.952447341e-13,-0.976195544e-15/
+    real :: dt
+    dt = max(cliq,T-T0)
+    tom_eliq = 100.*(a0 + dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))  
+  end 
+
+
+  real function tom_eice(T)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real a0,a1,a2,a3,a4,a5,a6,a7,a8
+    data a0,a1,a2,a3,a4,a5,a6,a7,a8 /&
+        6.11147274, 0.503160820, 0.188439774e-1, &
+        0.420895665e-3, 0.615021634e-5,0.602588177e-7, &
+        0.385852041e-9, 0.146898966e-11, 0.252751365e-14/       
+    real cice(6)
+    real dt
+    dt = T-T0
+    cice(1) = 273.15
+    cice(2) = 185.
+    cice(3) = -100.
+    cice(4) = 0.00763685
+    cice(5) = 0.000151069
+    cice(6) = 7.48215e-07
+    if (T .gt. cice(1)) then
+      tom_eice = tom_eliq(T)
+    else if (T .le. cice(2)) then
+      tom_eice = 100.*(cice(4) + max(cice(2),dt)*(cice(5)+max(cice(3),dt)*cice(6))) 
+    else
+      tom_eice = 100.*(a0 +dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))
+    end if
+  end      

@@ -25,8 +25,8 @@ use mod_ensemble, only: ensemble_type
   private
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 8
-  integer, parameter :: inputlength = 94
-  integer, parameter :: outputlength = 65
+  integer, parameter :: inputlength = 64
+  integer, parameter :: outputlength = 60
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
 
@@ -55,15 +55,14 @@ use mod_ensemble, only: ensemble_type
   public neural_net, init_keras_matrices, init_keras_norm
   contains
 
-  subroutine neural_net (QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (QBP, TBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
-    real(r8), intent(in) :: QBP(:)
+    real(r8), intent(in) :: QBP(:) ! note this could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
     real(r8), intent(in) :: TBP(:)   
-    real(r8), intent(in) :: VBP(:)
     real(r8), intent(in) :: PS
     real(r8), intent(in) :: SOLIN
     real(r8), intent(in) :: SHFLX
@@ -89,17 +88,16 @@ use mod_ensemble, only: ensemble_type
     ! 1. Concatenate input vector to neural network
     nlev=30
 #ifdef NEURALLIB
-    input(1:nlev) = TBP(:) !QBP(:) 
-    input((nlev+1):2*nlev) = QBP(:) !TBP(:)
+    input(1:nlev) = TBP(:) 
+    input((nlev+1):2*nlev) = QBP(:) 
 #else
     input(1:nlev) = QBP(:)
     input((nlev+1):2*nlev) = TBP(:)
 #endif
-    input((2*nlev+1):3*nlev)=VBP(:)
-    input(3*nlev+1) = PS
-    input(3*nlev+2) = SOLIN
-    input(3*nlev+3) = SHFLX
-    input(3*nlev+4) = LHFLX
+    input(2*nlev+1) = PS
+    input(2*nlev+2) = SOLIN
+    input(2*nlev+3) = SHFLX
+    input(2*nlev+4) = LHFLX
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input

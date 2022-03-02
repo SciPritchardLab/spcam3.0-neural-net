@@ -1942,8 +1942,9 @@ end do
 #else
           humidity(k)= QBP(c,i,k)
 #endif
-        end do        
-        call neural_net(humidity(:), TBP(c,i,:), VBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        end do
+        ! note Jerry never used VBP as an input variable.        
+        call neural_net(humidity(:), TBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
                         i)         
       end do ! end column loop

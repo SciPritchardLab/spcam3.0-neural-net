@@ -55,18 +55,18 @@ use mod_ensemble, only: ensemble_type
   public neural_net, init_keras_matrices, init_keras_norm
   contains
 
-  subroutine neural_net (QBP, TBP, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
-    real(r8), intent(in) :: QBP(:) ! note this could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
-    real(r8), intent(in) :: TBP(:)   
+    real(r8), intent(in) :: TBP(:) ! note QBP could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
+    real(r8), intent(in) :: QBP(:)   
+    real(r8), intent(in) :: LHFLX
+    real(r8), intent(in) :: SHFLX
     real(r8), intent(in) :: PS
     real(r8), intent(in) :: SOLIN
-    real(r8), intent(in) :: SHFLX
-    real(r8), intent(in) :: LHFLX
     ! Allocate outputs
     real(r8), intent(out) :: PHQ(:)
     real(r8), intent(out) :: TPHYSTND(:)

@@ -1920,7 +1920,7 @@ end do
       
       call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
       call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
-      call outfld('NNSOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld('SOLIN',solin(:ncol,c),pcols,lchnk)
       call outfld('NNTS',ts(:ncol,c),pcols,lchnk)
     end do
 
@@ -1944,7 +1944,7 @@ end do
 #endif
         end do
         ! note Jerry never used VBP as an input variable.        
-        call neural_net(humidity(:), TBP(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        call neural_net(TBP(c,i,:), humidity(:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
                         i)         
       end do ! end column loop

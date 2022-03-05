@@ -546,6 +546,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
    real(r8) :: humidity(pver)
 #endif
+#ifdef RHNN
+   real, external :: tom_esat, tom_eliq, tom_eice 
+#endif
+
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
 ! compute adiabatic tendencies that isolate dycore as was done in 'net training:
 ! SR: New fixed implementation of adiabatic tendencies, which also contain DTV, VD01
@@ -2246,6 +2250,7 @@ end subroutine tphysbc_internallythreaded
     real, parameter :: T0 = 273.16
     real, parameter :: T00 = 253.16
     real, external :: esatw_crm,esati_crm ! register functions from crm source.
+    real, external :: tom_eliq, tom_eice
     real :: omtmp,omega
     omtmp = (T-T00)/(T0-T00)
     omega = max(0.,min(1.,omtmp))
@@ -2257,7 +2262,7 @@ end subroutine tphysbc_internallythreaded
     else
       tom_esat = omega*tom_eliq(T) + (1.-omega)*tom_eice(T)
     endif
-  end
+  end function tom_esat
 
   real function tom_eliq(T)
     implicit none
@@ -2272,7 +2277,7 @@ end subroutine tphysbc_internallythreaded
     real :: dt
     dt = max(cliq,T-T0)
     tom_eliq = 100.*(a0 + dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))  
-  end 
+  end function tom_eliq
 
 
   real function tom_eice(T)
@@ -2286,6 +2291,7 @@ end subroutine tphysbc_internallythreaded
         0.385852041e-9, 0.146898966e-11, 0.252751365e-14/       
     real cice(6)
     real dt
+    real, external :: tom_eliq
     dt = T-T0
     cice(1) = 273.15
     cice(2) = 185.
@@ -2300,4 +2306,4 @@ end subroutine tphysbc_internallythreaded
     else
       tom_eice = 100.*(a0 +dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))
     end if
-  end      
+  end function tom_eice

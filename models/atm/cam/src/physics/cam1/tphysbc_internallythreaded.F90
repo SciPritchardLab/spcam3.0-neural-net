@@ -547,7 +547,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: humidity(pver)
 #endif
 #ifdef RHNN
-   real, external :: tom_esat, tom_eliq, tom_eice 
+   real, external :: tom_esat 
 #endif
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----

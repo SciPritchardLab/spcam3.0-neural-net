@@ -545,9 +545,12 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
    real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
    real(r8) :: humidity(pver)
-#endif
 #ifdef RHNN
    real, external :: tom_esat 
+#endif
+   logical :: nncoupled
+   integer, parameter :: nstepNN = 49 ! time step at which to couple to NN (to allow SP to spin up)
+                                      ! 49 for Beginning of second sim-day (when dtime=1800)
 #endif
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
@@ -1889,33 +1892,42 @@ end do
 #ifdef CLOUDBRAIN
   call t_startf ('cloudbrain')
 
-  ! As in SP retrieve state at the start of routine
-  do c=begchunk,endchunk
-    state(c) = state_save(c)
-    tend(c) = tend_save(c)
-    lchnk = state(c)%lchnk
-    ncol  = state(c)%ncol
-    ! SR: TE, TW and S before BRAIN or SP
-    call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
-    call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
-    call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
-  end do
-
   ! First time step
   if ( is_first_step()) then
-    ! Set tendencies to zero at first step
-    ! I think this is only important for variables we are not using, e.g. liq and ice
-    ptend(c)%q(:,:,1) = 0.  ! necessary?
-    ptend(c)%q(:,:,ixcldliq) = 0.
-    ptend(c)%q(:,:,ixcldice) = 0.
-    ptend(c)%s(:,:) = 0. ! necessary?
-
     ! Initialize network matrices
     call init_keras_norm()  ! Normalization matrix
     call init_keras_matrices()  ! Network matrices
+  endif
 
-  ! For all other time steps
-  else
+  ! Set tendencies to zero at first step
+  ! I think this is only important for variables we are not using, e.g. liq and ice
+  ptend(c)%q(:,:,1) = 0.  ! necessary?
+  ptend(c)%q(:,:,ixcldliq) = 0.
+  ptend(c)%q(:,:,ixcldice) = 0.
+  ptend(c)%s(:,:) = 0. ! necessary?
+
+! ------- is it a NN-coupling time step? ----
+  nncoupled = .false.
+  if (nstep .ge. nstepNN) then ! --- only if we are spun up...
+      nncoupled = .true.
+      if (nstep .eq. nstepNN) then
+        write (6,*) 'NN-coupling is turned on at timestep=',nstep
+      end if
+  endif !state of nncoupled
+
+  if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
+    ! As in SP retrieve state at the start of routine
+    do c=begchunk,endchunk
+      state(c) = state_save(c)
+      tend(c) = tend_save(c)
+      lchnk = state(c)%lchnk
+      ncol  = state(c)%ncol
+      ! SR: TE, TW and S before BRAIN or SP
+      call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+      call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+      call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+    end do
+
     ! At this point write to tape the other input variable
     ! Can't be in parallel loop
     do c=begchunk,endchunk 
@@ -1936,7 +1948,7 @@ end do
     ! This is the main computation loop which is parallel
     do c=begchunk,endchunk 
       lchnk = state(c)%lchnk  
-	    ncol  = state(c)%ncol
+      ncol  = state(c)%ncol
 
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! This is the neural network
@@ -1953,49 +1965,49 @@ end do
                         i)         
       end do ! end column loop
     end do
+  endif ! nncoupled? -- note we might want to enable diagnostic NN and delete this if clause, pritch.
 
-    ! Now save all the neural network outputs outside of parallel loop
-    do c=begchunk,endchunk 
-      lchnk = state(c)%lchnk  
-	    ncol  = state(c)%ncol
-      call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
-      call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-      call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-      call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
-      call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
-      call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
-      call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+  ! Now save all the neural network outputs outside of parallel loop
+  do c=begchunk,endchunk 
+    lchnk = state(c)%lchnk  
+    ncol  = state(c)%ncol
+    call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+    call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
 
-      ! Redundant to have the separate NN outputs but let's leave it for now
-      call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
-      call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
-      call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
-      call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
-      call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
+    ! Redundant to have the separate NN outputs but let's leave it for now
+    call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
+    call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
+    call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
 
+    ! Finish up: linkages from cloudbrain to arterial physics variables
+    ptend(c)%name  = 'cloudbrain'
+    ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+    ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+    ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
+    ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+    ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+    ptend(c)%lv    = .FALSE.
 
-
-      ! Finish up: linkages from cloudbrain to arterial physics variables
-      ptend(c)%name  = 'cloudbrain'
-      ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
-      ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-      ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-      ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
-      ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
-      ptend(c)%lv    = .FALSE.
- 
+    if (nncoupled) then 
       ! New energy computation here
       call physics_update(state(c),tend(c),ptend(c),ztodt)
       call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+    endif
 
       ! SR: I am not sure what this does.
       call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
       ! many things to history file tape.
 
-    end do ! end chunk loop 
-  endif ! not first step.
+  end do ! end chunk loop 
   call t_stopf ('cloudbrain')
-#endif 
+#endif ! CLOUDBRAIN 
 ! END OF CLOUDBRAIN
   
 #endif ! CRM
@@ -2101,7 +2113,9 @@ end do
 !
 ! No radiation if full physics cloudbrain
 #ifdef CLOUDBRAIN
-  ptend(c)%s = 0.
+  if ( nncoupled ) then
+    ptend(c)%s = 0.
+  end if
 #endif
    call physics_update(state(c), tend(c), ptend(c), ztodt)
 

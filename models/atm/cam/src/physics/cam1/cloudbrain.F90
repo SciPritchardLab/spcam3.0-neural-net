@@ -125,11 +125,11 @@ use mod_ensemble, only: ensemble_type
     ! 5. Split output into components
     TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
     PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
-    FSNT =        output(2*nlev+1)
-    FSNS =        output(2*nlev+2)
-    FLNT =        output(2*nlev+3)
-    FLNS =        output(2*nlev+4)
-    PRECT =       output(2*nlev+5)
+    ! FSNT =        output(2*nlev+1)
+    ! FSNS =        output(2*nlev+2)
+    ! FLNT =        output(2*nlev+3)
+    ! FLNS =        output(2*nlev+4)
+    ! PRECT =       output(2*nlev+5)
 
   end subroutine neural_net
 

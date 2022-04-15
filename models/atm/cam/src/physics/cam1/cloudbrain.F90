@@ -23,6 +23,10 @@ use mod_ensemble, only: ensemble_type
   save 
 
   private
+  ! time step at which to couple to NN (to allow SP to spin up), this is atm_in namelist variable
+  integer :: nstepNN = 48  ! 48 for turning on NN from Day 3 (when dtime=1800).
+                           ! nstep starts from 0.
+
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 8
   integer, parameter :: inputlength = 64
@@ -43,11 +47,13 @@ use mod_ensemble, only: ensemble_type
   real :: inp_div(inputlength)
   real :: out_scale(outputlength)
 
-  public neural_net, init_keras_matrices, init_keras_norm
+  public neural_net, init_keras_matrices, init_keras_norm, nstepNN 
+
   contains
 
   subroutine neural_net (TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
-                         PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT, &
+                         PHQ, TPHYSTND, &                       ! only 2 output vars
+                         ! FSNT, FSNS, FLNT, FLNS, PRECT, &     ! 5 extra output vars (for old PNAS version)
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
@@ -61,11 +67,11 @@ use mod_ensemble, only: ensemble_type
     ! Allocate outputs
     real(r8), intent(out) :: PHQ(:)
     real(r8), intent(out) :: TPHYSTND(:)
-    real(r8), intent(out) :: FSNT
-    real(r8), intent(out) :: FSNS
-    real(r8), intent(out) :: FLNT
-    real(r8), intent(out) :: FLNS
-    real(r8), intent(out) :: PRECT
+    ! real(r8), intent(out) :: FSNT
+    ! real(r8), intent(out) :: FSNS
+    ! real(r8), intent(out) :: FLNT
+    ! real(r8), intent(out) :: FLNS
+    ! real(r8), intent(out) :: PRECT
     ! Allocate utilities
 
     real(rk) :: input(inputlength),x1(width), x2(width)

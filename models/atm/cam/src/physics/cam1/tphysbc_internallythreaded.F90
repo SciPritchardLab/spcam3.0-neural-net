@@ -99,7 +99,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net
+    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN
 #endif
    implicit none
 
@@ -549,8 +549,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real, external :: tom_esat 
 #endif
    logical :: nncoupled
-   integer, parameter :: nstepNN = 49 ! time step at which to couple to NN (to allow SP to spin up)
-                                      ! 49 for Beginning of second sim-day (when dtime=1800)
 #endif
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
@@ -1118,9 +1116,16 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    end if
 
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
-     
 
 
+! ------- is it a NN-coupling time step? ----
+nncoupled = .false.
+if (nstep .ge. nstepNN) then ! --- only if we are spun up...
+  nncoupled = .true.
+    if (nstep .eq. nstepNN) then
+      write (6,*) 'NN-coupling is turned on at nstep = ',nstep
+    end if
+endif !state of nncoupled
 
 
 !INSERT or CLOUDBRAIN:
@@ -1141,7 +1146,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 ! Initialize stuff:
-#ifndef CLOUDBRAIN ! save time
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+if ( .not. nncoupled ) then
+#endif
 
 call t_startf ('crm')
 do c=begchunk,endchunk
@@ -1297,7 +1304,6 @@ end do
    else
 
 #ifdef SPFLUXBYPASS
-#ifndef CLOUDBRAIN  !SR: I don't think this is necessary because it is in a larger ifndef CLOUDBRAIN loop
  ! pritch -- apply surface flux perturbations to lowest level DSE,
  ! constituents here, right before superparameterization, insated of
  ! instead of in vertical diffusion routine. To avoid exposiing dycore to a
@@ -1323,7 +1329,6 @@ end do
     end do
     call physics_update (state(c), tend(c), ptend(c), ztodt)
   end do
-#endif
 #endif
 
 ! ================= BEGIN THREADED ZONE OF MOST WORK ===================
@@ -1884,7 +1889,10 @@ end do
 ! End of superparameterization zone.
   end do ! end pritch new chunk loop
   call t_stopf('crm')
-#endif ! ndef CLOUDBRAIN
+
+#ifdef CLOUDBRAIN 
+end if ! nncoupled
+#endif ! def CLOUDBRAIN
 
 !========================================================
 !=================== CLOUDBRAIN =========================
@@ -1893,27 +1901,24 @@ end do
   call t_startf ('cloudbrain')
 
   ! First time step
+  ! reading at first timestep, not nstepNN to leave init_keras debug outputs in the early part of log
   if ( is_first_step()) then
     ! Initialize network matrices
     call init_keras_norm()  ! Normalization matrix
     call init_keras_matrices()  ! Network matrices
   endif
 
-  ! Set tendencies to zero at first step
-  ! I think this is only important for variables we are not using, e.g. liq and ice
-  ptend(c)%q(:,:,1) = 0.  ! necessary?
-  ptend(c)%q(:,:,ixcldliq) = 0.
-  ptend(c)%q(:,:,ixcldice) = 0.
-  ptend(c)%s(:,:) = 0. ! necessary?
-
-! ------- is it a NN-coupling time step? ----
-  nncoupled = .false.
-  if (nstep .ge. nstepNN) then ! --- only if we are spun up...
-      nncoupled = .true.
-      if (nstep .eq. nstepNN) then
-        write (6,*) 'NN-coupling is turned on at timestep=',nstep
-      end if
-  endif !state of nncoupled
+  ! Sungduk: check if this is done correctly.
+  if ( (nstepNN .eq. 0) .and. is_first_step() ) then
+    ! Set tendencies to zero at first step
+    do c=begchunk,endchunk
+      ! I think this is only important for variables we are not using, e.g. liq and ice
+      ptend(c)%q(:,:,1) = 0.  ! necessary?
+      ptend(c)%q(:,:,ixcldliq) = 0.
+      ptend(c)%q(:,:,ixcldice) = 0.
+      ptend(c)%s(:,:) = 0. ! necessary?
+    end do
+  end if
 
   if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
     ! As in SP retrieve state at the start of routine
@@ -1961,7 +1966,8 @@ end do
         end do
         ! note Jerry never used VBP as an input variable.        
         call neural_net(TBP(c,i,:), humidity(:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
-                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), &
+                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), &                                          ! only 2 output vars 
+                        ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
                         i)         
       end do ! end column loop
     end do
@@ -1973,18 +1979,18 @@ end do
     ncol  = state(c)%ncol
     call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
     call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
-    call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
-    call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
-    call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
-    call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
-    call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+    ! call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
 
-    ! Redundant to have the separate NN outputs but let's leave it for now
-    call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
-    call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
-    call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
-    call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
-    call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
+    !! Redundant to have the separate NN outputs but let's leave it for now
+    ! call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    ! call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    ! call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
+    ! call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
+    ! call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
 
     ! Finish up: linkages from cloudbrain to arterial physics variables
     ptend(c)%name  = 'cloudbrain'
@@ -2160,10 +2166,14 @@ end do
    call outfld('PRECSTEND',precstend(:,c)  ,pcols   ,lchnk       )
 #endif
 
-#ifndef CLOUDBRAIN
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+if ( .not. nncoupled ) then
+#endif
    prect(:ncol,c) = precc(:ncol,c) + precl(:ncol,c)
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
+#ifdef CLOUDBRAIN !
+end if
 #endif
 
 #if ( defined COUP_CSM )

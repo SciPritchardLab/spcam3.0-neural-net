@@ -16,7 +16,7 @@
 iyear_ad                = 1950
 ! Atmospheric initial condition file:
  ncdata = 'spinup_AndKua_aqua_SPCAM3.0.cam2.i.0000-12-02-00000.nc'
- nelapse                =  1920 
+ nelapse                =  -365
  dtime = 1800
  start_ymd = 0101
  nsrest         = 0
@@ -36,10 +36,12 @@ iyear_ad                = 1950
 ! mfilt = 1
 nhtfrq = 0,1
 mfilt = 1,48
+fincl1 = 'NNDT:A'
 ! NN inputs then NN provisional outputs then ingredients for diag-SP corrections
 fincl2 = 'NNQBP:I','NNTBP:I','NNPS:I','NNVBP:I','SPDT:I','SPDQ:I','QRL:I','QRS:I','SPDQ:I','TPHYSTND:I','PHQ:I','SOLIN:I','PRECT:I','NNSHF:I','NNLHF:I','LHFLX:I','SHFLX:I','RELHUM:I'
 
-
+! timestep when NN replaces SP (if it's unset, default value is 48)
+nstepNN = 48
 /
 &clmexp
  finidat                = '/ocean/projects/atm200007p/mpritcha/csmdata_cam3_sp_frombranson/clmi_0000-09-01_64x128_T42_USGS_c030609.nc'

@@ -189,6 +189,12 @@ contains
     use physics_types,  only: physics_state, physics_ptend
     use history,        only: outfld
 !!$    use geopotential, only: geopotential_dse
+
+#ifdef CLOUDBRAIN
+   use time_manager, only: get_nstep
+   use cloudbrain, only: nstepNN
+#endif
+
 !------------------------------Arguments--------------------------------
     real(r8), intent(in) :: taux(pcols)            ! x surface stress (N/m2)
     real(r8), intent(in) :: tauy(pcols)            ! y surface stress (N/m2)
@@ -201,7 +207,8 @@ contains
     real(r8), intent(in) :: sgh(pcols)             ! standard deviation of orography
 
 #ifdef CLOUDBRAIN
-    type(physics_state), intent(inout)  :: state      ! Physics state variables
+    integer :: nstep                               ! current timestep number
+    type(physics_state), intent(inout)  :: state   ! Physics state variables
 #else
     type(physics_state), intent(in)  :: state      ! Physics state variables
 #endif
@@ -291,10 +298,17 @@ contains
     call outfld ('DTVKE   ',dtk,pcols,lchnk)
     dtk(:ncol,:) = ptend%s(:ncol,:)/cpair            ! normalize heating for history using dtk
     call outfld ('DTV     ',dtk    ,pcols,lchnk)
-#ifdef CLOUDBRAIN
+
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+nstep = get_nstep()
+if (nstep .lt. nstepNN) then ! --- before NN turns on
+#endif
     state%dtv(:,:) = dtk(:,:)
     state%vd01(:,:) = ptend%q(:,:,1)
+#ifdef CLOUDBRAIN
+end if ! ( nstep .lt. nstepNN )
 #endif
+
     call outfld ('DUV     ',ptend%u,pcols,lchnk)
     call outfld ('DVV     ',ptend%v,pcols,lchnk)
     do m = 1, pcnst+pnats

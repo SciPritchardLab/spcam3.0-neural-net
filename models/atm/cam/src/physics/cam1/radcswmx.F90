@@ -75,6 +75,10 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
    use aer_optics, only: nrh, ndstsz, ksul, wsul, gsul, &
      ksslt, wsslt, gsslt, kcphil, wcphil, gcphil, kcphob, wcphob, gcphob, &
      kcb, wcb, gcb, kdst, wdst, gdst, kbg, wbg, gbg
+#ifdef CLOUDBRAIN
+   use time_manager, only: get_nstep
+   use cloudbrain, only: nstepNN
+#endif
 
    implicit none
 
@@ -727,6 +731,9 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
    real(r8) fluxdn(0:pverp)  ! Down flux at model interface
    real(r8) wexptdn          ! Direct solar beam trans. to surface
 
+#ifdef CLOUDBRAIN
+   integer :: nstep  ! current timestep number
+#endif
 ! 
 !-----------------------------------------------------------------------
 ! START OF CALCULATION
@@ -814,7 +821,12 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
          do k=1,pverp
             pflx(i,k) = pint(i,k)
          end do
-#ifndef CLOUDBRAIN
+
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+nstep = get_nstep()
+if (nstep .lt. nstepNN) then ! --- before NN turns on
+#endif
+
 ! 
 ! Compute optical paths:
 ! 
@@ -891,13 +903,23 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
          wa(i,0)      = 0.925_r8
          ga(i,0)      = 0.850_r8
          fa(i,0)      = 0.7225_r8
+
+#ifdef CLOUDBRAIN
+end if
+#endif
+
 ! 
 ! End  do n=1,ndayc
 ! 
    end do
 ! 
 ! Begin spectral loop
-! 
+!
+
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+if (nstep .lt. nstepNN) then ! --- before NN turns on
+#endif
+
    do ns=1,nspint
 ! 
 ! Set index for cloud particle properties based on the wavelength,
@@ -1934,9 +1956,11 @@ subroutine radcswmx(lchnk   ,ncol1   ,ncol    ,                   &
 ! 
 ! End do n=1,ndayc
 ! 
-! End ifdef CLOUDBRAIN
-#endif
    end do
+
+#ifdef CLOUDBRAIN
+end if
+#endif
 
 !  write (6, '(a, x, i3)') 'radcswmx : exiting, chunk identifier', lchnk
 

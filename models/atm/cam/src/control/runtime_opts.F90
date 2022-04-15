@@ -733,6 +733,10 @@ subroutine read_namelist
                     aero_carbon, aero_feedback_carbon, &
                     aero_sea_salt, aero_feedback_sea_salt, &
                     bndtva, tau_t, tau_u, tau_v, tau_q,tau_ps, &
+! CLOUDBRAIN namelist variables: nstepNN
+#ifdef CLOUDBRAIN
+                    nstepNN, &
+#endif CLOUDBRAIN
 #ifdef CRM
                     crminitsave, crminitread, crmsavechunks, &
 #endif
@@ -751,13 +755,9 @@ subroutine read_namelist
   fluxdampfac,fluxdamp_equatoronly,flux_dylat,flux_critlat_deg, &
 #endif
                     analyses_time_interp, less_surface_nudging, nudge_dse_not_T, &
-                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix, &
-! CLOUDBRAIN namelist variables: nstepNN
-                    nstepNN
-
-
-
+                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix
 #endif
+
 !DJBBEGIN
    character(len=8), external :: upcase ! Uppercase 8-character variable
    integer(4) idjb_out
@@ -1831,7 +1831,9 @@ subroutine distnl
   call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
   call mpibcast (betafix, 1, mpir8, 0, mpicom) ! pritch
 ! CLOUDBRAIN namelist variables: nstepNN
+#ifdef CLOUDBRAIN
   call mpibcast (nstepNN, 1, mpiint, 0, mpicom)
+#endif 
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'
 ! ASK   call flush(idjb_out)

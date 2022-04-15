@@ -299,6 +299,7 @@ contains
     dtk(:ncol,:) = ptend%s(:ncol,:)/cpair            ! normalize heating for history using dtk
     call outfld ('DTV     ',dtk    ,pcols,lchnk)
 
+#ifdef CLOUDBRAIN
 #ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
 nstep = get_nstep()
 if (nstep .lt. nstepNN) then ! --- before NN turns on
@@ -307,6 +308,7 @@ if (nstep .lt. nstepNN) then ! --- before NN turns on
     state%vd01(:,:) = ptend%q(:,:,1)
 #ifdef CLOUDBRAIN
 end if ! ( nstep .lt. nstepNN )
+#endif
 #endif
 
     call outfld ('DUV     ',ptend%u,pcols,lchnk)

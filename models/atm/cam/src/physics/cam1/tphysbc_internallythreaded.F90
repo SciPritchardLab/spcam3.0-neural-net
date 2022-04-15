@@ -1117,7 +1117,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
 
-
+#ifdef CLOUDBRAIN
 ! ------- is it a NN-coupling time step? ----
 nncoupled = .false.
 if (nstep .ge. nstepNN) then ! --- only if we are spun up...
@@ -1125,8 +1125,8 @@ if (nstep .ge. nstepNN) then ! --- only if we are spun up...
     if (nstep .eq. nstepNN) then
       write (6,*) 'NN-coupling is turned on at nstep = ',nstep
     end if
-endif !state of nncoupled
-
+endif
+#endif
 
 !INSERT or CLOUDBRAIN:
 #ifdef CRM
@@ -1908,17 +1908,17 @@ end if ! nncoupled
     call init_keras_matrices()  ! Network matrices
   endif
 
-  ! Sungduk: check if this is done correctly.
-  if ( (nstepNN .eq. 0) .and. is_first_step() ) then
-    ! Set tendencies to zero at first step
-    do c=begchunk,endchunk
-      ! I think this is only important for variables we are not using, e.g. liq and ice
-      ptend(c)%q(:,:,1) = 0.  ! necessary?
-      ptend(c)%q(:,:,ixcldliq) = 0.
-      ptend(c)%q(:,:,ixcldice) = 0.
-      ptend(c)%s(:,:) = 0. ! necessary?
-    end do
-  end if
+  !! Sungduk: Comment the initialization block as NN starts from SP spunup states (at nstepNN)
+  ! if ( (nstepNN .eq. 0) .and. is_first_step() ) then
+  !  ! Set tendencies to zero at first step
+  !  do c=begchunk,endchunk
+  !    ! I think this is only important for variables we are not using, e.g. liq and ice
+  !    ptend(c)%q(:,:,1) = 0.  ! necessary?
+  !    ptend(c)%q(:,:,ixcldliq) = 0.
+  !    ptend(c)%q(:,:,ixcldice) = 0.
+  !    ptend(c)%s(:,:) = 0. ! necessary?
+  !  end do
+  ! end if
 
   if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
     ! As in SP retrieve state at the start of routine

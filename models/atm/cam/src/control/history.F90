@@ -6146,6 +6146,8 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
      call addfld ('PV2PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of second component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
      call addfld ('PV3PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of third component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
 
+! SY: cosine(zenith angle)
+      call addfld ('COSZRS',' ',1,    'I','Cosine of zenith angle', phys_decomp)
 
 ! MSP: for redundantly tracking total tendency after physics package (so we know MSE budget residual magnitude exactly)
       call addfld ('PVAP','(K m2/kg)/s',plev,'I','PV after physics',phys_decomp)

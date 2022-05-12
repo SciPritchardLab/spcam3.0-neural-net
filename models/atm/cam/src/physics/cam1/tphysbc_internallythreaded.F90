@@ -1042,6 +1042,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call get_rlat_all_p(lchnk, ncol, clat(:,c))
    call get_rlon_all_p(lchnk, ncol, clon(:,c))
    call zenith (calday, clat(:,c), clon(:,c), coszrs(:,c), ncol)
+   !Sungduk: save coszrs
+   call outfld('COSZRS',coszrs(:,c),pcols,lchnk)
 
 
    if (dosw .or. dolw) then

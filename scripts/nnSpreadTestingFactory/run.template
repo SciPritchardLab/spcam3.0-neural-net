@@ -1,0 +1,13 @@
+#!/bin/csh
+#SBATCH -A TG-ATM190002
+#SBATCH -N 1
+#SBATCH -n 64
+#SBATCH -t 08:00:00
+#SBATCH -p normal
+#SBATCH -J INITCOND
+
+cd RUNDIR
+setenv I_MPI_COMPATIBILITY 4
+ibrun -n 64 ./cam  < atm_in > logfile
+
+

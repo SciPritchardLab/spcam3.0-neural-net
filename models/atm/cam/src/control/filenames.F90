@@ -144,7 +144,8 @@ subroutine init_filepaths( archivedirname )
          call endrun
       end if
       upcaselogname = to_upper(logname)
-      archive_dir   = '/'//trim(upcaselogname)//'/csm/'//trim(caseid)//'/atm/'
+!      archive_dir   = '/'//trim(upcaselogname)//'/csm/'//trim(caseid)//'/atm/'
+      archive_dir   = TRIM(home_dir)//'/scratch1/'//TRIM(caseid)//'/atm/' ! FIS
    end if
    ind = len_trim(archive_dir)
    if ( archive_dir(ind:ind) /= '/' )then

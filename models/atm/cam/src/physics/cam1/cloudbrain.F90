@@ -9,15 +9,13 @@ use shr_kind_mod,    only: r8 => shr_kind_r8
 use ppgrid,          only: pcols, pver, pverp
 use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
-use pmgrid, only: masterproc
+use pmgrid,          only: masterproc
 !use runtime_opts, only: nn_nint, inputlength, outputlength, activation_type, width
 
-! -------- NEURAL-FORTRAN --------
-! imports
-use mod_kinds, only: ik, rk
-use mod_network , only: network_type
-use mod_ensemble, only: ensemble_type
-! --------------------------------
+! -------- PYTORCH BINDING --------
+use torch_ftn
+use iso_fortran_env
+! ---------------------------------
 
   implicit none
   save 
@@ -28,26 +26,18 @@ use mod_ensemble, only: ensemble_type
                            ! nstep starts from 0.
 
   ! Define variables for this entire module
-  integer, parameter :: nn_nint = 8
   integer, parameter :: inputlength = 64
   integer, parameter :: outputlength = 60
-  integer, parameter :: activation_type = 1
-  integer, parameter :: width = 256
 
-#ifdef ENSEMBLE
-  real(rk) :: noise = 0.0
-  type(ensemble_type) :: cloudbrain_ensemble
-#else
-  type(network_type) :: cloudbrain_net
-  integer(ik) :: fileunit, num_layers
-  integer(ik) :: n
-#endif
+  real(r8) :: inp_sub(inputlength)
+  real(r8) :: inp_div(inputlength)
+  real(r8) :: out_scale(outputlength)
 
-  real :: inp_sub(inputlength)
-  real :: inp_div(inputlength)
-  real :: out_scale(outputlength)
+  ! -------- PYTORCH BINDING --------
+  type(torch_module) :: torch_mod
+  ! ---------------------------------
 
-  public neural_net, init_keras_matrices, init_keras_norm, nstepNN 
+  public neural_net, init_ml_pytorch_model, init_ml_norm, nstepNN 
 
   contains
 
@@ -74,10 +64,15 @@ use mod_ensemble, only: ensemble_type
     ! real(r8), intent(out) :: PRECT
     ! Allocate utilities
 
-    real(rk) :: input(inputlength),x1(width), x2(width)
-    real(r8) :: output (outputlength)
     integer :: k, nlev, n
     integer, intent(in) :: icol
+
+    ! -------- PYTORCH BINDING --------
+    type(torch_tensor) :: in_tensor, out_tensor
+    real(real32) :: input(inputlength)     ! real32 is the precision used in torch_ftn 
+    real(real32), pointer :: output0 (:)   ! double precision (e.g. real64, r8) is not supported yet
+    real(real32), allocatable :: output(:)
+    ! ---------------------------------
 
     ! 1. Concatenate input vector to neural network
     nlev=30
@@ -104,13 +99,12 @@ use mod_ensemble, only: ensemble_type
 #endif
 
 ! 3. Neural network matrix multiplications and activations
-#ifdef ENSEMBLE
-    output = cloudbrain_ensemble % average(input)
-#else
-    ! use neural fortran library
-    output = cloudbrain_net % output(input)
-#endif
-
+    ! -------- PYTORCH BINDING --------
+    call in_tensor%from_array(input)
+    call torch_mod%forward(in_tensor, out_tensor)
+    call out_tensor%to_array(output0)
+    output = output0
+    ! ---------------------------------
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG output = ',output
@@ -140,27 +134,21 @@ use mod_ensemble, only: ensemble_type
   end subroutine neural_net
 
 
-
-  subroutine init_keras_matrices()    
-#ifdef ENSEMBLE
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loading -------'
-    cloudbrain_ensemble = ensemble_type('./Models/', noise)
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loaded -------'
-#else
-    call cloudbrain_net % load('./keras_matrices/model.txt')
-    write (6,*) '------- NEURAL-FORTRAN: loaded network from txt file -------'
-#endif
-
-  end subroutine init_keras_matrices
+! -------- PYTORCH BINDING --------
+  subroutine init_ml_pytorch_model()
+    call torch_mod%load('./pytorch_files/model.pt') ! must be a *traced* model
+    write (6,*) 'CLOUDBRAIN: loading a pytorch model -------'
+  end subroutine init_ml_pytorch_model
+! ---------------------------------
     
 
-subroutine init_keras_norm()
+subroutine init_ml_norm()
 
   ! 1. Read sub
   if (masterproc) then
     write (6,*) 'CLOUDBRAIN: reading inp_sub'
   endif
-  open (unit=555,file='./keras_matrices/inp_sub.txt',status='old',action='read')
+  open (unit=555,file='./pytorch_files/inp_sub.txt',status='old',action='read')
   read(555,*) inp_sub(:)
   close (555)
 #ifdef BRAINDEBUG
@@ -173,7 +161,7 @@ subroutine init_keras_norm()
   if (masterproc) then
     write (6,*) 'CLOUDBRAIN: reading inp_div'
   endif
-  open (unit=555,file='./keras_matrices/inp_div.txt',status='old',action='read')
+  open (unit=555,file='./pytorch_files/inp_div.txt',status='old',action='read')
   read(555,*) inp_div(:)
   close (555)
 #ifdef BRAINDEBUG
@@ -186,7 +174,7 @@ subroutine init_keras_norm()
   if (masterproc) then
     write (6,*) 'CLOUDBRAIN: reading out_scale'
   endif
-  open (unit=555,file='./keras_matrices/out_scale.txt',status='old',action='read')
+  open (unit=555,file='./pytorch_files/out_scale.txt',status='old',action='read')
   read(555,*) out_scale(:)
   close (555)
 #ifdef BRAINDEBUG
@@ -195,7 +183,7 @@ subroutine init_keras_norm()
     endif
 #endif
 
-  end subroutine init_keras_norm
+  end subroutine init_ml_norm
 
 end module cloudbrain
 #endif

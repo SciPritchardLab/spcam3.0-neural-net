@@ -99,7 +99,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN
+    use cloudbrain, only: init_ml_norm, init_ml_pytorch_model, neural_net, nstepNN
 #endif
    implicit none
 
@@ -1903,11 +1903,11 @@ end if ! nncoupled
   call t_startf ('cloudbrain')
 
   ! First time step
-  ! reading at first timestep, not nstepNN to leave init_keras debug outputs in the early part of log
+  ! reading at first timestep, not nstepNN to leave init_ml debug outputs in the early part of log
   if ( is_first_step()) then
     ! Initialize network matrices
-    call init_keras_norm()  ! Normalization matrix
-    call init_keras_matrices()  ! Network matrices
+    call init_ml_norm()  ! Normalization matrix
+    call init_ml_pytorch_model()  ! Pytorch model (traced)
   endif
 
   !! Sungduk: Comment the initialization block as NN starts from SP spunup states (at nstepNN)

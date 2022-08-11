@@ -1,5 +1,5 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Tue Jun 14 22:52:30 EDT 2022 on br012.ib.bridges2.psc.edu   \n\
+Libraries compiled on Fri Jul 15 20:35:19 EDT 2022 on br012.ib.bridges2.psc.edu   \n\
 Machine characteristics: Linux br012.ib.bridges2.psc.edu 4.18.0-193.28.1.el8_2.x86_64 #1 SMP Thu Oct 22 00:20:22 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc   -O  -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
@@ -80,6 +80,6 @@ Using include paths: -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/
 Using ESMF directory: /jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/coupledResults/spcam/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpiifort -O -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/coupledResults/spcam/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/ocean/projects/atm200007p/jlin96/prognosticTesting/coupledResults/spcam/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpiifort -O -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel "; 

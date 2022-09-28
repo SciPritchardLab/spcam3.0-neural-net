@@ -122,6 +122,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                PS(begchunk:endchunk,pcols), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
+               TBPm1(begchunk:endchunk,pcols,pver), &
+               QBPm1(begchunk:endchunk,pcols,pver), &
                VBP(begchunk:endchunk,pcols,pver), &
                idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq(pcols,begchunk:endchunk), abstot, &
                corr, drad, absrad, errt(pcols,begchunk:endchunk)
@@ -1967,7 +1969,7 @@ end if ! nncoupled
 #endif
         end do
         ! note Jerry never used VBP as an input variable.        
-        call neural_net(TBP(c,i,:), humidity(:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        call neural_net(TBPm1(c,i,:), QBPm1(c,i,:),TBP(c,i,:), humidity(:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), &                                          ! only 2 output vars 
                         ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
                         i)         
@@ -2264,6 +2266,13 @@ call outfld('DBGT6',ptend(c)%s ,pcols,lchnk)
   in_surface_state2d(c)%solld(:)      =  solld(:,c) 		      
 
 end do ! PRITCH FINAL CHUNK (should be no need to thread it).
+
+  TBPm1(:,:,:) = TBP(:,:,:)
+  QBPm1(:,:,:) = QBP(:,:,:) ! TODO Jerry check if this works.
+  ! Main uncertainty is whether these will persist. 
+  ! BRAINDEBUG output from successive time steps will tell answer. 
+  ! If not, then we intervene in state(c)%tm1 (add new units to structure that does persist)
+  
 
    return
 end subroutine tphysbc_internallythreaded

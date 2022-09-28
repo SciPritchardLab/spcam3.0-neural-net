@@ -29,8 +29,8 @@ use mod_ensemble, only: ensemble_type
 
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 8
-  integer, parameter :: inputlength = 64
-  integer, parameter :: outputlength = 60
+  integer, parameter :: inputlength = 64 ! Jerry TODO increase by 30+30?
+  integer, parameter :: outputlength = 60 
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
 
@@ -51,13 +51,15 @@ use mod_ensemble, only: ensemble_type
 
   contains
 
-  subroutine neural_net (TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (TBPm1, QBPm1, TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, &                       ! only 2 output vars
                          ! FSNT, FSNS, FLNT, FLNS, PRECT, &     ! 5 extra output vars (for old PNAS version)
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
+    real(r8), intent(in) :: TBPm1(:) !From previous time step
+    real(r8), intent(in) :: QBPm1(:)   
     real(r8), intent(in) :: TBP(:) ! note QBP could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
     real(r8), intent(in) :: QBP(:)   
     real(r8), intent(in) :: LHFLX
@@ -81,6 +83,7 @@ use mod_ensemble, only: ensemble_type
 
     ! 1. Concatenate input vector to neural network
     nlev=30
+    ! Jery TODO add the *m1 variables that were receivedin the right place and cross check order. 
     input(1:nlev) = TBP(:) 
     input((nlev+1):2*nlev) = QBP(:) 
     input(2*nlev+1) = PS

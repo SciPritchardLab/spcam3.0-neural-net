@@ -24,7 +24,7 @@ use mod_ensemble, only: ensemble_type
 
   private
   ! time step at which to couple to NN (to allow SP to spin up), this is atm_in namelist variable
-  integer :: nstepNN = 48  ! 48 for turning on NN from Day 3 (when dtime=1800).
+  integer :: nstepNN = 48  ! 48 for turning on NN from Day 1 (when dtime=1800).
                            ! nstep starts from 0.
 
   ! Define variables for this entire module
@@ -43,9 +43,9 @@ use mod_ensemble, only: ensemble_type
   integer(ik) :: n
 #endif
 
-  real :: inp_sub(inputlength)
-  real :: inp_div(inputlength)
-  real :: out_scale(outputlength)
+  real(rk) :: inp_sub(inputlength)
+  real(rk) :: inp_div(inputlength)
+  real(rk) :: out_scale(outputlength)
 
   public neural_net, init_keras_matrices, init_keras_norm, nstepNN 
 
@@ -155,6 +155,10 @@ use mod_ensemble, only: ensemble_type
     
 
 subroutine init_keras_norm()
+
+  if (masterproc) then
+    write (6,*) 'CLOUDBRAIN: FKB is configured with ', rk, ' real number and', ik, ' integer.'
+  endif
 
   ! 1. Read sub
   if (masterproc) then

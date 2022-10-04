@@ -57,9 +57,9 @@ null  :=
 space := $(null) $(null)
 comma := $(null),$(null)
 
-NEURAL_MOD := -I/ocean/projects/atm200007p/shared/FKB/build/include/
-NEURAL_A :=   -L/ocean/projects/atm200007p/shared/FKB/build/lib/
-NEURAL_O :=   -L/ocean/projects/atm200007p/shared/FKB/build/CMakeFiles/neural.dir/
+NEURAL_MOD := -I/home1/00993/tg802402/repositories/FKB/build/include/
+NEURAL_A := -L/home1/00993/tg802402/repositories/FKB/build/lib/
+NEURAL_O := -L/home1/00993/tg802402/repositories/FKB/build/CMakeFiles/neural.dir/
 
 # Determine distribution root directory
 ifeq ($(ROOTDIR),$(null))
@@ -167,10 +167,10 @@ OBJS      := $(addsuffix .o, $(basename $(SOURCES)))
 CPPDEF    := -DCAM -DNO_SHR_VMATH -DHIDE_SHR_MSG
 
 $(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
-# For regular SP
-#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -lnetcdff -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS) 
-# For NN-SP (but still works for regular SP)
-	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -lnetcdff -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf_c++ -lnetcdff -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
 
 debug: $(OBJS)
 	echo "FFLAGS: $(FFLAGS)"
@@ -308,9 +308,9 @@ ifeq ($(UNAMES),Linux)
 #  endif
 #endif
 
-# MSP hardwired values INTEL at bridges-2
+# MSP hardwired values INTEL at stampede
 ESMF_ARCH = linux_intel
-FC := mpiifort
+FC := mpif90
 CC := mpicc
 CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS #-xMIC-AVX512
 #CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -xMIC-AVX512

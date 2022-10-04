@@ -1,34 +1,29 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Fri Jul 15 20:35:19 EDT 2022 on br012.ib.bridges2.psc.edu   \n\
-Machine characteristics: Linux br012.ib.bridges2.psc.edu 4.18.0-193.28.1.el8_2.x86_64 #1 SMP Thu Oct 22 00:20:22 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux   \n\
+Libraries compiled on Fri Feb 11 20:53:38 CST 2022 on login3.stampede2.tacc.utexas.edu   \n\
+Machine characteristics: Linux login3.stampede2.tacc.utexas.edu 3.10.0-957.5.1.el7.x86_64 #1 SMP Fri Feb 1 14:54:57 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
-Using C compiler: mpicc   -O  -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
+Using C compiler: mpicc  -qopenmp  -O  -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
 C Compiler version:  \n\
-gcc (GCC) 8.3.1 20191121 (Red Hat 8.3.1-5)  \n\
-Copyright (C) 2018 Free Software Foundation, Inc.  \n\
-This is free software; see the source for copying conditions.  There is NO  \n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  \n\
+icc (ICC) 18.0.2 20180210  \n\
+Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.  \n\
   \n\
 C++ Compiler version:  \n\
-gcc (GCC) 8.3.1 20191121 (Red Hat 8.3.1-5)  \n\
-Copyright (C) 2018 Free Software Foundation, Inc.  \n\
-This is free software; see the source for copying conditions.  There is NO  \n\
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  \n\
+icc (ICC) 18.0.2 20180210  \n\
+Copyright (C) 1985-2018 Intel Corporation.  All rights reserved.  \n\
   \n\
-Using Fortran compiler: mpiifort -O -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                           \n\
+Using Fortran compiler: mpif90 -qopenmp  -O -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                           \n\
 Fortran Compiler version:  \n\
 Error: Command line argument is needed!  \n\
 Simple script to compile and/or link MPI programs.  \n\
-Usage: mpiifort [options] <files>  \n\
+Usage: mpif90 [options] <files>  \n\
 ----------------------------------------------------------------------------  \n\
 The following options are supported:  \n\
    -fc=<name> | -f90=<name>  \n\
                    specify a FORTRAN compiler name: i.e. -fc=ifort  \n\
    -echo           print the scripts during their execution  \n\
    -show           show command lines without real calling  \n\
-   -show_env       show environment variables  \n\
    -config=<name>  specify a configuration file: i.e. -config=ifort for mpif90-ifort.conf file  \n\
-   -v              print version info of mpiifort and its native compiler  \n\
+   -v              print version info of mpif90 and its native compiler  \n\
    -profile=<name> specify a profile configuration file (an MPI profiling  \n\
                    library): i.e. -profile=myprofile for the myprofile.cfg file.  \n\
                    As a special case, lib<name>.so or lib<name>.a may be used  \n\
@@ -50,8 +45,6 @@ The following options are supported:  \n\
    -O              enable optimization  \n\
    -link_mpi=<name>  \n\
                    link against the specified version of the Intel(R) MPI Library  \n\
-                   i.e -link_mpi=opt|opt_mt|dbg|dbg_mt  \n\
-   -norpath        disable rpath for compiler wrapper of the Intel(R) MPI Library  \n\
 All other options will be passed to the compiler without changing.  \n\
 ----------------------------------------------------------------------------  \n\
 The following environment variables are used:  \n\
@@ -66,20 +59,26 @@ The following environment variables are used:  \n\
                    specify a default profile for the -trace option  \n\
    I_MPI_CHECK_PROFILE  \n\
                    specify a default profile for the -check_mpi option  \n\
+   I_MPI_CHECK_COMPILER  \n\
+                   enable compiler setup checks  \n\
    I_MPI_LINK      specify the version of the Intel(R) MPI Library  \n\
    I_MPI_DEBUG_INFO_STRIP  \n\
                    turn on/off the debug information stripping during static linking  \n\
+   I_MPI_FCFLAGS  \n\
+                   special flags needed for compilation  \n\
+   I_MPI_LDFLAGS   \n\
+                   special flags needed for linking  \n\
 ----------------------------------------------------------------------------  \n\
 -----------------------------------------  \n\
 Using ESMF flags:                       \n\
 -----------------------------------------  \n\
 Using configuration flags:  \n\
 -----------------------------------------  \n\
-Using include paths: -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni    \n\
+Using include paths: -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/include -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/include   -I/home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni    \n\
 -----------------------------------------  \n\
-Using ESMF directory: /jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf  \n\
+Using ESMF directory: /home1/08110/tg874091/repos/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpiifort -O -Wl,-rpath,/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/ocean/projects/atm200007p/jlin96/prognosticTesting/onlineCoupling/specific_cam/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/scratch/08110/tg874091/neuralSanity/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpif90  -O -Wl,-rpath,/scratch/08110/tg874091/neuralSanity/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/scratch/08110/tg874091/neuralSanity/obj/esmf/lib/libO/linux_intel "; 

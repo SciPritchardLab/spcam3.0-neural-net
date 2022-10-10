@@ -29,7 +29,7 @@ use mod_ensemble, only: ensemble_type
 
   ! Define variables for this entire module
   integer, parameter :: nn_nint = 8
-  integer, parameter :: inputlength = 64 ! Jerry TODO increase by 30+30?
+  integer, parameter :: inputlength = 124 ! Jerry TODO increase by 30+30?
   integer, parameter :: outputlength = 60 
   integer, parameter :: activation_type = 1
   integer, parameter :: width = 256
@@ -51,17 +51,17 @@ use mod_ensemble, only: ensemble_type
 
   contains
 
-  subroutine neural_net (TBPm1, QBPm1, TBP, QBP, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (TBP, QBP, TPHYSTNDm1, PHQm1, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, &                       ! only 2 output vars
                          ! FSNT, FSNS, FLNT, FLNS, PRECT, &     ! 5 extra output vars (for old PNAS version)
                          icol)
     ! PNAS version: First row = inputs, second row = outputs
     ! icol is used for debugging to only output one colum
     ! Allocate inputs
-    real(r8), intent(in) :: TBPm1(:) !From previous time step
-    real(r8), intent(in) :: QBPm1(:)   
     real(r8), intent(in) :: TBP(:) ! note QBP could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
     real(r8), intent(in) :: QBP(:)   
+    real(r8), intent(in) :: TPHYSTNDm1(:) !From previous time step
+    real(r8), intent(in) :: PHQm1(:) 
     real(r8), intent(in) :: LHFLX
     real(r8), intent(in) :: SHFLX
     real(r8), intent(in) :: PS
@@ -86,10 +86,12 @@ use mod_ensemble, only: ensemble_type
     ! Jery TODO add the *m1 variables that were receivedin the right place and cross check order. 
     input(1:nlev) = TBP(:) 
     input((nlev+1):2*nlev) = QBP(:) 
-    input(2*nlev+1) = PS
-    input(2*nlev+2) = SOLIN
-    input(2*nlev+3) = SHFLX
-    input(2*nlev+4) = LHFLX
+    input((2*nlev+1):(3*nlev)) = TPHYSTNDm1(:)
+    input((3*nlev+1):(4*nlev)) = PHQm1(:)
+    input(4*nlev+1) = PS
+    input(4*nlev+2) = SOLIN
+    input(4*nlev+3) = SHFLX
+    input(4*nlev+4) = LHFLX
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input

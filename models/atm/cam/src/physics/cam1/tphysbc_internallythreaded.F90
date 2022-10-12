@@ -122,8 +122,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                PS(begchunk:endchunk,pcols), &
                TBP(begchunk:endchunk,pcols,pver), &
                QBP(begchunk:endchunk,pcols,pver), &
-               TBPm1(begchunk:endchunk,pcols,pver), &
-               QBPm1(begchunk:endchunk,pcols,pver), &
+               TPHYSTNDm1(begchunk:endchunk,pcols,pver), & ! FIX THIS
+               PHQm1(begchunk:endchunk,pcols,pver), & ! FIX THIS
                VBP(begchunk:endchunk,pcols,pver), &
                idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq(pcols,begchunk:endchunk), abstot, &
                corr, drad, absrad, errt(pcols,begchunk:endchunk)

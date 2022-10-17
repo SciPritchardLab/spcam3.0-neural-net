@@ -80,7 +80,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
    use sfcwind_anncycle, only: read_sfcwindanncycle, allocate_sfcwindanncycle,ref_sfcwindanncycle_int, sfcwind_interference
    use phys_grid,       only: get_rlat_all_p
    use runtime_opts, only: fluxdampfac,fluxdamp_equatoronly, flux_dylat,flux_critlat_deg
-
+   use cloudbrain, only: TPHYSTNDm1, PHQm1
 #endif
 !-----------------------------------------------------------------------
    implicit none
@@ -668,6 +668,10 @@ end do
       do m=1,ppcnst
          call outfld(qphystendnam(m),qphystend(1,1,m,c),pcols   ,c   )
       enddo
+      !!! SAVE m1 tendencies HERE !!!
+      TPHYSTNDm1(:ncol,:,c) = tphystend(:ncol,:,c)
+      PHQm1(:ncol,:,c) = qphystend(:ncol,:,1,c)
+      ! assuming m = 1 means water vapor
       call t_stopf ('tphysac')
      ! MSP added:
      ! Note that state%t IS UPDATED via tend@dtdt at the end of tphysac.

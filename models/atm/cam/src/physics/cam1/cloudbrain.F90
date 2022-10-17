@@ -47,7 +47,13 @@ use mod_ensemble, only: ensemble_type
   real :: inp_div(inputlength)
   real :: out_scale(outputlength)
 
-  public neural_net, init_keras_matrices, init_keras_norm, nstepNN 
+  real(r8) :: TPHYSTNDm1(pcols, pver, begchunk:endchunk)
+  real(r8) :: PHQm1(pcols, pver, begchunk:endchunk)
+
+
+
+
+  public neural_net, init_keras_matrices, init_keras_norm, nstepNN, TPHYSTNDm1, PHQm1 
 
   contains
 

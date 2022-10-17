@@ -99,7 +99,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN
+    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
+                          TPHYSTNDm1, PHQm1
 #endif
    implicit none
 
@@ -1969,7 +1970,7 @@ end if ! nncoupled
 #endif
         end do
         ! note Jerry never used VBP as an input variable.        
-        call neural_net(TBP(c,i,:), humidity(:), TPHYSTNDm1(c,i,:), PHQm1(c,i,:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
+        call neural_net(TBP(c,i,:), humidity(:), TPHYSTNDm1(i,:,c), PHQm1(i,:,c), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), &                                          ! only 2 output vars 
                         ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
                         i)         

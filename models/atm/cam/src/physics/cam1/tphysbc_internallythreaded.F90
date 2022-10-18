@@ -1969,11 +1969,15 @@ end if ! nncoupled
           humidity(k)= QBP(c,i,k)
 #endif
         end do
-        ! note Jerry never used VBP as an input variable.        
+        ! note Jerry never used VBP as an input variable.     
+        print*,'Jerry check',TPHYSTNDm1(i,1:5,c)    
         call neural_net(TBP(c,i,:), humidity(:), TPHYSTNDm1(i,:,c), PHQm1(i,:,c), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
                         ptend(c)%q(i,:,1), ptend(c)%s(i,:), &                                          ! only 2 output vars 
                         ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
                         i)         
+         TPHYSTNDm1(i,:,c) =  ptend(c)%s(i,:)
+         ! PHQm1(i,:,c) = ptend(c)%q(i,:,1)            
+         print*,'Jerry check2',ptend(c)%s(i,1:5)
       end do ! end column loop
     end do
   endif ! nncoupled? -- note we might want to enable diagnostic NN and delete this if clause, pritch.
@@ -2268,8 +2272,6 @@ call outfld('DBGT6',ptend(c)%s ,pcols,lchnk)
 
 end do ! PRITCH FINAL CHUNK (should be no need to thread it).
 
-  TPHYSTNDm1(:,:,:) = TPHYSTND(:,:,:)
-  PHQm1(:,:,:) = PHQ(:,:,:) ! TODO Jerry check if this works.
   ! Main uncertainty is whether these will persist. 
   ! BRAINDEBUG output from successive time steps will tell answer. 
   ! If not, then we intervene in state(c)%tm1 (add new units to structure that does persist)

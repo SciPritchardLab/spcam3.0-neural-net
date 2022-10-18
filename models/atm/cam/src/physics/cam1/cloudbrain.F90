@@ -6,7 +6,7 @@
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
-use ppgrid,          only: pcols, pver, pverp
+use ppgrid,          only: pcols, pver, pverp, begchunk, endchunk
 use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid, only: masterproc
@@ -57,7 +57,7 @@ use mod_ensemble, only: ensemble_type
 
   contains
 
-  subroutine neural_net (TBP, QBP, TPHYSTNDm1, PHQm1, PS, SOLIN, SHFLX, LHFLX, &
+  subroutine neural_net (TBP, QBP, TPHYSTNDprevious, PHQprevious, PS, SOLIN, SHFLX, LHFLX, &
                          PHQ, TPHYSTND, &                       ! only 2 output vars
                          ! FSNT, FSNS, FLNT, FLNS, PRECT, &     ! 5 extra output vars (for old PNAS version)
                          icol)
@@ -66,8 +66,8 @@ use mod_ensemble, only: ensemble_type
     ! Allocate inputs
     real(r8), intent(in) :: TBP(:) ! note QBP could be RH #ifdef RHNN (see calling in tphysbc_internallythreaded)
     real(r8), intent(in) :: QBP(:)   
-    real(r8), intent(in) :: TPHYSTNDm1(:) !From previous time step
-    real(r8), intent(in) :: PHQm1(:) 
+    real(r8), intent(in) :: TPHYSTNDprevious(:) !From previous time step
+    real(r8), intent(in) :: PHQprevious(:) 
     real(r8), intent(in) :: LHFLX
     real(r8), intent(in) :: SHFLX
     real(r8), intent(in) :: PS
@@ -92,8 +92,8 @@ use mod_ensemble, only: ensemble_type
     ! Jery TODO add the *m1 variables that were receivedin the right place and cross check order. 
     input(1:nlev) = TBP(:) 
     input((nlev+1):2*nlev) = QBP(:) 
-    input((2*nlev+1):(3*nlev)) = TPHYSTNDm1(:)
-    input((3*nlev+1):(4*nlev)) = PHQm1(:)
+    input((2*nlev+1):(3*nlev)) = TPHYSTNDprevious(:)
+    input((3*nlev+1):(4*nlev)) = PHQprevious(:)
     input(4*nlev+1) = PS
     input(4*nlev+2) = SOLIN
     input(4*nlev+3) = SHFLX

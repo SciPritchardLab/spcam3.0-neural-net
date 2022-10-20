@@ -6174,6 +6174,14 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNQBP','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVBP','K     ',pver, 'A','TC into NN',phys_decomp)
 
+! Sungduk: Debugging variables for CBLIMITER
+#ifdef CBLIMITER
+      call addfld ('dt_befor','K/s     ',pver, 'I','debug',phys_decomp)
+      call addfld ('dt_after','K/s     ',pver, 'I',  'debug',phys_decomp)
+      call addfld ('dq_befor','kg/kg/s ',pver, 'I',  'debug',phys_decomp)
+      call addfld ('dq_after','kg/kg/s ',pver, 'I',  'debug',phys_decomp)
+#endif
+
 ! SR: Additional debug outputs to check T at several stages
       call addfld ('TE ','_    ',1,    'A','Total energy after CBRAIN/SP',phys_decomp)
       call addfld ('TW ','_    ',1,    'A','Total water after CBRAIN/SP',phys_decomp)

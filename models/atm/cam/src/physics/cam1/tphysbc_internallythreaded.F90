@@ -100,6 +100,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
     use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN
+#ifdef CBLIMITER
+    use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
+#endif
 #endif
    implicit none
 
@@ -1124,9 +1127,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 nncoupled = .false.
 if (nstep .ge. nstepNN) then ! --- only if we are spun up...
   nncoupled = .true.
-    if (nstep .eq. nstepNN) then
-      write (6,*) 'NN-coupling is turned on at nstep = ',nstep
-    end if
+
+  if (nstep .eq. nstepNN .and. masterproc) then
+     write (6,*) 'NN-coupling is turned on at nstep = ',nstep
+  end if
 endif
 #endif
 
@@ -1908,6 +1912,14 @@ end if ! nncoupled
     ! Initialize network matrices
     call init_keras_norm()  ! Normalization matrix
     call init_keras_matrices()  ! Network matrices
+
+#ifdef CBLIMITER
+    call init_cb_limiter
+    if (masterproc) then
+       write (6,*) '[CBLIMITER] CLOUDBRAIN output limier is initialized.'
+     end if
+#endif
+
   endif
 
   !! Sungduk: Comment the initialization block as NN starts from SP spunup states (at nstepNN)
@@ -1972,7 +1984,19 @@ end if ! nncoupled
                         ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
                         i)         
       end do ! end column loop
-    end do
+
+#ifdef CBLIMITER
+      ! Bound pted(c)%s and ptend(c)%q by 1st and 99th percentile from SP control simulation
+      call outfld('dt_befor',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk) ! for debugging
+      call outfld('dq_befor',ptend(c)%q(:ncol,:pver,1),pcols,lchnk)     ! for debugging
+      call cb_limiter(ptend(c), lchnk, ncol)
+      call outfld('dt_after',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk) ! for debugging
+      call outfld('dq_after',ptend(c)%q(:ncol,:pver,1),pcols,lchnk)     ! for debugging
+#endif
+
+    end do ! end chunk loop
+
+
   endif ! nncoupled? -- note we might want to enable diagnostic NN and delete this if clause, pritch.
 
   ! Now save all the neural network outputs outside of parallel loop

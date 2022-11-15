@@ -68,20 +68,20 @@ use iso_fortran_env
     integer, intent(in) :: icol
 
     ! -------- PYTORCH BINDING --------
-    type(torch_tensor) :: in_tensor, out_tensor
-    real(real32) :: input(inputlength)     ! real32 is the precision used in torch_ftn 
-    real(real32), pointer :: output0 (:)   ! double precision (e.g. real64, r8) is not supported yet
-    real(real32), allocatable :: output(:)
+    type(torch_tensor_wrap) :: input_tensors
+    type(torch_tensor) :: out_tensor
+    real(real32) :: input(inputlength,1)     ! real32 is the precision used in torch_ftn 
+    real(real32), pointer :: output (:)   ! double precision (e.g. real64, r8) is not supported yet
     ! ---------------------------------
 
     ! 1. Concatenate input vector to neural network
     nlev=30
-    input(1:nlev) = TBP(:) 
-    input((nlev+1):2*nlev) = QBP(:) 
-    input(2*nlev+1) = PS
-    input(2*nlev+2) = SOLIN
-    input(2*nlev+3) = SHFLX
-    input(2*nlev+4) = LHFLX
+    input(1:nlev,1) = TBP(:) 
+    input((nlev+1):2*nlev,1) = QBP(:) 
+    input(2*nlev+1,1) = PS
+    input(2*nlev+2,1) = SOLIN
+    input(2*nlev+3,1) = SHFLX
+    input(2*nlev+4,1) = LHFLX
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG input pre norm=',input
@@ -90,7 +90,7 @@ use iso_fortran_env
 
     ! 2. Normalize input
     do k=1,inputlength
-      input(k) = (input(k) - inp_sub(k))/inp_div(k)
+      input(k,1) = (input(k,1) - inp_sub(k))/inp_div(k)
     end do
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
@@ -99,11 +99,12 @@ use iso_fortran_env
 #endif
 
 ! 3. Neural network matrix multiplications and activations
+     write (6,*) input
     ! -------- PYTORCH BINDING --------
-    call in_tensor%from_array(input)
-    call torch_mod%forward(in_tensor, out_tensor)
-    call out_tensor%to_array(output0)
-    output = output0
+    call input_tensors%create
+    call input_tensors%add_array(input)
+    call torch_mod%forward(input_tensors, out_tensor)
+    call out_tensor%to_array(output)
     ! ---------------------------------
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then

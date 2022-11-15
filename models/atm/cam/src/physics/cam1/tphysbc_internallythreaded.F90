@@ -1907,7 +1907,9 @@ end if ! nncoupled
   if ( is_first_step()) then
     ! Initialize network matrices
     call init_ml_norm()  ! Normalization matrix
+    ! -------- PYTORCH BINDING --------
     call init_ml_pytorch_model()  ! Pytorch model (traced)
+    ! ---------------------------------
   endif
 
   !! Sungduk: Comment the initialization block as NN starts from SP spunup states (at nstepNN)

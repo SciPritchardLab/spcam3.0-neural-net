@@ -57,8 +57,8 @@ null  :=
 space := $(null) $(null)
 comma := $(null),$(null)
 
-NEURAL_MOD := -I/ocean/projects/atm200007p/shared/pytorch-fortran_intel/install/include/mod_files
-NEURAL_A :=   -L/ocean/projects/atm200007p/shared/pytorch-fortran_intel/install/lib
+NEURAL_MOD := -I/ocean/projects/atm200007p/shared/pytorch-fortran-v0.3/intel/install/include/mod_files
+NEURAL_A :=   -L/ocean/projects/atm200007p/shared/pytorch-fortran-v0.3/intel/install/lib
 #NEURAL_O := 
 
 # Determine distribution root directory

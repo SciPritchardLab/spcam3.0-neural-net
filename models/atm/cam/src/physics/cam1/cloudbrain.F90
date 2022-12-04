@@ -67,6 +67,8 @@ use mod_ensemble, only: ensemble_type
     ! Allocate outputs
     real(r8), intent(out) :: PHQ(:)
     real(r8), intent(out) :: TPHYSTND(:)
+    real(r8), intent(out) :: DIAGONAL(:)
+    
     ! real(r8), intent(out) :: FSNT
     ! real(r8), intent(out) :: FSNS
     ! real(r8), intent(out) :: FLNT
@@ -131,6 +133,8 @@ use mod_ensemble, only: ensemble_type
     ! 5. Split output into components
     TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
     PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
+    DIAGONAL(:) = output((2*nlev+1):4*nlev)
+    
     ! FSNT =        output(2*nlev+1)
     ! FSNS =        output(2*nlev+2)
     ! FLNT =        output(2*nlev+3)

@@ -99,9 +99,12 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN
+   use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
+                         nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
+                         init_nn_vectors
+   use string_utils, only: to_upper
 #ifdef CBLIMITER
-    use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
+   use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
 #endif
 #endif
    implicit none
@@ -544,14 +547,15 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real (r8) :: tmp1
 #endif
 #ifdef CLOUDBRAIN
-   real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
-   real(r8) :: spdq_vint, spdq_abs_vint,vd01_vint,column_moistening_excess
-   real(r8) :: spdt_vint, spdt_abs_vint,dtv_vint,column_heating_excess
-   real(r8) :: humidity(pver)
-#ifdef RHNN
-   real, external :: tom_esat 
-#endif
+   type(nn_in_t)  :: nn_in
+   type(nn_out_t) :: nn_out
    logical :: nncoupled
+   real(r8) :: o3vmr(begchunk:endchunk,pcols,pver)
+   real(r8) :: humidity(pver)
+   integer :: do_nn_o3
+#ifdef RHNN
+   real, external :: tom_esat
+#endif
 #endif
 
 ! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
@@ -1129,7 +1133,7 @@ if (nstep .ge. nstepNN) then ! --- only if we are spun up...
   nncoupled = .true.
 
   if (nstep .eq. nstepNN .and. masterproc) then
-     write (6,*) 'NN-coupling is turned on at nstep = ',nstep
+     write (6,*) 'CLOUDBRAIN: NN-coupling is turned on at nstep = ',nstep
   end if
 endif
 #endif
@@ -1909,7 +1913,8 @@ end if ! nncoupled
   ! First time step
   ! reading at first timestep, not nstepNN to leave init_keras debug outputs in the early part of log
   if ( is_first_step()) then
-    ! Initialize network matrices
+    ! Initialize network matrices and allocate arrays
+    call init_nn_vectors()
     call init_keras_norm()  ! Normalization matrix
     call init_keras_matrices()  ! Network matrices
 
@@ -1959,10 +1964,17 @@ end if ! nncoupled
       call outfld('NNTS',ts(:ncol,c),pcols,lchnk)
     end do
 
-! Compute the networks in parallel except for debugging purposes, where the order is important
-#ifndef BRAINDEBUG
-!$OMP PARALLEL DO PRIVATE (C,K,I,LCHNK,NCOL)
-#endif
+    ! Calculate O3
+    do_nn_o3 = index(to_upper(nn_in_out_vars), 'O3VMR')
+    if ( do_nn_o3 .gt. 0 ) then
+      do c=begchunk,endchunk
+        lchnk = state(c)%lchnk
+        ncol  = state(c)%ncol
+        call radozn(lchnk, 1, ncol, state(c)%pmid, o3vmr(c,:ncol,:pver))
+      end do
+    end if
+
+! SY: OMP directive deleted 
 
     ! This is the main computation loop which is parallel
     do c=begchunk,endchunk 
@@ -1978,11 +1990,41 @@ end if ! nncoupled
           humidity(k)= QBP(c,i,k)
 #endif
         end do
-        ! note Jerry never used VBP as an input variable.        
-        call neural_net(TBP(c,i,:), humidity(:), PS(c,i), solin(i,c), shf(i,c), lhf(i,c), &
-                        ptend(c)%q(i,:,1), ptend(c)%s(i,:), &                                          ! only 2 output vars 
-                        ! in_fsnt(i, c), in_fsns(i, c), in_flnt(i, c), in_flns(i, c), NNPRECT(i, c), & ! 5 extra output vars (for old PNAS version)
-                        i)         
+
+        ! pack input
+        select case (to_upper(trim(nn_in_out_vars)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+            nn_in%vbp(:pver) = VBP(c,i,:pver)
+            nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
+            nn_in%coszrs = coszrs(i,c)
+        end select
+
+        ! NN inference
+        call neural_net(nn_in, nn_out, i)
+
+        ! unpack output
+        select case (to_upper(trim(nn_in_out_vars)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+        end select
+
       end do ! end column loop
 
 #ifdef CBLIMITER

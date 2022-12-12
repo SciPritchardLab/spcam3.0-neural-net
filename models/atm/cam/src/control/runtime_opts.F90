@@ -55,7 +55,10 @@ module runtime_opts
    use aerosols, only: radforce, sulscl_rf, carscl_rf, ssltscl_rf, dustscl_rf, bgscl_rf, tauback, sulscl, carscl, ssltscl, dustscl
    use cloudsimulatorparms, only: doisccp
 #ifdef CLOUDBRAIN
-   use cloudbrain, only: nstepNN
+   use cloudbrain, only: nstepNN, &         ! [int] timestep at which NN turns on.
+                         nn_in_out_vars, &  ! [char] user-defined name that defines input output vectors of NN
+                         inputlength, &     ! [int] length of NN input vector
+                         outputlength       ! [int] length of NN output bector
 #endif
 
 
@@ -733,9 +736,9 @@ subroutine read_namelist
                     aero_carbon, aero_feedback_carbon, &
                     aero_sea_salt, aero_feedback_sea_salt, &
                     bndtva, tau_t, tau_u, tau_v, tau_q,tau_ps, &
-! CLOUDBRAIN namelist variables: nstepNN
+! CLOUDBRAIN namelist variables
 #ifdef CLOUDBRAIN
-                    nstepNN, &
+                    nstepNN, nn_in_out_vars, inputlength, outputlength,&
 #endif CLOUDBRAIN
 #ifdef CRM
                     crminitsave, crminitread, crmsavechunks, &
@@ -1830,9 +1833,12 @@ subroutine distnl
   call mpibcast (aqua_AndKua, 1,mpilog,0,mpicom)
   call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
   call mpibcast (betafix, 1, mpir8, 0, mpicom) ! pritch
-! CLOUDBRAIN namelist variables: nstepNN
+! CLOUDBRAIN namelist variables
 #ifdef CLOUDBRAIN
   call mpibcast (nstepNN, 1, mpiint, 0, mpicom)
+  call mpibcast (inputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (outputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (nn_in_out_vars,len(nn_in_out_vars),mpichar,0,mpicom)
 #endif 
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'

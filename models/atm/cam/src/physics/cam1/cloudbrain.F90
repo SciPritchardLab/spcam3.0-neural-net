@@ -6,7 +6,7 @@
 
 module cloudbrain
 use shr_kind_mod,    only: r8 => shr_kind_r8
-use ppgrid,          only: pcols, pver, pverp
+use ppgrid,          only: pcols, pver, pverp, begchunk, endchunk
 use history,         only: outfld, addfld, add_default, phys_decomp
 use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid,          only: masterproc
@@ -46,15 +46,19 @@ use mod_ensemble, only: ensemble_type
   real(rk), allocatable :: inp_sub(:)
   real(rk), allocatable :: inp_div(:)
   real(rk), allocatable :: out_scale(:)
-  real(rk), allocatable:: input(:)
-  real(r8), allocatable:: output(:)
+  real(rk), allocatable :: input(:)
+  real(r8), allocatable :: output(:)
+
+  real(r8), allocatable :: dtdt_m1(:,:,:), dqdt_m1(:,:,:)
 
   type nn_in_t
     real(r8),dimension(pver) :: &
       tbp,   &
       qbp,   &
       vbp,   &
-      o3vmr
+      o3vmr, &
+      dtdtm1,& ! tphystnd tendency at timestep n-1
+      dqdtm1   ! phq      tendency at timestep n-1
     real(r8) :: &
       ps,     &
       lhf,    &
@@ -71,7 +75,8 @@ use mod_ensemble, only: ensemble_type
 
   public neural_net, init_keras_matrices, init_keras_norm, nstepNN, &
          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
-         init_nn_vectors
+         init_nn_vectors, &
+         dtdt_m1, dqdt_m1 ! buffer variables for previous timestep tendencies
 
   contains
 
@@ -93,6 +98,15 @@ use mod_ensemble, only: ensemble_type
         input(2*nlev+2) = nn_in%solin
         input(2*nlev+3) = nn_in%shf
         input(2*nlev+4) = nn_in%lhf
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+        input(1:nlev)            = nn_in%tbp(:nlev)
+        input((1*nlev+1):2*nlev) = nn_in%qbp(:nlev)
+        input((2*nlev+1):3*nlev) = nn_in%dtdtm1(:nlev)
+        input((3*nlev+1):4*nlev) = nn_in%dqdtm1(:nlev)
+        input(4*nlev+1) = nn_in%ps
+        input(4*nlev+2) = nn_in%solin
+        input(4*nlev+3) = nn_in%shf
+        input(4*nlev+4) = nn_in%lhf
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         input(1:nlev) = nn_in%tbp(:nlev)
         input((nlev+1):2*nlev) = nn_in%qbp(:nlev)
@@ -151,6 +165,9 @@ use mod_ensemble, only: ensemble_type
     select case (to_upper(trim(nn_in_out_vars)))
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
         nn_out%tphystnd(:nlev) = output(1:nlev)  
+        nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+        nn_out%tphystnd(:nlev) = output(1:nlev)
         nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         nn_out%tphystnd(:nlev) = output(1:nlev)
@@ -231,6 +248,9 @@ use mod_ensemble, only: ensemble_type
       write (6,*) 'CLOUDBRAIN: allocate input vector: ', inputlength
       write (6,*) 'CLOUDBRAIN: allocate output vector: ', outputlength
     end if
+    ! for previous tendencies
+    allocate(dtdt_m1 (begchunk:endchunk,pcols,pver))
+    allocate(dqdt_m1 (begchunk:endchunk,pcols,pver))
   end subroutine init_nn_vectors
 
 end module cloudbrain

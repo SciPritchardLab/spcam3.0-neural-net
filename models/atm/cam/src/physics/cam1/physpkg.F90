@@ -80,8 +80,12 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
    use sfcwind_anncycle, only: read_sfcwindanncycle, allocate_sfcwindanncycle,ref_sfcwindanncycle_int, sfcwind_interference
    use phys_grid,       only: get_rlat_all_p
    use runtime_opts, only: fluxdampfac,fluxdamp_equatoronly, flux_dylat,flux_critlat_deg
-
 #endif
+
+#ifdef CLOUDBRAIN
+   use cloudbrain, only: dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
+#endif
+
 !-----------------------------------------------------------------------
    implicit none
 !-----------------------------------------------------------------------
@@ -669,6 +673,14 @@ end do
          call outfld(qphystendnam(m),qphystend(1,1,m,c),pcols   ,c   )
       enddo
       call t_stopf ('tphysac')
+
+     ! Sungduk added:
+     ! Save tendencies 
+#ifdef CLOUDBRAIN
+     dtdt_m1(c,:ncol,:) = tphystend(:ncol,:,c)
+     dqdt_m1(c,:ncol,:) = qphystend(:ncol,:,1,c)
+#endif
+
      ! MSP added:
      ! Note that state%t IS UPDATED via tend@dtdt at the end of tphysac.
 #ifdef CLOUDBRAIN

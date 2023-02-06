@@ -101,7 +101,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #ifdef CLOUDBRAIN
    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
                          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
-                         init_nn_vectors
+                         init_nn_vectors, &
+                         dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
    use string_utils, only: to_upper
 #ifdef CBLIMITER
    use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
@@ -2000,6 +2001,15 @@ end if ! nncoupled
             nn_in%solin = solin(i,c)
             nn_in%shf = shf(i,c)
             nn_in%lhf = lhf(i,c)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%dtdtm1(:pver) = dtdt_m1(c,i,:pver) ! previous tendencies are saved in physpkg.F90
+            nn_in%dqdtm1(:pver) = dqdt_m1(c,i,:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
           case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
             nn_in%tbp(:pver) = TBP(c,i,:pver)
             nn_in%qbp(:pver) = humidity(:pver)
@@ -2020,12 +2030,19 @@ end if ! nncoupled
           case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
             ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
             ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
           case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
             ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
             ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
         end select
 
       end do ! end column loop
+
+      ! for debugging only (for previous tendency terms):
+      call outfld('DTDT_M1', dtdt_m1(c,:ncol,:pver),pcols   ,c   )
+      call outfld('DQDT_M1', dqdt_m1(c,:ncol,:pver),pcols   ,c   )
 
 #ifdef CBLIMITER
       ! Bound pted(c)%s and ptend(c)%q by 1st and 99th percentile from SP control simulation

@@ -100,7 +100,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 #ifdef CLOUDBRAIN
    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
-                         nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
+                         nn_in_t, nn_out_t, nn_in_out_vars1, nn_in_out_vars2, &
+                         inputlength1, outputlength1, inputlength2, outputlength2, &
                          init_nn_vectors, &
                          dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
    use string_utils, only: to_upper
@@ -1966,7 +1967,7 @@ end if ! nncoupled
     end do
 
     ! Calculate O3
-    do_nn_o3 = index(to_upper(nn_in_out_vars), 'O3VMR')
+    do_nn_o3 = index(to_upper(nn_in_out_vars1), 'O3VMR') + index(to_upper(nn_in_out_vars2), 'O3VMR')
     if ( do_nn_o3 .gt. 0 ) then
       do c=begchunk,endchunk
         lchnk = state(c)%lchnk
@@ -1991,52 +1992,51 @@ end if ! nncoupled
           humidity(k)= QBP(c,i,k)
 #endif
         end do
-
+        
+        !!!!! SPLIT NETWORK INFERENCE 1 !!!!!
         ! pack input
-        select case (to_upper(trim(nn_in_out_vars)))
-          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+        select case (to_upper(trim(nn_in_out_vars1)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND')
             nn_in%tbp(:pver) = TBP(c,i,:pver)
             nn_in%qbp(:pver) = humidity(:pver)
             nn_in%ps = PS(c,i)
             nn_in%solin = solin(i,c)
             nn_in%shf = shf(i,c)
             nn_in%lhf = lhf(i,c)
-          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
-            nn_in%tbp(:pver) = TBP(c,i,:pver)
-            nn_in%qbp(:pver) = humidity(:pver)
-            nn_in%dtdtm1(:pver) = dtdt_m1(c,i,:pver) ! previous tendencies are saved in physpkg.F90
-            nn_in%dqdtm1(:pver) = dqdt_m1(c,i,:pver)
-            nn_in%ps = PS(c,i)
-            nn_in%solin = solin(i,c)
-            nn_in%shf = shf(i,c)
-            nn_in%lhf = lhf(i,c)
-          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
-            nn_in%tbp(:pver) = TBP(c,i,:pver)
-            nn_in%qbp(:pver) = humidity(:pver)
-            nn_in%ps = PS(c,i)
-            nn_in%solin = solin(i,c)
-            nn_in%shf = shf(i,c)
-            nn_in%lhf = lhf(i,c)
-            nn_in%vbp(:pver) = VBP(c,i,:pver)
-            nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
-            nn_in%coszrs = coszrs(i,c)
         end select
 
         ! NN inference
-        call neural_net(nn_in, nn_out, i)
+        call neural_net(nn_in, nn_out, i, 1)
 
         ! unpack output
-        select case (to_upper(trim(nn_in_out_vars)))
-          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+        select case (to_upper(trim(nn_in_out_vars1)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND')
             ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
-            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
-          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
-            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
-            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
-          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
-            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            !ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+        end select
+        !!!!!
+
+        !!!!! SPLIT NETWORK INFERENCE 2 !!!!!
+        ! pack input
+        select case (to_upper(trim(nn_in_out_vars2)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+        end select
+
+        ! NN inference
+        call neural_net(nn_in, nn_out, i, 2)
+
+        ! unpack output
+        select case (to_upper(trim(nn_in_out_vars1)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_PHQ')
             ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
         end select
+        !!!!!
 
       end do ! end column loop
 

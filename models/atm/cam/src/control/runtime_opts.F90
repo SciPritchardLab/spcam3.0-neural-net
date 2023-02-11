@@ -55,10 +55,10 @@ module runtime_opts
    use aerosols, only: radforce, sulscl_rf, carscl_rf, ssltscl_rf, dustscl_rf, bgscl_rf, tauback, sulscl, carscl, ssltscl, dustscl
    use cloudsimulatorparms, only: doisccp
 #ifdef CLOUDBRAIN
-   use cloudbrain, only: nstepNN, &         ! [int] timestep at which NN turns on.
-                         nn_in_out_vars, &  ! [char] user-defined name that defines input output vectors of NN
-                         inputlength, &     ! [int] length of NN input vector
-                         outputlength       ! [int] length of NN output bector
+   use cloudbrain, only: nstepNN, &                          ! [int] timestep at which NN turns on.
+                         nn_in_out_vars1, nn_in_out_vars2, & ! [char] user-defined name that defines input output vectors of NN
+                         inputlength1, inputlength2, &       ! [int] length of NN input vector
+                         outputlength1, outputlength2        ! [int] length of NN output bector
 #endif
 
 
@@ -738,7 +738,9 @@ subroutine read_namelist
                     bndtva, tau_t, tau_u, tau_v, tau_q,tau_ps, &
 ! CLOUDBRAIN namelist variables
 #ifdef CLOUDBRAIN
-                    nstepNN, nn_in_out_vars, inputlength, outputlength,&
+                    nstepNN, &
+                    nn_in_out_vars1, inputlength1, outputlength1, &
+                    nn_in_out_vars2, inputlength2, outputlength2, &
 #endif CLOUDBRAIN
 #ifdef CRM
                     crminitsave, crminitread, crmsavechunks, &
@@ -1836,9 +1838,12 @@ subroutine distnl
 ! CLOUDBRAIN namelist variables
 #ifdef CLOUDBRAIN
   call mpibcast (nstepNN, 1, mpiint, 0, mpicom)
-  call mpibcast (inputlength, 1, mpiint, 0, mpicom)
-  call mpibcast (outputlength, 1, mpiint, 0, mpicom)
-  call mpibcast (nn_in_out_vars,len(nn_in_out_vars),mpichar,0,mpicom)
+  call mpibcast (inputlength1, 1, mpiint, 0, mpicom)
+  call mpibcast (outputlength1, 1, mpiint, 0, mpicom)
+  call mpibcast (nn_in_out_vars1,len(nn_in_out_vars1),mpichar,0,mpicom)
+  call mpibcast (inputlength2, 1, mpiint, 0, mpicom)
+  call mpibcast (outputlength2, 1, mpiint, 0, mpicom)
+  call mpibcast (nn_in_out_vars2,len(nn_in_out_vars2),mpichar,0,mpicom)
 #endif 
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'

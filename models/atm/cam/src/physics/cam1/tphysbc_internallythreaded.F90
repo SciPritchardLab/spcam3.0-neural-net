@@ -2032,7 +2032,7 @@ end if ! nncoupled
         call neural_net(nn_in, nn_out, i, 2)
 
         ! unpack output
-        select case (to_upper(trim(nn_in_out_vars1)))
+        select case (to_upper(trim(nn_in_out_vars2)))
           case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_PHQ')
             ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
         end select

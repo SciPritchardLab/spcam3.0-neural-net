@@ -945,41 +945,63 @@ subroutine read_namelist
 
       if(l_analyses) then
 
+         ! if (tau_t  < 0.) then
+         !    write(6,*)'PARSE_NAMELIST: Namelist variable TAU_T must be set to a positive number (days)'
+         !    call endrun
+         ! end if
+         ! if (tau_u  < 0.) then
+         !    write(6,*)'PARSE_NAMELIST: Namelist variable TAU_U must be set to a positive number (days)'
+         !    call endrun
+         ! end if
+         ! if (tau_v  < 0.) then
+         !    write(6,*)'PARSE_NAMELIST: Namelist variable TAU_V must be set to a positive number (days)'
+         !    call endrun
+         ! end if
+         ! if (tau_q  < 0.) then
+         !    write(6,*)'PARSE_NAMELIST: Namelist variable TAU_Q must be set to a positive number (days)'
+         !    call endrun
+         ! end if
+         ! if (tau_ps < 0.) then
+         !    write(6,*)'PARSE_NAMELIST: Namelist variable TAU_PS must be set to a positive number (days)'
+         !    call endrun
+         ! end if
+
          if (tau_t  < 0.) then
-            write(6,*)'PARSE_NAMELIST: Namelist variable TAU_T must be set to a positive number (days)'
-            call endrun
+            write(6,*)'Nudging T'
+            tau_q  = 86400.*tau_t  
          end if
          if (tau_u  < 0.) then
-            write(6,*)'PARSE_NAMELIST: Namelist variable TAU_U must be set to a positive number (days)'
-            call endrun
+            write(6,*)'Nudging U'
+            tau_q  = 86400.*tau_u
          end if
          if (tau_v  < 0.) then
-            write(6,*)'PARSE_NAMELIST: Namelist variable TAU_V must be set to a positive number (days)'
-            call endrun
+            write(6,*)'Nudging V'
+            tau_q  = 86400.*tau_v
          end if
-         if (tau_q  < 0.) then
-            write(6,*)'PARSE_NAMELIST: Namelist variable TAU_Q must be set to a positive number (days)'
-            call endrun
+         if (tau_q  > 0.) then
+            write(6,*)'Nudging Q'
+            tau_q  = 86400.*tau_q
          end if
          if (tau_ps < 0.) then
-            write(6,*)'PARSE_NAMELIST: Namelist variable TAU_PS must be set to a positive number (days)'
-            call endrun
+            write(6,*)'Nudging PS'
+            tau_q  = 86400.*tau_ps
          end if
+
          ctemp = upcase(analyses_time_interp)
-       analyses_time_interp = trim(ctemp)
+         analyses_time_interp = trim(ctemp)
          if (analyses_time_interp /= 'LINEAR' .and. analyses_time_interp /= 'CUBIC' &
-       .and. analyses_time_interp /= 'QUINTIC') then
+            .and. analyses_time_interp /= 'QUINTIC') then
             write(6,*) 'PARSE_NAMELIST: Namelist variable ANALYSES_TIME_INTERP must be', &
                        ' set toLINEA,CUBI, orQUINTI only.'
             write(6,*) 'Currently set to:  ',analyses_time_interp
             call endrun
          end if
 
-         tau_t  = 86400.*tau_t
-         tau_u  = 86400.*tau_u
-         tau_v  = 86400.*tau_v
-         tau_q  = 86400.*tau_q
-         tau_ps = 86400.*tau_ps
+         ! tau_t  = 86400.*tau_t
+         ! tau_u  = 86400.*tau_u
+         ! tau_v  = 86400.*tau_v
+         ! tau_q  = 86400.*tau_q
+         ! tau_ps = 86400.*tau_ps
 
       end if
 
@@ -1325,6 +1347,7 @@ subroutine read_namelist
          write(6,3000) tau_v ,tau_v /86400.
          write(6,4000) tau_q ,tau_q /86400.
          write(6,5000) tau_ps,tau_ps/86400.
+         write(6,*) '(Only positive tau_X indicates nudging.)'
          write(6,*   ) 'Time interpolation method will be:  ',analyses_time_interp
 1000     format('     Tau_T  is: ',1pg14.6,' seconds (',1pg14.6,' day(s))')
 2000     format('     Tau_U  is: ',1pg14.6,' seconds (',1pg14.6,' day(s))')
@@ -2158,7 +2181,7 @@ subroutine preset
    tau_v      = -1.
    tau_q      = -1.
    tau_ps     = -1.
-   analyses_time_interp = ' '
+   analyses_time_interp = 'LINEAR'
    ncid_analyses = -1
 
 

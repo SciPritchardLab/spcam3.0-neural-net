@@ -966,15 +966,15 @@ subroutine read_namelist
          !    call endrun
          ! end if
 
-         if (tau_t  < 0.) then
+         if (tau_t  > 0.) then
             write(6,*)'Nudging T'
             tau_q  = 86400.*tau_t  
          end if
-         if (tau_u  < 0.) then
+         if (tau_u  > 0.) then
             write(6,*)'Nudging U'
             tau_q  = 86400.*tau_u
          end if
-         if (tau_v  < 0.) then
+         if (tau_v  > 0.) then
             write(6,*)'Nudging V'
             tau_q  = 86400.*tau_v
          end if
@@ -982,7 +982,7 @@ subroutine read_namelist
             write(6,*)'Nudging Q'
             tau_q  = 86400.*tau_q
          end if
-         if (tau_ps < 0.) then
+         if (tau_ps > 0.) then
             write(6,*)'Nudging PS'
             tau_q  = 86400.*tau_ps
          end if

@@ -968,15 +968,15 @@ subroutine read_namelist
 
          if (tau_t  > 0.) then
             write(6,*)'Nudging T'
-            tau_q  = 86400.*tau_t  
+            tau_t  = 86400.*tau_t  
          end if
          if (tau_u  > 0.) then
             write(6,*)'Nudging U'
-            tau_q  = 86400.*tau_u
+            tau_u  = 86400.*tau_u
          end if
          if (tau_v  > 0.) then
             write(6,*)'Nudging V'
-            tau_q  = 86400.*tau_v
+            tau_v  = 86400.*tau_v
          end if
          if (tau_q  > 0.) then
             write(6,*)'Nudging Q'
@@ -984,7 +984,7 @@ subroutine read_namelist
          end if
          if (tau_ps > 0.) then
             write(6,*)'Nudging PS'
-            tau_q  = 86400.*tau_ps
+            tau_ps  = 86400.*tau_ps
          end if
 
          ctemp = upcase(analyses_time_interp)

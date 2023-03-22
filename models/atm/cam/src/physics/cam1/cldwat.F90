@@ -1380,7 +1380,9 @@ subroutine findsp (lchnk, ncol, q, t, p, tsp, qsp)
 !  tmin = 173.16 ! the coldest temperature we can deal with
 !
 ! max number of times to iterate the calculation
-   iter = 8
+   ! iter = 8
+   iter = 128   ! Sungduk (Mon Mar 20 19:58:57 EDT 2023)
+                ! for BNL VAE nudging
 #ifdef CBLIMITER
    iter = 20
 #endif

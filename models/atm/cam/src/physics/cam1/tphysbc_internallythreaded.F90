@@ -1982,6 +1982,69 @@ end if ! nncoupled
       lchnk = state(c)%lchnk  
       ncol  = state(c)%ncol
 
+  !!!!! NUDGING (Start) !!!!!
+  if (l_analyses) then ! Only do nudging if bndtva was specified in the namelist
+
+     ptend(c)%name  = "analyses_nudge"
+
+     if (tau_t .gt. 0) then
+        s_tmp(:ncol,:pver,c) = state(c)%s(:ncol,:pver)
+        if (nudge_dse_not_T) then
+           call outfld('MSPSA',s_a,pcols,lchnk)
+        else
+           do k=1,pver
+              aux_s_a (:ncol,k,c) = cpair*t_a(:ncol,k,lchnk) + gravit*state(c)%zm(:ncol,k) + state(c)%phis(:ncol)
+           end do
+           call outfld('MSPSA',aux_s_a(:,:,c),pcols,lchnk)
+        endif
+        call outfld('MSPS',s_tmp(:,:,c),pcols,lchnk)
+
+        if (nudge_dse_not_T) then
+           call analyses_nudge(ztodt   ,tau_t   ,ncol   ,pver    ,s_a(1,1,lchnk), &
+                             state(c)%s          ,ptend(c)%s       ,ptend(c)%ls)
+        else
+           call analyses_nudge(ztodt   ,tau_t   ,ncol   ,pver    ,aux_s_a(:,:,c)  , &
+                               state(c)%s          ,ptend(c)%s       ,ptend(c)%ls)
+        end if
+
+        s_tmp(:ncol,:pver,c) = (state(c)%s(:ncol,:pver) - s_tmp(:ncol,:pver,c))/ztodt
+        call outfld('SNTEND  ',s_tmp   ,pcols   ,lchnk   )
+     end if
+
+     if (tau_u .gt. 0) then
+        call analyses_nudge(ztodt   ,tau_u   ,ncol   ,pver    ,u_a (1,1,lchnk), &
+                            state(c)%u          ,ptend(c)%u       ,ptend(c)%lu)
+        call outfld('UNTEND  ',ptend(c)%u       ,pcols   ,lchnk   )
+     end if
+
+     if (tau_v .gt. 0) then
+        call analyses_nudge(ztodt   ,tau_v   ,ncol   ,pver    ,v_a (1,1,lchnk), &
+                            state(c)%v          ,ptend(c)%v       ,ptend(c)%lv)
+        call outfld('VNTEND  ',ptend(c)%v       ,pcols   ,lchnk   )
+     end if
+
+     if (tau_q .gt. 0) then
+        call analyses_nudge(ztodt   ,tau_q   ,ncol   ,pver    ,q_a (1,1,lchnk), &
+                            state(c)%q(1,1,1)   ,ptend(c)%q(1,1,1),ptend(c)%lq(1))
+        call outfld('QNTEND  ',ptend(c)%q(1,1,1),pcols   ,lchnk   )
+     end if
+
+     if (tau_ps .gt. 0) then
+        ps_local(:ncol,c) =      state(c)%ps(:ncol)
+        state(c)%ps(:ncol) = log( state(c)%ps(:ncol) )
+        call analyses_nudge(ztodt   ,tau_ps  ,ncol   ,1       ,ps_a(1,  lchnk), &
+                            state(c)%ps         ,dpdt(:,c)       ,lpsntenl   )
+        state(c)%ps(:ncol) = state(c)%ps(:ncol) + dpdt(:ncol,c) * ztodt
+        state(c)%ps(:ncol) = exp( state(c)%ps(:ncol) )
+        ps_local(:ncol,c) = ( state(c)%ps(:ncol) - ps_local(:ncol,c) )/ztodt
+        call outfld('LPSNTEN ',ps_local(:,c)      ,pcols   ,lchnk   )
+     end if
+
+     call physics_update(state(c), tend(c), ptend(c), ztodt)
+  end if ! l_analyses for nudging.
+  !!!!! NUDGING (End) !!!!!
+
+
       do i=1,ncol ! this is the loop over independent GCM columns.
         ! This is the neural network
         do k=1,pver
@@ -2115,67 +2178,6 @@ end if ! nncoupled
    ncol  = state(c)%ncol 
    ifld = pbuf_get_fld_idx('CLD')
    cld => pbuf(ifld)%fld_ptr(1,1:pcols,1:pver,lchnk,itim)
-
-
-  if (l_analyses) then ! Only do nudging if bndtva was specified in the namelist
-
-     ptend(c)%name  = "analyses_nudge"
-
-     if (tau_t .gt. 0) then
-        s_tmp(:ncol,:pver,c) = state(c)%s(:ncol,:pver)
-        if (nudge_dse_not_T) then
-           call outfld('MSPSA',s_a,pcols,lchnk)
-        else
-           do k=1,pver
-              aux_s_a (:ncol,k,c) = cpair*t_a(:ncol,k,lchnk) + gravit*state(c)%zm(:ncol,k) + state(c)%phis(:ncol)
-           end do
-           call outfld('MSPSA',aux_s_a(:,:,c),pcols,lchnk)
-        endif
-        call outfld('MSPS',s_tmp(:,:,c),pcols,lchnk)
-
-        if (nudge_dse_not_T) then
-           call analyses_nudge(ztodt   ,tau_t   ,ncol   ,pver    ,s_a(1,1,lchnk), &
-                             state(c)%s          ,ptend(c)%s       ,ptend(c)%ls)
-        else
-           call analyses_nudge(ztodt   ,tau_t   ,ncol   ,pver    ,aux_s_a(:,:,c)  , &
-                               state(c)%s          ,ptend(c)%s       ,ptend(c)%ls)
-        end if
-
-        s_tmp(:ncol,:pver,c) = (state(c)%s(:ncol,:pver) - s_tmp(:ncol,:pver,c))/ztodt
-        call outfld('SNTEND  ',s_tmp   ,pcols   ,lchnk   )
-     end if
-
-     if (tau_u .gt. 0) then
-        call analyses_nudge(ztodt   ,tau_u   ,ncol   ,pver    ,u_a (1,1,lchnk), &
-                            state(c)%u          ,ptend(c)%u       ,ptend(c)%lu)
-        call outfld('UNTEND  ',ptend(c)%u       ,pcols   ,lchnk   )
-     end if
-
-     if (tau_v .gt. 0) then
-        call analyses_nudge(ztodt   ,tau_v   ,ncol   ,pver    ,v_a (1,1,lchnk), &
-                            state(c)%v          ,ptend(c)%v       ,ptend(c)%lv)
-        call outfld('VNTEND  ',ptend(c)%v       ,pcols   ,lchnk   )
-     end if
-
-     if (tau_q .gt. 0) then
-        call analyses_nudge(ztodt   ,tau_q   ,ncol   ,pver    ,q_a (1,1,lchnk), &
-                            state(c)%q(1,1,1)   ,ptend(c)%q(1,1,1),ptend(c)%lq(1))
-        call outfld('QNTEND  ',ptend(c)%q(1,1,1),pcols   ,lchnk   )
-     end if
-
-     if (tau_ps .gt. 0) then
-        ps_local(:ncol,c) =      state(c)%ps(:ncol)
-        state(c)%ps(:ncol) = log( state(c)%ps(:ncol) )
-        call analyses_nudge(ztodt   ,tau_ps  ,ncol   ,1       ,ps_a(1,  lchnk), &
-                            state(c)%ps         ,dpdt(:,c)       ,lpsntenl   )
-        state(c)%ps(:ncol) = state(c)%ps(:ncol) + dpdt(:ncol,c) * ztodt
-        state(c)%ps(:ncol) = exp( state(c)%ps(:ncol) )
-        ps_local(:ncol,c) = ( state(c)%ps(:ncol) - ps_local(:ncol,c) )/ztodt
-        call outfld('LPSNTEN ',ps_local(:,c)      ,pcols   ,lchnk   )
-     end if
-
-     call physics_update(state(c), tend(c), ptend(c), ztodt)
-  end if ! l_analyses for nudging.
 
 !
 ! pressure arrays

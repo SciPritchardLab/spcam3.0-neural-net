@@ -69,7 +69,7 @@ subroutine nmmatrix(zb      ,zcr1    ,bm1     ,bmi     )
 !
 ! Determine eigenvalues and left/right eigenvectors of "zb"
 !
-  call sgeev('v'     ,'v'     ,plev    ,x       ,plev    , &
+  call dgeev('v'     ,'v'     ,plev    ,x       ,plev    , &
              zcr1    ,zci     ,bmlft   ,plev    ,bmrgt   , &
              plev    ,work    ,lwork   ,istat   )
 !

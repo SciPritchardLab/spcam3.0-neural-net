@@ -318,7 +318,7 @@ mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
 #FFLAGS := $(cpp_path) -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -ftz -traceback -xHost -extend-source -qopenmp 
 FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -qopenmp #-check bounds #-xMIC-AVX512
 FREEFLAGS := -recursive
-LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -qopenmp #-xMIC-AVX512
+LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -qopenmp -lmkl_intel_lp64 #-xMIC-AVX512
 
 .SUFFIXES:
 .SUFFIXES: .F .F90 .c .o

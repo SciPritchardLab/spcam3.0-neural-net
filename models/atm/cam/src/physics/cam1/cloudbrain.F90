@@ -71,7 +71,7 @@ use iso_fortran_env
     type(torch_tensor_wrap) :: input_tensors
     type(torch_tensor) :: out_tensor
     real(real32) :: input(inputlength,1)     ! real32 is the precision used in torch_ftn 
-    real(real32), pointer :: output (:)   ! double precision (e.g. real64, r8) is not supported yet
+    real(r8), pointer :: output (:,:)   ! double precision (e.g. real64, r8) is not supported yet
     ! ---------------------------------
 
     ! 1. Concatenate input vector to neural network
@@ -99,7 +99,6 @@ use iso_fortran_env
 #endif
 
 ! 3. Neural network matrix multiplications and activations
-     write (6,*) input
     ! -------- PYTORCH BINDING --------
     call input_tensors%create
     call input_tensors%add_array(input)
@@ -114,7 +113,7 @@ use iso_fortran_env
 
     ! 4. Unnormalize output
     do k=1,outputlength
-      output(k) = output(k) / out_scale(k)
+      output(k,1) = output(k,1) / out_scale(k)
     end do
 
 #ifdef BRAINDEBUG
@@ -124,8 +123,8 @@ use iso_fortran_env
 #endif
 
     ! 5. Split output into components
-    TPHYSTND(:) =      output(1:nlev) * cpair! JORDAN SWAPPED PHQ(:)
-    PHQ(:) = output((nlev+1):2*nlev)! This is still the wrong unit, needs to be converted to W/m^2
+    TPHYSTND(:) =      output(1:nlev,1) * cpair! JORDAN SWAPPED PHQ(:)
+    PHQ(:) = output((nlev+1):2*nlev,1)! This is still the wrong unit, needs to be converted to W/m^2
     ! FSNT =        output(2*nlev+1)
     ! FSNS =        output(2*nlev+2)
     ! FLNT =        output(2*nlev+3)

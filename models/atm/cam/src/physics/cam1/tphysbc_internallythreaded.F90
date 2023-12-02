@@ -99,7 +99,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-   use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
+   use cloudbrain, only: init_nn_norm, init_nn_model, neural_net, nstepNN, &
                          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
                          init_nn_vectors, &
                          dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
@@ -1916,8 +1916,8 @@ end if ! nncoupled
   if ( is_first_step()) then
     ! Initialize network matrices and allocate arrays
     call init_nn_vectors()
-    call init_keras_norm()  ! Normalization matrix
-    call init_keras_matrices()  ! Network matrices
+    call init_nn_norm()  ! Normalization matrix
+    call init_nn_model() ! ML model
 
 #ifdef CBLIMITER
     call init_cb_limiter

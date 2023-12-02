@@ -12,12 +12,15 @@ use physconst,       only: gravit,cpair,latvap,latice
 use pmgrid,          only: masterproc
 use string_utils,    only: to_upper
 
-! -------- NEURAL-FORTRAN --------
-! imports
-use mod_kinds, only: ik, rk
-use mod_network , only: network_type
-use mod_ensemble, only: ensemble_type
-! --------------------------------
+! ------------ FORPY ------------
+use forpy_mod, only: forpy_initialize, forpy_finalize,&
+                     module_py, print_py, err_print,& 
+                     ndarray, list, tuple, object,&
+                     import_py, print_py, call_py, cast,&
+                     tuple_create, ndarray_create,&
+                     get_sys_path
+use iso_fortran_env, only: real64
+! -------------------------------
 
   implicit none
   save 
@@ -34,20 +37,21 @@ use mod_ensemble, only: ensemble_type
   integer :: outputlength = 60 ! length of output vector for NN
   !!!!
 
-#ifdef ENSEMBLE
-  real(rk) :: noise = 0.0
-  type(ensemble_type) :: cloudbrain_ensemble
-#else
-  type(network_type) :: cloudbrain_net
-  integer(ik) :: fileunit, num_layers
-  integer(ik) :: n
-#endif
+  !!!! FORPY !!!!
+  type(module_py) :: nn_interface
+  type(object)    :: nn_return
+  type(tuple)     :: nn_args
+  type(ndarray)   :: nn_in_p, nn_out_p
+  type(list)      :: paths
+  integer         :: ierror
+  !!!! 
 
-  real(rk), allocatable :: inp_sub(:)
-  real(rk), allocatable :: inp_div(:)
-  real(rk), allocatable :: out_scale(:)
-  real(rk), allocatable :: input(:)
-  real(r8), allocatable :: output(:)
+  real(r8), allocatable      :: inp_sub(:)
+  real(r8), allocatable      :: inp_div(:)
+  real(r8), allocatable      :: out_scale(:)
+  real(r8), allocatable      :: input_forpy(:,:), input(:)
+  real(r8), allocatable      :: output(:)
+  real(kind=real64), pointer :: output_forpy(:,:) ! Forpy NN call returns np.float64
 
   real(r8), allocatable :: dtdt_m1(:,:,:), dqdt_m1(:,:,:)
 
@@ -73,7 +77,7 @@ use mod_ensemble, only: ensemble_type
       tphystnd
   end type nn_out_t
 
-  public neural_net, init_keras_matrices, init_keras_norm, nstepNN, &
+  public neural_net, init_nn_model, init_nn_norm, nstepNN, &
          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
          init_nn_vectors, &
          dtdt_m1, dqdt_m1 ! buffer variables for previous timestep tendencies
@@ -137,13 +141,16 @@ use mod_ensemble, only: ensemble_type
 #endif
 
 ! 3. Neural network matrix multiplications and activations
-#ifdef ENSEMBLE
-    output = cloudbrain_ensemble % average(input)
-#else
-    ! use neural fortran library
-    output = cloudbrain_net % output(input)
-#endif
-
+    ! use forpy library
+    ierror = tuple_create(nn_args, 1) ! [TODO] move to init
+    input_forpy(1,:) = input(:) ! expanding a singleton sample dimension [forpy]
+    ierror = ndarray_create(nn_in_p, input_forpy)
+    ierror = nn_args%setitem(0, nn_in_p)
+    ierror = call_py(nn_return, nn_interface, "predict", nn_args)
+    ierror = cast(nn_out_p, nn_return)
+    ierror = nn_out_p%get_data(output_forpy)
+    if (ierror/=0) then; call err_print; endif
+    output(:) = real(output_forpy(1,:), r8)
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
         write (6,*) 'BRAINDEBUG output = ',output
@@ -174,37 +181,41 @@ use mod_ensemble, only: ensemble_type
         nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
     end select
 
+    ! 6. Forpy destroy (freeing resources)
+    call nn_in_p%destroy
+    call nn_args%destroy
+    call nn_return%destroy
+    call nn_out_p%destroy
+    !deallocate(output_forpy)
+    !nullify(output_forpy)
+
   end subroutine neural_net
 
 
-  subroutine init_keras_matrices()
-#ifdef ENSEMBLE
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loading -------'
-    cloudbrain_ensemble = ensemble_type('./Models/', noise)
-    write (6,*) '------- NEURAL-FORTRAN: ensemble loaded -------'
-#else
-    call cloudbrain_net % load('./keras_matrices/model.txt')
+  subroutine init_nn_model()
+    ierror = forpy_initialize()
+    if (ierror/=0) then; call err_print; endif
+    ierror = get_sys_path(paths)
+    ierror = paths%append("./nn_files")
+    ierror = import_py(nn_interface, "nn_interface")
     if (masterproc) then
-      write (6,*) '------- NEURAL-FORTRAN: loaded network from txt file -------'
+      write (6,*) '------- NEURAL-FORTRAN: ML model loaded -------'
+      ierror = print_py(nn_interface)
+      if (ierror/=0) then; call err_print; endif
     end if
-#endif
-  end subroutine init_keras_matrices
+  end subroutine init_nn_model
     
 
-  subroutine init_keras_norm()
+  subroutine init_nn_norm()
     allocate(inp_sub (inputlength))
     allocate(inp_div (inputlength))
     allocate(out_scale (outputlength))
-  
-    if (masterproc) then
-      write (6,*) 'CLOUDBRAIN: FKB is configured with ', rk, ' real number and', ik, ' integer.'
-    endif
   
     ! 1. Read sub
     if (masterproc) then
       write (6,*) 'CLOUDBRAIN: reading inp_sub'
     endif
-    open (unit=555,file='./keras_matrices/inp_sub.txt',status='old',action='read')
+    open (unit=555,file='./nn_files/inp_sub.txt',status='old',action='read')
     read(555,*) inp_sub(:)
     close (555)
 #ifdef BRAINDEBUG
@@ -217,7 +228,7 @@ use mod_ensemble, only: ensemble_type
     if (masterproc) then
       write (6,*) 'CLOUDBRAIN: reading inp_div'
     endif
-    open (unit=555,file='./keras_matrices/inp_div.txt',status='old',action='read')
+    open (unit=555,file='./nn_files/inp_div.txt',status='old',action='read')
     read(555,*) inp_div(:)
     close (555)
 #ifdef BRAINDEBUG
@@ -230,7 +241,7 @@ use mod_ensemble, only: ensemble_type
     if (masterproc) then
       write (6,*) 'CLOUDBRAIN: reading out_scale'
     endif
-    open (unit=555,file='./keras_matrices/out_scale.txt',status='old',action='read')
+    open (unit=555,file='./nn_files/out_scale.txt',status='old',action='read')
     read(555,*) out_scale(:)
     close (555)
 #ifdef BRAINDEBUG
@@ -238,11 +249,12 @@ use mod_ensemble, only: ensemble_type
         write (6,*) 'BRAINDEBUG out_scale = ',out_scale
       endif
 #endif
-  end subroutine init_keras_norm
+  end subroutine init_nn_norm
 
   subroutine init_nn_vectors()
-    allocate(input (inputlength))
-    allocate(output (outputlength))
+    allocate(input(inputlength))
+    allocate(input_forpy(1,inputlength))
+    allocate(output(outputlength))
     if (masterproc) then
       write (6,*) 'CLOUDBRAIN: nn_in_out_vars: ', trim(nn_in_out_vars)
       write (6,*) 'CLOUDBRAIN: allocate input vector: ', inputlength

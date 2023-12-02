@@ -1,7 +1,12 @@
 #include <misc.h>
 #include <params.h>
-#define CLOUDBRAIN
-#define BRAINDEBUG
+!#define CLOUDBRAIN
+!#define BRAINCTRLFLUX
+!#define NOBRAINRAD
+!#define BRAINDEBUG
+!#define NOADIAB
+#define DEEP
+#define SPFLUXBYPASS
 #define PCWDETRAIN
 #define RADTIME 900.
 #define SP_DIR_NS
@@ -39,7 +44,16 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Author: CCM1, CMS Contact: J. Truesdale
 ! 
 !-----------------------------------------------------------------------
-     
+
+! CLOUDBRAIN assert statement
+#ifdef CLOUDBRAIN
+#ifndef CRM
+  write (6,*) 'YO  CLOUDBRAIN currently cant be defined without #define CRM'
+  call endrun
+#endif
+#endif
+
+
    use shr_kind_mod,    only: r8 => shr_kind_r8
    use ppgrid
    use pmgrid, only: masterproc,iam
@@ -57,7 +71,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use constituents,    only: dcconnam, cnst_get_ind
    use zm_conv,         only: zm_conv_evap, zm_convr
    use time_manager,    only: is_first_step, get_nstep, get_curr_calday
-   use moistconvection, only: cmfmca
+   use moistconvection, only: cmfmca,rgrav
    use check_energy,    only: check_energy_chng, check_energy_fix
    use dycore,          only: dycore_is
    use cloudsimulatorparms, only: doisccp
@@ -85,7 +99,14 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use qrl_anncycle, only: accumulate_dailymean_qrl, qrl_interference
 #endif
 #ifdef CLOUDBRAIN
-    use cloudbrain_convo_module
+   use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
+                         nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
+                         init_nn_vectors, &
+                         dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
+   use string_utils, only: to_upper
+#ifdef CBLIMITER
+   use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
+#endif
 #endif
    implicit none
 
@@ -97,8 +118,20 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Arguments
 !
 
-#ifdef CLOUDBRAIN
-   real(r8) :: dTdt_adiab(pver),dQdt_adiab(pver)
+#if defined (CRM) || defined (CLOUDBRAIN)
+   real(r8) :: dTdt_adiab(begchunk:endchunk,pcols,pver),&
+               dQdt_adiab(begchunk:endchunk,pcols,pver),&
+               NNPRECT(pcols,begchunk:endchunk),&
+               brainolr(pcols,begchunk:endchunk), &
+               TC(begchunk:endchunk,pcols,pver), &
+               QC(begchunk:endchunk,pcols,pver), &
+               VC(begchunk:endchunk,pcols,pver), &
+               PS(begchunk:endchunk,pcols), &
+               TBP(begchunk:endchunk,pcols,pver), &
+               QBP(begchunk:endchunk,pcols,pver), &
+               VBP(begchunk:endchunk,pcols,pver), &
+               idq(pver), idt(pver), vdq, vdt, avdq, avdt, errq(pcols,begchunk:endchunk), abstot, &
+               corr, drad, absrad, errt(pcols,begchunk:endchunk)
 #endif
    real(r8), intent(in) :: ztodt                          ! 2 delta t (model time increment)
    real(r8), intent(inout) :: pblht(pcols,begchunk:endchunk)                ! Planetary boundary layer height
@@ -158,6 +191,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 
+#ifdef NOBRAINRAD
+   real(r8) :: auxqrs(pcols,pver,begchunk:endchunk)            ! Shortwave heating rate
+   real(r8) :: auxqrl(pcols,pver,begchunk:endchunk)            ! Longwave  heating rate
+#endif
 
 
    real(r8) :: asdir(pcols,begchunk:endchunk)                  ! Albedo: shortwave, direct
@@ -193,7 +230,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real(r8)    :: tauy(pcols,begchunk:endchunk)   ! surface stress (zonal) (N/m2)
    real(r8)    :: shf(pcols,begchunk:endchunk)   ! surface sensible heat flux (W/m2)
    real(r8)    :: lhf(pcols,begchunk:endchunk)   ! surface latent heat flux (W/m2) 
-
+#ifdef BRAINCTRLFLUX
+   real(r8)    :: ctrlSHFLX
+   real(r8)    :: ctrlLHFLX,sl
+#endif
 
 
 !
@@ -504,16 +544,65 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #ifdef QRLDAMP
    real (r8) :: newqrl (pcols,pver), dqrl(pcols,pver)
 #endif
-#ifdef BRAINDEBUG
-   real(r8) :: braindebug_x1,braindebug_x2,braindebug_y1,braindebug_y2
-   real(r8) :: braindt(pcols,pver),braindq(pcols,pver)
-   braindebug_x1 = 180.*3.14159/180.
-   braindebug_x2 = 182.*3.14159/180.
-   braindebug_y1 = 0.
-   braindebug_y2 = 2.*3.14159/180.
+#ifdef SPFLUXBYPASS 
+   real (r8) :: tmp1
 #endif
-! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
+#ifdef CLOUDBRAIN
+   type(nn_in_t)  :: nn_in
+   type(nn_out_t) :: nn_out
+   logical :: nncoupled
+   real(r8) :: o3vmr(begchunk:endchunk,pcols,pver)
+   real(r8) :: humidity(pver)
+   integer :: do_nn_o3
+#ifdef RHNN
+   real, external :: tom_esat
+#endif
+#endif
 
+! ---- PRITCH IMPOSED INTERNAL THREAD STAGE 1 -----
+! compute adiabatic tendencies that isolate dycore as was done in 'net training:
+! SR: New fixed implementation of adiabatic tendencies, which also contain DTV, VD01
+! At this stage state%tap is TAP from the previous time step after coupling, right?
+! At this stage state%t is TBP from this time step (also called T_G in my notation)
+    ! real(r8), intent(in) :: TC(pver)   ! CRM-equivalent T = TAP[t-1] - DTV[t-1]*dt
+    ! real(r8), intent(in) :: QC(pver)   ! QAP[t-1] - VD01[t-1]*dt
+    ! real(r8), intent(in) :: VC(pver)   ! VAP[t-1]
+    ! real(r8), intent(in) :: dTdt_adiabatic(pver) ! TBP[t]/dt - TC/dt
+    ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
+    ! real(r8), intent(in) :: PS ! From t-1
+    ! real(r8), intent(in) :: SOLIN ! From t
+#if defined (CRM) || defined (CLOUDBRAIN)
+! || means OR I guess
+! At this point the BP and adiabatic variables can be computed and stored for later
+! BP is defined as T at the beginning of time step before any physics update
+! PS also needs to be stored here?
+! Current version: PNAS with
+! Inputs: [QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX]
+! Outputs: [PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT]
+   do c=begchunk,endchunk
+     lchnk = state(c)%lchnk
+     ncol  = state(c)%ncol 
+     do i=1,ncol
+       do k=1,pver
+          TBP(c,i,k) = state(c)%t(i,k)
+          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+          VBP(c,i,k) = state(c)%v(i,k)
+         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+       end do 
+       PS(c, i) = state(c)%ps(i)
+     end do
+   end do
+   ! Now write the variables to tape for debugging
+   do c=begchunk,endchunk
+      ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
+      call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
+   end do
+#endif
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -544,9 +633,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
      taux(1:pcols,c) 	= in_srfflx_state2d(c)%wsx
      tauy(1:pcols,c) 	= in_srfflx_state2d(c)%wsy  
      shf(1:pcols,c) 	= in_srfflx_state2d(c)%shf  ! surface sensible heat flux (W/m2)
-     lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2) 
-
-     
+     lhf(1:pcols,c) 	= in_srfflx_state2d(c)%lhf ! surface latent heat flux (W/m2)      
      
    ! this next code was originally in tphysbc.F90:... (MS)     
    ! Just updating to generality of column,chunk arrays. 
@@ -625,6 +712,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    !*** BAB's FV heating kludge *** save the initial temperature
    tini(:ncol,:pver) = state(c)%t(:ncol,:pver)
    if (dycore_is('LR')) then
+      write (6,*) 'SR: energy fix is happening'
       call check_energy_fix(state(c), ptend(c), nstep, flx_heat(:,c))
       call physics_update(state(c), tend(c), ptend(c), ztodt)
       call check_energy_chng(state(c), tend(c), "chkengyfix", nstep, ztodt, zero, zero, zero, flx_heat(:,c))
@@ -659,7 +747,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call physics_update (state(c), tend(c), ptend(c), ztodt)
 
 #if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
+
 ! Save the state and tend variables to overwrite conventional physics effects
 ! leter before calling the superparameterization. Conventional moist
 ! physics is allowed to compute tendencies due to conventional
@@ -667,8 +755,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
     state_save(c) = state(c)
     tend_save(c) = tend(c)
-
 #endif
+
 !
 !===================================================
 ! Moist convection
@@ -853,7 +941,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
                rhdfda(:,:,c),   rhu00(:,:,c) , state(c)%phis)
    call t_stopf('cldnrh')
 #if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
    call outfld('_CONCLD  ',concld(:,:,c), pcols,lchnk)
    call outfld('_CLDST   ',cldst(:,:,c),  pcols,lchnk)
    call outfld('_CNVCLD  ',clc(:,c),    pcols,lchnk)
@@ -864,9 +951,11 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 #endif
 ! cloud water and ice parameterizations
    call t_startf('cldwat_tend')
+
    call cldcond_tend(state(c), ptend(c), ztodt, &
        tcwat, qcwat, lcwat, prec_pcw(:,c), snow_pcw(:,c), in_icefrac(:,c), rhdfda(:,:,c), rhu00(:,:,c), cld, nevapr(:,:,c), prain(:,:,c), qme(:,:,c), snowh(:,c))
    call physics_update (state(c), tend(c), ptend(c), ztodt)
+
 !   if(lchnk.eq.478.and.nstep.le.96) then
 !        i = 10
 !	write(22,*) state%t(i,:),   state%q(i,:,:), cld(i,:), prec_zmc(i), prec_cmf(i), prec_sed(i), &
@@ -926,23 +1015,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('DQCOND  ',dqcond(1,1,m,c),pcols   ,lchnk   )
    end do
 
-#ifdef BRAINDEBUG
-   call get_rlat_all_p(lchnk, ncol, clat(:,c))
-   call get_rlon_all_p(lchnk, ncol, clon(:,c))
-
-   do i=1,ncol
-     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-       write (666,*) 'STATE AFTER DTCOND:i (P,s,T,Q,DTCOND,DQCOND)'
-       do k=1,pver
-         write (666,'(F10.3,E14.7,E14.7,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
-         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1),dtcond(i,k,c),dqcond(i,k,1,c)
-       end do
-     endif
-   end do  
-#endif
-
 ! Compute total convective and stratiform precipitation and snow rates
    do i=1,ncol
       precc (i,c) = prec_zmc(i,c) + prec_cmf(i,c)
@@ -965,7 +1037,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! send dynamical variables, and derived variables to history file
 !===================================================
 !
-!#ifndef CRM
 #if !defined(CRM) && !defined(CLOUDBRAIN)
    call diag_dynvar (lchnk, ncol, state(c))
 #endif
@@ -979,6 +1050,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call get_rlat_all_p(lchnk, ncol, clat(:,c))
    call get_rlon_all_p(lchnk, ncol, clon(:,c))
    call zenith (calday, clat(:,c), clon(:,c), coszrs(:,c), ncol)
+   !Sungduk: save coszrs
+   call outfld('COSZRS',coszrs(:,c),pcols,lchnk)
+
 
    if (dosw .or. dolw) then
 
@@ -1020,7 +1094,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 ! Dump cloud field information to history tape buffer (diagnostics)
 !
 #if defined (CRM) || defined (CLOUDBRAIN)
-!#ifdef CRM
       call outfld('_CLOUD  ',cld,  pcols,lchnk)
       call outfld('_CLDTOT ',cltot(:,c)  ,pcols,lchnk)
       call outfld('_CLDLOW ',cllow(:,c)  ,pcols,lchnk)
@@ -1055,10 +1128,15 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
   end do    ! ------ PRITCH END INTERNALLY THREADED CHUNK LOOP STAGE 1 -----
 
 #ifdef CLOUDBRAIN
-#ifndef CRM
-  write (6,*) 'YO  CLOUDBRAIN currently cant be defined without #define CRM'
-  call endrun
-#endif
+! ------- is it a NN-coupling time step? ----
+nncoupled = .false.
+if (nstep .ge. nstepNN) then ! --- only if we are spun up...
+  nncoupled = .true.
+
+  if (nstep .eq. nstepNN .and. masterproc) then
+     write (6,*) 'CLOUDBRAIN: NN-coupling is turned on at nstep = ',nstep
+  end if
+endif
 #endif
 
 !INSERT or CLOUDBRAIN:
@@ -1079,11 +1157,20 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 
 ! Initialize stuff:
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+if ( .not. nncoupled ) then
+#endif
 
 call t_startf ('crm')
 do c=begchunk,endchunk
   state(c) = state_save(c)
   tend(c) = tend_save(c)
+     lchnk = state(c)%lchnk
+	   ncol  = state(c)%ncol
+! SR: TE, TW and S before BRAIN or SP
+     call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
 end do
 
    if(is_first_step() .and. .not. crminitread ) then
@@ -1226,7 +1313,35 @@ end do
       end do ! pritch begchunk etc.
 
    else
-   
+
+#ifdef SPFLUXBYPASS
+ ! pritch -- apply surface flux perturbations to lowest level DSE,
+ ! constituents here, right before superparameterization, insated of
+ ! instead of in vertical diffusion routine. To avoid exposiing dycore to a
+ ! bottom-centric physics tendency profile component, and to allow SP to do
+ ! the job of diffusing the flux infusion.
+  do c=begchunk,endchunk
+    call get_rlat_all_p(lchnk, ncol, clat(:,c))
+    call get_rlon_all_p(lchnk, ncol, clon(:,c))
+    ncol  = state(c)%ncol
+    ptend(c)%lu = .false.
+    ptend(c)%lv = .false.
+    ptend(c)%ls = .true.
+    ptend(c)%lq = .false.
+    ptend(c)%lq(1) = .true.
+    do i=1,ncol
+        tmp1 = gravit*state(c)%rpdel(i,pver)
+        ptend(c)%s(i,:) = 0.
+        ptend(c)%s(i,pver) = tmp1*shf(i,c) 
+        ptend(c)%q(i,:,1) = 0.
+        ptend(c)%q(i,pver,1) = tmp1*lhf(i,c)/latvap
+        !write (6,*) 'SR: c, i, cflx = ', c, i, tmp1*cflx(i, 1, c)
+        !write (6,*) 'SR: c, i, lhf = ', c, i, tmp1*lhf(i,c)/latvap
+    end do
+    call physics_update (state(c), tend(c), ptend(c), ztodt)
+  end do
+#endif
+
 ! ================= BEGIN THREADED ZONE OF MOST WORK ===================
 
 ! INSERT PRITCH MY MAIN TARGET INTERNALLY TRHEADED LOOP STARTS HERE:
@@ -1726,9 +1841,7 @@ end do
 ! Compute energy and water integrals of input state
 
      call check_energy_timestep_init(state(c), tend(c), pbuf)
-#ifndef CLOUDBRAIN
      call physics_update (state(c), tend(c), ptend(c), ztodt)
-#endif
 !    check energy integrals
      wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) + prectend(:ncol,c)*1.e-3 ! include precip storage term
      icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) + precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
@@ -1787,107 +1900,217 @@ end do
 ! End of superparameterization zone.
   end do ! end pritch new chunk loop
   call t_stopf('crm')
+
+#ifdef CLOUDBRAIN 
+end if ! nncoupled
+#endif ! def CLOUDBRAIN
+
+!========================================================
+!=================== CLOUDBRAIN =========================
+!========================================================
 #ifdef CLOUDBRAIN
-  ! As in SP, forget previous stuff (we will retain SP's qrl,qrs)
   call t_startf ('cloudbrain')
-  do c=begchunk,endchunk
-    state(c) = state_save(c)
-    tend(c) = tend_save(c)
-  end do
-  
-  ! HEY we cannot activte brain until step 2, for adiab tendencies to be
-  ! defined.
-  if ( .not. is_first_step()) then
-   do c=begchunk,endchunk  ! INSERT OMP threading here later if desired.
-      ncol  = state(c)%ncol
+
+  ! First time step
+  ! reading at first timestep, not nstepNN to leave init_keras debug outputs in the early part of log
+  if ( is_first_step()) then
+    ! Initialize network matrices and allocate arrays
+    call init_nn_vectors()
+    call init_keras_norm()  ! Normalization matrix
+    call init_keras_matrices()  ! Network matrices
+
+#ifdef CBLIMITER
+    call init_cb_limiter
+    if (masterproc) then
+       write (6,*) '[CBLIMITER] CLOUDBRAIN output limier is initialized.'
+     end if
+#endif
+
+  endif
+
+  !! Sungduk: Comment the initialization block as NN starts from SP spunup states (at nstepNN)
+  ! if ( (nstepNN .eq. 0) .and. is_first_step() ) then
+  !  ! Set tendencies to zero at first step
+  !  do c=begchunk,endchunk
+  !    ! I think this is only important for variables we are not using, e.g. liq and ice
+  !    ptend(c)%q(:,:,1) = 0.  ! necessary?
+  !    ptend(c)%q(:,:,ixcldliq) = 0.
+  !    ptend(c)%q(:,:,ixcldice) = 0.
+  !    ptend(c)%s(:,:) = 0. ! necessary?
+  !  end do
+  ! end if
+
+  if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
+    ! As in SP retrieve state at the start of routine
+    do c=begchunk,endchunk
+      state(c) = state_save(c)
+      tend(c) = tend_save(c)
       lchnk = state(c)%lchnk
+      ncol  = state(c)%ncol
+      ! SR: TE, TW and S before BRAIN or SP
+      call outfld('TEPRE',state(c)%te_cur(:ncol),pcols,lchnk)
+      call outfld('TWPRE',state(c)%tw_cur(:ncol),pcols,lchnk)
+      call outfld('SPRE',state(c)%s(:ncol, :pver),pcols,lchnk)
+    end do
+
+    ! At this point write to tape the other input variable
+    ! Can't be in parallel loop
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
+      ncol  = state(c)%ncol
+      
+      call outfld('NNSHF',shf(1:pcols,c),pcols,lchnk)
+      call outfld('NNLHF',lhf(1:pcols,c),pcols,lchnk)
+      call outfld('SOLIN',solin(:ncol,c),pcols,lchnk)
+      call outfld('NNTS',ts(:ncol,c),pcols,lchnk)
+    end do
+
+    ! Calculate O3
+    do_nn_o3 = index(to_upper(nn_in_out_vars), 'O3VMR')
+    if ( do_nn_o3 .gt. 0 ) then
+      do c=begchunk,endchunk
+        lchnk = state(c)%lchnk
+        ncol  = state(c)%ncol
+        call radozn(lchnk, 1, ncol, state(c)%pmid, o3vmr(c,:ncol,:pver))
+      end do
+    end if
+
+! SY: OMP directive deleted 
+
+    ! This is the main computation loop which is parallel
+    do c=begchunk,endchunk 
+      lchnk = state(c)%lchnk  
+      ncol  = state(c)%ncol
 
       do i=1,ncol ! this is the loop over independent GCM columns.
-!         call cloudbrain(in_net_s(i,:),in_net_qv(i,:),in_net_w(i,:),in_net_rho(i,:),shf(i,c),lhf(i,c),ztodt,out_net_dsdt(i,:),out_net_dqdt(i,:)) !,out_precip(i)) rain under construction
-
-          if(is_first_step()) then
-            dTdt_adiab(:) = 0. ! no "after physics" state exists, yet.
-            dQdt_adiab(:) = 0. 
-          else
-            dTdt_adiab(:) = (state(c)%t(i,:) - state(c)%tap(i,:))/ztodt
-            dQdt_adiab(:) = (state(c)%q(i,:,1) - state(c)%qap(i,:))/ztodt
-          endif
-#ifdef BRAINDEBUG
-          if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-            write (555,*) 'tap=',state(c)%tap(i,:)
-            write (555,*) 'qap=',state(c)%qap(i,:)
-            write (555,*) 'dTdt_adiab(:)=',dTdt_adiab(:)
-            write(555,*) 'dQdt_adiab(:) =',dQdt_adiab(:)
-          endif 
+        ! This is the neural network
+        do k=1,pver
+#ifdef RHNN
+          humidity(k) =  461.*state(c)%pmid(i,k)*QBP(c,i,k)/(287.*tom_esat(real(TBP(c,i,k)))) ! note function tom_esat below refercing SAM's sat.F90
+#else
+          humidity(k)= QBP(c,i,k)
 #endif
-          call cloudbrain_convo (state(c)%tap(i,:),state(c)%qap(i,:),state(c)%omega(i,:),shf(i,c),lhf(i,c),dTdt_adiab,dQdt_adiab,ptend(c)%s(i,:),ptend(c)%q(i,:,1) )
-          ! INSERT need an estimate of adiabatic tendencies.
+        end do
 
-         ! INSERT (later) interface to radiation
-         ! Based on downstream logic, key is just that qrs and qrl arrays populated
-         ! i.e. shortwave and longwave heating rates
-         ! They are separately wired to arterial ptend structures downstream.         
+        ! pack input
+        select case (to_upper(trim(nn_in_out_vars)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%dtdtm1(:pver) = dtdt_m1(c,i,:pver) ! previous tendencies are saved in physpkg.F90
+            nn_in%dqdtm1(:pver) = dqdt_m1(c,i,:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+            nn_in%vbp(:pver) = VBP(c,i,:pver)
+            nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
+            nn_in%coszrs = coszrs(i,c)
+        end select
+
+        ! NN inference
+        call neural_net(nn_in, nn_out, i)
+
+        ! unpack output
+        select case (to_upper(trim(nn_in_out_vars)))
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+        end select
 
       end do ! end column loop
 
-      ! Finish up: linkages from cloudbrain to arterial physics variables
-     ptend(c)%name  = 'cloudbrain'
-     ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
-     ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
-     ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
-     ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
-     ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
-     ptend(c)%lv    = .FALSE.
- 
-     braindt = ptend(c)%s(:ncol,:pver)/cpair 
-     call outfld('BRAINDT',braindt,pcols,lchnk) 
-     braindq = ptend(c)%q(:ncol,:pver,1)
-     call outfld('BRAINDQ',braindq,pcols,lchnk) 
+      ! for debugging only (for previous tendency terms):
+      call outfld('DTDT_M1', dtdt_m1(c,:ncol,:pver),pcols   ,c   )
+      call outfld('DQDT_M1', dqdt_m1(c,:ncol,:pver),pcols   ,c   )
 
-   call physics_update(state(c),tend(c),ptend(c),ztodt)
-
-#ifdef BRAINDEBUG
-   do i=1,ncol
-     if (clat(i,c) .ge. braindebug_y1 .and. clat(i,c) .le. braindebug_y2 &
-         .and. clon(i,c) .ge. braindebug_x1 .and. clon(i,c) &
-         .le. braindebug_x2)  then
-       write (555,*) 'STATE AFTER DTBRAIN: (P,s,T,Q,BRAINDT,BRAINDQ)'
-       do k=1,pver
-         write (555,'(F10.3,E14.7,E14.7,E14.7,E14.7,E14.7)') state(c)%pmid(i,k), &
-         state(c)%s(i,k),state(c)%t(i,k),state(c)%q(i,k,1),braindt(i,k),braindq(i,k)
-       end do
-     endif
-   end do  
+#ifdef CBLIMITER
+      ! Bound pted(c)%s and ptend(c)%q by 1st and 99th percentile from SP control simulation
+      call outfld('dt_befor',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk) ! for debugging
+      call outfld('dq_befor',ptend(c)%q(:ncol,:pver,1),pcols,lchnk)     ! for debugging
+      call cb_limiter(ptend(c), lchnk, ncol)
+      call outfld('dt_after',ptend(c)%s(:ncol,:pver)/cpair,pcols,lchnk) ! for debugging
+      call outfld('dq_after',ptend(c)%q(:ncol,:pver,1),pcols,lchnk)     ! for debugging
 #endif
-   ! Apply tendencies, check energy.
-!     call check_energy_timestep_init(state(c), tend(c), pbuf) ! compute energy,
-!for later
-      ! and water integrals of input state.
-! ----------
-!    check energy integrals
-!    INSERT update the water sink terms below once precip variables done.
 
-!     wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) +
-!prectend(:ncol,c)*1.e-3 ! include precip storage term
-!     icesink(:ncol,c) = precsc(:ncol,c) + precsl(:ncol,c) +
-!precstend(:ncol,c)*1.e-3   ! conversion of ice to snow
-!     write(6,'(a,12e10.3)')'prect=',(prect(i),i=1,12)
-!     call check_energy_chng(state(c), tend(c), "crm", nstep, ztodt, zero,
-!wtricesink(:,c), icesink(:,c), zero)
-! -----------
-   call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
-   ! many things to history file tape.
+    end do ! end chunk loop
 
-!    INSERT need to send precip, liquid water paths, other desired diags (mass
-!    fluxes?) to history file tapes at this stage, see SP outfld logic for inspiration. 
+
+  endif ! nncoupled? -- note we might want to enable diagnostic NN and delete this if clause, pritch.
+
+  ! Now save all the neural network outputs outside of parallel loop
+  do c=begchunk,endchunk 
+    lchnk = state(c)%lchnk  
+    ncol  = state(c)%ncol
+    call outfld('NNDQ',ptend(c)%q(:ncol,:pver,1),pcols,lchnk) 
+    call outfld('NNDT',ptend(c)%s(:ncol,:pver)/cpair ,pcols,lchnk) 
+    ! call outfld('NNPRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFSNS',in_fsns(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFLNT',in_flnt(:ncol,c),pcols,lchnk)
+    ! call outfld('NNFLNS',in_flns(:ncol,c),pcols,lchnk)
+
+    !! Redundant to have the separate NN outputs but let's leave it for now
+    ! call outfld('PRECT',NNPRECT(:ncol,c),pcols,lchnk)
+    ! call outfld('FSNT',in_fsnt(:ncol,c),pcols,lchnk)
+    ! call outfld('FSNS',in_fsns(:ncol,c),pcols,lchnk)
+    ! call outfld('FLNT',in_flnt(:ncol,c),pcols,lchnk)
+    ! call outfld('FLNS',in_flns(:ncol,c),pcols,lchnk)
+
+    ! Finish up: linkages from cloudbrain to arterial physics variables
+    ptend(c)%name  = 'cloudbrain'
+    ptend(c)%ls    = .TRUE. ! allowed to update GCM DSE
+    ptend(c)%lq(1) = .TRUE. ! allowed to update GCM vapor
+    ptend(c)%lq(ixcldliq) = .FALSE. ! allowed to update GCM liquid water
+    ptend(c)%lq(ixcldice) = .FALSE. ! allowed to update GCM ice water 
+    ptend(c)%lu    = .FALSE. ! not allowed to update GCM momentum
+    ptend(c)%lv    = .FALSE.
+
+    if (nncoupled) then 
+      ! New energy computation here
+      call physics_update(state(c),tend(c),ptend(c),ztodt)
+      call check_energy_chng(state(c), tend(c), "cbrain", nstep, ztodt, zero, zero, zero, zero)
+    endif
+
+      ! SR: I am not sure what this does.
+      call diag_dynvar (lchnk, ncol, state(c)) ! after applying neural net, write
+      ! many things to history file tape.
+
   end do ! end chunk loop 
-#endif 
-endif ! not first step.
+  call t_stopf ('cloudbrain')
+#endif ! CLOUDBRAIN 
 ! END OF CLOUDBRAIN
+  
 #endif ! CRM
+
  do c=begchunk,endchunk ! pritch new chunk loop
+
+     ! SR: TE, TW and S after BRAIN or SP, with SPs update
+     call outfld('TEPOST',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPOST',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPOST',state(c)%s(:ncol, :pver),pcols,lchnk)
+
+
    lchnk = state(c)%lchnk
    ncol  = state(c)%ncol 
    ifld = pbuf_get_fld_idx('CLD')
@@ -1970,15 +2193,31 @@ endif ! not first step.
 !
 ! Compute net radiative heating
 !
+! SR Is this necessary?
    call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
+
+     call outfld('TEPRE_R',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPRE_R',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPRE_R',state(c)%s(:ncol, :pver),pcols,lchnk)
 !
 ! Add radiation tendencies to cummulative model tendencies and update profiles
 !
+! No radiation if full physics cloudbrain
+#ifdef CLOUDBRAIN
+  if ( nncoupled ) then
+    ptend(c)%s = 0.
+  end if
+#endif
    call physics_update(state(c), tend(c), ptend(c), ztodt)
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)
 !
+
+     call outfld('TEPOST_R',state(c)%te_cur(:ncol),pcols,lchnk)
+     call outfld('TWPOST_R',state(c)%tw_cur(:ncol),pcols,lchnk)
+     call outfld('SPOST_R',state(c)%s(:ncol, :pver),pcols,lchnk)
+
 ! Compute net surface radiative flux for use by surface temperature code.
 ! Note that units have already been converted to mks in RADCTL.  Since
 ! fsns and flwds are in the buffer, array values will be carried across
@@ -1994,6 +2233,11 @@ endif ! not first step.
                     state(c)%pmid,      &
                  state(c)%rpdel(1,pver))
 
+
+! At this stage save column integral energy and water
+   call outfld('TE', state(c)%te_cur, pcols, lchnk   )
+   call outfld('TW', state(c)%tw_cur, pcols, lchnk   )
+
 !---------------------------------------------------------------------------------------
 ! Save history variables. These should move to the appropriate parameterization interface
 !---------------------------------------------------------------------------------------
@@ -2002,10 +2246,20 @@ endif ! not first step.
    call outfld('PRECC   ',precc(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECSL  ',precsl(:,c)  ,pcols   ,lchnk       )
    call outfld('PRECSC  ',precsc(:,c)  ,pcols   ,lchnk       )
-   
+#ifdef CRM
+   call outfld('PRECTEND',prectend(:,c)  ,pcols   ,lchnk       )
+   call outfld('PRECSTEND',precstend(:,c)  ,pcols   ,lchnk       )
+#endif
+
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+if ( .not. nncoupled ) then
+#endif
    prect(:ncol,c) = precc(:ncol,c) + precl(:ncol,c)
    call outfld('PRECT   ',prect(:,c)   ,pcols   ,lchnk       )
    call outfld('PRECTMX ',prect(:,c)   ,pcols   ,lchnk       )
+#ifdef CLOUDBRAIN !
+end if
+#endif
 
 #if ( defined COUP_CSM )
    call outfld('PRECLav ',precl(:,c)   ,pcols   ,lchnk   )
@@ -2048,6 +2302,10 @@ endif ! not first step.
 ! Also apply artificial interference to the radiative heating driving the CRM
 ! on subsequent call to crm, identically in each of the CRM sub-columns...
 
+!SR: More debug
+call outfld('DBGT5',tend(c)%dtdt ,pcols,lchnk)
+call outfld('DBGT6',ptend(c)%s ,pcols,lchnk)
+
  ! Now it appears to me that qrl_crm has units of qrl_tmp / cpair * pdel
  ! at this scope in the code whereas qrl has units of qrl_tmp
  ! Hence applying "qrl"-scope anomalies (dqrl) to qrl_crm variable means multiplying first by pdel / cpair.
@@ -2088,11 +2346,73 @@ endif ! not first step.
   in_surface_state2d(c)%solsd(:)  =  solsd(:,c)	 	
   in_surface_state2d(c)%solld(:)      =  solld(:,c) 		      
 
-#ifdef CLOUDBRAIN
-  state(c)%tap = state(c)%t
-  state(c)%qap = state(c)%q(:,:,1)
-#endif
 end do ! PRITCH FINAL CHUNK (should be no need to thread it).
 
    return
 end subroutine tphysbc_internallythreaded
+
+  real function tom_esat(T) 
+  ! For consistency with the python port of Tom's RH-calculator, this is how it
+  ! was done in the training environment (Caution: could be porting bugs here)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real, parameter :: T00 = 253.16
+    real, external :: esatw_crm,esati_crm ! register functions from crm source.
+    real, external :: tom_eliq, tom_eice
+    real :: omtmp,omega
+    omtmp = (T-T00)/(T0-T00)
+    omega = max(0.,min(1.,omtmp))
+!tf.where(T>T0,eliq(T),tf.where(T<T00,eice(T),(omega*eliq(T)+(1-omega)*eice(T))))
+    if (T .gt. T0) then
+      tom_esat = tom_eliq(T)
+    elseif (T .lt. T00) then
+      tom_esat = tom_eice(T)
+    else
+      tom_esat = omega*tom_eliq(T) + (1.-omega)*tom_eice(T)
+    endif
+  end function tom_esat
+
+  real function tom_eliq(T)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real, parameter :: cliq = -80. 
+    real a0,a1,a2,a3,a4,a5,a6,a7,a8
+    data a0,a1,a2,a3,a4,a5,a6,a7,a8 /&
+       6.11239921, 0.443987641, 0.142986287e-1, &
+       0.264847430e-3, 0.302950461e-5, 0.206739458e-7, &
+       0.640689451e-10, -0.952447341e-13,-0.976195544e-15/
+    real :: dt
+    dt = max(cliq,T-T0)
+    tom_eliq = 100.*(a0 + dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))  
+  end function tom_eliq
+
+
+  real function tom_eice(T)
+    implicit none
+    real T
+    real, parameter :: T0 = 273.16
+    real a0,a1,a2,a3,a4,a5,a6,a7,a8
+    data a0,a1,a2,a3,a4,a5,a6,a7,a8 /&
+        6.11147274, 0.503160820, 0.188439774e-1, &
+        0.420895665e-3, 0.615021634e-5,0.602588177e-7, &
+        0.385852041e-9, 0.146898966e-11, 0.252751365e-14/       
+    real cice(6)
+    real dt
+    real, external :: tom_eliq
+    dt = T-T0
+    cice(1) = 273.15
+    cice(2) = 185.
+    cice(3) = -100.
+    cice(4) = 0.00763685
+    cice(5) = 0.000151069
+    cice(6) = 7.48215e-07
+    if (T .gt. cice(1)) then
+      tom_eice = tom_eliq(T)
+    else if (T .le. cice(2)) then
+      tom_eice = 100.*(cice(4) + max(cice(2),dt)*(cice(5)+max(cice(3),dt)*cice(6))) 
+    else
+      tom_eice = 100.*(a0 +dt*(a1+dt*(a2+dt*(a3+dt*(a4+dt*(a5+dt*(a6+dt*(a7+a8*dt))))))))
+    end if
+  end function tom_eice

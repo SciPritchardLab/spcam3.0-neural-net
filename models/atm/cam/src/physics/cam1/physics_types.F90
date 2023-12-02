@@ -1,5 +1,6 @@
 #include <misc.h>
-#define CLOUDBRAIN
+! CLOUDBRAIN doesn't actually do anyting here but import some things
+!#define CLOUDBRAIN
 !-------------------------------------------------------------------------------
 !physics data types module
 !-------------------------------------------------------------------------------
@@ -55,6 +56,8 @@ module physics_types
 #endif
 #ifdef CLOUDBRAIN
           tap, qap, & ! T,Q after physics.
+          dtv, vd01, & ! vertical diffusion of T, Q (for energy checker)
+          vap, &      ! SR, also add v-component of wind
 #endif
           zm      ! geopotential height above surface at midpoints (m)
      real(r8), dimension(pcols,pver,ppcnst) :: &

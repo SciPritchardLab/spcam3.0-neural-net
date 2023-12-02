@@ -237,6 +237,7 @@ subroutine stepon
         write (6,*) 'MDEBUG d_p_coupling'
       end if
 #endif
+! SR: This is where physics state gets populated with t3, but what is that!?
       call d_p_coupling (ps(1,beglat,n3), t3(i1,1,begj,n3), u3(i1,1,begj,n3), &
                          v3(i1,1,begj,n3), q3(i1,1,1,begj,n3), &
 #ifdef QVORTDAMP
@@ -258,6 +259,7 @@ subroutine stepon
         write (6,*) 'MDEBUG physpkg'
       end if
 #endif
+
          call physpkg (phys_state, gw, ztodt, phys_tend, pbuf)
       end if
       call t_stopf('phys_driver')

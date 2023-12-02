@@ -57,6 +57,10 @@ null  :=
 space := $(null) $(null)
 comma := $(null),$(null)
 
+NEURAL_MOD := -I/home1/00993/tg802402/repositories/FKB/build/include/
+NEURAL_A := -L/home1/00993/tg802402/repositories/FKB/build/lib/
+NEURAL_O := -L/home1/00993/tg802402/repositories/FKB/build/CMakeFiles/neural.dir/
+
 # Determine distribution root directory
 ifeq ($(ROOTDIR),$(null))
 ROOTDIR := $(shell cat Rootdir)
@@ -164,7 +168,9 @@ CPPDEF    := -DCAM -DNO_SHR_VMATH -DHIDE_SHR_MSG
 
 $(MODEL_EXEDIR)/$(EXENAME): $(OBJS)
 #	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf_c++ -lnetcdff -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
-	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
+#	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(LDFLAGS)
+	$(FC) -o $@ $(OBJS) -L$(LIB_NETCDF) -lnetcdf -L$(ESMF_LIB)/$(ESMF_ARCH) -lesmf $(NEURAL_O) $(NEURAL_A) -lneural $(LDFLAGS)
 
 debug: $(OBJS)
 	echo "FFLAGS: $(FFLAGS)"
@@ -271,8 +277,8 @@ ifeq ($(UNAMES),Linux)
 #  endif
 
 #  ifeq ($(SMP),TRUE)
-#    FFLAGS += -openmp
-#    LDFLAGS += -openmp
+#    FFLAGS += -qopenmp
+#    LDFLAGS += -qopenmp
 #  endif
 
 #endif
@@ -309,10 +315,10 @@ CC := mpicc
 CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -DTHREADED_PTHREADS #-xMIC-AVX512
 #CFLAGS = $(cpp_path) -DLINUX $(CPPDEF) -xMIC-AVX512
 mod_path  := -I$(ESMF_MOD)/$(ESMF_ARCH) -I$(MOD_NETCDF)
-#FFLAGS := $(cpp_path) -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -ftz -traceback -xHost -extend-source -openmp 
-FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -openmp -check bounds #-xMIC-AVX512
+#FFLAGS := $(cpp_path) -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -ftz -traceback -xHost -extend-source -qopenmp 
+FFLAGS := $(cpp_path) -O2 -DLINUX -DINTEL64 $(mod_path) -r8 -i4 $(CPPDEF) -convert big_endian -assume byterecl -traceback -extend-source -qopenmp #-check bounds #-xMIC-AVX512
 FREEFLAGS := -recursive
-LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -openmp #-xMIC-AVX512
+LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/linux_intel -lm -qopenmp #-xMIC-AVX512
 
 .SUFFIXES:
 .SUFFIXES: .F .F90 .c .o
@@ -327,7 +333,7 @@ LDFLAGS = -L/home1/00993/tg802402/pritchard/models/atm/cam/obj/esmf/lib/libO/lin
 #endif
 
 .F90.o:
-	$(FC) -c $(FREEFLAGS) $(FFLAGS) $<
+	$(FC) -c $(FREEFLAGS) $(FFLAGS) $(NEURAL_MOD) $<
 .F.o:
 	$(FC) -c $(FFLAGS) $<
 .c.o:

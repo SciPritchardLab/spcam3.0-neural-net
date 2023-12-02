@@ -1,6 +1,8 @@
 #include <misc.h>
 #include <params.h>
-
+!#define BRAINCTRLFLUX
+!#define CLOUDBRAIN
+#define NODTVKE
 subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
                     taux,    tauy,    cflx,    sgh,    lhf,  &
                     landfrac,snowh,   tref,    precc,  precl,&
@@ -36,7 +38,9 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
    use aerosol_intr,       only: aerosol_emis_intr, aerosol_drydep_intr, aerosol_srcsnk_intr
    use check_energy,    only: check_energy_chng
    use time_manager,    only: get_nstep
-
+#ifdef BRAINCTRLFLUX
+   use phys_grid         , only: get_rlat_all_p
+#endif
    implicit none
 
 #include <comctl.h>
@@ -96,6 +100,10 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
    real(r8), pointer, dimension(:,:) :: qini
    real(r8), pointer, dimension(:,:) :: tini
    real(r8), pointer, dimension(:,:) :: cld
+#ifdef BRAINCTRLFLUX
+   real(r8) :: clat(pcols)
+   real(r8) :: sl
+#endif
 !
 !-----------------------------------------------------------------------
    lchnk = state%lchnk
@@ -161,13 +169,36 @@ subroutine tphysac (ztodt,   pblh,    qpert,   tpert,  shf,  &
 ! Call vertical diffusion code (pbl, free atmosphere and molecular)
 !===================================================
 
+#ifdef BRAINCTRLFLUX
+ ! Pritch, make sure if prescribing surface fluxes the vdiff routine is aware.
+   call get_rlat_all_p(lchnk, ncol, clat)
+   do i=1,ncol
+     sl = sin(clat(i))
+     shf(i) = 4.312427e+02*sl**12 + 1.236086e+03*sl**11 + -1.756544e+03*sl**10 + -3.708686e+03*sl**9 + 2.521981e+03*sl**8 + 4.105127e+03*sl**7 + &
+-1.442402e+03*sl**6 + -1.983412e+03*sl**5 + 2.087324e+02*sl**4 + &
+3.652624e+02*sl**3 + 4.211648e+01*sl**2 + -7.257877e+00*sl**1 + 7.512179e+00 
+     lhf(i) = -1.443965e+04*sl**12 + 1.155046e+04*sl**11 + 4.867104e+04*sl**10 + &
+-3.345586e+04*sl**9 + -6.413659e+04*sl**8 + 3.559247e+04*sl**7 + &
+4.149002e+04*sl**6 + -1.658518e+04*sl**5 + -1.317367e+04*sl**4 + &
+2.968841e+03*sl**3 + 1.499744e+03*sl**2 + -5.255945e+01*sl**1 + & 
+1.114391e+02*sl**0
+   end do 
+#endif
    call vd_intr (ztodt    ,state    ,taux     ,tauy     , shf    ,&
                  cflx     ,pblh     ,tpert    ,qpert    , surfric  ,&
                  obklen   ,ptend    ,cld      ,ocnfrac  , landfrac, sgh )
-
+! Full physics implementation. I think this is where DTV and VD01 are applied, so we want to comment that out!
+#ifdef NODTVKE
+! I think this should still be active for te fluxbypass version
+! There DTV and VD01 are not applied, but DTVKE is still
+! But we are also predicting this, so I think we should set it to zero.
+  ptend%s = 0.
+  ptend%q = 0.
+#endif
    call physics_update (state, tend, ptend, ztodt)
 ! Check energy integrals
    call check_energy_chng(state, tend, "vdiff", nstep, ztodt, cflx(:,1), zero, zero, shf)
+
 
 !  aerosol dry deposition processes
    call aerosol_drydep_intr (state, ptend, cflx(:,1), ztodt, &

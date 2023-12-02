@@ -1,6 +1,6 @@
 #include <misc.h>
 #include <params.h>
-
+!#define BETAFIX
 subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
                           q3      ,q3m1    ,ps      ,cwava   ,alpha   , &
                           etamid  ,qfcst   ,div     ,phis    ,omga    , &
@@ -22,6 +22,7 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
   use constituents, only: pcnst, pnats, qmin
   use constituents, only: tottnam
   use physconst, only: cpair, gravit
+  use runtime_opts, only: betafix
 
   implicit none
 
@@ -116,16 +117,24 @@ subroutine tfilt_massfix (ztodt   ,lat     ,u3m1    ,v3m1    ,t3m1    , &
 !
 ! Add temperature correction for energy conservation
 !
+! SR: Hack
+!beta = 0.0005
   do k=1,plev
     do i=1,nlon
       engycorr(i,k) = (cpair/gravit)*beta*pdel(i,k)/ztodt
+! 5/13/20 JO: RETURNING TO NORMAL CORRECTION
+#ifdef BETAFIX
+      t3m1    (i,k) = t3m1(i,k) + betafix ! + beta  ! SR: Comment out beta correction
+#else
       t3m1    (i,k) = t3m1(i,k) + beta
+#endif
     end do
   end do
 !
 ! Output Energy correction term
 !
   call outfld('ENGYCORR',engycorr ,plond   ,lat     )
+
 !
 ! Compute q tendency due to mass adjustment
 ! If LFIXLIM = .T., then:

@@ -54,6 +54,12 @@ module runtime_opts
 #endif
    use aerosols, only: radforce, sulscl_rf, carscl_rf, ssltscl_rf, dustscl_rf, bgscl_rf, tauback, sulscl, carscl, ssltscl, dustscl
    use cloudsimulatorparms, only: doisccp
+#ifdef CLOUDBRAIN
+   use cloudbrain, only: nstepNN, &         ! [int] timestep at which NN turns on.
+                         nn_in_out_vars, &  ! [char] user-defined name that defines input output vectors of NN
+                         inputlength, &     ! [int] length of NN input vector
+                         outputlength       ! [int] length of NN output bector
+#endif
 
 
 !-----------------------------------------------------------------------
@@ -536,8 +542,8 @@ module runtime_opts
   real (r8), public :: fluxdampfac,flux_dylat,flux_critlat_deg
   logical, public :: fluxdamp_equatoronly
 #endif
-  logical, public :: aqua_uniform, aqua_AndKua
-  real(r8), public :: aqua_uniform_sst_degC
+  logical, public :: aqua_uniform, aqua_AndKua, aqua_3KW1
+  real(r8), public :: aqua_uniform_sst_degC, betafix
 
   real(r8), public :: tau_t            ! time scale for nudging T  with analyses (seconds)
   real(r8), public :: tau_u            ! time scale for nudging u  with analyses (seconds)  
@@ -730,6 +736,10 @@ subroutine read_namelist
                     aero_carbon, aero_feedback_carbon, &
                     aero_sea_salt, aero_feedback_sea_salt, &
                     bndtva, tau_t, tau_u, tau_v, tau_q,tau_ps, &
+! CLOUDBRAIN namelist variables
+#ifdef CLOUDBRAIN
+                    nstepNN, nn_in_out_vars, inputlength, outputlength,&
+#endif CLOUDBRAIN
 #ifdef CRM
                     crminitsave, crminitread, crmsavechunks, &
 #endif
@@ -748,10 +758,9 @@ subroutine read_namelist
   fluxdampfac,fluxdamp_equatoronly,flux_dylat,flux_critlat_deg, &
 #endif
                     analyses_time_interp, less_surface_nudging, nudge_dse_not_T, &
-                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua
-
-
+                    aqua_uniform, aqua_uniform_sst_degC, aqua_AndKua, aqua_3KW1, betafix
 #endif
+
 !DJBBEGIN
    character(len=8), external :: upcase ! Uppercase 8-character variable
    integer(4) idjb_out
@@ -1559,6 +1568,10 @@ subroutine read_namelist
     write (6,*) 'Pritch Andersen & Kuang 2012 aquaplanet SSTs activated'
     aqua_planet = .true.
   end if
+  if (aqua_3KW1) then
+    write (6,*) 'SR Zonally assymetric'
+    aqua_planet = .true.
+  end if
 #ifdef FLUXDAMP
   if (masterproc) then
    write (6,*) 'fluxdampfac=',fluxdampfac
@@ -1818,6 +1831,15 @@ subroutine distnl
   call mpibcast (aqua_uniform  ,1,mpilog,0,mpicom)
   call mpibcast (aqua_uniform_sst_degC, 1, mpir8, 0, mpicom) ! pritch
   call mpibcast (aqua_AndKua, 1,mpilog,0,mpicom)
+  call mpibcast (aqua_3KW1, 1,mpilog,0,mpicom)
+  call mpibcast (betafix, 1, mpir8, 0, mpicom) ! pritch
+! CLOUDBRAIN namelist variables
+#ifdef CLOUDBRAIN
+  call mpibcast (nstepNN, 1, mpiint, 0, mpicom)
+  call mpibcast (inputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (outputlength, 1, mpiint, 0, mpicom)
+  call mpibcast (nn_in_out_vars,len(nn_in_out_vars),mpichar,0,mpicom)
+#endif 
 !DJBBEGIN
 ! ASK   write(idjb_out,'(a)')' After doisccp broadcast'
 ! ASK   call flush(idjb_out)
@@ -2022,7 +2044,7 @@ subroutine preset
 ! Frequency in iterations of absorptivity/emissivity calc (negative
 ! values in model hours)
 !
-   iradae = -12
+   iradae = 1
 !
 ! Frequency of annual cycle sst update
 !
@@ -2031,8 +2053,8 @@ subroutine preset
 ! Default frequency of shortwave and longwave radiation computations: 
 ! once per hour (negative value implies model hours)
 !
-   iradsw = -1
-   iradlw = -1
+   iradsw = 1
+   iradlw = 1
 !
 ! Numerical scheme default values
 !
@@ -2097,8 +2119,11 @@ subroutine preset
    flux_critlat_deg = -999.
 #endif
    aqua_uniform = .false.
-   aqua_uniform_sst_degC = -999.
+   aqua_uniform_sst_degC = 0.
    aqua_AndKua = .false.
+   aqua_3KW1 = .false.
+
+   betafix = 0.
 #if ( defined COUP_CSM )
 !
 ! Communications with the flux coupler

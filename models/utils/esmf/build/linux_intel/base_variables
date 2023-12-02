@@ -14,8 +14,8 @@ SH_LD		   = pgcc
 #
 #C_CC		   = cc 
 #C_FC		   = ftn
-C_CC		   = mpicc  -openmp 
-C_FC		   = mpif90 -openmp 
+C_CC		   = mpicc  -qopenmp 
+C_FC		   = mpif90 -qopenmp 
 C_FC_MOD           = -I
 C_CLINKER_SLFLAG   = -Wl,-rpath,
 C_FLINKER_SLFLAG   = -Wl,-rpath,

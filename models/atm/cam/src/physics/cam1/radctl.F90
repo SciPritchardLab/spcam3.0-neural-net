@@ -1,5 +1,7 @@
 #include <misc.h>
 #include <params.h>
+! Skip over longwave computation, keep shortwave for SOLIN
+!#define CLOUDBRAIN
 
 subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
                   lwup    ,emis    ,          &
@@ -41,7 +43,10 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
    use physconst, only: cpair, epsilo
    use aer_optics, only: idxVIS
    use aerosol_intr, only: set_aerosol_from_prognostics
-
+#ifdef CLOUDBRAIN
+   use time_manager, only: get_nstep
+   use cloudbrain, only: nstepNN
+#endif
 
    implicit none
 
@@ -188,6 +193,10 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
    logical, parameter ::  dooutfld = .true.
 #else
    real(r8) qm2(pcols,pver) ! Specific humidity 
+#endif
+
+#ifdef CLOUDBRAIN
+   integer :: nstep  ! current timestep number
 #endif
 
 #ifdef CRM
@@ -392,6 +401,12 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
 !
 ! Longwave radiation computation
 !
+!SR: Don't need longwave for cloudbrain.
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+nstep = get_nstep()
+if (nstep .lt. nstepNN) then ! --- before NN turns on
+#endif
+
 #ifdef CRM
    if (do_lw) then
 #else
@@ -493,6 +508,10 @@ subroutine radctl(lchnk   ,ncol1   ,ncol    ,                   &
      end if
 !
    end if
+
+#ifdef CLOUDBRAIN
+end if ! ( nstep .lt. nstepNN )
+#endif
 !
 #ifdef CRM
    qm1(ncol1:ncol,:pver,1) = qm2(ncol1:ncol,:pver)

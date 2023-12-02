@@ -1381,6 +1381,9 @@ subroutine findsp (lchnk, ncol, q, t, p, tsp, qsp)
 !
 ! max number of times to iterate the calculation
    iter = 8
+#ifdef CBLIMITER
+   iter = 20
+#endif
 !
    do k = k1mb,pver
 

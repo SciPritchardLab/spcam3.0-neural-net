@@ -1,5 +1,7 @@
 #include <misc.h>
 #include <params.h>
+! CLOUDBRAIN doesn't actually do anyting here but import some things
+!#define CLOUDBRAIN
 #define XEONPHI ! Pritch at TACC / Stampede
 
 subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
@@ -38,7 +40,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 #endif
    use analyses, only: analyses_int
    use runtime_opts,  only: l_analyses
-   use runtime_opts, only: aqua_AndKua, aqua_uniform, aqua_uniform_sst_degC
+   use runtime_opts, only: aqua_AndKua, aqua_3KW1, aqua_uniform, aqua_uniform_sst_degC
 
 
    use check_energy, only: check_energy_gmean
@@ -78,8 +80,12 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
    use sfcwind_anncycle, only: read_sfcwindanncycle, allocate_sfcwindanncycle,ref_sfcwindanncycle_int, sfcwind_interference
    use phys_grid,       only: get_rlat_all_p
    use runtime_opts, only: fluxdampfac,fluxdamp_equatoronly, flux_dylat,flux_critlat_deg
-
 #endif
+
+#ifdef CLOUDBRAIN
+   use cloudbrain, only: dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
+#endif
+
 !-----------------------------------------------------------------------
    implicit none
 !-----------------------------------------------------------------------
@@ -269,6 +275,8 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
       uphystend(:ncol,:,c) = phys_state(c)%u(:ncol,:)
       vphystend(:ncol,:,c) = phys_state(c)%v(:ncol,:)
       qphystend(:ncol,:,:,c) = phys_state(c)%q(:ncol,:,:)
+      ! SR: Debug output T 1
+      call outfld ('DBGT1',phys_state(c)%t(:ncol,:),pcols,c)
    end do
 
    call tphysbc_internallythreaded (ztodt, pblht(:,begchunk:endchunk), tpert(:,begchunk:endchunk),             &
@@ -288,7 +296,12 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
                    ,flwds_crm,flns_crm,flut_crm   &
                    ,fsdsc_crm,fsntoac_crm,flnsc_crm, flutc_crm & 
 #endif
-)                      
+)
+do c=begchunk, endchunk
+      ncol = get_ncols_p(c)
+      ! SR: Debug output T 2
+      call outfld ('DBGT2',phys_state(c)%t(:ncol,:),pcols,c)
+end do                      
       call t_stopf ('tphysbc_internallythreaded')
       do c=begchunk,endchunk 
         if (dosw .or. dolw) then
@@ -470,7 +483,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
    if (ifluxcalc .eq. 1) then
 #endif
    call t_startf ('sstint')
-   call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_uniform_sst_degC)
+   call sstint (.false.,aqua_uniform, aqua_AndKua, aqua_3KW1, aqua_uniform_sst_degC)
    call t_stopf ('sstint')
 !
 ! iceint may change ocean fraction, so call it before camoce
@@ -636,6 +649,7 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
 !
 ! surface diagnostics for history files
 !
+      call outfld ('DBGT3',phys_state(c)%t(:ncol,:pver),pcols,c) ! SR: Debug T 3
       call diag_surf (c, ncol, srfflx_state2d(c)%shf, srfflx_state2d(c)%lhf, srfflx_state2d(c)%cflx, &
                       srfflx_state2d(c)%tref, trefmxav(1,c), trefmnav(1,c), srfflx_state2d(c)%qref, &
                       srfflx_state2d(c)%wsx, srfflx_state2d(c)%wsy, &
@@ -659,8 +673,21 @@ subroutine physpkg(phys_state, gw, ztodt, phys_tend, pbuf)
          call outfld(qphystendnam(m),qphystend(1,1,m,c),pcols   ,c   )
       enddo
       call t_stopf ('tphysac')
+
+     ! Sungduk added:
+     ! Save tendencies 
+#ifdef CLOUDBRAIN
+     dtdt_m1(c,:ncol,:) = tphystend(:ncol,:,c)
+     dqdt_m1(c,:ncol,:) = qphystend(:ncol,:,1,c)
+#endif
+
      ! MSP added:
      ! Note that state%t IS UPDATED via tend@dtdt at the end of tphysac.
+#ifdef CLOUDBRAIN
+  phys_state(c)%tap = phys_state(c)%t
+  phys_state(c)%qap = phys_state(c)%q(:,:,1)
+  phys_state(c)%vap = phys_state(c)%v   ! SR: Add v-wind
+#endif
      aux(:ncol,:pver) = phys_state(c)%t(:ncol,:pver)
      call outfld ('TAP',aux,pcols,c)
      aux(:ncol,:pver) = phys_state(c)%q(:ncol,:pver,1)

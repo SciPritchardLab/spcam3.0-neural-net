@@ -1,6 +1,8 @@
 #include <misc.h>
 #include <params.h>
-
+! CLOUDBRAIN only writes out some output here
+!#define CLOUDBRAIN
+#define SPFLUXBYPASS
 module vertical_diffusion
 
 !---------------------------------------------------------------------------------
@@ -187,6 +189,12 @@ contains
     use physics_types,  only: physics_state, physics_ptend
     use history,        only: outfld
 !!$    use geopotential, only: geopotential_dse
+
+#ifdef CLOUDBRAIN
+   use time_manager, only: get_nstep
+   use cloudbrain, only: nstepNN
+#endif
+
 !------------------------------Arguments--------------------------------
     real(r8), intent(in) :: taux(pcols)            ! x surface stress (N/m2)
     real(r8), intent(in) :: tauy(pcols)            ! y surface stress (N/m2)
@@ -198,7 +206,12 @@ contains
     real(r8), intent(in) :: landfrac(pcols)        ! Land fraction
     real(r8), intent(in) :: sgh(pcols)             ! standard deviation of orography
 
+#ifdef CLOUDBRAIN
+    integer :: nstep                               ! current timestep number
+    type(physics_state), intent(inout)  :: state   ! Physics state variables
+#else
     type(physics_state), intent(in)  :: state      ! Physics state variables
+#endif
     type(physics_ptend), intent(inout)  :: ptend   ! indivdual parameterization tendencies
 
     real(r8), intent(out) :: pblh(pcols)           ! planetary boundary layer height
@@ -285,6 +298,19 @@ contains
     call outfld ('DTVKE   ',dtk,pcols,lchnk)
     dtk(:ncol,:) = ptend%s(:ncol,:)/cpair            ! normalize heating for history using dtk
     call outfld ('DTV     ',dtk    ,pcols,lchnk)
+
+#ifdef CLOUDBRAIN
+#ifdef CLOUDBRAIN ! only executed when nncoupled==.false.
+nstep = get_nstep()
+if (nstep .lt. nstepNN) then ! --- before NN turns on
+#endif
+    state%dtv(:,:) = dtk(:,:)
+    state%vd01(:,:) = ptend%q(:,:,1)
+#ifdef CLOUDBRAIN
+end if ! ( nstep .lt. nstepNN )
+#endif
+#endif
+
     call outfld ('DUV     ',ptend%u,pcols,lchnk)
     call outfld ('DVV     ',ptend%v,pcols,lchnk)
     do m = 1, pcnst+pnats
@@ -385,6 +411,7 @@ contains
     integer :: i,k,m                               ! longitude,level,constituent indices
     integer :: ktopbl(pcols)                       ! index of first midpoint inside pbl
     integer :: ktopblmn                            ! min value of ktopbl
+
 
 !-----------------------------------------------------------------------
     zero(:) = 0.
@@ -487,11 +514,15 @@ contains
 !!$       print *, "dampx, dampy", lchnk,i, dampx, dampy
 !!$       u(i,pver) = u(i,pver) / (1. + ztodt*dampx)
 !!$       v(i,pver) = v(i,pver) / (1. + ztodt*dampx)
-       dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
+#ifndef SPFLUXBYPASS
+        dse(i,pver) = dse(i,pver) + tmp1(i) * shflx(i)
+#endif
     end do
     do m = 1, pcnst+pnats
        do i = 1, ncol
-          q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+#ifndef SPFLUXBYPASS
+        q(i,pver,m) = q(i,pver,m) + tmp1(i) * cflx(i,m)
+#endif
        end do
     end do
 

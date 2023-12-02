@@ -90,13 +90,13 @@ subroutine qneg3 (subnam  ,idx     ,ncol    ,ncold   ,lver    ,lconst  , &
          end if
       end do
       if (found .and. abs(worst)>1.e-16) then
-         write(6,9000)subnam,m,idx,nvals,qmin(m),worst,iw,kw
+!         write(6,9000)subnam,m,idx,nvals,qmin(m),worst,iw,kw
       end if
    end do
 !
    return
-9000 format(' QNEG3 from ',a,':m=',i3,' lat/lchnk=',i3, &
-            ' Min. mixing ratio violated at ',i4,' points.  Reset to ', &
-            1p,e8.1,' Worst =',e8.1,' at i,k=',i4,i3)
+!9000 format(' QNEG3 from ',a,':m=',i3,' lat/lchnk=',i3, &
+!            ' Min. mixing ratio violated at ',i4,' points.  Reset to ', &
+!            1p,e8.1,' Worst =',e8.1,' at i,k=',i4,i3)
 end subroutine qneg3
 

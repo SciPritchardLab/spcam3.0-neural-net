@@ -200,7 +200,7 @@ PRIVATE
    character(len=8)  :: logname             ! user name
    character(len=16) :: host                ! host name
    character(len=nlen) :: ctitle = ' '      ! Case title
-   character(len=8)  :: inithist = 'YEARLY' ! If set to '6-HOURLY, 'DAILY', 'MONTHLY' or
+   character(len=8)  :: inithist = 'DAILY' ! If set to '6-HOURLY, 'DAILY', 'MONTHLY' or
                                             ! 'YEARLY' then write IC file
    character(len=10) :: fincl(pflds,ptapes) ! List of fields to add to primary h-file
    character(len=max_chars) :: fincllonlat(pflds,ptapes) ! List of fields to add to primary h-file
@@ -2544,6 +2544,7 @@ CONTAINS
       call add_default ('PRECSH  ', 1, ' ')
       call add_default ('PRECSL  ', 1, ' ')
       call add_default ('PRECSC  ', 1, ' ')
+      call add_default ('PRECT  ', 1, ' ')
       call add_default ('SHFLX   ', 1, ' ')
       call add_default ('LHFLX   ', 1, ' ')
       call add_default ('QFLX    ', 1, ' ')
@@ -2807,6 +2808,8 @@ CONTAINS
      call add_default ('XXXU3AUX',1,' ')
      call add_default ('DQFCST',1,' ')
 #endif
+     call add_default ('TE   ',1,' ')
+     call add_default ('TW   ',1,' ')
 ! These fields removed 10/30/2003 per CRB decision.
 !      call add_default ('CLDST   ', 1, ' ')
 !      call add_default ('CNVCLD  ', 1, ' ')
@@ -6038,10 +6041,22 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       'Large-scale (stable) precipitation rate (less than '//trim(string)// &
       'mm/hr is set to zero -- to get intensity divide by PRECLFRQ)',phys_decomp)
       call addfld ('PRECT   ','m/s     ',1,    'A','Total (convective and large-scale) precipitation rate',phys_decomp)
+      call addfld ('BRAINRAIN','mm/day',1,'A','Neural net estimated rain rate (mm/day, I think',phys_decomp) 
+      call addfld ('BRAINOLR','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNSHF','W/m2',1,'A','SHF into NN',phys_decomp)
+      call addfld ('NNLHF','W/m2',1,'A','LHF into NN',phys_decomp)
+      call addfld ('NNSOLIN','W/m2',1,'A','SOLIN into NN',phys_decomp)
+      call addfld ('NNPS','W/m2',1,'A','SOLIN into NN',phys_decomp)
+      call addfld ('NNTS','W/m2',1,'A','SOLIN into NN',phys_decomp)
+
       call addfld ('EVAPPCT ','percent ',1,    'A','Percentage of Zhang-McFarlane precipitation going into evaporation',phys_decomp)
       call addfld ('PRECTMX ','m/s     ',1,    'X','Maximum (convective and large-scale) precipitation rate',phys_decomp)
       call addfld ('PRECSL  ','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
       call addfld ('PRECSC  ','m/s     ',1,    'A','Convective snow rate (water equivalent)',phys_decomp)
+#ifdef CRM
+      call addfld ('PRECTEND','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
+      call addfld ('PRECSTEND','m/s     ',1,    'A','Large-scale (stable) snow rate (water equivalent)',phys_decomp)
+#endif
       call addfld ('SHFLX   ','W/m2    ',1,    'A','Surface sensible heat flux',phys_decomp)
       call addfld ('LHFLX   ','W/m2    ',1,    'A','Surface latent heat flux',phys_decomp)
       call addfld ('QFLX    ','kg/m2/s ',1,    'A','Surface water flux',phys_decomp)
@@ -6131,6 +6146,11 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
      call addfld ('PV2PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of second component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
      call addfld ('PV3PHYSTND','K m2/kg/s2',plev, 'A','Physics tendency of third component in PV = -G*(vr*dthdp - (dthdx*dvdp-dthdy*dudp)',phys_decomp)
 
+! SY: cosine(zenith angle)
+      call addfld ('COSZRS',' ',1,    'I','Cosine of zenith angle', phys_decomp)
+!   : debug previous tendencies
+      call addfld ('DTDT_M1','K/s     ',plev, 'A','T physics tendency (timestep n-1)',phys_decomp)
+      call addfld ('DQDT_M1','kg/kg/s ',plev, 'A','Q physics tendency (timestep n-1)',phys_decomp)
 
 ! MSP: for redundantly tracking total tendency after physics package (so we know MSE budget residual magnitude exactly)
       call addfld ('PVAP','(K m2/kg)/s',plev,'I','PV after physics',phys_decomp)
@@ -6147,8 +6167,48 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('CMFDQ   ','kg/kg/s ',pver, 'A','Q tendency - Hack convection',phys_decomp)
       call addfld ('ZMDT    ','K/s     ',pver, 'A','T tendency - Zhang-McFarlane moist convection',phys_decomp)
       call addfld ('ZMDQ    ','kg/kg/s ',pver, 'A','Q tendency - Zhang-McFarlane moist convection',phys_decomp)
-      call addfld ('BRAINDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
-      call addfld ('BRAINDQ ','kg/kg/s ',pver, 'A','Q tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
+      call addfld ('NNTAP','K     ',pver, 'A','T into NN ',phys_decomp)
+      call addfld ('NNQAP','kg/kg ',pver,'A','Q into NN',phys_decomp)
+! SR: Implementing new variables to check NN input/output
+      call addfld ('NNTC','K     ',pver, 'A','TC into NN',phys_decomp)
+      call addfld ('NNQC','K     ',pver, 'A','TC into NN',phys_decomp)
+      call addfld ('NNVC','K     ',pver, 'A','TC into NN',phys_decomp)
+      call addfld ('NNTBP','K     ',pver, 'A','TC into NN',phys_decomp)
+      call addfld ('NNQBP','K     ',pver, 'A','TC into NN',phys_decomp)
+      call addfld ('NNVBP','K     ',pver, 'A','TC into NN',phys_decomp)
+
+! Sungduk: Debugging variables for CBLIMITER
+#ifdef CBLIMITER
+      call addfld ('dt_befor','K/s     ',pver, 'I','debug',phys_decomp)
+      call addfld ('dt_after','K/s     ',pver, 'I',  'debug',phys_decomp)
+      call addfld ('dq_befor','kg/kg/s ',pver, 'I',  'debug',phys_decomp)
+      call addfld ('dq_after','kg/kg/s ',pver, 'I',  'debug',phys_decomp)
+#endif
+
+! SR: Additional debug outputs to check T at several stages
+      call addfld ('TE ','_    ',1,    'A','Total energy after CBRAIN/SP',phys_decomp)
+      call addfld ('TW ','_    ',1,    'A','Total water after CBRAIN/SP',phys_decomp)
+
+      call addfld ('NNDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
+      call addfld ('NNDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)
+      call addfld ('NNFSNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFSNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFLNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('NNPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+
+      call addfld ('PPDT ','K/s     ',pver, 'A','T tendency - Gentine-Pritchard neural net for moist convection',phys_decomp)
+      call addfld ('PPDQ ','kg/kg/s ',pver, 'A','Q tendency - neural net for moist convection',phys_decomp)
+      call addfld ('PPFSNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFSNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFLNT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPFLNS','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp) 
+      call addfld ('PPPRECT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
+      call addfld ('ERRT','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
+      call addfld ('ERRQ','W/m2',1,'A','Neural net estimated OLR (W/m2, I think',phys_decomp)
+
+      call addfld ('dTdtadia','K/s',pver,'A','Internally estimated adiabatic T tendency entering net',phys_decomp)
+      call addfld ('dQdtadia','kg/kg/s',pver,'A','Internally estimated adiabatic Q tendency entering net',phys_decomp)
       call addfld ('CMFDQR  ','kg/kg/s ',pver, 'A','Q tendency - shallow convection rainout',phys_decomp)
       call addfld ('QC      ','kg/kg/s ',pver, 'A','Q tendency - shallow convection LW export',phys_decomp)
       call addfld ('CMFMC   ','kg/m2/s ',pverp,'A','Moist convection mass flux',phys_decomp)

@@ -148,7 +148,7 @@ use iso_fortran_env, only: real64
     ierror = nn_args%setitem(0, nn_in_p)
     ierror = call_py(nn_return, nn_interface, "predict", nn_args)
     ierror = cast(nn_out_p, nn_return)
-    ierror = nn_out_p%get_data(output_forpy)
+    ierror = nn_out_p%get_data(output_forpy) ! [TODO] maybe need to add order='C' when batch inferencing is implemented.
     if (ierror/=0) then; call err_print; endif
     output(:) = real(output_forpy(1,:), r8)
 #ifdef BRAINDEBUG

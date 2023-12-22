@@ -17,8 +17,11 @@ module gw_drag
   use physics_types,  only: physics_state, physics_ptend
   use pmgrid, only:         masterproc
   use history, only:        outfld
+#ifdef CLOUDBRAIN
+  use cloudbrain, only:     nncoupled
+#endif
 
-  implicit none
+implicit none
 
   save
   private                         ! Make default type private to the module
@@ -314,6 +317,14 @@ contains
     ptend%ls    = .TRUE.
     ptend%lu    = .TRUE.
     ptend%lv    = .TRUE.
+
+#ifdef CLOUDBRAIN
+! if NN param is used, only allow gw momentum tenencies,
+! because NN tendencies already include all physics's T and Q tendenceis.
+    if ( nncoupled ) then
+       ptend%ls    = .FALSE.
+    end if  
+#endif
 
 ! Write output fields to history file
     call outfld ('UTGWORO', utgw,  pcols, lchnk)

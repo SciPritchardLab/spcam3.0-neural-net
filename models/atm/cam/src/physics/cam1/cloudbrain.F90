@@ -73,10 +73,13 @@ use mod_ensemble, only: ensemble_type
       tphystnd
   end type nn_out_t
 
+  logical :: nncoupled = .false.
+
   public neural_net, init_keras_matrices, init_keras_norm, nstepNN, &
          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
          init_nn_vectors, &
-         dtdt_m1, dqdt_m1 ! buffer variables for previous timestep tendencies
+         dtdt_m1, dqdt_m1, & ! buffer variables for previous timestep tendencies
+         nncoupled
 
   contains
 

@@ -102,7 +102,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    use cloudbrain, only: init_keras_norm, init_keras_matrices, neural_net, nstepNN, &
                          nn_in_t, nn_out_t, nn_in_out_vars, inputlength, outputlength, &
                          init_nn_vectors, &
-                         dtdt_m1, dqdt_m1 ! buffer variables for previous tendencies
+                         dtdt_m1, dqdt_m1, & ! buffer variables for previous tendencies
+                         nncoupled
    use string_utils, only: to_upper
 #ifdef CBLIMITER
    use cloudbrain_output_limiter, only: init_cb_limiter, cb_limiter
@@ -552,7 +553,6 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    type(physics_tend ) :: tend_save_nn(begchunk:endchunk)
    type(nn_in_t)  :: nn_in
    type(nn_out_t) :: nn_out
-   logical :: nncoupled
    real(r8) :: o3vmr(begchunk:endchunk,pcols,pver)
    real(r8) :: humidity(pver)
    integer :: do_nn_o3
@@ -1143,11 +1143,10 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
 #ifdef CLOUDBRAIN
 ! ------- is it a NN-coupling time step? ----
-nncoupled = .false.
-if (nstep .ge. nstepNN) then ! --- only if we are spun up...
+if (nstep .eq. nstepNN) then ! --- only if we are spun up...
   nncoupled = .true.
 
-  if (nstep .eq. nstepNN .and. masterproc) then
+  if (masterproc) then
      write (6,*) 'CLOUDBRAIN: NN-coupling is turned on at nstep = ',nstep
   end if
 endif

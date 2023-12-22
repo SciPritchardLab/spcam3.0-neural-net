@@ -548,6 +548,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    real (r8) :: tmp1
 #endif
 #ifdef CLOUDBRAIN
+   type(physics_state) :: state_save_nn(begchunk:endchunk)
+   type(physics_tend ) :: tend_save_nn(begchunk:endchunk)
    type(nn_in_t)  :: nn_in
    type(nn_out_t) :: nn_out
    logical :: nncoupled
@@ -603,6 +605,16 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
    end do
 #endif
+
+#if defined (CLOUDBRAIN)
+   do c=begchunk,endchunk
+! Sungduk Yu / Fri Dec 22 14:56:45 EST 2023
+! save state and tend for NN subroutine input
+    state_save_nn(c) = state(c)
+    tend_save_nn(c) = tend(c)
+   end do
+#endif
+
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -746,12 +758,14 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
    call t_stopf ('dadadj')
    call physics_update (state(c), tend(c), ptend(c), ztodt)
 
-#if defined (CRM) || defined (CLOUDBRAIN)
+#if defined (CRM)
 
 ! Save the state and tend variables to overwrite conventional physics effects
 ! leter before calling the superparameterization. Conventional moist
 ! physics is allowed to compute tendencies due to conventional
 ! moist physics for diagnostics purposes. -Marat
+
+! SY: this is for SP calls (not NN calls)
 
     state_save(c) = state(c)
     tend_save(c) = tend(c)
@@ -1943,8 +1957,8 @@ end if ! nncoupled
   if ( nncoupled ) then  ! only turn on NN + diag SP after SP has spun up.
     ! As in SP retrieve state at the start of routine
     do c=begchunk,endchunk
-      state(c) = state_save(c)
-      tend(c) = tend_save(c)
+      state(c) = state_save_nn(c)
+      tend(c) = tend_save_nn(c)
       lchnk = state(c)%lchnk
       ncol  = state(c)%ncol
       ! SR: TE, TW and S before BRAIN or SP

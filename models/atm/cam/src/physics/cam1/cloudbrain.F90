@@ -120,6 +120,18 @@ use mod_ensemble, only: ensemble_type
         input((2*nlev+5):(2*nlev+5+nlev-1)) = nn_in%vbp(:nlev)
         input((2*nlev+5+nlev):2*nlev+5+2*nlev-1) = nn_in%o3vmr(:nlev)
         input(2*nlev+5+2*nlev) = nn_in%coszrs
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+        input(1:nlev)            = nn_in%tbp(:nlev)
+        input((1*nlev+1):2*nlev) = nn_in%qbp(:nlev)
+        input((2*nlev+1):3*nlev) = nn_in%dtdtm1(:nlev)
+        input((3*nlev+1):4*nlev) = nn_in%dqdtm1(:nlev)
+        input(4*nlev+1) = nn_in%ps
+        input(4*nlev+2) = nn_in%solin
+        input(4*nlev+3) = nn_in%shf
+        input(4*nlev+4) = nn_in%lhf
+        input((4*nlev+5):(5*nlev+4)) = nn_in%vbp(:nlev)
+        input((5*nlev+5):(6*nlev+4)) = nn_in%o3vmr(:nlev)
+        input(6*nlev+5) = nn_in%coszrs
     end select
 
 #ifdef BRAINDEBUG
@@ -173,6 +185,9 @@ use mod_ensemble, only: ensemble_type
         nn_out%tphystnd(:nlev) = output(1:nlev)
         nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+        nn_out%tphystnd(:nlev) = output(1:nlev)
+        nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         nn_out%tphystnd(:nlev) = output(1:nlev)
         nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
     end select

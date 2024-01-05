@@ -27,11 +27,15 @@ use mod_ensemble, only: ensemble_type
   ! these are CAM namelist variables, but they are initalized with the following values
   ! for a backward compatibility (Jerry's original NN for spreadtesting). That is,
   ! these values are used when these variables are not specified in atm_in.
+  ! Jerry's original NN for spread testing: 
+  !     nn_in_out = 'in_TBP_QBP_PS_SOLIN_SHF_LHF_out_TPHYSTND_PHQ'
+  !     inputlength = 64
+  !     outputlength = 60 
   integer :: nstepNN = 48  ! a model time step at which NN turns on
-  character(len=256) :: nn_in_out_vars = 'in_TBP_QBP_PS_SOLIN_SHF_LHF_out_TPHYSTND_PHQ'
+  character(len=256) :: nn_in_out_vars = 'user input via atm_in'
                         ! A userdefined name for a specific input/output combination
-  integer :: inputlength = 64  ! length of input vector for NN
-  integer :: outputlength = 60 ! length of output vector for NN
+  integer :: inputlength  = -999 ! length of input vector for NN
+  integer :: outputlength = -999 ! length of output vector for NN
   !!!!
 
 #ifdef ENSEMBLE

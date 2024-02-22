@@ -571,38 +571,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
-#if defined (CRM) || defined (CLOUDBRAIN)
-! || means OR I guess
-! At this point the BP and adiabatic variables can be computed and stored for later
-! BP is defined as T at the beginning of time step before any physics update
-! PS also needs to be stored here?
-! Current version: PNAS with
-! Inputs: [QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! Outputs: [PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT]
-   do c=begchunk,endchunk
-     lchnk = state(c)%lchnk
-     ncol  = state(c)%ncol 
-     do i=1,ncol
-       do k=1,pver
-          TBP(c,i,k) = state(c)%t(i,k)
-          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
-          VBP(c,i,k) = state(c)%v(i,k)
-         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
-         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
-       end do 
-       PS(c, i) = state(c)%ps(i)
-     end do
-   end do
-   ! Now write the variables to tape for debugging
-   do c=begchunk,endchunk
-      ncol  = state(c)%ncol
-      lchnk = state(c)%lchnk
-      call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
-   end do
-#endif
+
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -755,6 +724,31 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
     state_save(c) = state(c)
     tend_save(c) = tend(c)
+
+   do c=begchunk,endchunk
+     lchnk = state(c)%lchnk
+     ncol  = state(c)%ncol 
+     do i=1,ncol
+       do k=1,pver
+          TBP(c,i,k) = state(c)%t(i,k)
+          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+          VBP(c,i,k) = state(c)%v(i,k)
+         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+       end do 
+       PS(c, i) = state(c)%ps(i)
+     end do
+   end do
+   ! Now write the variables to tape for debugging
+   do c=begchunk,endchunk
+      ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
+      call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
+   end do
+
 #endif
 
 !

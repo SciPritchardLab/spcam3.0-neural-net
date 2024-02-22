@@ -1689,6 +1689,7 @@ end do
 !  subtract radiative heating tendency from the CRM tendency:
 !  it will be added later:
 
+! This is where the tendency due to SP (convection + radiation) minus the radiation part (i.e. convective tendency alone) is calculated...( MSP)
      ptend(c)%s(:ncol,pver-crm_nz+1:pver) = ptend(c)%s(:ncol,pver-crm_nz+1:pver) -  &
         (qrs(:ncol,pver-crm_nz+1:pver,c) + qrl(:ncol,pver-crm_nz+1:pver,c))
 
@@ -1835,6 +1836,7 @@ end do
 ! Compute energy and water integrals of input state
 
      call check_energy_timestep_init(state(c), tend(c), pbuf)
+! This is where the tendency due to SP (convection + radiation) minus the radiation part (i.e. convective tendency alone) is *applied*...( MSP)
      call physics_update (state(c), tend(c), ptend(c), ztodt)
 !    check energy integrals
      wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) + prectend(:ncol,c)*1.e-3 ! include precip storage term
@@ -2188,7 +2190,8 @@ end if ! nncoupled
 ! Compute net radiative heating
 !
 ! SR Is this necessary?
-   call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
+! Populates tendency due to net radiation .....  (MSP) 
+call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
 
      call outfld('TEPRE_R',state(c)%te_cur(:ncol),pcols,lchnk)
      call outfld('TWPRE_R',state(c)%tw_cur(:ncol),pcols,lchnk)
@@ -2202,7 +2205,10 @@ end if ! nncoupled
     ptend(c)%s = 0.
   end if
 #endif
+! Applies tendency due to net radiation .....  (MSP) - only if not using NN due to shunt immediately above.
    call physics_update(state(c), tend(c), ptend(c), ztodt)
+
+! ----- END OF EMULATION REGION (SP ONLY) IS HERE ---- (MSP)
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)

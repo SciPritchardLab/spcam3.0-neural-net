@@ -6173,10 +6173,14 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNTC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNQC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVC','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNTBP','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNQBP','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNVBP','K     ',pver, 'A','TC into NN',phys_decomp)
-
+      call addfld ('NNTBSP','K     ',pver, 'A','T for NN before SP',phys_decomp)
+      call addfld ('NNQBSP','kg/kg  ',pver, 'A','Q for NN before SP',phys_decomp)
+      call addfld ('NNVBSP','m/s    ',pver, 'A','V ror NN before SP',phys_decomp)
+      call addfld ('NNPSBSP','Pa    ',pver, 'A','PS for NN before SP',phys_decomp)
+      call addfld ('NNTASP','K    ',pver, 'A','T for NN after SP',phys_decomp)
+      call addfld ('NNQASP','kg/kg     ',pver, 'A','Q for NN after SP',phys_decomp)
+      call addfld ('NNVASP','m/s    ',pver, 'A','V for NN after SP',phys_decomp)
+    
 ! Sungduk: Debugging variables for CBLIMITER
 #ifdef CBLIMITER
       call addfld ('dt_befor','K/s     ',pver, 'I','debug',phys_decomp)

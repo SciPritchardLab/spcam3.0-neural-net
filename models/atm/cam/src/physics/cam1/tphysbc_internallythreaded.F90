@@ -2252,6 +2252,10 @@ call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
 !
 ! Save atmospheric fields to force surface models
 !
+! MSP: We think this is where the state structures felt by the simple aquaplanet flux calculation inside
+! src/dom/camocn --> ??fx?  originate. But we need to verify the call stack is what we assume. 
+! Open question -- do the exner function get updated or need to be after that? Assuming not under assumption that pressure fields are invariant over physics.
+
    call srfxfer (lchnk, ncol, state(c)%ps, state(c)%u(1,pver), state(c)%v(1,pver),    &
                  state(c)%t(1,pver), state(c)%q(1,pver,1), state(c)%exner(1,pver), state(c)%zm(1,pver), &
                     state(c)%pmid,      &

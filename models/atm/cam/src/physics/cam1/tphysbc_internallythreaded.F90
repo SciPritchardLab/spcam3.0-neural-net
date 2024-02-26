@@ -748,8 +748,8 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       call outfld('NNVBSP',VBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNPSBSP',PS(c,:ncol),pcols,lchnk)
       ! avoid having to worry about time shifting on history file output using the standard SHF, LHF variables:
-      call outfld('SHFLXBSP',shf(:,c),pcols,lchnk)
-      call outfld('LHFLXBSP',lhf(:,c),pcols,lchnk)
+      call outfld('SHFB',shf(:,c),pcols,lchnk)
+      call outfld('LHFB',lhf(:,c),pcols,lchnk)
 
 
 #endif

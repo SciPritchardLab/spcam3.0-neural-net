@@ -725,7 +725,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     state_save(c) = state(c)
     tend_save(c) = tend(c)
 
-   do c=begchunk,endchunk
+
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
      do i=1,ncol
@@ -738,9 +738,9 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
        end do 
        PS(c, i) = state(c)%ps(i)
      end do
-   end do
+
    ! Now write the variables to tape for debugging
-   do c=begchunk,endchunk
+
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
       call outfld('NNTBSP',TBP(c,:ncol,:),pcols,lchnk)
@@ -750,7 +750,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
       ! avoid having to worry about time shifting on history file output using the standard SHF, LHF variables:
       call outfld('NNSHFLXBSP',shf(:,c),pcols,lchnk)
       call outfld('NNLHFLXBSP',lhf(:,c),pcols,lchnk)
-end do
+
 
 #endif
 
@@ -2212,7 +2212,7 @@ call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
    call physics_update(state(c), tend(c), ptend(c), ztodt)
 
 ! ----- END OF EMULATION REGION (SP ONLY) IS HERE ---- (MSP)
-   do c=begchunk,endchunk
+
      lchnk = state(c)%lchnk
      ncol  = state(c)%ncol 
      do i=1,ncol
@@ -2224,15 +2224,15 @@ call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
          !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
        end do 
      end do
-   end do
+
    ! Now write the variables to tape for debugging
-   do c=begchunk,endchunk
+
       ncol  = state(c)%ncol
       lchnk = state(c)%lchnk
       call outfld('NNTASP',TBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNQASP',QBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNVASP',VBP(c,:ncol,:),pcols,lchnk)
-   end do
+
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)

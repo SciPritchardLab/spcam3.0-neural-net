@@ -6060,8 +6060,8 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('SHFLX   ','W/m2    ',1,    'A','Surface sensible heat flux',phys_decomp)
       call addfld ('LHFLX   ','W/m2    ',1,    'A','Surface latent heat flux',phys_decomp)
 #ifdef CLOUDBRAIN
-      call addfld ('SHFB','W/m2    ',1,    'A','Surface sensible heat flux for NN (no time shift)',phys_decomp)
-      call addfld ('LHFB','W/m2    ',1,    'A','Surface latent heat flux for NN (no time shift)',phys_decomp)
+      call addfld ('SHFLXBSP','W/m2    ',1,    'A','Surface sensible heat flux for NN (no time shift)',phys_decomp)
+      call addfld ('LHFLXBSP','W/m2    ',1,    'A','Surface latent heat flux for NN (no time shift)',phys_decomp)
 #endif
       call addfld ('QFLX    ','kg/m2/s ',1,    'A','Surface water flux',phys_decomp)
       call addfld ('PBLH    ','m       ',1,    'A','PBL height',phys_decomp)

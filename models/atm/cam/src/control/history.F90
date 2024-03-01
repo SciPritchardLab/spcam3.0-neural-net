@@ -6059,6 +6059,8 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
 #endif
       call addfld ('SHFLX   ','W/m2    ',1,    'A','Surface sensible heat flux',phys_decomp)
       call addfld ('LHFLX   ','W/m2    ',1,    'A','Surface latent heat flux',phys_decomp)
+      call addfld ('NNSHFBSP','W/m2    ',1,    'A','Surface sensible heat flux for NN (no time shift)',phys_decomp)
+      call addfld ('NNLHFBSP','W/m2    ',1,    'A','Surface latent heat flux for NN (no time shift)',phys_decomp)
       call addfld ('QFLX    ','kg/m2/s ',1,    'A','Surface water flux',phys_decomp)
       call addfld ('PBLH    ','m       ',1,    'A','PBL height',phys_decomp)
       call addfld ('USTAR   ','m/s     ',1,    'A','Surface friction velocity',phys_decomp)
@@ -6173,10 +6175,14 @@ subroutine write_collapse_crmvar3d (id,crmvarid,crmvar,crmsavechunks)
       call addfld ('NNTC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNQC','K     ',pver, 'A','TC into NN',phys_decomp)
       call addfld ('NNVC','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNTBP','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNQBP','K     ',pver, 'A','TC into NN',phys_decomp)
-      call addfld ('NNVBP','K     ',pver, 'A','TC into NN',phys_decomp)
-
+      call addfld ('NNTBSP','K     ',pver, 'A','T for NN before SP',phys_decomp)
+      call addfld ('NNQBSP','kg/kg  ',pver, 'A','Q for NN before SP',phys_decomp)
+      call addfld ('NNVBSP','m/s    ',pver, 'A','V ror NN before SP',phys_decomp)
+      call addfld ('NNPSBSP','Pa    ',1, 'A','PS for NN before SP',phys_decomp)
+      call addfld ('NNTASP','K    ',pver, 'A','T for NN after SP',phys_decomp)
+      call addfld ('NNQASP','kg/kg     ',pver, 'A','Q for NN after SP',phys_decomp)
+      call addfld ('NNVASP','m/s    ',pver, 'A','V for NN after SP',phys_decomp)
+    
 ! Sungduk: Debugging variables for CBLIMITER
 #ifdef CBLIMITER
       call addfld ('dt_befor','K/s     ',pver, 'I','debug',phys_decomp)

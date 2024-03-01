@@ -571,38 +571,7 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
     ! real(r8), intent(in) :: dQdt_adiabatic(pver) ! QBP[t]/dt - QC/dt
     ! real(r8), intent(in) :: PS ! From t-1
     ! real(r8), intent(in) :: SOLIN ! From t
-#if defined (CRM) || defined (CLOUDBRAIN)
-! || means OR I guess
-! At this point the BP and adiabatic variables can be computed and stored for later
-! BP is defined as T at the beginning of time step before any physics update
-! PS also needs to be stored here?
-! Current version: PNAS with
-! Inputs: [QBP, TBP, VBP, PS, SOLIN, SHFLX, LHFLX]
-! Outputs: [PHQ, TPHYSTND, FSNT, FSNS, FLNT, FLNS, PRECT]
-   do c=begchunk,endchunk
-     lchnk = state(c)%lchnk
-     ncol  = state(c)%ncol 
-     do i=1,ncol
-       do k=1,pver
-          TBP(c,i,k) = state(c)%t(i,k)
-          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
-          VBP(c,i,k) = state(c)%v(i,k)
-         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
-         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
-       end do 
-       PS(c, i) = state(c)%ps(i)
-     end do
-   end do
-   ! Now write the variables to tape for debugging
-   do c=begchunk,endchunk
-      ncol  = state(c)%ncol
-      lchnk = state(c)%lchnk
-      call outfld('NNTBP',TBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNQBP',QBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNVBP',VBP(c,:ncol,:),pcols,lchnk)
-      call outfld('NNPS',PS(c,:ncol),pcols,lchnk)
-   end do
-#endif
+
    do c=begchunk,endchunk ! Initialize previously acknowledged tphysbc (chunk-level) variable names:
    
      ! MAP ALL-->THIS CHUNK (input args)
@@ -755,6 +724,34 @@ subroutine tphysbc_internallythreaded (ztodt,   pblht,   tpert,   in_srfflx_stat
 
     state_save(c) = state(c)
     tend_save(c) = tend(c)
+
+
+     lchnk = state(c)%lchnk
+     ncol  = state(c)%ncol 
+     do i=1,ncol
+       do k=1,pver
+          TBP(c,i,k) = state(c)%t(i,k)
+          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+          VBP(c,i,k) = state(c)%v(i,k)
+         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+       end do 
+       PS(c, i) = state(c)%ps(i)
+     end do
+
+   ! Now write the variables to tape for debugging
+
+      ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
+      call outfld('NNTBSP',TBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQBSP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVBSP',VBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNPSBSP',PS(c,:ncol),pcols,lchnk)
+      ! avoid having to worry about time shifting on history file output using the standard SHF, LHF variables:
+      call outfld('NNSHFBSP',shf(:ncol,c),pcols,lchnk)
+      call outfld('NNLHFBSP',lhf(:ncol,c),pcols,lchnk)
+
+
 #endif
 
 !
@@ -1695,6 +1692,7 @@ end do
 !  subtract radiative heating tendency from the CRM tendency:
 !  it will be added later:
 
+! This is where the tendency due to SP (convection + radiation) minus the radiation part (i.e. convective tendency alone) is calculated...( MSP)
      ptend(c)%s(:ncol,pver-crm_nz+1:pver) = ptend(c)%s(:ncol,pver-crm_nz+1:pver) -  &
         (qrs(:ncol,pver-crm_nz+1:pver,c) + qrl(:ncol,pver-crm_nz+1:pver,c))
 
@@ -1841,6 +1839,7 @@ end do
 ! Compute energy and water integrals of input state
 
      call check_energy_timestep_init(state(c), tend(c), pbuf)
+! This is where the tendency due to SP (convection + radiation) minus the radiation part (i.e. convective tendency alone) is *applied*...( MSP)
      call physics_update (state(c), tend(c), ptend(c), ztodt)
 !    check energy integrals
      wtricesink(:ncol,c) = precc(:ncol,c) + precl(:ncol,c) + prectend(:ncol,c)*1.e-3 ! include precip storage term
@@ -2194,7 +2193,8 @@ end if ! nncoupled
 ! Compute net radiative heating
 !
 ! SR Is this necessary?
-   call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
+! Populates tendency due to net radiation .....  (MSP) 
+call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
 
      call outfld('TEPRE_R',state(c)%te_cur(:ncol),pcols,lchnk)
      call outfld('TWPRE_R',state(c)%tw_cur(:ncol),pcols,lchnk)
@@ -2208,7 +2208,31 @@ end if ! nncoupled
     ptend(c)%s = 0.
   end if
 #endif
+! Applies tendency due to net radiation .....  (MSP) - only if not using NN due to shunt immediately above.
    call physics_update(state(c), tend(c), ptend(c), ztodt)
+
+! ----- END OF EMULATION REGION (SP ONLY) IS HERE ---- (MSP)
+
+     lchnk = state(c)%lchnk
+     ncol  = state(c)%ncol 
+     do i=1,ncol
+       do k=1,pver
+          TBP(c,i,k) = state(c)%t(i,k)
+          QBP(c,i,k) = state(c)%q(i,k,1)   ! index 1 is vapor
+          VBP(c,i,k) = state(c)%v(i,k)
+         !  dTdt_adiab(c,i,k) = (TBP(c,i,k) - TC(c,i,k))/ztodt
+         !  dQdt_adiab(c,i,k) = (QBP(c,i,k) - QC(c,i,k))/ztodt
+       end do 
+     end do
+
+   ! Now write the variables to tape for debugging
+
+      ncol  = state(c)%ncol
+      lchnk = state(c)%lchnk
+      call outfld('NNTASP',TBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNQASP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNVASP',VBP(c,:ncol,:),pcols,lchnk)
+
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)
@@ -2228,6 +2252,10 @@ end if ! nncoupled
 !
 ! Save atmospheric fields to force surface models
 !
+! MSP: We think this is where the state structures felt by the simple aquaplanet flux calculation inside
+! src/dom/camocn --> ??fx?  originate. But we need to verify the call stack is what we assume. 
+! Open question -- do the exner function get updated or need to be after that? Assuming not under assumption that pressure fields are invariant over physics.
+
    call srfxfer (lchnk, ncol, state(c)%ps, state(c)%u(1,pver), state(c)%v(1,pver),    &
                  state(c)%t(1,pver), state(c)%q(1,pver,1), state(c)%exner(1,pver), state(c)%zm(1,pver), &
                     state(c)%pmid,      &

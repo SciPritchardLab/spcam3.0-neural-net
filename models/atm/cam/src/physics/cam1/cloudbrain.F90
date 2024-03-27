@@ -117,6 +117,21 @@ use mod_ensemble, only: ensemble_type
         input((2*nlev+5):(2*nlev+5+nlev-1)) = nn_in%vbp(:nlev)
         input((2*nlev+5+nlev):2*nlev+5+2*nlev-1) = nn_in%o3vmr(:nlev)
         input(2*nlev+5+2*nlev) = nn_in%coszrs
+      case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        input(1:nlev) = nn_in%tbp(:nlev)
+        input(nlev+1) = 0
+        input(nlev+2) = 0
+        input(nlev+3) = 0
+        input(nlev+4) = 0
+        input(nlev+5) = 0
+        input((nlev+6):2*nlev-5) = nn_in%qbp(:nlev)
+        input(2*nlev+1) = nn_in%ps
+        input(2*nlev+2) = nn_in%solin
+        input(2*nlev+3) = nn_in%shf
+        input(2*nlev+4) = nn_in%lhf
+        input((2*nlev+5):(2*nlev+5+nlev-1)) = nn_in%vbp(:nlev)
+        input((2*nlev+5+nlev):2*nlev+5+2*nlev-1) = nn_in%o3vmr(:nlev)
+        input(2*nlev+5+2*nlev) = nn_in%coszrs
     end select
 
 #ifdef BRAINDEBUG
@@ -172,6 +187,19 @@ use mod_ensemble, only: ensemble_type
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         nn_out%tphystnd(:nlev) = output(1:nlev)
         nn_out%phq(:nlev) = output((nlev+1):2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        nn_out%tphystnd(1) = 0
+        nn_out%tphystnd(2) = 0
+        nn_out%tphystnd(3) = 0
+        nn_out%tphystnd(4) = 0
+        nn_out%tphystnd(5) = 0
+        nn_out%tphystnd(:nlev) = output(6:nlev)
+        nn_out%phq(1) = 0
+        nn_out%phq(2) = 0
+        nn_out%phq(3) = 0
+        nn_out%phq(4) = 0
+        nn_out%phq(5) = 0
+        nn_out%phq(:nlev) = output((nlev+1):5+2*nlev) ! This is still the wrong unit, needs to be converted to W/m^2     
     end select
 
   end subroutine neural_net

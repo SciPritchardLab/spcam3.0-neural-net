@@ -209,7 +209,7 @@ use mod_ensemble, only: ensemble_type
         nn_out%phq(3) = 0
         nn_out%phq(4) = 0
         nn_out%phq(5) = 0
-        nn_out%phq(nlev+1+5:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2     
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2     
     end select
 
   end subroutine neural_net

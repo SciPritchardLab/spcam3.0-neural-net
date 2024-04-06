@@ -136,14 +136,16 @@ use mod_ensemble, only: ensemble_type
         input(nlev+3) = 0
         input(nlev+4) = 0
         input(nlev+5) = 0
-        input((nlev+6):2*nlev-5) = nn_in%qbp(:nlev)
-        input(2*nlev+1-5) = nn_in%ps
-        input(2*nlev+2-5) = nn_in%solin
-        input(2*nlev+3-5) = nn_in%shf
-        input(2*nlev+4-5) = nn_in%lhf
-        input((2*nlev+5-5):(2*nlev+5-5+nlev-1)) = nn_in%vbp(:nlev)
-        input((2*nlev+5-5+nlev):2*nlev+5-5+2*nlev-1) = nn_in%o3vmr(:nlev)
-        input(2*nlev+5-5+2*nlev) = nn_in%coszrs
+        input((nlev+6):2*nlev-5) = nn_in%qbp(6:nlev)
+        input((2*nlev-5+1):2*nlev-5+30) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):2*nlev+50) = nn_in%dqdtm1(6:nlev)
+        input(2*nlev+51) = nn_in%ps
+        input(2*nlev+52) = nn_in%solin
+        input(2*nlev+53) = nn_in%shf
+        input(2*nlev+54) = nn_in%lhf
+        input((2*nlev+55):(2*nlev+84)) = nn_in%vbp(:nlev)
+        input((2*nlev+85):2*nlev+114) = nn_in%o3vmr(:nlev)
+        input(2*nlev+115) = nn_in%coszrs
     end select
 
 #ifdef BRAINDEBUG

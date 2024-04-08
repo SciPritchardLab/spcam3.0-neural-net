@@ -131,31 +131,21 @@ use mod_ensemble, only: ensemble_type
         input(4*nlev+5+2*nlev) = nn_in%coszrs
       case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
         input(1:nlev) = nn_in%tbp(:nlev)
-        input(nlev+1) = 0
-        input(nlev+2) = 0
-        input(nlev+3) = 0
-        input(nlev+4) = 0
-        input(nlev+5) = 0
-        input((nlev+6):2*nlev) = nn_in%qbp(6:nlev)
-        input((2*nlev+1):2*nlev+30) = nn_in%dtdtm1(:nlev)
-        input(2*nlev+31) = 0
-        input(2*nlev+32) = 0
-        input(2*nlev+33) = 0
-        input(2*nlev+34) = 0
-        input(2*nlev+35) = 0
-        input((2*nlev+36):2*nlev+60) = nn_in%dqdtm1(6:nlev)
-        input(2*nlev+61) = nn_in%ps
-        input(2*nlev+62) = nn_in%solin
-        input(2*nlev+63) = nn_in%shf
-        input(2*nlev+64) = nn_in%lhf
-        input((2*nlev+65):(2*nlev+94)) = nn_in%vbp(:nlev)
-        input((2*nlev+95):2*nlev+114) = nn_in%o3vmr(:nlev)
+        input((nlev+1):2*nlev-5) = nn_in%qbp(6:nlev)
+        input((2*nlev-4):2*nlev+25) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):2*nlev+50) = nn_in%dqdtm1(6:nlev)
+        input(2*nlev+51) = nn_in%ps
+        input(2*nlev+52) = nn_in%solin
+        input(2*nlev+53) = nn_in%shf
+        input(2*nlev+54) = nn_in%lhf
+        input((2*nlev+55):(2*nlev+84)) = nn_in%vbp(:nlev)
+        input((2*nlev+85):2*nlev+114) = nn_in%o3vmr(:nlev)
         input(2*nlev+115) = nn_in%coszrs
     end select
 
 #ifdef BRAINDEBUG
       if (masterproc .and. icol .eq. 1) then
-        write (6,*) 'BRAINDEBUG input pre norm=',input
+        write (6,*) 'BRAINDEBUG input pre norm (cloudbrain)=',input
       endif
 #endif
 

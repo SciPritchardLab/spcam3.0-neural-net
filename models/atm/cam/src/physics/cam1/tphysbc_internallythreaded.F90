@@ -2019,6 +2019,30 @@ end if ! nncoupled
             nn_in%vbp(:pver) = VBP(c,i,:pver)
             nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
             nn_in%coszrs = coszrs(i,c)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%dtdtm1(:pver) = dtdt_m1(c,i,:pver) ! previous tendencies are saved in physpkg.F90
+            nn_in%dqdtm1(:pver) = dqdt_m1(c,i,:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+            nn_in%vbp(:pver) = VBP(c,i,:pver)
+            nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
+            nn_in%coszrs = coszrs(i,c)
+         case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+            nn_in%tbp(:pver) = TBP(c,i,:pver)
+            nn_in%qbp(:pver) = humidity(:pver)
+            nn_in%dtdtm1(:pver) = dtdt_m1(c,i,:pver) ! previous tendencies are saved in physpkg.F90
+            nn_in%dqdtm1(:pver) = dqdt_m1(c,i,:pver)
+            nn_in%ps = PS(c,i)
+            nn_in%solin = solin(i,c)
+            nn_in%shf = shf(i,c)
+            nn_in%lhf = lhf(i,c)
+            nn_in%vbp(:pver) = VBP(c,i,:pver)
+            nn_in%o3vmr(:pver) = o3vmr(c,i,:pver)
+            nn_in%coszrs = coszrs(i,c)
         end select
 
         ! NN inference

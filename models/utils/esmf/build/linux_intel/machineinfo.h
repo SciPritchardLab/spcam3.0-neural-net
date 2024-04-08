@@ -1,6 +1,6 @@
 static char *machineinfo = "    \n\
-Libraries compiled on Mon Apr  1 13:51:12 EDT 2024 on br014.ib.bridges2.psc.edu   \n\
-Machine characteristics: Linux br014.ib.bridges2.psc.edu 4.18.0-477.27.1.el8_8.x86_64 #1 SMP Thu Aug 31 10:29:22 EDT 2023 x86_64 x86_64 x86_64 GNU/Linux   \n\
+Libraries compiled on Mon Apr  8 18:23:37 EDT 2024 on br011.ib.bridges2.psc.edu   \n\
+Machine characteristics: Linux br011.ib.bridges2.psc.edu 4.18.0-477.27.1.el8_8.x86_64 #1 SMP Thu Aug 31 10:29:22 EDT 2023 x86_64 x86_64 x86_64 GNU/Linux   \n\
 -----------------------------------------  \n\
 Using C compiler: mpicc   -O  -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/include -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/build/linux_intel -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/include   -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf/src/Infrastructure/mpiuni                          -D__SDIR__=''   \n\
 C Compiler version:  \n\
@@ -80,6 +80,6 @@ Using include paths: -I/jet/home/jlin96/repositories/spcam3.0-neural-net/models/
 Using ESMF directory: /jet/home/jlin96/repositories/spcam3.0-neural-net/models/utils/esmf  \n\
 Using ESMF arch: linux_intel  \n\
 ------------------------------------------  \n\
-Using C linker: mpicc  -O  -Wl,-rpath,/ocean/projects/atm200007p/jlin96/debug_wiring/ablated/cam_folder/obj/esmf/lib/libO/linux_intel   \n\
-Using Fortran linker: mpiifort -O -Wl,-rpath,/ocean/projects/atm200007p/jlin96/debug_wiring/ablated/cam_folder/obj/esmf/lib/libO/linux_intel   \n\
-Using libraries: -L/ocean/projects/atm200007p/jlin96/debug_wiring/ablated/cam_folder/obj/esmf/lib/libO/linux_intel "; 
+Using C linker: mpicc  -O  -Wl,-rpath,/ocean/projects/atm200007p/jlin96/debug_wiring/ablated_short/cam_folder/obj/esmf/lib/libO/linux_intel   \n\
+Using Fortran linker: mpiifort -O -Wl,-rpath,/ocean/projects/atm200007p/jlin96/debug_wiring/ablated_short/cam_folder/obj/esmf/lib/libO/linux_intel   \n\
+Using libraries: -L/ocean/projects/atm200007p/jlin96/debug_wiring/ablated_short/cam_folder/obj/esmf/lib/libO/linux_intel "; 

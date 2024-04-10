@@ -2059,6 +2059,12 @@ end if ! nncoupled
           case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
             ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
             ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
+          case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+            ptend(c)%s(i,:pver)   = nn_out%tphystnd(:pver)*cpair
+            ptend(c)%q(i,:pver,1) = nn_out%phq(:pver)
         end select
 
       end do ! end column loop

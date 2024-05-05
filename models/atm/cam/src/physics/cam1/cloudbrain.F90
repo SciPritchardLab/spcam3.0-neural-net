@@ -144,13 +144,13 @@ use mod_ensemble, only: ensemble_type
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
         input(1:nlev) = nn_in%tbp(:nlev)
         input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
-        input(2*lev-4) = nn_in%ps
-        input(2*lev-3) = nn_in%solin
-        input(2*lev-2) = nn_in%shf
-        input(2*lev-1) = nn_in%lhf
-        input((2*lev):(2*lev+29)) = nn_in%vbp(:nlev)
-        input((2*lev+30):(2*lev+59)) = nn_in%o3vmr(:nlev)
-        input(2*lev+60) = nn_in%coszrs
+        input(2*nlev-4) = nn_in%ps
+        input(2*nlev-3) = nn_in%solin
+        input(2*nlev-2) = nn_in%shf
+        input(2*nlev-1) = nn_in%lhf
+        input((2*nlev):(2*nlev+29)) = nn_in%vbp(:nlev)
+        input((2*nlev+30):(2*nlev+59)) = nn_in%o3vmr(:nlev)
+        input(2*nlev+60) = nn_in%coszrs
       case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
         input(1:nlev) = nn_in%tbp(:nlev)
         input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)

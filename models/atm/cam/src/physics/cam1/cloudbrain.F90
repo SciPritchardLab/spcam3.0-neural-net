@@ -93,54 +93,97 @@ use mod_ensemble, only: ensemble_type
     select case (to_upper(trim(nn_in_out_vars)))
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
         input(1:nlev) = nn_in%tbp(:nlev)
-        input((nlev+1):2*nlev) = nn_in%qbp(:nlev)
+        input((nlev+1):(2*nlev)) = nn_in%qbp(:nlev)
         input(2*nlev+1) = nn_in%ps 
         input(2*nlev+2) = nn_in%solin
         input(2*nlev+3) = nn_in%shf
         input(2*nlev+4) = nn_in%lhf
       case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_OUT_TPHYSTND_PHQ')
         input(1:nlev)            = nn_in%tbp(:nlev)
-        input((1*nlev+1):2*nlev) = nn_in%qbp(:nlev)
-        input((2*nlev+1):3*nlev) = nn_in%dtdtm1(:nlev)
-        input((3*nlev+1):4*nlev) = nn_in%dqdtm1(:nlev)
+        input((1*nlev+1):(2*nlev)) = nn_in%qbp(:nlev)
+        input((2*nlev+1):(3*nlev)) = nn_in%dtdtm1(:nlev)
+        input((3*nlev+1):(4*nlev)) = nn_in%dqdtm1(:nlev)
         input(4*nlev+1) = nn_in%ps
         input(4*nlev+2) = nn_in%solin
         input(4*nlev+3) = nn_in%shf
         input(4*nlev+4) = nn_in%lhf
       case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         input(1:nlev) = nn_in%tbp(:nlev)
-        input((nlev+1):2*nlev) = nn_in%qbp(:nlev)
+        input((nlev+1):(2*nlev)) = nn_in%qbp(:nlev)
         input(2*nlev+1) = nn_in%ps
         input(2*nlev+2) = nn_in%solin
         input(2*nlev+3) = nn_in%shf
         input(2*nlev+4) = nn_in%lhf
         input((2*nlev+5):(2*nlev+5+nlev-1)) = nn_in%vbp(:nlev)
-        input((2*nlev+5+nlev):2*nlev+5+2*nlev-1) = nn_in%o3vmr(:nlev)
+        input((2*nlev+5+nlev):(2*nlev+5+2*nlev-1)) = nn_in%o3vmr(:nlev)
         input(2*nlev+5+2*nlev) = nn_in%coszrs
       case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ')
         input(1:nlev) = nn_in%tbp(:nlev)
-        input((1*nlev+1):2*nlev) = nn_in%qbp(:nlev)
-        input((2*nlev+1):3*nlev) = nn_in%dtdtm1(:nlev)
-        input((3*nlev+1):4*nlev) = nn_in%dqdtm1(:nlev)
+        input((1*nlev+1):(2*nlev)) = nn_in%qbp(:nlev)
+        input((2*nlev+1):(3*nlev)) = nn_in%dtdtm1(:nlev)
+        input((3*nlev+1):(4*nlev)) = nn_in%dqdtm1(:nlev)
         input(4*nlev+1) = nn_in%ps
         input(4*nlev+2) = nn_in%solin
         input(4*nlev+3) = nn_in%shf
         input(4*nlev+4) = nn_in%lhf
         input((4*nlev+5):(4*nlev+5+nlev-1)) = nn_in%vbp(:nlev)
-        input((4*nlev+5+nlev):4*nlev+5+2*nlev-1) = nn_in%o3vmr(:nlev)
+        input((4*nlev+5+nlev):(4*nlev+5+2*nlev-1)) = nn_in%o3vmr(:nlev)
         input(4*nlev+5+2*nlev) = nn_in%coszrs
       case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
         input(1:nlev) = nn_in%tbp(:nlev)
-        input((nlev+1):2*nlev-5) = nn_in%qbp(6:nlev)
-        input((2*nlev-4):2*nlev+25) = nn_in%dtdtm1(:nlev)
-        input((2*nlev+26):2*nlev+50) = nn_in%dqdtm1(6:nlev)
+        input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
+        input((2*nlev-4):(2*nlev+25)) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):(2*nlev+50)) = nn_in%dqdtm1(6:nlev)
         input(2*nlev+51) = nn_in%ps
         input(2*nlev+52) = nn_in%solin
         input(2*nlev+53) = nn_in%shf
         input(2*nlev+54) = nn_in%lhf
         input((2*nlev+55):(2*nlev+84)) = nn_in%vbp(:nlev)
-        input((2*nlev+85):2*nlev+114) = nn_in%o3vmr(:nlev)
+        input((2*nlev+85):(2*nlev+114)) = nn_in%o3vmr(:nlev)
         input(2*nlev+115) = nn_in%coszrs
+      case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        input(1:nlev) = nn_in%tbp(:nlev)
+        input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
+        input(2*lev-4) = nn_in%ps
+        input(2*lev-3) = nn_in%solin
+        input(2*lev-2) = nn_in%shf
+        input(2*lev-1) = nn_in%lhf
+        input((2*lev):(2*lev+29)) = nn_in%vbp(:nlev)
+        input((2*lev+30):(2*lev+59)) = nn_in%o3vmr(:nlev)
+        input(2*lev+60) = nn_in%coszrs
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        input(1:nlev) = nn_in%tbp(:nlev)
+        input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
+        input((2*nlev-4):(2*nlev+25)) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):(2*nlev+50)) = nn_in%dqdtm1(6:nlev)
+        input(2*nlev+51) = nn_in%ps
+        input(2*nlev+52) = nn_in%solin
+        input(2*nlev+53) = nn_in%shf
+        input(2*nlev+54) = nn_in%lhf
+        input((2*nlev+55):(2*nlev+84)) = nn_in%o3vmr(:nlev)
+        input(2*nlev+85) = nn_in%coszrs
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        input(1:nlev) = nn_in%tbp(:nlev)
+        input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
+        input((2*nlev-4):(2*nlev+25)) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):(2*nlev+50)) = nn_in%dqdtm1(6:nlev)
+        input(2*nlev+51) = nn_in%ps
+        input(2*nlev+52) = nn_in%solin
+        input(2*nlev+53) = nn_in%shf
+        input(2*nlev+54) = nn_in%lhf
+        input((2*nlev+55):(2*nlev+84)) = nn_in%vbp(:nlev)
+        input(2*nlev+85) = nn_in%coszrs
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_OUT_TPHYSTND_PHQ_ABLATED')
+        input(1:nlev) = nn_in%tbp(:nlev)
+        input((nlev+1):(2*nlev-5)) = nn_in%qbp(6:nlev)
+        input((2*nlev-4):(2*nlev+25)) = nn_in%dtdtm1(:nlev)
+        input((2*nlev+26):(2*nlev+50)) = nn_in%dqdtm1(6:nlev)
+        input(2*nlev+51) = nn_in%ps
+        input(2*nlev+52) = nn_in%solin
+        input(2*nlev+53) = nn_in%shf
+        input(2*nlev+54) = nn_in%lhf
+        input((2*nlev+55):(2*nlev+84)) = nn_in%vbp(:nlev)
+        input((2*nlev+85):(2*nlev+114)) = nn_in%o3vmr(:nlev)
     end select
 
 #ifdef BRAINDEBUG
@@ -206,8 +249,39 @@ use mod_ensemble, only: ensemble_type
         nn_out%phq(3) = 0
         nn_out%phq(4) = 0
         nn_out%phq(5) = 0
-        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2     
-    end select
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_PS_SOLIN_SHF_LHF_VBP_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')   
+        nn_out%tphystnd(:nlev) = output(1:nlev)
+        nn_out%phq(1) = 0
+        nn_out%phq(2) = 0
+        nn_out%phq(3) = 0
+        nn_out%phq(4) = 0
+        nn_out%phq(5) = 0
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_O3VMR_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        nn_out%tphystnd(:nlev) = output(1:nlev)
+        nn_out%phq(1) = 0
+        nn_out%phq(2) = 0
+        nn_out%phq(3) = 0
+        nn_out%phq(4) = 0
+        nn_out%phq(5) = 0
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_COSZRS_OUT_TPHYSTND_PHQ_ABLATED')
+        nn_out%tphystnd(:nlev) = output(1:nlev)
+        nn_out%phq(1) = 0
+        nn_out%phq(2) = 0
+        nn_out%phq(3) = 0
+        nn_out%phq(4) = 0
+        nn_out%phq(5) = 0
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2
+      case('IN_TBP_QBP_TPHYSTND_PHQ_PS_SOLIN_SHF_LHF_VBP_O3VMR_OUT_TPHYSTND_PHQ_ABLATED')
+        nn_out%tphystnd(:nlev) = output(1:nlev)
+        nn_out%phq(1) = 0
+        nn_out%phq(2) = 0
+        nn_out%phq(3) = 0
+        nn_out%phq(4) = 0
+        nn_out%phq(5) = 0
+        nn_out%phq(6:nlev) = output((nlev+1):2*nlev-5) ! This is still the wrong unit, needs to be converted to W/m^2
 
   end subroutine neural_net
 

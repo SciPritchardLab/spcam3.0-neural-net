@@ -2316,8 +2316,8 @@ call radheat_net (state(c), ptend(c), qrl(:,:,c), qrs(:,:,c))
       lchnk = state(c)%lchnk
       call outfld('NNTASP',TBP(c,:ncol,:),pcols,lchnk)
       call outfld('NNQASP',QBP(c,:ncol,:),pcols,lchnk)
+      call outfld('NNPSASP',PS(c,:ncol),pcols,lchnk)
       call outfld('NNVASP',VBP(c,:ncol,:),pcols,lchnk)
-
 
 ! check energy integrals
    call check_energy_chng(state(c), tend(c), "radheat", nstep, ztodt, zero, zero, zero, tend(c)%flx_net)
